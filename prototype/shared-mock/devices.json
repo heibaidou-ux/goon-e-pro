@@ -1,0 +1,51 @@
+{
+  "devices": [
+    { "deviceId": "DEV001", "deviceCode": "YL-LOCK-01", "roomId": "RM001", "type": "Lock", "protocol": "Zigbee", "status": "Online", "batteryLevel": 85 },
+    { "deviceId": "DEV002", "deviceCode": "YL-AC-01", "roomId": "RM001", "type": "AC", "protocol": "RS485", "status": "Online", "temperature": 24, "mode": "cool" },
+    { "deviceId": "DEV003", "deviceCode": "YL-LIGHT-01A", "roomId": "RM001", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 80, "colorTemp": 4000 },
+    { "deviceId": "DEV004", "deviceCode": "YL-LIGHT-01B", "roomId": "RM001", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 80, "colorTemp": 4000 },
+    { "deviceId": "DEV005", "deviceCode": "YL-CURTAIN-01", "roomId": "RM001", "type": "Curtain", "protocol": "RS485", "status": "Online", "position": "closed" },
+    { "deviceId": "DEV006", "deviceCode": "YL-SPEAKER-01A", "roomId": "RM001", "type": "Speaker", "protocol": "IP", "status": "Online", "volume": 70, "playing": true, "source": "bgm" },
+    { "deviceId": "DEV007", "deviceCode": "YL-SPEAKER-01B", "roomId": "RM001", "type": "Speaker", "protocol": "IP", "status": "Online", "volume": 70, "playing": true, "source": "bgm" },
+
+    { "deviceId": "DEV008", "deviceCode": "YL-LOCK-02", "roomId": "RM002", "type": "Lock", "protocol": "Zigbee", "status": "Offline", "batteryLevel": 0 },
+    { "deviceId": "DEV009", "deviceCode": "YL-AC-02", "roomId": "RM002", "type": "AC", "protocol": "RS485", "status": "Online", "temperature": 26, "mode": "cool" },
+    { "deviceId": "DEV010", "deviceCode": "YL-LIGHT-02A", "roomId": "RM002", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 60, "colorTemp": 3000 },
+    { "deviceId": "DEV011", "deviceCode": "YL-LIGHT-02B", "roomId": "RM002", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 60, "colorTemp": 3000 },
+    { "deviceId": "DEV012", "deviceCode": "YL-CURTAIN-02", "roomId": "RM002", "type": "Curtain", "protocol": "RS485", "status": "Online", "position": "closed" },
+    { "deviceId": "DEV013", "deviceCode": "YL-SPEAKER-02", "roomId": "RM002", "type": "Speaker", "protocol": "IP", "status": "Online", "volume": 50, "playing": false, "source": "bgm" },
+
+    { "deviceId": "DEV014", "deviceCode": "YL-LOCK-03", "roomId": "RM003", "type": "Lock", "protocol": "Zigbee", "status": "Online", "batteryLevel": 92 },
+    { "deviceId": "DEV015", "deviceCode": "YL-AC-03", "roomId": "RM003", "type": "AC", "protocol": "RS485", "status": "Online", "temperature": 26, "mode": "off" },
+    { "deviceId": "DEV016", "deviceCode": "YL-LIGHT-03A", "roomId": "RM003", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 0, "colorTemp": 3000 },
+    { "deviceId": "DEV017", "deviceCode": "YL-LIGHT-03B", "roomId": "RM003", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 0, "colorTemp": 3000 },
+    { "deviceId": "DEV018", "deviceCode": "YL-CURTAIN-03", "roomId": "RM003", "type": "Curtain", "protocol": "RS485", "status": "Online", "position": "open" },
+    { "deviceId": "DEV019", "deviceCode": "YL-SPEAKER-03", "roomId": "RM003", "type": "Speaker", "protocol": "IP", "status": "Online", "volume": 0, "playing": false, "source": "bgm" },
+
+    { "deviceId": "DEV020", "deviceCode": "YL-LOCK-04", "roomId": "RM004", "type": "Lock", "protocol": "Zigbee", "status": "Online", "batteryLevel": 73 },
+    { "deviceId": "DEV021", "deviceCode": "YL-AC-04", "roomId": "RM004", "type": "AC", "protocol": "RS485", "status": "Online", "temperature": 24, "mode": "cool" },
+    { "deviceId": "DEV022", "deviceCode": "YL-LIGHT-04A", "roomId": "RM004", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 80, "colorTemp": 3000 },
+    { "deviceId": "DEV023", "deviceCode": "YL-LIGHT-04B", "roomId": "RM004", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 80, "colorTemp": 3000 },
+    { "deviceId": "DEV024", "deviceCode": "YL-LIGHT-04C", "roomId": "RM004", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 80, "colorTemp": 3000 },
+    { "deviceId": "DEV025", "deviceCode": "YL-CURTAIN-04", "roomId": "RM004", "type": "Curtain", "protocol": "RS485", "status": "Online", "position": "open" },
+    { "deviceId": "DEV026", "deviceCode": "YL-SPEAKER-04", "roomId": "RM004", "type": "Speaker", "protocol": "IP", "status": "Online", "volume": 70, "playing": true, "source": "bgm" },
+
+    { "deviceId": "DEV027", "deviceCode": "YL-AC-05", "roomId": "RM005", "type": "AC", "protocol": "RS485", "status": "Online", "temperature": 26, "mode": "cool" },
+    { "deviceId": "DEV028", "deviceCode": "YL-LIGHT-05A", "roomId": "RM005", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 90, "colorTemp": 4000 },
+    { "deviceId": "DEV029", "deviceCode": "YL-LIGHT-05B", "roomId": "RM005", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 90, "colorTemp": 4000 },
+    { "deviceId": "DEV030", "deviceCode": "YL-LIGHT-05C", "roomId": "RM005", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 90, "colorTemp": 4000 },
+    { "deviceId": "DEV031", "deviceCode": "YL-LIGHT-05D", "roomId": "RM005", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 90, "colorTemp": 4000 },
+    { "deviceId": "DEV032", "deviceCode": "YL-SPEAKER-05A", "roomId": "RM005", "type": "Speaker", "protocol": "IP", "status": "Online", "volume": 50, "playing": true, "source": "bgm" },
+    { "deviceId": "DEV033", "deviceCode": "YL-SPEAKER-05B", "roomId": "RM005", "type": "Speaker", "protocol": "IP", "status": "Online", "volume": 50, "playing": true, "source": "bgm" },
+
+    { "deviceId": "DEV034", "deviceCode": "YL-LIGHT-06", "roomId": "RM006", "type": "Light", "protocol": "RS485", "status": "Online", "brightness": 50, "colorTemp": 4000 }
+  ],
+  "deviceTypes": {
+    "Lock": { "label": "门锁", "icon": "lock" },
+    "AC": { "label": "空调", "icon": "ac" },
+    "Light": { "label": "灯光", "icon": "light" },
+    "Curtain": { "label": "窗帘", "icon": "curtain" },
+    "Speaker": { "label": "音响", "icon": "speaker" },
+    "Sensor": { "label": "传感器", "icon": "sensor" }
+  }
+}

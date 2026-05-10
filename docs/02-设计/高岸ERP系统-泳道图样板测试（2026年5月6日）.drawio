@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram id="test" name="F01-包间预约纵向泳道">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" page="1" pageWidth="1200" pageHeight="700">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="t" value="F01 包间预约到店消费（纵向泳道图）" style="text;html=1;strokeColor=none;align=center;fontSize=15;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="300" y="10" width="500" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== 表头行（泳道列头） ========== -->
+        <mxCell id="hdr-corner" value="角色 / 阶段" style="rounded=0;whiteSpace=wrap;fillColor=#E2E8F0;strokeColor=#CBD5E1;fontSize=11;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="130" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="hdr-guest" value="客人" style="rounded=0;whiteSpace=wrap;fillColor=#DBEAFE;strokeColor=#3B82F6;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;fontColor=#1E40AF;" vertex="1" parent="1">
+          <mxGeometry x="170" y="50" width="170" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="hdr-sys" value="系统ERP" style="rounded=0;whiteSpace=wrap;fillColor=#D1FAE5;strokeColor=#22C55E;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;fontColor=#166534;" vertex="1" parent="1">
+          <mxGeometry x="340" y="50" width="170" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="hdr-iot" value="IoT平台" style="rounded=0;whiteSpace=wrap;fillColor=#CFFAFE;strokeColor=#06B6D4;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;fontColor=#155E75;" vertex="1" parent="1">
+          <mxGeometry x="510" y="50" width="170" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="hdr-staff" value="店员" style="rounded=0;whiteSpace=wrap;fillColor=#FFEDD5;strokeColor=#F97316;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;fontColor=#9A3412;" vertex="1" parent="1">
+          <mxGeometry x="680" y="50" width="170" height="35" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== 第1行：预约 ========== -->
+        <mxCell id="r1-label" value="预约" style="rounded=0;whiteSpace=wrap;fillColor=#F1F5F9;strokeColor=#CBD5E1;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="90" width="130" height="75" as="geometry"/>
+        </mxCell>
+        <!-- 预约/客人 -->
+        <mxCell id="r1-guest" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="90" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="g1" value="选择门店、包间、时段" style="rounded=1;whiteSpace=wrap;fillColor=#EFF6FF;strokeColor=#60A5FA;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="180" y="100" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <!-- 预约/系统 -->
+        <mxCell id="r1-sys" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="340" y="90" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="s1" value="校验可用性&#xa;生成预约单" style="rounded=1;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#34D399;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="350" y="100" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <!-- 预约/IoT -->
+        <mxCell id="r1-iot" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="510" y="90" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <!-- 预约/店员 -->
+        <mxCell id="r1-staff" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="680" y="90" width="170" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== 第2行：支付 ========== -->
+        <mxCell id="r2-label" value="支付" style="rounded=0;whiteSpace=wrap;fillColor=#F1F5F9;strokeColor=#CBD5E1;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="170" width="130" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2-guest" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="170" y="170" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="g2" value="确认订单&#xa;选择支付方式并支付" style="rounded=1;whiteSpace=wrap;fillColor=#EFF6FF;strokeColor=#60A5FA;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="180" y="180" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2-sys" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="340" y="170" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="s2" value="生成门禁密码&#xa;推送预约成功通知" style="rounded=1;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#34D399;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="350" y="180" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2-iot" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="510" y="170" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2-staff" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="680" y="170" width="170" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== 第3行：消费 ========== -->
+        <mxCell id="r3-label" value="消费" style="rounded=0;whiteSpace=wrap;fillColor=#F1F5F9;strokeColor=#CBD5E1;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="250" width="130" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="r3-guest" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="170" y="250" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="g3" value="到店输入密码开门&#xa;入座使用包间" style="rounded=1;whiteSpace=wrap;fillColor=#EFF6FF;strokeColor=#60A5FA;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="180" y="260" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="r3-sys" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="340" y="250" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="r3-iot" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="510" y="250" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="i1" value="欢迎场景&#xa;开灯→空调→轻音乐" style="rounded=1;whiteSpace=wrap;fillColor=#ECFEFF;strokeColor=#22D3EE;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="520" y="260" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="r3-staff" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="680" y="250" width="170" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== 第4行：退房 ========== -->
+        <mxCell id="r4-label" value="退房" style="rounded=0;whiteSpace=wrap;fillColor=#F1F5F9;strokeColor=#CBD5E1;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="330" width="130" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="r4-guest" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="170" y="330" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="g4" value="退房离店" style="rounded=1;whiteSpace=wrap;fillColor=#EFF6FF;strokeColor=#60A5FA;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="180" y="340" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="r4-sys" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="340" y="330" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="s4" value="更新房态&#xa;改为「待打扫」" style="rounded=1;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#34D399;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="350" y="340" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="r4-iot" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="510" y="330" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="i3" value="节能场景&#xa;关灯→关空调→关音乐" style="rounded=1;whiteSpace=wrap;fillColor=#ECFEFF;strokeColor=#22D3EE;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="520" y="340" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="r4-staff" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="680" y="330" width="170" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== 第5行：保洁 ========== -->
+        <mxCell id="r5-label" value="保洁" style="rounded=0;whiteSpace=wrap;fillColor=#F1F5F9;strokeColor=#CBD5E1;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="410" width="130" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="r5-guest" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="170" y="410" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="r5-sys" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="340" y="410" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="s5" value="自动生成保洁任务&#xa;推送至店员端" style="rounded=1;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#34D399;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="350" y="420" width="150" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="r5-iot" value="" style="rounded=0;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="510" y="410" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="r5-staff" value="" style="rounded=0;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="680" y="410" width="170" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="st1" value="接单→到房间&#xa;完成清洁并标记" style="rounded=1;whiteSpace=wrap;fillColor=#FFF7ED;strokeColor=#FB923C;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="690" y="420" width="150" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== 纵向连线（同列内步骤顺序） ========== -->
+        <!-- 客人: 预约→支付→消费→退房 -->
+        <mxCell id="ag1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#2563EB;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="g1" target="g2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ag2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#2563EB;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="g2" target="g3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ag3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#2563EB;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="g3" target="g4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 系统: 预约→支付→退房→保洁 -->
+        <mxCell id="as1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#16A34A;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="s1" target="s2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="as2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#16A34A;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="s2" target="s4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="as3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#16A34A;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="s4" target="s5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- IoT: 消费→退房 -->
+        <mxCell id="ai1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#0891B2;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="i1" target="i3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== 横向连线（跨泳道交互） ========== -->
+        <!-- 预约: 客人→系统（提交预约） -->
+        <mxCell id="ac1" value="提交" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#64748B;strokeWidth=1;endArrow=classic;fontSize=9;" edge="1" parent="1" source="g1" target="s1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 支付: 客人→系统（支付回调） -->
+        <mxCell id="ac2" value="支付回调" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#64748B;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" parent="1" source="g2" target="s2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 支付: 系统→IoT（预开空调指令） -->
+        <mxCell id="ac3" value="预开指令" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#64748B;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" parent="1" source="s2" target="i1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 消费: 客人→IoT（开门触发） -->
+        <mxCell id="ac4" value="开门触发" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#64748B;strokeWidth=1;endArrow=classic;fontSize=9;" edge="1" parent="1" source="g3" target="i1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 退房: 客人→系统 -->
+        <mxCell id="ac5" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#64748B;strokeWidth=1;endArrow=classic;" edge="1" parent="1" source="g4" target="s4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 保洁: 系统→店员 -->
+        <mxCell id="ac6" value="派单" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;strokeColor=#64748B;strokeWidth=1;endArrow=classic;fontSize=9;" edge="1" parent="1" source="s5" target="st1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

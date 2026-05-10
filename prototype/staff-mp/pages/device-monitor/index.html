@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设备监控 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; min-height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.header { background:#fff; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0f0f0; }
+.header-title { font-size:17px; font-weight:700; }
+.view-toggle { display:flex; gap:6px; }
+.toggle-btn { padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer; border:none; background:#f5f5f5; color:#999; }
+.toggle-btn.active { background:#0052d9; color:#fff; }
+.page { flex:1; overflow-y:auto; padding:12px 16px; padding-bottom:60px; }
+.alert-bar { background:#ffebee; border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+.alert-bar-text { font-size:13px; color:#d54941; font-weight:500; }
+.alert-bar-arrow { color:#d54941; }
+.room-group { background:#fff; border-radius:14px; padding:14px; margin-bottom:12px; }
+.room-group-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer; user-select:none; }
+.room-group-header .collapse-icon { font-size:14px; transition:transform .2s; display:inline-block; }
+.room-group-header .collapse-icon.open { transform:rotate(90deg); }
+.room-group-name { font-size:15px; font-weight:600; }
+.room-group-summary { font-size:12px; }
+.room-group-summary.allgood { color:#00a870; }
+.room-group-summary.warn { color:#d54941; }
+.room-devices { transition:max-height .3s ease; overflow:hidden; }
+.room-devices.collapsed { max-height:0; }
+.room-devices.expanded { max-height:800px; }
+.sort-info { font-size:11px; color:#999; margin-bottom:10px; text-align:center; }
+.device-row { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #f5f5f5; cursor:pointer; transition:background .15s; }
+.device-row:last-child { border-bottom:none; }
+.device-row:hover { background:#fafafa; }
+.device-dot { width:10px; height:10px; border-radius:50%; margin-right:12px; flex-shrink:0; }
+.device-dot.online { background:#00a870; }
+.device-dot.offline { background:#d54941; }
+.device-dot.fault { background:#e37318; }
+.device-type-icon { font-size:18px; margin-right:10px; width:28px; text-align:center; }
+.device-info { flex:1; }
+.device-code { font-size:13px; font-weight:500; }
+.device-state { font-size:11px; color:#999; }
+.device-arrow { color:#ccc; font-size:14px; }
+.type-sections { display:none; }
+.type-sections.active { display:block; }
+.type-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+.type-card-left { display:flex; align-items:center; gap:10px; }
+.type-card-icon { font-size:24px; }
+.type-card-info { display:flex; flex-direction:column; }
+.type-card-name { font-size:14px; font-weight:600; }
+.type-card-stats { font-size:11px; color:#999; }
+.type-card-badge { padding:4px 10px; border-radius:10px; font-size:11px; font-weight:600; }
+.type-card-badge.good { background:#e8f5e9; color:#00a870; }
+.type-card-badge.warn { background:#ffebee; color:#d54941; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item.active { color:#0052d9; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="header">
+    <span class="header-title">设备监控</span>
+    <div class="view-toggle">
+      <button class="toggle-btn active" onclick="switchView('room',this)">按包间</button>
+      <button class="toggle-btn" onclick="switchView('type',this)">按类型</button>
+    </div>
+  </div>
+  <div class="page">
+    <div class="alert-bar" onclick="location.href='../device-control/index.html?deviceId=DEV008&type=Lock&roomId=RM002&roomName=%E4%B8%AD%E8%8C%B6%E5%AE%A4A'">
+      <span class="alert-bar-text">🔴 1台设备离线 · 1台故障</span>
+      <span class="alert-bar-arrow">查看 ›</span>
+    </div>
+    <div id="roomView"></div>
+    <div id="typeView" class="type-sections"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../room-status/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">房态</div></div>
+    <div class="nav-item active"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../scene-control/index.html'"><div class="nav-icon">🎬</div><div class="nav-label">场景</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const rooms = [
+  { roomId:"RM001", name:"大会议室" }, { roomId:"RM002", name:"中茶室A" }, { roomId:"RM003", name:"中茶室B" },
+  { roomId:"RM004", name:"大茶室C" }, { roomId:"RM005", name:"展厅" }, { roomId:"RM006", name:"工作间" },
+];
+
+const devices = [
+  { deviceId:"DEV001", deviceCode:"YL-LOCK-01", roomId:"RM001", type:"Lock", status:"Online", info:"电量 85%", typeIcon:"🔒", typeLabel:"门锁" },
+  { deviceId:"DEV002", deviceCode:"YL-AC-01", roomId:"RM001", type:"AC", status:"Online", info:"24°C · 制冷", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV003", deviceCode:"YL-LIGHT-01A", roomId:"RM001", type:"Light", status:"Online", info:"亮度 80% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV004", deviceCode:"YL-LIGHT-01B", roomId:"RM001", type:"Light", status:"Online", info:"亮度 80% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV005", deviceCode:"YL-CURTAIN-01", roomId:"RM001", type:"Curtain", status:"Online", info:"关闭", typeIcon:"🪟", typeLabel:"窗帘" },
+  { deviceId:"DEV006", deviceCode:"YL-SPEAKER-01A", roomId:"RM001", type:"Speaker", status:"Online", info:"音量 70% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV007", deviceCode:"YL-SPEAKER-01B", roomId:"RM001", type:"Speaker", status:"Online", info:"音量 70% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV008", deviceCode:"YL-LOCK-02", roomId:"RM002", type:"Lock", status:"Offline", info:"电量 0% · 离线", typeIcon:"🔒", typeLabel:"门锁" },
+  { deviceId:"DEV009", deviceCode:"YL-AC-02", roomId:"RM002", type:"AC", status:"Online", info:"26°C · 制冷", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV010", deviceCode:"YL-LIGHT-02A", roomId:"RM002", type:"Light", status:"Online", info:"亮度 60% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV011", deviceCode:"YL-LIGHT-02B", roomId:"RM002", type:"Light", status:"Online", info:"亮度 60% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV012", deviceCode:"YL-CURTAIN-02", roomId:"RM002", type:"Curtain", status:"Online", info:"关闭", typeIcon:"🪟", typeLabel:"窗帘" },
+  { deviceId:"DEV013", deviceCode:"YL-SPEAKER-02", roomId:"RM002", type:"Speaker", status:"Online", info:"音量 50% · 已停止", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV014", deviceCode:"YL-LOCK-03", roomId:"RM003", type:"Lock", status:"Online", info:"电量 92%", typeIcon:"🔒", typeLabel:"门锁" },
+  { deviceId:"DEV015", deviceCode:"YL-AC-03", roomId:"RM003", type:"AC", status:"Online", info:"26°C · 关闭", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV016", deviceCode:"YL-LIGHT-03A", roomId:"RM003", type:"Light", status:"Fault", info:"面板无响应", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV017", deviceCode:"YL-LIGHT-03B", roomId:"RM003", type:"Light", status:"Online", info:"亮度 0% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV018", deviceCode:"YL-CURTAIN-03", roomId:"RM003", type:"Curtain", status:"Online", info:"打开", typeIcon:"🪟", typeLabel:"窗帘" },
+  { deviceId:"DEV019", deviceCode:"YL-SPEAKER-03", roomId:"RM003", type:"Speaker", status:"Online", info:"音量 0% · 已停止", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV020", deviceCode:"YL-LOCK-04", roomId:"RM004", type:"Lock", status:"Online", info:"电量 73%", typeIcon:"🔒", typeLabel:"门锁" },
+  { deviceId:"DEV021", deviceCode:"YL-AC-04", roomId:"RM004", type:"AC", status:"Online", info:"24°C · 制冷", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV022", deviceCode:"YL-LIGHT-04A", roomId:"RM004", type:"Light", status:"Online", info:"亮度 80% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV023", deviceCode:"YL-LIGHT-04B", roomId:"RM004", type:"Light", status:"Online", info:"亮度 80% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV024", deviceCode:"YL-LIGHT-04C", roomId:"RM004", type:"Light", status:"Online", info:"亮度 80% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV025", deviceCode:"YL-CURTAIN-04", roomId:"RM004", type:"Curtain", status:"Online", info:"打开", typeIcon:"🪟", typeLabel:"窗帘" },
+  { deviceId:"DEV026", deviceCode:"YL-SPEAKER-04", roomId:"RM004", type:"Speaker", status:"Online", info:"音量 70% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV027", deviceCode:"YL-AC-05", roomId:"RM005", type:"AC", status:"Online", info:"26°C · 制冷", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV028", deviceCode:"YL-LIGHT-05A", roomId:"RM005", type:"Light", status:"Online", info:"亮度 90% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV029", deviceCode:"YL-LIGHT-05B", roomId:"RM005", type:"Light", status:"Online", info:"亮度 90% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV030", deviceCode:"YL-LIGHT-05C", roomId:"RM005", type:"Light", status:"Online", info:"亮度 90% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV031", deviceCode:"YL-LIGHT-05D", roomId:"RM005", type:"Light", status:"Online", info:"亮度 90% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV032", deviceCode:"YL-SPEAKER-05A", roomId:"RM005", type:"Speaker", status:"Online", info:"音量 50% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV033", deviceCode:"YL-SPEAKER-05B", roomId:"RM005", type:"Speaker", status:"Online", info:"音量 50% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV034", deviceCode:"YL-LIGHT-06", roomId:"RM006", type:"Light", status:"Online", info:"亮度 50% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+];
+
+function renderRoomView() {
+  // Sort rooms: faulty/offline rooms first
+  var sortedRooms = rooms.slice().sort(function(a, b) {
+    var aBad = devices.filter(function(d) { return d.roomId === a.roomId && d.status !== 'Online'; }).length;
+    var bBad = devices.filter(function(d) { return d.roomId === b.roomId && d.status !== 'Online'; }).length;
+    return bBad - aBad;
+  });
+  var hasIssues = devices.some(function(d) { return d.status !== 'Online'; });
+  var statusLabel = { Online:'在线', Offline:'离线', Fault:'故障' };
+
+  var html = hasIssues ? '<div class="sort-info">⚠ 有异常的包间已置顶显示，点击展开查看详情</div>' : '<div class="sort-info">🟢 所有设备运行正常</div>';
+
+  html += sortedRooms.map(function(room) {
+    var roomDevices = devices.filter(function(d) { return d.roomId === room.roomId; });
+    var offlineCount = roomDevices.filter(function(d) { return d.status !== 'Online'; }).length;
+    var allGood = offlineCount === 0;
+
+    return '<div class="room-group">' +
+      '<div class="room-group-header" onclick="toggleRoom(this)">' +
+        '<span class="collapse-icon' + (allGood ? '' : ' open') + '">▶</span> ' +
+        '<span class="room-group-name">' + room.name + '</span>' +
+        '<span class="room-group-summary ' + (allGood ? 'allgood' : 'warn') + '">' + (allGood ? '🟢 全部在线' : '⚠ ' + offlineCount + '台异常') + ' · ' + roomDevices.length + '台</span>' +
+      '</div>' +
+      '<div class="room-devices' + (allGood ? ' collapsed' : ' expanded') + '">' +
+        roomDevices.map(function(d) {
+          return '<div class="device-row" onclick="location.href=\'../device-control/index.html?deviceId=' + d.deviceId + '&type=' + d.type + '&roomId=' + room.roomId + '&roomName=' + encodeURIComponent(room.name) + '\'">' +
+            '<div class="device-dot ' + d.status.toLowerCase() + '"></div>' +
+            '<span class="device-type-icon">' + d.typeIcon + '</span>' +
+            '<div class="device-info">' +
+              '<div class="device-code">' + d.typeLabel + '</div>' +
+              '<div class="device-state">' + d.deviceCode + ' · ' + d.info + ' · ' + statusLabel[d.status] + '</div>' +
+            '</div>' +
+            '<span class="device-arrow">›</span>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('roomView').innerHTML = html;
+}
+
+function toggleRoom(el) {
+  var icon = el.querySelector('.collapse-icon');
+  var devicesDiv = el.parentElement.querySelector('.room-devices');
+  if (devicesDiv.classList.contains('collapsed')) {
+    devicesDiv.classList.remove('collapsed');
+    devicesDiv.classList.add('expanded');
+    icon.classList.add('open');
+  } else {
+    devicesDiv.classList.remove('expanded');
+    devicesDiv.classList.add('collapsed');
+    icon.classList.remove('open');
+  }
+}
+
+function renderTypeView() {
+  const types = ['Lock','AC','Light','Curtain','Speaker'];
+  const typeLabels = { Lock:'门锁', AC:'空调', Light:'灯光', Curtain:'窗帘', Speaker:'音响' };
+  const typeIcons = { Lock:'🔒', AC:'❄️', Light:'💡', Curtain:'🪟', Speaker:'🔊' };
+
+  document.getElementById('typeView').innerHTML = types.map(type => {
+    const typeDevices = devices.filter(d => d.type === type);
+    const online = typeDevices.filter(d => d.status === 'Online').length;
+    const offline = typeDevices.filter(d => d.status !== 'Online').length;
+    return `<div class="type-card" onclick="filterByType('${type}')">
+      <div class="type-card-left">
+        <span class="type-card-icon">${typeIcons[type]}</span>
+        <div class="type-card-info">
+          <span class="type-card-name">${typeLabels[type]}</span>
+          <span class="type-card-stats">共${typeDevices.length}台 · 在线${online}台 · 异常${offline}台</span>
+        </div>
+      </div>
+      <span class="type-card-badge ${offline===0?'good':'warn'}">${offline===0?'✓ 全部正常':'⚠ '+offline+'台异常'}</span>
+    </div>`;
+  }).join('');
+}
+
+function filterByType(type) {
+  var sortedRooms = rooms.slice().sort(function(a, b) {
+    var aBad = devices.filter(function(d) { return d.roomId === a.roomId && d.type === type && d.status !== 'Online'; }).length;
+    var bBad = devices.filter(function(d) { return d.roomId === b.roomId && d.type === type && d.status !== 'Online'; }).length;
+    return bBad - aBad;
+  });
+  var statusLabel = { Online:'在线', Offline:'离线', Fault:'故障' };
+
+  document.getElementById('roomView').innerHTML = sortedRooms.map(room => {
+    const roomDevices = devices.filter(d => d.roomId === room.roomId && d.type === type);
+    if (!roomDevices.length) return '';
+    const offlineCount = roomDevices.filter(d => d.status !== 'Online').length;
+    const allGood = offlineCount === 0;
+
+    return '<div class="room-group">' +
+      '<div class="room-group-header" onclick="toggleRoom(this)">' +
+        '<span class="collapse-icon' + (allGood ? '' : ' open') + '">▶</span> ' +
+        '<span class="room-group-name">' + room.name + '</span>' +
+        '<span class="room-group-summary ' + (offlineCount ? 'warn' : 'allgood') + '">' + (offlineCount ? '⚠ ' + offlineCount + '台异常' : '🟢 正常') + ' · ' + roomDevices.length + '台</span>' +
+      '</div>' +
+      '<div class="room-devices' + (allGood ? ' collapsed' : ' expanded') + '">' +
+        roomDevices.map(d => `
+        <div class="device-row" onclick="location.href='../device-control/index.html?deviceId=${d.deviceId}&type=${d.type}&roomId=${room.roomId}&roomName=${encodeURIComponent(room.name)}'">
+          <div class="device-dot ${d.status.toLowerCase()}"></div><span class="device-type-icon">${d.typeIcon}</span>
+          <div class="device-info"><div class="device-code">${d.typeLabel}</div><div class="device-state">${d.deviceCode} · ${d.info} · ${statusLabel[d.status]}</div></div><span class="device-arrow">›</span>
+        </div>`).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('roomView').style.display = 'block';
+  document.getElementById('typeView').className = 'type-sections';
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.toggle-btn:first-child').classList.add('active');
+}
+
+let currentView = 'room';
+function switchView(view, el) {
+  currentView = view;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('roomView').style.display = view === 'room' ? 'block' : 'none';
+  document.getElementById('typeView').className = 'type-sections' + (view === 'type' ? ' active' : '');
+  if (view === 'room') renderRoomView();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2000);
+}
+
+renderRoomView();
+renderTypeView();
+</script>
+</body>
+</html>

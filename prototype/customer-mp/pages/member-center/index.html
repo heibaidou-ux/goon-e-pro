@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>会员中心 - 高岸茶室</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; min-height:812px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:absolute; top:10px; right:10px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.page { flex:1; height:0; overflow-y:auto; padding-bottom:80px; }
+
+/* Member page */
+.member-card { background:linear-gradient(135deg,#0052d9,#366ef4); border-radius:16px; padding:24px; color:#fff; margin:16px; }
+.member-avatar { width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 12px; }
+.member-name { text-align:center; font-size:18px; font-weight:700; margin-bottom:4px; }
+.member-level { text-align:center; display:inline-block; padding:4px 16px; border-radius:12px; background:rgba(255,255,255,.2); font-size:12px; }
+.member-balance { text-align:center; margin-top:16px; }
+.balance-label { font-size:12px; opacity:.8; }
+.balance-amount { font-size:36px; font-weight:800; margin-top:4px; }
+.member-stats { display:flex; gap:12px; margin-top:16px; }
+.stat-item { flex:1; text-align:center; background:rgba(255,255,255,.15); border-radius:10px; padding:10px; }
+.stat-num { font-size:18px; font-weight:700; }
+.stat-label { font-size:10px; opacity:.8; margin-top:2px; }
+
+.benefits-card { background:#fff; border-radius:14px; padding:16px; margin:0 16px 16px; }
+.benefits-title { font-size:15px; font-weight:600; color:#333; margin-bottom:12px; }
+.benefit-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f5f5f5; font-size:13px; color:#666; }
+.benefit-row:last-child { border-bottom:none; }
+.benefit-icon { font-size:20px; width:28px; text-align:center; }
+
+.actions-card { background:#fff; border-radius:14px; padding:16px; margin:0 16px 16px; }
+.action-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f5f5f5; cursor:pointer; font-size:14px; color:#333; }
+.action-row:last-child { border-bottom:none; }
+.action-row .arrow { color:#ccc; }
+.logout-wrap { padding:0 16px; }
+.logout-btn { width:100%; padding:14px; border-radius:12px; background:#fff; color:#d54941; border:1.5px solid #d54941; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
+
+/* Bottom nav */
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item.active { color:#07c160; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:300px;text-align:center; }
+.modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
+.modal p { font-size:13px;color:#666;margin-bottom:16px; }
+.modal-buttons { display:flex;gap:10px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#07c160;color:#fff; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="page">
+    <div class="member-card">
+      <div class="member-avatar">👤</div>
+      <div style="text-align:center;">
+        <div class="member-name" id="memberName">张先生</div>
+        <div class="member-level" id="memberLevel">金牌会员</div>
+      </div>
+      <div class="member-balance">
+        <div class="balance-label">账户余额</div>
+        <div class="balance-amount" id="balanceAmount">¥280</div>
+      </div>
+      <div class="member-stats">
+        <div class="stat-item"><div class="stat-num" id="statOrders">12</div><div class="stat-label">预订次数</div></div>
+        <div class="stat-item"><div class="stat-num" id="statSpent">¥3,680</div><div class="stat-label">累计消费</div></div>
+        <div class="stat-item"><div class="stat-num" id="statPoints">850</div><div class="stat-label">会员积分</div></div>
+      </div>
+    </div>
+
+    <div class="benefits-card">
+      <div class="benefits-title">🏅 金牌会员权益</div>
+      <div class="benefit-row"><span class="benefit-icon">💰</span><span>包间消费享 9 折优惠</span></div>
+      <div class="benefit-row"><span class="benefit-icon">🎂</span><span>生日当月免费赠送茶点一份</span></div>
+      <div class="benefit-row"><span class="benefit-icon">🎫</span><span>每月获赠 2 张满减优惠券</span></div>
+      <div class="benefit-row"><span class="benefit-icon">⭐</span><span>消费 1 元累计 1 积分，积分可兑换商品</span></div>
+      <div class="benefit-row"><span class="benefit-icon">📅</span><span>优先预约权 · 可提前 7 天预约</span></div>
+    </div>
+
+    <div class="actions-card">
+      <div class="action-row" onclick="showTopup()"><span>💳 余额充值</span><span style="font-size:13px;color:#07c160;">余额 ¥<span id="memberBalance">280</span></span><span class="arrow">›</span></div>
+      <div class="action-row" onclick="showToast('优惠券功能开发中')"><span>🎫 我的优惠券</span><span class="arrow">›</span></div>
+      <div class="action-row" onclick="showToast('积分商城开发中')"><span>🎁 积分商城</span><span class="arrow">›</span></div>
+      <div class="action-row" onclick="showToast('发票功能开发中')"><span>🧾 开票记录</span><span class="arrow">›</span></div>
+      <div class="action-row" onclick="showToast('设置功能开发中')"><span>⚙ 账户设置</span><span class="arrow">›</span></div>
+    </div>
+
+    <div class="logout-wrap"><button class="logout-btn" onclick="handleLogout()">退出登录</button></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../home/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
+    <div class="nav-item" onclick="location.href='../room-detail/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
+    <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item active"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="topupModal">
+  <div class="modal">
+    <h3>💳 余额充值</h3>
+    <p>选择充值金额</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:8px 0;" id="topupAmounts">
+      <button class="modal-btn" style="background:#f5f5f5;color:#333;border:2px solid transparent;" onclick="selectTopupAmount(100,this)">¥100</button>
+      <button class="modal-btn" style="background:#f5f5f5;color:#333;border:2px solid transparent;" onclick="selectTopupAmount(200,this)">¥200</button>
+      <button class="modal-btn" style="background:#f5f5f5;color:#333;border:2px solid transparent;" onclick="selectTopupAmount(500,this)">¥500</button>
+      <button class="modal-btn" style="background:#f5f5f5;color:#333;border:2px solid transparent;" onclick="selectTopupAmount(1000,this)">¥1000</button>
+    </div>
+    <div style="margin:8px 0;">
+      <input type="number" id="customAmount" placeholder="自定义金额（输入后点击确认）" style="width:100%;padding:10px 12px;border:1.5px solid #e5e5e5;border-radius:8px;font-size:14px;text-align:center;" onfocus="selectCustomAmount()" oninput="updateCustomAmount()">
+    </div>
+    <p style="font-size:12px;color:#999;">选择支付方式</p>
+    <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;" id="topupPayments">
+      <button class="modal-btn" style="background:#f5f5f5;color:#333;width:100%;border:2px solid transparent;text-align:left;padding-left:16px;" onclick="selectTopupPay('wechat',this)">💚 微信支付</button>
+      <button class="modal-btn" style="background:#f5f5f5;color:#333;width:100%;border:2px solid transparent;text-align:left;padding-left:16px;" onclick="selectTopupPay('alipay',this)">💙 支付宝</button>
+      <button class="modal-btn" style="background:#f5f5f5;color:#333;width:100%;border:2px solid transparent;text-align:left;padding-left:16px;" onclick="selectTopupPay('meituan',this)">🟡 美团</button>
+    </div>
+    <div style="font-size:14px;color:#333;margin:8px 0;"><span>充值金额: </span><span style="font-weight:700;color:#e37318;" id="topupTotal">¥0</span></div>
+    <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideTopup()">取消</button><button class="modal-btn confirm" onclick="confirmTopup()">确认充值</button></div>
+  </div>
+</div>
+<script>
+// Update balance display from localStorage
+function updateBalanceDisplay() {
+  const bal = localStorage.getItem('mp_balance') || '280';
+  const el1 = document.getElementById('memberBalance');
+  if (el1) el1.textContent = bal;
+  const el2 = document.getElementById('balanceAmount');
+  if (el2) el2.textContent = '¥' + bal;
+}
+
+// Top-up
+let topupAmount = 0, topupPayMethod = '';
+
+function showTopup() {
+  topupAmount = 0; topupPayMethod = '';
+  document.getElementById('topupTotal').textContent = '¥0';
+  document.querySelectorAll('#topupAmounts button').forEach(function(b) { b.style.borderColor = 'transparent'; b.style.background = '#f5f5f5'; b.style.color = '#333'; });
+  document.querySelectorAll('#topupPayments button').forEach(function(b) { b.style.borderColor = 'transparent'; b.style.background = '#f5f5f5'; b.style.color = '#333'; });
+  document.getElementById('topupModal').style.display = 'flex';
+}
+
+function selectTopupAmount(amount, el) {
+  topupAmount = amount;
+  document.querySelectorAll('#topupAmounts button').forEach(function(b) { b.style.borderColor = 'transparent'; b.style.background = '#f5f5f5'; b.style.color = '#333'; });
+  el.style.borderColor = '#07c160'; el.style.background = '#f0fdf4'; el.style.color = '#07c160';
+  document.getElementById('topupTotal').textContent = '¥' + amount;
+}
+
+function selectCustomAmount() {
+  topupAmount = 0;
+  document.querySelectorAll('#topupAmounts button').forEach(function(b) { b.style.borderColor = 'transparent'; b.style.background = '#f5f5f5'; b.style.color = '#333'; });
+}
+
+function updateCustomAmount() {
+  const v = parseInt(document.getElementById('customAmount').value) || 0;
+  topupAmount = v;
+  document.getElementById('topupTotal').textContent = '¥' + v;
+}
+
+function selectTopupPay(method, el) {
+  topupPayMethod = method;
+  document.querySelectorAll('#topupPayments button').forEach(function(b) { b.style.borderColor = 'transparent'; b.style.background = '#f5f5f5'; b.style.color = '#333'; });
+  el.style.borderColor = '#07c160'; el.style.background = '#f0fdf4'; el.style.color = '#07c160';
+}
+
+function confirmTopup() {
+  if (!topupAmount) { showToast('请选择充值金额'); return; }
+  if (!topupPayMethod) { showToast('请选择支付方式'); return; }
+  const balance = parseInt(localStorage.getItem('mp_balance') || '280');
+  localStorage.setItem('mp_balance', String(balance + topupAmount));
+  updateBalanceDisplay();
+  hideTopup();
+  const payLabels = { wechat:'微信支付', alipay:'支付宝', meituan:'美团' };
+  showToast('充值成功！¥' + topupAmount + ' 已通过' + payLabels[topupPayMethod] + '到账');
+}
+
+function hideTopup() { document.getElementById('topupModal').style.display = 'none'; }
+
+function handleLogout() {
+  localStorage.removeItem('mp_logged_in');
+  localStorage.removeItem('mp_user');
+  showToast('已退出登录');
+  setTimeout(function() { location.href = '../home/index.html'; }, 800);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(function() { t.style.display = 'none'; }, 2000);
+}
+
+// Auto-open topup if requested via URL param
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('action') === 'topup') {
+    setTimeout(function() { showTopup(); }, 300);
+  }
+})();
+
+updateBalanceDisplay();
+</script>
+</body>
+</html>

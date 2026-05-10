@@ -1,0 +1,50 @@
+{
+  "employees": [
+    {
+      "employeeId": "EMP001",
+      "name": "小林",
+      "role": "store_manager",
+      "roleLabel": "店长",
+      "phone": "133****0001",
+      "avatar": "/images/avatar-staff-01.png",
+      "status": "OnDuty",
+      "shift": "09:00-18:00"
+    },
+    {
+      "employeeId": "EMP002",
+      "name": "小陈",
+      "role": "waiter",
+      "roleLabel": "服务员",
+      "phone": "133****0002",
+      "avatar": "/images/avatar-staff-02.png",
+      "status": "OnDuty",
+      "shift": "14:00-22:00"
+    },
+    {
+      "employeeId": "EMP003",
+      "name": "阿强",
+      "role": "technician",
+      "roleLabel": "技术员",
+      "phone": "133****0003",
+      "avatar": "/images/avatar-staff-03.png",
+      "status": "OnDuty",
+      "shift": "09:00-18:00"
+    },
+    {
+      "employeeId": "EMP004",
+      "name": "小芳",
+      "role": "cleaner",
+      "roleLabel": "保洁员",
+      "phone": "133****0004",
+      "avatar": "/images/avatar-staff-04.png",
+      "status": "OnDuty",
+      "shift": "08:00-16:00"
+    }
+  ],
+  "roles": {
+    "store_manager": { "label": "店长", "permissions": ["all"] },
+    "waiter": { "label": "服务员", "permissions": ["room_status", "booking", "customer_service"] },
+    "technician": { "label": "技术员", "permissions": ["device_control", "device_monitor", "scene_config"] },
+    "cleaner": { "label": "保洁员", "permissions": ["cleaning_task", "room_status"] }
+  }
+}

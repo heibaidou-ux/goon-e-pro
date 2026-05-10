@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技术运维中心</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
+.phone { width:375px; min-height:812px; background:#f8f9fc; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.header-bar { background:linear-gradient(135deg,#0d47a1,#1565c0); padding:20px 16px 16px; color:#fff; }
+.header-bar .greeting { font-size:14px; opacity:.8; }
+.header-bar .title { font-size:22px; font-weight:700; margin-top:4px; }
+.stats-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:16px; }
+.stat-card { background:#fff; border-radius:12px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.stat-card .stat-label { font-size:12px; color:#999; }
+.stat-card .stat-value { font-size:22px; font-weight:700; margin-top:4px; }
+.stat-card .stat-sub { font-size:11px; color:#aaa; margin-top:2px; }
+.stat-card.green .stat-value { color:#07c160; }
+.stat-card.orange .stat-value { color:#e37318; }
+.stat-card.blue .stat-value { color:#0052d9; }
+.stat-card.red .stat-value { color:#d54941; }
+.section { padding:0 16px; margin-bottom:16px; }
+.section-title { font-size:15px; font-weight:600; color:#1a1a1a; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.section-more { font-size:12px; color:#0052d9; cursor:pointer; }
+.device-group { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.04); margin-bottom:8px; }
+.device-group .dg-header { padding:10px 14px; font-size:13px; font-weight:600; background:#f8f9fc; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; }
+.device-item { display:flex; align-items:center; padding:10px 14px; border-bottom:1px solid #f5f5f5; }
+.device-item:last-child { border-bottom:none; }
+.device-item .di-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-right:10px; }
+.device-item .di-dot.online { background:#07c160; }
+.device-item .di-dot.offline { background:#d54941; }
+.device-item .di-body { flex:1; }
+.device-item .di-body .di-name { font-size:13px; font-weight:500; }
+.device-item .di-body .di-meta { font-size:11px; color:#999; margin-top:2px; }
+.device-item .di-status { font-size:11px; }
+.di-status.online { color:#07c160; }
+.di-status.offline { color:#d54941; }
+.alert-item { display:flex; align-items:center; padding:10px 14px; background:#fff; border-radius:10px; margin-bottom:6px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.alert-item .al-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.alert-item .al-body { flex:1; margin:0 10px; }
+.alert-item .al-body .al-title { font-size:13px; font-weight:500; }
+.alert-item .al-body .al-time { font-size:11px; color:#999; margin-top:2px; }
+.alert-item .al-tag { font-size:10px; padding:2px 8px; border-radius:8px; }
+.al-critical { background:#fef0ef; color:#d54941; }
+.al-warning { background:#fff3e0; color:#e37318; }
+.scene-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.scene-btn { padding:16px; border-radius:12px; text-align:center; border:none; cursor:pointer; font-size:14px; font-weight:600; transition:transform .15s; }
+.scene-btn:active { transform:scale(.96); }
+.scene-btn .sc-icon { font-size:24px; }
+.scene-btn .sc-label { margin-top:4px; font-size:12px; font-weight:500; }
+.scene-btn.scene-active { background:#e8f5e9; color:#2e7d32; border:2px solid #07c160; }
+.scene-btn.scene-inactive { background:#f5f5f5; color:#999; border:2px solid #e0e0e0; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; text-decoration:none; color:#999; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
+.kpi-row { display:flex; gap:8px; padding:0 16px 12px; }
+.kpi-card { flex:1; background:rgba(255,255,255,.15); border-radius:8px; padding:10px; text-align:center; }
+.kpi-card .kpi-val { font-size:16px; font-weight:700; }
+.kpi-card .kpi-label { font-size:10px; opacity:.7; margin-top:2px; }
+.toggle-btn { padding:4px 12px; border-radius:12px; border:none; font-size:11px; cursor:pointer; }
+.toggle-on { background:#e8f5e9; color:#2e7d32; }
+.toggle-off { background:#f5f5f5; color:#999; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../customer-mp/index.html">← 返回</a></div>
+<div class="phone">
+  <div class="page">
+    <div class="header-bar">
+      <div class="greeting">👋 阿强，上午好</div>
+      <div class="title">技术运维中心</div>
+      <div class="kpi-row" id="kpiRow"></div>
+    </div>
+
+    <div class="stats-row" id="statsRow"></div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>🔧 设备状态</span>
+      </div>
+      <div id="deviceList"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>⚠️ 告警信息</span>
+        <span class="section-more" onclick="showToast('查看全部告警')">更多 →</span>
+      </div>
+      <div id="alertList"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>🎛️ 快捷场景</span>
+      </div>
+      <div class="scene-grid" id="sceneGrid"></div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><div class="nav-icon">🔧</div><div class="nav-label">运维</div></div>
+    <div class="nav-item" onclick="showToast('报修记录')"><div class="nav-icon">📋</div><div class="nav-label">报修</div></div>
+    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+
+<script>
+// ── Data ──
+const totalDevices = 26;
+const onlineDevices = 24;
+const offlineDevices = 2;
+
+const rooms = [
+  { name:'大会议室', devices:[
+    { name:'门锁', status:'online', meta:'YL-LOCK-01 · 电量85%' },
+    { name:'空调', status:'online', meta:'24°C · 制冷模式' },
+    { name:'灯光A', status:'online', meta:'亮度80% · 色温4000K' },
+    { name:'灯光B', status:'online', meta:'亮度80% · 色温4000K' },
+    { name:'窗帘', status:'online', meta:'已关闭' },
+    { name:'音箱A', status:'online', meta:'音量70 · 背景音乐' },
+    { name:'音箱B', status:'online', meta:'音量70 · 背景音乐' },
+  ]},
+  { name:'中茶室A', devices:[
+    { name:'门锁', status:'offline', meta:'YL-LOCK-02 · 电量0%' },
+    { name:'空调', status:'online', meta:'26°C · 制冷模式' },
+    { name:'灯光A', status:'online', meta:'亮度60% · 色温3000K' },
+    { name:'灯光B', status:'online', meta:'亮度60% · 色温3000K' },
+    { name:'窗帘', status:'online', meta:'已关闭' },
+    { name:'音箱', status:'online', meta:'待机' },
+  ]},
+  { name:'中茶室B', devices:[
+    { name:'门锁', status:'online', meta:'YL-LOCK-03 · 电量92%' },
+    { name:'空调', status:'online', meta:'26°C · 已关闭' },
+    { name:'灯光A', status:'online', meta:'已关闭' },
+    { name:'灯光B', status:'online', meta:'已关闭' },
+    { name:'窗帘', status:'online', meta:'已开启' },
+    { name:'音箱', status:'online', meta:'待机' },
+  ]},
+  { name:'大茶室C', devices:[
+    { name:'门锁', status:'online', meta:'YL-LOCK-04 · 电量73%' },
+    { name:'空调', status:'online', meta:'24°C · 制冷模式' },
+    { name:'灯光A', status:'online', meta:'亮度80% · 色温3000K' },
+    { name:'灯光B', status:'online', meta:'亮度80% · 色温3000K' },
+    { name:'灯光C', status:'online', meta:'亮度80% · 色温3000K' },
+    { name:'窗帘', status:'online', meta:'已开启' },
+    { name:'音箱', status:'online', meta:'背景音乐播放中' },
+  ]},
+];
+
+const alertsData = [
+  { type:'设备离线', desc:'门锁YL-LOCK-02离线', room:'中茶室A', time:'10分钟前', level:'critical' },
+  { type:'电量不足', desc:'门锁YL-LOCK-02电量0%', room:'中茶室A', time:'30分钟前', level:'warning' },
+  { type:'通信异常', desc:'中茶室B空调响应超时', room:'中茶室B', time:'2小时前', level:'warning' },
+];
+
+const scenes = [
+  { name:'营业模式', icon:'☀️', active:true, color:'#e8f5e9', border:'#07c160' },
+  { name:'节能模式', icon:'🌙', active:false, color:'#f5f5f5', border:'#e0e0e0' },
+  { name:'会议模式', icon:'💼', active:true, color:'#e8f5e9', border:'#07c160' },
+  { name:',全关', icon:'🔌', active:false, color:'#f5f5f5', border:'#e0e0e0' },
+];
+
+// ── Render ──
+document.getElementById('kpiRow').innerHTML = [
+  { label:'设备总数', val:totalDevices },
+  { label:'在线率', val:(onlineDevices/totalDevices*100).toFixed(0) + '%' },
+  { label:'告警', val:alertsData.length },
+  { label:'待维修', val:'1' },
+].map(function(k) {
+  return '<div class="kpi-card"><div class="kpi-val">' + k.val + '</div><div class="kpi-label">' + k.label + '</div></div>';
+}).join('');
+
+document.getElementById('statsRow').innerHTML = [
+  { label:'设备总数', value:totalDevices, sub:'在线' + onlineDevices + '台', cls:'blue' },
+  { label:'在线率', value:(onlineDevices/totalDevices*100).toFixed(0) + '%', sub:'离线' + offlineDevices + '台', cls:'green' },
+  { label:'今日告警', value:alertsData.length + '条', sub:'严重' + alertsData.filter(a => a.level==='critical').length + '条', cls:'red' },
+  { label:'场景数', value:'8个', sub:'已启用4个', cls:'orange' },
+].map(function(s) {
+  return '<div class="stat-card ' + s.cls + '"><div class="stat-label">' + s.label + '</div><div class="stat-value">' + s.value + '</div><div class="stat-sub">' + s.sub + '</div></div>';
+}).join('');
+
+document.getElementById('deviceList').innerHTML = rooms.map(function(r) {
+  var online = r.devices.filter(function(d) { return d.status === 'online'; }).length;
+  var total = r.devices.length;
+  return '<div class="device-group">' +
+    '<div class="dg-header"><span>' + r.name + '</span><span style="font-weight:400;font-size:12px;color:#999">' + online + '/' + total + ' 在线</span></div>' +
+    r.devices.map(function(d) {
+      return '<div class="device-item">' +
+        '<div class="di-dot ' + d.status + '"></div>' +
+        '<div class="di-body"><div class="di-name">' + d.name + '</div><div class="di-meta">' + d.meta + '</div></div>' +
+        '<div class="di-status ' + d.status + '">' + (d.status === 'online' ? '在线' : '离线') + '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}).join('');
+
+document.getElementById('alertList').innerHTML = alertsData.map(function(a) {
+  return '<div class="alert-item">' +
+    '<div class="al-icon" style="background:' + (a.level==='critical'?'#fef0ef':'#fff3e0') + '">⚠️</div>' +
+    '<div class="al-body"><div class="al-title">' + a.desc + '</div><div class="al-time">' + a.room + ' · ' + a.time + '</div></div>' +
+    '<span class="al-tag ' + (a.level==='critical'?'al-critical':'al-warning') + '">' + (a.level==='critical'?'严重':'提醒') + '</span>' +
+  '</div>';
+}).join('');
+
+document.getElementById('sceneGrid').innerHTML = scenes.map(function(s) {
+  return '<div class="scene-btn ' + (s.active ? 'scene-active' : 'scene-inactive') + '" onclick="toggleScene(this)">' +
+    '<div class="sc-icon">' + s.icon + '</div>' +
+    '<div class="sc-label">' + s.name + '</div>' +
+  '</div>';
+}).join('');
+
+function toggleScene(el) {
+  var isActive = el.classList.contains('scene-active');
+  if (isActive) {
+    el.classList.remove('scene-active');
+    el.classList.add('scene-inactive');
+  } else {
+    el.classList.remove('scene-inactive');
+    el.classList.add('scene-active');
+  }
+  showToast('场景已' + (isActive ? '关闭' : '启用'));
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.className = 'toast'; t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(function() { t.style.display = 'none'; }, 2000);
+}
+</script>
+<style>
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+</style>
+<div class="toast" id="toast"></div>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设备控制 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; min-height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:0 8px 0 0; }
+.nav-title { flex:1; font-size:15px; font-weight:600; }
+.nav-subtitle { font-size:11px; color:#999; }
+.page { flex:1; overflow-y:auto; padding:16px; }
+.status-card { background:#fff; border-radius:14px; padding:16px; margin-bottom:16px; }
+.status-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
+.status-label { font-size:13px; color:#999; }
+.status-value { font-size:14px; font-weight:500; color:#333; }
+.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+.status-dot.online { background:#00a870; }
+.status-dot.offline { background:#d54941; }
+.status-dot.fault { background:#e37318; }
+.control-section { background:#fff; border-radius:14px; padding:16px; margin-bottom:16px; }
+.section-title { font-size:14px; font-weight:600; color:#333; margin-bottom:14px; }
+.temp-grid { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-bottom:14px; }
+.temp-btn { width:44px; height:36px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; }
+.temp-btn:hover { border-color:#0052d9; }
+.temp-btn.active { background:#0052d9; color:#fff; border-color:#0052d9; }
+.mode-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:14px; }
+.mode-btn { padding:10px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; font-size:12px; cursor:pointer; text-align:center; transition:all .15s; }
+.mode-btn.active { background:#e3f2fd; color:#0052d9; border-color:#0052d9; }
+.fan-grid { display:flex; gap:6px; margin-bottom:14px; }
+.fan-btn { flex:1; padding:8px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; font-size:12px; cursor:pointer; text-align:center; }
+.fan-btn.active { background:#e3f2fd; color:#0052d9; border-color:#0052d9; }
+.slider-group { margin-bottom:14px; }
+.slider-label { display:flex; justify-content:space-between; font-size:12px; color:#666; margin-bottom:6px; }
+.slider { width:100%; -webkit-appearance:none; height:6px; border-radius:3px; background:#e5e5e5; outline:none; }
+.slider::-webkit-slider-thumb { -webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:#0052d9; cursor:pointer; }
+.color-temp-grid { display:flex; gap:6px; }
+.ct-btn { flex:1; padding:10px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; font-size:11px; cursor:pointer; text-align:center; transition:all .15s; display:flex; flex-direction:column; align-items:center; }
+.ct-btn .ct-k { font-weight:600; font-size:14px; }
+.ct-btn .ct-label { font-size:10px; color:#999; }
+.ct-btn.active { background:#e3f2fd; color:#0052d9; border-color:#0052d9; }
+.ct-btn.active .ct-label { color:#0052d9; }
+.big-btn { width:100%; padding:14px; border-radius:12px; border:none; font-size:16px; font-weight:600; cursor:pointer; margin-bottom:10px; transition:opacity .15s; }
+.big-btn:active { opacity:.8; }
+.big-btn.primary { background:#0052d9; color:#fff; }
+.big-btn.danger { background:#d54941; color:#fff; }
+.big-btn.warning { background:#e37318; color:#fff; }
+.big-btn.success { background:#00a870; color:#fff; }
+.big-btn:disabled { background:#ccc; cursor:not-allowed; }
+.play-row { display:flex; justify-content:center; gap:16px; align-items:center; margin-bottom:14px; }
+.player-btn { width:44px; height:44px; border-radius:50%; border:none; background:#f5f7fa; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.player-btn.main { width:56px; height:56px; background:#0052d9; color:#fff; font-size:24px; }
+.source-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.source-btn { padding:10px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; font-size:12px; cursor:pointer; text-align:center; }
+.source-btn.active { background:#e3f2fd; color:#0052d9; border-color:#0052d9; }
+.event-log { background:#fff; border-radius:14px; padding:16px; }
+.event-item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f5f5f5; font-size:12px; color:#666; }
+.event-item:last-child { border-bottom:none; }
+.event-time { color:#999; flex-shrink:0; width:40px; }
+.event-desc { flex:1; margin-left:10px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item.active { color:#0052d9; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:300px; }
+.modal h3 { font-size:15px;margin-bottom:8px;color:#333; }
+.modal textarea { width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;height:60px; resize:vertical;margin-bottom:8px; }
+.modal-buttons { display:flex;gap:8px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#0052d9;color:#fff; }
+.offline-banner { background:#ffebee; border-radius:10px; padding:12px 14px; margin-bottom:16px; text-align:center; }
+.offline-banner-text { font-size:13px; color:#d54941; font-weight:500; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <div>
+      <div class="nav-title" id="deviceTitle">设备控制</div>
+      <div class="nav-subtitle" id="deviceSubtitle"></div>
+    </div>
+  </div>
+  <div class="page" id="controlPanel"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../room-status/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">房态</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../scene-control/index.html'"><div class="nav-icon">🎬</div><div class="nav-label">场景</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3 id="confirmTitle">确认操作</h3>
+    <textarea placeholder="操作原因 * (≥5字)" id="confirmReason"></textarea>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="hideModal()">取消</button>
+      <button class="modal-btn confirm" id="confirmBtn" onclick="doConfirm()">确认</button>
+    </div>
+  </div>
+</div>
+<script>
+const rooms = [
+  { roomId:"RM001", name:"大会议室" }, { roomId:"RM002", name:"中茶室A" }, { roomId:"RM003", name:"中茶室B" },
+  { roomId:"RM004", name:"大茶室C" }, { roomId:"RM005", name:"展厅" }, { roomId:"RM006", name:"工作间" },
+];
+
+const devices = [
+  { deviceId:"DEV001", deviceCode:"YL-LOCK-01", roomId:"RM001", type:"Lock", status:"Online", info:"电量 85%", typeIcon:"🔒", typeLabel:"门锁" },
+  { deviceId:"DEV002", deviceCode:"YL-AC-01", roomId:"RM001", type:"AC", status:"Online", info:"24°C · 制冷", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV003", deviceCode:"YL-LIGHT-01A", roomId:"RM001", type:"Light", status:"Online", info:"亮度 80% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV004", deviceCode:"YL-LIGHT-01B", roomId:"RM001", type:"Light", status:"Online", info:"亮度 80% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV005", deviceCode:"YL-CURTAIN-01", roomId:"RM001", type:"Curtain", status:"Online", info:"关闭", typeIcon:"🪟", typeLabel:"窗帘" },
+  { deviceId:"DEV006", deviceCode:"YL-SPEAKER-01A", roomId:"RM001", type:"Speaker", status:"Online", info:"音量 70% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV007", deviceCode:"YL-SPEAKER-01B", roomId:"RM001", type:"Speaker", status:"Online", info:"音量 70% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV008", deviceCode:"YL-LOCK-02", roomId:"RM002", type:"Lock", status:"Offline", info:"电量 0% · 离线", typeIcon:"🔒", typeLabel:"门锁" },
+  { deviceId:"DEV009", deviceCode:"YL-AC-02", roomId:"RM002", type:"AC", status:"Online", info:"26°C · 制冷", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV010", deviceCode:"YL-LIGHT-02A", roomId:"RM002", type:"Light", status:"Online", info:"亮度 60% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV011", deviceCode:"YL-LIGHT-02B", roomId:"RM002", type:"Light", status:"Online", info:"亮度 60% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV012", deviceCode:"YL-CURTAIN-02", roomId:"RM002", type:"Curtain", status:"Online", info:"关闭", typeIcon:"🪟", typeLabel:"窗帘" },
+  { deviceId:"DEV013", deviceCode:"YL-SPEAKER-02", roomId:"RM002", type:"Speaker", status:"Online", info:"音量 50% · 已停止", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV014", deviceCode:"YL-LOCK-03", roomId:"RM003", type:"Lock", status:"Online", info:"电量 92%", typeIcon:"🔒", typeLabel:"门锁" },
+  { deviceId:"DEV015", deviceCode:"YL-AC-03", roomId:"RM003", type:"AC", status:"Online", info:"26°C · 关闭", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV016", deviceCode:"YL-LIGHT-03A", roomId:"RM003", type:"Light", status:"Fault", info:"面板无响应", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV017", deviceCode:"YL-LIGHT-03B", roomId:"RM003", type:"Light", status:"Online", info:"亮度 0% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV018", deviceCode:"YL-CURTAIN-03", roomId:"RM003", type:"Curtain", status:"Online", info:"打开", typeIcon:"🪟", typeLabel:"窗帘" },
+  { deviceId:"DEV019", deviceCode:"YL-SPEAKER-03", roomId:"RM003", type:"Speaker", status:"Online", info:"音量 0% · 已停止", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV020", deviceCode:"YL-LOCK-04", roomId:"RM004", type:"Lock", status:"Online", info:"电量 73%", typeIcon:"🔒", typeLabel:"门锁" },
+  { deviceId:"DEV021", deviceCode:"YL-AC-04", roomId:"RM004", type:"AC", status:"Online", info:"24°C · 制冷", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV022", deviceCode:"YL-LIGHT-04A", roomId:"RM004", type:"Light", status:"Online", info:"亮度 80% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV023", deviceCode:"YL-LIGHT-04B", roomId:"RM004", type:"Light", status:"Online", info:"亮度 80% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV024", deviceCode:"YL-LIGHT-04C", roomId:"RM004", type:"Light", status:"Online", info:"亮度 80% · 3000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV025", deviceCode:"YL-CURTAIN-04", roomId:"RM004", type:"Curtain", status:"Online", info:"打开", typeIcon:"🪟", typeLabel:"窗帘" },
+  { deviceId:"DEV026", deviceCode:"YL-SPEAKER-04", roomId:"RM004", type:"Speaker", status:"Online", info:"音量 70% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV027", deviceCode:"YL-AC-05", roomId:"RM005", type:"AC", status:"Online", info:"26°C · 制冷", typeIcon:"❄️", typeLabel:"空调" },
+  { deviceId:"DEV028", deviceCode:"YL-LIGHT-05A", roomId:"RM005", type:"Light", status:"Online", info:"亮度 90% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV029", deviceCode:"YL-LIGHT-05B", roomId:"RM005", type:"Light", status:"Online", info:"亮度 90% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV030", deviceCode:"YL-LIGHT-05C", roomId:"RM005", type:"Light", status:"Online", info:"亮度 90% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV031", deviceCode:"YL-LIGHT-05D", roomId:"RM005", type:"Light", status:"Online", info:"亮度 90% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+  { deviceId:"DEV032", deviceCode:"YL-SPEAKER-05A", roomId:"RM005", type:"Speaker", status:"Online", info:"音量 50% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV033", deviceCode:"YL-SPEAKER-05B", roomId:"RM005", type:"Speaker", status:"Online", info:"音量 50% · 播放中", typeIcon:"🔊", typeLabel:"音响" },
+  { deviceId:"DEV034", deviceCode:"YL-LIGHT-06", roomId:"RM006", type:"Light", status:"Online", info:"亮度 50% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
+];
+
+const params = new URLSearchParams(window.location.search);
+const deviceId = params.get('deviceId') || 'DEV001';
+const device = devices.find(d => d.deviceId === deviceId) || devices[0];
+const room = rooms.find(r => r.roomId === device.roomId) || rooms[0];
+const devType = device.type;
+const isOffline = device.status !== 'Online';
+
+document.getElementById('deviceTitle').textContent = `${device.typeIcon} ${device.typeLabel} - ${device.deviceCode}`;
+document.getElementById('deviceSubtitle').textContent = `${room.name} · ${device.status === 'Online' ? '在线' : device.status === 'Offline' ? '离线' : '故障'}`;
+
+let pendingAction = null;
+let deviceState = {
+  type: devType,
+  status: device.status,
+  temp: 24, mode:'cool', fan:'auto',
+  brightness: devType === 'Light' ? parseInt(device.info.match(/(\d+)%/)?.[1] || '80') : 80,
+  colorTemp: devType === 'Light' ? parseInt(device.info.match(/(\d+)K/)?.[1] || '4000') : 3000,
+  power: devType === 'Light' ? (parseInt(device.info.match(/(\d+)%/)?.[1] || '80') > 0) : true,
+  position: device.info?.includes('打开') ? 'open' : 'closed',
+  volume: devType === 'Speaker' ? parseInt(device.info.match(/(\d+)%/)?.[1] || '70') : 70,
+  playing: device.info?.includes('播放中'),
+  source:'bgm', muted:false,
+  batteryLevel: devType === 'Lock' ? parseInt(device.info.match(/(\d+)%/)?.[1] || '85') : 85,
+};
+
+const statusCN = { Online:'在线', Offline:'离线', Fault:'故障' };
+const statusDotClass = { Online:'online', Offline:'offline', Fault:'fault' };
+
+function renderControl() {
+  const container = document.getElementById('controlPanel');
+  let html = '';
+
+  if (isOffline) {
+    html += `<div class="offline-banner"><div class="offline-banner-text">⚠ 设备${statusCN[device.status]}，部分功能不可用</div></div>`;
+  }
+
+  html += `<div class="status-card">
+    <div class="status-row"><span class="status-label">设备类型</span><span class="status-value">${device.typeIcon} ${device.typeLabel}</span></div>
+    <div class="status-row"><span class="status-label">所属房间</span><span class="status-value">${room.name}</span></div>
+    <div class="status-row"><span class="status-label">设备编号</span><span class="status-value">${device.deviceCode}</span></div>
+    <div class="status-row"><span class="status-label">状态</span><span class="status-value"><span class="status-dot ${statusDotClass[device.status]}"></span>${statusCN[device.status]}</span></div>`;
+
+  if (devType === 'Lock') {
+    html += `<div class="status-row"><span class="status-label">电量</span><span class="status-value">${deviceState.batteryLevel}%</span></div>`;
+  } else if (devType === 'AC') {
+    html += `<div class="status-row"><span class="status-label">当前温度</span><span class="status-value">${deviceState.temp}°C</span></div>
+      <div class="status-row"><span class="status-label">模式</span><span class="status-value">${{cool:'制冷',heat:'制热',fan:'送风',dry:'除湿',off:'关闭'}[deviceState.mode]}</span></div>`;
+  } else if (devType === 'Light') {
+    html += `<div class="status-row"><span class="status-label">开关</span><span class="status-value">${deviceState.power?'已开启':'已关闭'}</span></div>
+      <div class="status-row"><span class="status-label">亮度</span><span class="status-value">${deviceState.brightness}%</span></div>
+      <div class="status-row"><span class="status-label">色温</span><span class="status-value">${deviceState.colorTemp}K</span></div>`;
+  } else if (devType === 'Curtain') {
+    html += `<div class="status-row"><span class="status-label">位置</span><span class="status-value">${deviceState.position==='open'?'打开':'关闭'}</span></div>`;
+  } else if (devType === 'Speaker') {
+    html += `<div class="status-row"><span class="status-label">播放</span><span class="status-value">${deviceState.playing?'播放中':'已停止'}</span></div>
+      <div class="status-row"><span class="status-label">音量</span><span class="status-value">${deviceState.volume}%</span></div>`;
+  }
+  html += `</div>`;
+
+  if (devType === 'Lock') {
+    html += `<div class="control-section"><div class="section-title">门锁控制</div>
+      <button class="big-btn primary" onclick="confirmAction('unlock','远程开门')" ${isOffline?'disabled':''}>🔓 远程开门</button>
+      <p style="font-size:12px;color:#999;margin-bottom:10px;">高风险操作，需填写原因并二次确认，操作记录将写入审计日志</p>
+      ${isOffline ? '<p style="font-size:12px;color:#d54941;">设备离线，无法远程操作</p>' : ''}
+      <button class="big-btn warning" onclick="confirmAction('emergencyUnlock','紧急开锁')">🚨 紧急机械开锁</button></div>`;
+  } else if (devType === 'AC') {
+    html += `<div class="control-section"><div class="section-title">温度设定</div>
+      <div class="temp-grid">${[16,18,20,22,24,26,28,30].map(t => `<button class="temp-btn ${deviceState.temp===t?'active':''}" onclick="setTemp(${t})" ${isOffline?'disabled':''}>${t}°</button>`).join('')}</div></div>
+      <div class="control-section"><div class="section-title">模式</div>
+      <div class="mode-grid">${['cool','heat','fan','dry'].map(m => `<button class="mode-btn ${deviceState.mode===m?'active':''}" onclick="setMode('${m}')" ${isOffline?'disabled':''}>${{cool:'制冷',heat:'制热',fan:'送风',dry:'除湿'}[m]}</button>`).join('')}</div></div>
+      <div class="control-section"><div class="section-title">风速</div>
+      <div class="fan-grid">${['low','mid','high','auto'].map(f => `<button class="fan-btn ${deviceState.fan===f?'active':''}" onclick="setFan('${f}')" ${isOffline?'disabled':''}>${{low:'低',mid:'中',high:'高',auto:'自动'}[f]}</button>`).join('')}</div></div>
+      <button class="big-btn danger" onclick="confirmAction('acOff','关闭空调')" ${isOffline?'disabled':''}>关闭空调</button>`;
+  } else if (devType === 'Light') {
+    html += `<div class="control-section"><div class="section-title">开关</div>
+      <div style="display:flex;gap:10px;"><button class="big-btn success" onclick="toggleLight(true)" ${isOffline?'disabled':''}>🔆 开</button><button class="big-btn" style="background:#f5f5f5;color:#666;" onclick="toggleLight(false)" ${isOffline?'disabled':''}>🔅 关</button></div></div>
+      <div class="control-section"><div class="section-title">亮度</div>
+      <div class="slider-group"><div class="slider-label"><span>0%</span><span>${deviceState.brightness}%</span><span>100%</span></div>
+      <input type="range" class="slider" min="0" max="100" value="${deviceState.brightness}" oninput="setBrightness(this.value)" ${isOffline?'disabled':''}></div></div>
+      <div class="control-section"><div class="section-title">色温</div>
+      <div class="color-temp-grid">${[{k:2700,l:'暖黄'},{k:3000,l:'暖白'},{k:3500,l:'自然白'},{k:4000,l:'冷白'}].map(c => `<button class="ct-btn ${deviceState.colorTemp===c.k?'active':''}" onclick="setColorTemp(${c.k})" ${isOffline?'disabled':''}><span class="ct-k">${c.k}K</span><span class="ct-label">${c.l}</span></button>`).join('')}</div></div>`;
+  } else if (devType === 'Curtain') {
+    html += `<div class="control-section"><div class="section-title">窗帘控制</div>
+      <button class="big-btn success" onclick="confirmAction('curtainOpen','打开窗帘')" ${isOffline?'disabled':''}>🪟 打开</button>
+      <button class="big-btn" style="background:#f5f5f5;color:#666;" onclick="confirmAction('curtainClose','关闭窗帘')" ${isOffline?'disabled':''}>🪟 关闭</button>
+      <button class="big-btn warning" style="margin-top:6px;" onclick="confirmAction('curtainStop','停止窗帘')" ${isOffline?'disabled':''}>⏹ 停止</button></div>`;
+  } else if (devType === 'Speaker') {
+    html += `<div class="control-section"><div class="section-title">播放控制</div>
+      <div class="play-row"><button class="player-btn" onclick="showToast('上一首')">⏮</button>
+      <button class="player-btn main" onclick="togglePlay()" ${isOffline?'disabled':''}>${deviceState.playing?'⏸':'▶'}</button>
+      <button class="player-btn" onclick="showToast('下一首')">⏭</button></div>
+      <div class="slider-group"><div class="slider-label"><span>🔈</span><span>${deviceState.volume}%</span><span>🔊</span></div>
+      <input type="range" class="slider" min="0" max="100" value="${deviceState.volume}" oninput="setVolume(this.value)" ${isOffline?'disabled':''}></div></div>
+      <div class="control-section"><div class="section-title">音源</div>
+      <div class="source-grid">${['bgm','bluetooth','tv'].map(s => `<button class="source-btn ${deviceState.source===s?'active':''}" onclick="setSource('${s}')" ${isOffline?'disabled':''}>${{bgm:'背景音乐',bluetooth:'蓝牙',tv:'TV音频'}[s]}</button>`).join('')}</div></div>
+      <button class="big-btn" style="background:#f5f5f5;color:#666;" onclick="toggleMute()" ${isOffline?'disabled':''}>🔇 ${deviceState.muted?'取消静音':'静音'}</button>`;
+  }
+
+  html += `<div class="event-log" style="margin-top:16px;"><div class="section-title">近期操作记录</div>
+    <div class="event-item"><span class="event-time">14:03</span><span class="event-desc">客人密码开门 (8264)</span></div>
+    <div class="event-item"><span class="event-time">13:55</span><span class="event-desc">系统下发预开指令</span></div>
+    <div class="event-item"><span class="event-time">11:30</span><span class="event-desc">保洁完成确认，设备检查通过</span></div>
+    <div class="event-item"><span class="event-time">10:00</span><span class="event-desc">客人退房，自动触发节能场景</span></div></div>`;
+
+  container.innerHTML = html;
+}
+
+function setTemp(t) { deviceState.temp = t; renderControl(); showToast(`温度已设为 ${t}°C`); }
+function setMode(m) { deviceState.mode = m; renderControl(); showToast(`模式: ${{cool:'制冷',heat:'制热',fan:'送风',dry:'除湿'}[m]}`); }
+function setFan(f) { deviceState.fan = f; renderControl(); showToast(`风速: ${{low:'低',mid:'中',high:'高',auto:'自动'}[f]}`); }
+function setBrightness(v) { deviceState.brightness = parseInt(v); document.querySelector('.slider-label span:nth-child(2)').textContent = v+'%'; }
+function setColorTemp(k) { deviceState.colorTemp = k; renderControl(); showToast(`色温已设为 ${k}K`); }
+function toggleLight(on) { deviceState.power = on; renderControl(); showToast(on ? '灯光已开启' : '灯光已关闭'); }
+function setVolume(v) { deviceState.volume = parseInt(v); if (document.querySelector('.slider-label span:nth-child(2)')) document.querySelector('.slider-label span:nth-child(2)').textContent = v+'%'; }
+function togglePlay() { deviceState.playing = !deviceState.playing; renderControl(); showToast(deviceState.playing ? '开始播放' : '已暂停'); }
+function setSource(s) { deviceState.source = s; renderControl(); showToast(`音源: ${{bgm:'背景音乐',bluetooth:'蓝牙',tv:'TV音频'}[s]}`); }
+function toggleMute() { deviceState.muted = !deviceState.muted; renderControl(); showToast(deviceState.muted ? '已静音' : '已取消静音'); }
+
+function confirmAction(action, title) {
+  pendingAction = action;
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmReason').value = '';
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+
+function doConfirm() {
+  const reason = document.getElementById('confirmReason').value;
+  if (reason.length < 5) { showToast('操作原因至少5字'); return; }
+  if (pendingAction === 'unlock') { showToast('远程开门已执行，已记录审计日志'); }
+  else if (pendingAction === 'emergencyUnlock') { showToast('紧急开锁指令已发送，请配合机械钥匙使用'); }
+  else if (pendingAction === 'acOff') { deviceState.mode = 'off'; renderControl(); showToast('空调已关闭'); }
+  else if (pendingAction === 'curtainOpen') { deviceState.position = 'open'; renderControl(); showToast('窗帘已打开'); }
+  else if (pendingAction === 'curtainClose') { deviceState.position = 'closed'; renderControl(); showToast('窗帘已关闭'); }
+  else if (pendingAction === 'curtainStop') { showToast('窗帘已停止'); }
+  hideModal();
+}
+
+function hideModal() { document.getElementById('confirmModal').style.display = 'none'; pendingAction = null; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2000);
+}
+
+renderControl();
+</script>
+</body>
+</html>

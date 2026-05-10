@@ -1,0 +1,88 @@
+{
+  "revenueAccounts": [
+    { "level1": "主营业务收入", "level2": "空间租用收入", "source": "包间/会议室订单" },
+    { "level1": "主营业务收入", "level2": "商品零售收入", "source": "零售订单" },
+    { "level1": "主营业务收入", "level2": "品牌特许经营收入", "source": "加盟金/品牌管理费" },
+    { "level1": "其他业务收入", "level2": "平台补贴收入", "source": "平台结算单" },
+    { "level1": "其他业务收入", "level2": "充电宝分成", "source": "供应商结算" },
+    { "level1": "其他业务收入", "level2": "广告收入", "source": "合同确认" },
+    { "level1": "其他业务收入", "level2": "赔偿金", "source": "偶发收入" },
+    { "level1": "债务性收入", "level2": "会员充值", "source": "充值记录（递延确认）" }
+  ],
+  "expenseAccounts": [
+    { "level1": "营业成本", "level2": "茶叶采购", "desc": "茶叶、茶具等商品采购" },
+    { "level1": "营业成本", "level2": "场地成本", "desc": "门店租金、物业费" },
+    { "level1": "营业成本", "level2": "人力成本", "desc": "工资、社保、公积金" },
+    { "level1": "营业成本", "level2": "水电费", "desc": "各门店水电能耗" },
+    { "level1": "营业成本", "level2": "折旧费", "desc": "固定资产折旧" },
+    { "level1": "销售费用", "level2": "广告费", "desc": "平台推广、营销活动" },
+    { "level1": "管理费用", "level2": "办公费", "desc": "日常办公开支" },
+    { "level1": "管理费用", "level2": "总部费用分摊", "desc": "按门店分摊总部成本" }
+  ],
+  "dailyRevenue": [
+    { "date": "2026-04-25", "storeName": "盈隆店", "totalAmount": 1840, "orderCount": 12, "platformBreakdown": { "美团": 680, "抖音": 520, "小程序": 420, "线下": 220 } },
+    { "date": "2026-04-25", "storeName": "盈丰店", "totalAmount": 1260, "orderCount": 8, "platformBreakdown": { "美团": 460, "抖音": 380, "小程序": 260, "线下": 160 } },
+    { "date": "2026-04-25", "storeName": "金德店", "totalAmount": 980, "orderCount": 6, "platformBreakdown": { "美团": 380, "抖音": 240, "小程序": 200, "线下": 160 } },
+    { "date": "2026-04-26", "storeName": "盈隆店", "totalAmount": 2160, "orderCount": 15, "platformBreakdown": { "美团": 860, "抖音": 620, "小程序": 480, "线下": 200 } },
+    { "date": "2026-04-26", "storeName": "盈丰店", "totalAmount": 1480, "orderCount": 10, "platformBreakdown": { "美团": 560, "抖音": 420, "小程序": 300, "线下": 200 } },
+    { "date": "2026-04-27", "storeName": "盈隆店", "totalAmount": 1980, "orderCount": 14, "platformBreakdown": { "美团": 720, "抖音": 580, "小程序": 450, "线下": 230 } },
+    { "date": "2026-04-28", "storeName": "盈隆店", "totalAmount": 2320, "orderCount": 16, "platformBreakdown": { "美团": 920, "抖音": 680, "小程序": 520, "线下": 200 } },
+    { "date": "2026-04-28", "storeName": "金德店", "totalAmount": 1120, "orderCount": 7, "platformBreakdown": { "美团": 420, "抖音": 280, "小程序": 240, "线下": 180 } },
+    { "date": "2026-04-29", "storeName": "盈隆店", "totalAmount": 2560, "orderCount": 18, "platformBreakdown": { "美团": 1020, "抖音": 760, "小程序": 560, "线下": 220 } },
+    { "date": "2026-04-29", "storeName": "盈丰店", "totalAmount": 1680, "orderCount": 11, "platformBreakdown": { "美团": 620, "抖音": 480, "小程序": 360, "线下": 220 } },
+    { "date": "2026-04-30", "storeName": "盈隆店", "totalAmount": 3080, "orderCount": 22, "platformBreakdown": { "美团": 1280, "抖音": 920, "小程序": 680, "线下": 200 } },
+    { "date": "2026-04-30", "storeName": "盈丰店", "totalAmount": 2040, "orderCount": 14, "platformBreakdown": { "美团": 780, "抖音": 560, "小程序": 440, "线下": 260 } },
+    { "date": "2026-04-30", "storeName": "金德店", "totalAmount": 1360, "orderCount": 9, "platformBreakdown": { "美团": 520, "抖音": 360, "小程序": 280, "线下": 200 } },
+    { "date": "2026-05-01", "storeName": "盈隆店", "totalAmount": 4200, "orderCount": 28, "platformBreakdown": { "美团": 1800, "抖音": 1400, "小程序": 800, "线下": 200 } },
+    { "date": "2026-05-02", "storeName": "盈隆店", "totalAmount": 3860, "orderCount": 25, "platformBreakdown": { "美团": 1620, "抖音": 1240, "小程序": 760, "线下": 240 } },
+    { "date": "2026-05-03", "storeName": "盈隆店", "totalAmount": 2980, "orderCount": 20, "platformBreakdown": { "美团": 1180, "抖音": 900, "小程序": 600, "线下": 300 } },
+    { "date": "2026-05-04", "storeName": "盈隆店", "totalAmount": 1750, "orderCount": 11, "platformBreakdown": { "美团": 680, "抖音": 420, "小程序": 380, "线下": 270 } },
+    { "date": "2026-05-04", "storeName": "盈丰店", "totalAmount": 1340, "orderCount": 9, "platformBreakdown": { "美团": 500, "抖音": 380, "小程序": 280, "线下": 180 } }
+  ],
+  "monthlyReport": [
+    { "storeName": "盈隆店", "revenue": 42800, "platformFee": 6420, "marketingCost": 3200, "materialCost": 8900, "laborCost": 16800, "depreciation": 2500, "operatingCost": 12000, "operatingProfit": null, "subsidy": 1850, "netProfit": null },
+    { "storeName": "盈丰店", "revenue": 28600, "platformFee": 4290, "marketingCost": 2100, "materialCost": 5600, "laborCost": 14200, "depreciation": 1800, "operatingCost": 9500, "operatingProfit": null, "subsidy": 1200, "netProfit": null },
+    { "storeName": "金德店", "revenue": 19200, "platformFee": 2880, "marketingCost": 1500, "materialCost": 3800, "laborCost": 12600, "depreciation": 1500, "operatingCost": 8200, "operatingProfit": null, "subsidy": 800, "netProfit": null }
+  ],
+  "dividends": {
+    "brandShareholders": [
+      { "name": "品牌创始人A", "shareRatio": 0.40, "amount": 40000 },
+      { "name": "品牌创始人B", "shareRatio": 0.30, "amount": 30000 },
+      { "name": "品牌合伙人C", "shareRatio": 0.20, "amount": 20000 },
+      { "name": "员工持股平台", "shareRatio": 0.10, "amount": 10000 }
+    ],
+    "storeShareholders": {
+      "盈隆店": [
+        { "name": "门店股东甲", "shareRatio": 0.50, "amount": 2230 },
+        { "name": "门店股东乙", "shareRatio": 0.30, "amount": 1338 },
+        { "name": "门店合伙人丙", "shareRatio": 0.20, "amount": 892 }
+      ]
+    }
+  },
+  "reconciliationTasks": [
+    { "taskId": "REC001", "platform": "美团", "orderNo": "MT20260508001", "systemAmount": 168, "platformAmount": 158, "diffAmount": 10, "status": "待处理", "type": "金额不一致", "createdAt": "2026-05-08", "handler": "", "remark": "" },
+    { "taskId": "REC002", "platform": "抖音", "orderNo": "DY20260508003", "systemAmount": 258, "platformAmount": 258, "diffAmount": 0, "status": "已通过", "type": "金额一致", "createdAt": "2026-05-08", "handler": "系统", "remark": "自动通过" },
+    { "taskId": "REC003", "platform": "ERP", "orderNo": "SYS20260507002", "systemAmount": 0, "platformAmount": 120, "diffAmount": 120, "status": "待处理", "type": "平台有记录、系统无记录", "createdAt": "2026-05-07", "handler": "", "remark": "可能为线下手工订单" },
+    { "taskId": "REC004", "platform": "美团", "orderNo": "MT20260507005", "systemAmount": 198, "platformAmount": 198, "diffAmount": 0, "status": "已通过", "type": "金额一致", "createdAt": "2026-05-07", "handler": "系统", "remark": "自动通过" },
+    { "taskId": "REC005", "platform": "ERP", "orderNo": "SYS20260506001", "systemAmount": 340, "platformAmount": 0, "diffAmount": 340, "status": "待处理", "type": "系统有记录、平台无记录", "createdAt": "2026-05-06", "handler": "", "remark": "需核实是否线下现金交易" }
+  ],
+  "glEntries": [
+    { "entryId": "GL20260508001", "date": "2026-05-08", "desc": "日结汇总-空间租用收入", "debit": 2840, "credit": 0, "account": "银行存款", "status": "已过账" },
+    { "entryId": "GL20260508002", "date": "2026-05-08", "desc": "日结汇总-空间租用收入", "debit": 0, "credit": 2840, "account": "主营业务收入-空间租用收入", "status": "已过账" },
+    { "entryId": "GL20260508003", "date": "2026-05-08", "desc": "日结汇总-商品零售收入", "debit": 680, "credit": 0, "account": "银行存款", "status": "已过账" },
+    { "entryId": "GL20260508004", "date": "2026-05-08", "desc": "日结汇总-商品零售收入", "debit": 0, "credit": 680, "account": "主营业务收入-商品零售收入", "status": "已过账" },
+    { "entryId": "GL20260507001", "date": "2026-05-07", "desc": "日结汇总-空间租用收入", "debit": 2320, "credit": 0, "account": "银行存款", "status": "已过账" },
+    { "entryId": "GL20260507002", "date": "2026-05-07", "desc": "日结汇总-空间租用收入", "debit": 0, "credit": 2320, "account": "主营业务收入-空间租用收入", "status": "已过账" }
+  ],
+  "fixedAssets": [
+    { "assetId": "FA001", "name": "立式空调（大厅）", "category": "电器", "purchaseDate": "2025-06-01", "originalValue": 8500, "depreciationYears": 5, "residualRate": 0.05, "currentValue": 6970, "department": "盈隆店", "location": "大厅", "supplier": "格力经销商", "status": "使用中" },
+    { "assetId": "FA002", "name": "智能门锁套装A", "category": "电子设备", "purchaseDate": "2025-06-15", "originalValue": 3200, "depreciationYears": 3, "residualRate": 0.05, "currentValue": 2283, "department": "盈隆店", "location": "201包间", "supplier": "小米智能家居", "status": "使用中" },
+    { "assetId": "FA003", "name": "茶桌套装（实木）", "category": "家具", "purchaseDate": "2025-05-01", "originalValue": 6800, "depreciationYears": 5, "residualRate": 0.05, "currentValue": 5204, "department": "盈隆店", "location": "202包间", "supplier": "红星家具", "status": "使用中" },
+    { "assetId": "FA004", "name": "音响系统", "category": "电子设备", "purchaseDate": "2025-06-01", "originalValue": 4500, "depreciationYears": 5, "residualRate": 0.05, "currentValue": 3690, "department": "盈隆店", "location": "K歌包间", "supplier": "JBL经销商", "status": "使用中" },
+    { "assetId": "FA005", "name": "监控系统全套", "category": "电子设备", "purchaseDate": "2025-04-01", "originalValue": 12000, "depreciationYears": 5, "residualRate": 0.05, "currentValue": 8760, "department": "盈隆店", "location": "全店", "supplier": "海康威视", "status": "使用中" }
+  ],
+  "monthlySettlements": [
+    { "settlementId": "MS202604", "period": "2026年4月", "status": "已月结", "revenue": 90600, "expense": 67200, "profit": 23400, "generatedAt": "2026-04-25", "reportUrl": "#", "note": "正常月结" },
+    { "settlementId": "MS202605", "period": "2026年5月（进行中）", "status": "计算中", "revenue": 0, "expense": 0, "profit": 0, "generatedAt": "", "reportUrl": "", "note": "预计5月25日触发月结" }
+  ]
+}

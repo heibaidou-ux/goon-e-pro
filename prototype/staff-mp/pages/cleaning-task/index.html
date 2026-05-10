@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>保洁任务 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; min-height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; }
+.nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; }
+.page { flex:1; overflow-y:auto; padding:16px; padding-bottom:60px; }
+.task-header { background:#fff; border-radius:14px; padding:14px; margin-bottom:12px; }
+.task-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.task-room { font-size:16px; font-weight:700; }
+.task-status { font-size:12px; font-weight:600; padding:3px 10px; border-radius:10px; }
+.status-pending { background:#fff3e0; color:#e37318; }
+.status-progress { background:#e8f5e9; color:#00a870; }
+.status-completed { background:#f5f5f5; color:#999; }
+.task-meta { font-size:12px; color:#999; }
+.task-meta-row { display:flex; gap:16px; margin-top:4px; }
+.time-warning { color:#d54941; font-weight:500; }
+.checklist-section { background:#fff; border-radius:14px; padding:16px; margin-bottom:12px; }
+.section-title { font-size:14px; font-weight:600; color:#333; margin-bottom:12px; }
+.checklist-item { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #f5f5f5; cursor:pointer; }
+.checklist-item:last-child { border-bottom:none; }
+.checklist-check { width:22px; height:22px; border-radius:50%; border:2px solid #ddd; margin-right:12px; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; transition:all .2s; }
+.checklist-check.done { background:#07c160; border-color:#07c160; color:#fff; }
+.checklist-label { font-size:14px; color:#333; flex:1; }
+.checklist-label.done { color:#999; text-decoration:line-through; }
+.checklist-cat { font-size:10px; color:#999; padding:2px 6px; background:#f5f5f5; border-radius:4px; }
+.device-section { background:#fff; border-radius:14px; padding:16px; margin-bottom:12px; }
+.device-check-row { display:flex; align-items:center; padding:8px 0; justify-content:space-between; }
+.device-check-left { display:flex; align-items:center; gap:8px; }
+.device-check-icon { font-size:16px; }
+.device-check-name { font-size:13px; color:#333; }
+.device-check-status { font-size:12px; }
+.device-check-status.good { color:#00a870; }
+.device-check-status.bad { color:#d54941; }
+.fault-report { background:#fffbf0; border-radius:10px; padding:12px; margin-top:10px; border:1px solid #ffe0a0; }
+.fault-title { font-size:13px; font-weight:600; color:#e37318; margin-bottom:8px; }
+.fault-device { font-size:12px; color:#666; margin-bottom:6px; }
+.fault-textarea { width:100%; height:60px; border:1px solid #ddd; border-radius:8px; padding:8px; font-size:13px; resize:vertical; margin-bottom:6px; }
+.fault-btn { padding:8px 16px; border-radius:8px; background:#e37318; color:#fff; border:none; font-size:13px; cursor:pointer; }
+.complete-section { margin-top:8px; }
+.complete-btn { width:100%; padding:16px; border-radius:12px; background:#07c160; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; transition:opacity .15s; }
+.complete-btn:active { opacity:.8; }
+.complete-btn:disabled { background:#ccc; cursor:not-allowed; }
+.complete-hint { font-size:12px; color:#999; text-align:center; margin-top:8px; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item.active { color:#e37318; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:300px;text-align:center; }
+.modal h3 { font-size:15px;margin-bottom:8px;color:#333; }
+.modal p { font-size:13px;color:#666;margin-bottom:12px; }
+.modal-buttons { display:flex;gap:8px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#07c160;color:#fff; }
+.tab-row { display:flex; background:#f0f0f0; border-radius:10px; padding:2px; margin-bottom:14px; }
+.tab-item { flex:1; text-align:center; padding:10px; border-radius:8px; font-size:13px; cursor:pointer; color:#999; font-weight:500; transition:all .15s; }
+.tab-item.active { background:#fff; color:#333; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">保洁任务</span>
+  </div>
+  <div class="page">
+    <div class="tab-row">
+      <div class="tab-item active" onclick="switchTab('current',this)">进行中</div>
+      <div class="tab-item" onclick="switchTab('pending',this)">待处理</div>
+      <div class="tab-item" onclick="switchTab('done',this)">已完成</div>
+    </div>
+    <div id="taskContent"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../room-status/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">房态</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../scene-control/index.html'"><div class="nav-icon">🎬</div><div class="nav-label">场景</div></div>
+    <div class="nav-item active"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="completeModal">
+  <div class="modal">
+    <h3>确认保洁完成？</h3>
+    <p id="completeMsg"></p>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="hideModal()">再检查</button>
+      <button class="modal-btn confirm" onclick="doComplete()">确认完成</button>
+    </div>
+  </div>
+</div>
+<script>
+let currentTab = 'current';
+let pendingComplete = null;
+
+const tasks = [
+  {
+    taskId:"CLN002", roomName:"大会议室", status:"InProgress", priority:"Normal",
+    createdAt:"12:00", dueBy:"13:00", staff:"小芳", startedAt:"12:05", remaining:55,
+    checklist: [
+      { item:"会议桌擦拭", category:"surface", done:true },
+      { item:"地面清扫", category:"floor", done:true },
+      { item:"垃圾桶清空", category:"waste", done:true },
+      { item:"白板清洁", category:"surface", done:false },
+    ],
+    devices: [
+      { code:"YL-LOCK-01", type:"🔒", name:"门锁", ok:true }, { code:"YL-AC-01", type:"❄️", name:"空调", ok:true },
+      { code:"YL-LIGHT-01A", type:"💡", name:"灯光A", ok:true }, { code:"YL-LIGHT-01B", type:"💡", name:"灯光B", ok:true },
+      { code:"YL-CURTAIN-01", type:"🪟", name:"窗帘", ok:false, issue:"电机异响，电流异常", reported:true },
+      { code:"YL-SPEAKER-01A", type:"🔊", name:"音响A", ok:true }, { code:"YL-SPEAKER-01B", type:"🔊", name:"音响B", ok:true },
+    ]
+  },
+  {
+    taskId:"CLN001", roomName:"中茶室A", status:"Pending", priority:"High",
+    createdAt:"11:55", dueBy:"12:30", staff:"小芳",
+    checklist: [
+      { item:"茶台清洁", category:"surface", done:false }, { item:"地面清扫", category:"floor", done:false },
+      { item:"茶具清洗消毒", category:"utensil", done:false }, { item:"垃圾桶清空", category:"waste", done:false },
+      { item:"落地窗擦拭", category:"glass", done:false },
+    ],
+    devices: [
+      { code:"YL-LOCK-02", type:"🔒", name:"门锁", ok:false, issue:"离线，电池0%", reported:true },
+      { code:"YL-AC-02", type:"❄️", name:"空调", ok:true }, { code:"YL-LIGHT-02A", type:"💡", name:"灯光A", ok:true },
+      { code:"YL-LIGHT-02B", type:"💡", name:"灯光B", ok:true }, { code:"YL-CURTAIN-02", type:"🪟", name:"窗帘", ok:true },
+      { code:"YL-SPEAKER-02", type:"🔊", name:"音响", ok:true },
+    ]
+  },
+  {
+    taskId:"CLN003", roomName:"大茶室C", status:"Pending", priority:"Normal",
+    createdAt:"10:30", dueBy:"11:30", staff:"小芳",
+    checklist: [
+      { item:"茶台清洁", category:"surface", done:false }, { item:"地面清扫", category:"floor", done:false },
+      { item:"K歌设备擦拭", category:"equipment", done:false }, { item:"垃圾桶清空", category:"waste", done:false }, { item:"落地窗擦拭", category:"glass", done:false },
+    ],
+    devices: []
+  },
+  {
+    taskId:"CLN004", roomName:"中茶室B", status:"Completed", priority:"Normal",
+    createdAt:"09:00", dueBy:"10:00", staff:"小芳", startedAt:"09:05", completedAt:"09:45",
+    checklist: [
+      { item:"茶台清洁", category:"surface", done:true }, { item:"地面清扫", category:"floor", done:true },
+      { item:"茶具清洗消毒", category:"utensil", done:true }, { item:"垃圾桶清空", category:"waste", done:true },
+    ],
+    devices: [{ code:"YL-LIGHT-03A", type:"💡", name:"主灯", ok:false, issue:"面板无响应，已上报", reported:true }]
+  },
+];
+
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTasks();
+}
+
+function renderTasks() {
+  const container = document.getElementById('taskContent');
+  let list;
+  if (currentTab === 'current') list = tasks.filter(t => t.status === 'InProgress');
+  else if (currentTab === 'pending') list = tasks.filter(t => t.status === 'Pending');
+  else list = tasks.filter(t => t.status === 'Completed');
+
+  if (!list.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:#999;"><p style="font-size:48px;">🧹</p><p>暂无任务</p></div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(t => {
+    const statusBadge = t.status === 'InProgress' ? 'status-progress' : t.status === 'Pending' ? 'status-pending' : 'status-completed';
+    const statusLabel = t.status === 'InProgress' ? '进行中' : t.status === 'Pending' ? '待处理' : '已完成';
+
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const dueParts = t.dueBy.split(':').map(Number);
+    const dueMinutes = dueParts[0] * 60 + dueParts[1];
+    const isOverdue = t.status === 'Pending' && nowMinutes > dueMinutes;
+
+    let metaHtml = `<div class="task-meta">生成: ${t.createdAt} · 截止: ${t.dueBy} · 保洁员: ${t.staff}${isOverdue?' <span style=\\"color:#d54941;font-weight:500\\">⚠ 已超时</span>':''}</div>`;
+    if (t.status === 'InProgress') {
+      const isUrgent = t.remaining < 15;
+      metaHtml += `<div class="task-meta-row"><span>开始: ${t.startedAt}</span><span class="${isUrgent?'time-warning':''}">剩余: ${t.remaining}分钟</span></div>`;
+    }
+    if (t.status === 'Completed') {
+      metaHtml += `<div class="task-meta-row"><span>开始: ${t.startedAt}</span><span>完成: ${t.completedAt}</span></div>`;
+    }
+
+    const allDone = t.status === 'Completed' || t.checklist.every(c => c.done);
+
+    let checklistHtml = t.checklist.map((c, i) => `
+      <div class="checklist-item" onclick="${t.status==='InProgress'?`toggleItem('${t.taskId}',${i})`:''}">
+        <div class="checklist-check ${c.done?'done':''}">${c.done?'✓':''}</div>
+        <span class="checklist-label ${c.done?'done':''}">${c.item}</span>
+        <span class="checklist-cat">${t.status==='InProgress'&&!c.done?({surface:'台面',floor:'地面',equipment:'设备',utensil:'器具',waste:'垃圾',glass:'玻璃'}[c.category]||c.category):''}</span>
+      </div>
+    `).join('');
+
+    const badDevices = (t.devices||[]).filter(d => !d.ok);
+    let deviceHtml = '';
+    if (t.devices && t.devices.length > 0) {
+      deviceHtml = `<div class="section-title">设备状态检查</div>
+        ${t.devices.map(d => `
+          <div class="device-check-row">
+            <div class="device-check-left">
+              <span class="device-check-icon">${d.type}</span>
+              <span class="device-check-name">${d.name} ${d.code}</span>
+            </div>
+            <span class="device-check-status ${d.ok?'good':'bad'}">${d.ok?'🟢 正常':'🔴 '+d.issue}</span>
+          </div>
+        `).join('')}`;
+
+      if (badDevices.length > 0 && !badDevices[0].reported) {
+        deviceHtml += `<div class="fault-report">
+          <div class="fault-title">故障上报</div>
+          <div class="fault-device">故障设备: ${badDevices[0].name} - ${t.roomName}</div>
+          <textarea class="fault-textarea" id="faultDesc${t.taskId}" placeholder="故障描述...">${badDevices[0].issue||''}</textarea>
+          <button class="fault-btn" onclick="reportFault('${t.taskId}','${badDevices[0].code}')">📷 上报故障</button>
+        </div>`;
+      }
+    }
+
+    let actionsHtml = '';
+    if (t.status === 'Pending') {
+      actionsHtml = `<button class="complete-btn" onclick="startTask('${t.taskId}')" style="background:#0052d9;">开始保洁</button>`;
+    } else if (t.status === 'InProgress') {
+      actionsHtml = `<button class="complete-btn" onclick="tryComplete('${t.taskId}')" ${!allDone?'disabled':''}>✓ 确认保洁完成</button>
+        <div class="complete-hint">${allDone?'所有检查项已完成，可以提交':'请完成所有检查项后提交'}</div>`;
+    }
+
+    return `<div>
+      <div class="task-header">
+        <div class="task-header-row"><span class="task-room">${t.roomName}</span><span class="task-status ${statusBadge}">${statusLabel}</span></div>
+        ${metaHtml}
+      </div>
+      <div class="checklist-section"><div class="section-title">保洁检查清单</div>${checklistHtml}</div>
+      ${deviceHtml?`<div class="device-section">${deviceHtml}</div>`:''}
+      <div class="complete-section">${actionsHtml}</div>
+      <div style="height:12px;"></div>
+    </div>`;
+  }).join('');
+}
+
+function toggleItem(taskId, idx) {
+  const task = tasks.find(t => t.taskId === taskId);
+  if (!task || task.status !== 'InProgress') return;
+  task.checklist[idx].done = !task.checklist[idx].done;
+  renderTasks();
+}
+
+function startTask(taskId) {
+  const task = tasks.find(t => t.taskId === taskId);
+  if (task) { task.status = 'InProgress'; task.startedAt = new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}); task.remaining = 30; }
+  renderTasks();
+  showToast('保洁任务已开始');
+}
+
+function tryComplete(taskId) {
+  const task = tasks.find(t => t.taskId === taskId);
+  if (!task || !task.checklist.every(c => c.done)) { showToast('请完成所有检查项'); return; }
+  pendingComplete = taskId;
+  const badDevices = (task.devices||[]).filter(d => !d.ok);
+  document.getElementById('completeMsg').textContent = badDevices.length > 0 ? `${task.roomName} 有${badDevices.length}台设备异常，可先完成保洁，设备维修另行处理` : `${task.roomName} 所有设备正常，确认完成保洁？`;
+  document.getElementById('completeModal').style.display = 'flex';
+}
+
+function doComplete() {
+  if (!pendingComplete) return;
+  const task = tasks.find(t => t.taskId === pendingComplete);
+  if (task) { task.status = 'Completed'; task.completedAt = new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}); }
+  hideModal();
+  renderTasks();
+  showToast('保洁已完成！');
+}
+
+function reportFault(taskId, deviceCode) {
+  const desc = document.getElementById(`faultDesc${taskId}`)?.value || '';
+  if (desc.length < 3) { showToast('请填写故障描述'); return; }
+  const task = tasks.find(t => t.taskId === taskId);
+  const dev = task?.devices?.find(d => d.code === deviceCode);
+  if (dev) { dev.reported = true; dev.issue = desc; }
+  renderTasks();
+  showToast('故障已上报，生成维修工单');
+}
+
+function hideModal() { document.getElementById('completeModal').style.display = 'none'; pendingComplete = null; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2000);
+}
+
+renderTasks();
+</script>
+</body>
+</html>

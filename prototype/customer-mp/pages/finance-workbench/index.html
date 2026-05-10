@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务工作台</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
+.phone { width:375px; min-height:812px; background:#f8f9fc; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.header-bar { background:linear-gradient(135deg,#1b4332,#2d6a4f); padding:20px 16px 16px; color:#fff; }
+.header-bar .greeting { font-size:14px; opacity:.8; }
+.header-bar .title { font-size:22px; font-weight:700; margin-top:4px; }
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:16px; }
+.stat-card { background:#fff; border-radius:12px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.stat-card .stat-label { font-size:12px; color:#999; }
+.stat-card .stat-value { font-size:20px; font-weight:700; margin-top:4px; }
+.stat-card .stat-sub { font-size:11px; color:#aaa; margin-top:2px; }
+.stat-card.green .stat-value { color:#07c160; }
+.stat-card.orange .stat-value { color:#e37318; }
+.stat-card.blue .stat-value { color:#0052d9; }
+.stat-card.red .stat-value { color:#d54941; }
+.section { padding:0 16px; margin-bottom:16px; }
+.section-title { font-size:15px; font-weight:600; color:#1a1a1a; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.section-more { font-size:12px; color:#0052d9; cursor:pointer; }
+.balance-card { background:linear-gradient(135deg,#0052d9,#1a73e8); color:#fff; border-radius:14px; padding:20px; margin:0 16px 16px; box-shadow:0 4px 16px rgba(0,82,217,.3); }
+.balance-card .bal-label { font-size:12px; opacity:.8; }
+.balance-card .bal-amount { font-size:32px; font-weight:800; margin-top:4px; }
+.balance-card .bal-row { display:flex; gap:20px; margin-top:12px; }
+.balance-card .bal-item { flex:1; }
+.balance-card .bal-item .bi-label { font-size:11px; opacity:.7; }
+.balance-card .bal-item .bi-val { font-size:16px; font-weight:600; margin-top:2px; }
+.compare-bar { display:flex; gap:12px; padding:10px 0; }
+.compare-item { flex:1; text-align:center; }
+.compare-item .ci-bar { height:60px; border-radius:6px; display:flex; align-items:flex-end; overflow:hidden; position:relative; }
+.compare-item .ci-fill { width:100%; border-radius:6px; transition:height .5s; }
+.compare-item .ci-label { font-size:11px; color:#999; margin-top:4px; }
+.compare-item .ci-value { font-size:13px; font-weight:600; margin-top:2px; }
+.trans-item { display:flex; align-items:center; padding:12px; background:#fff; border-radius:10px; margin-bottom:6px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.trans-item .ti-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.trans-item .ti-body { flex:1; margin:0 10px; }
+.trans-item .ti-body .ti-name { font-size:13px; font-weight:500; }
+.trans-item .ti-body .ti-meta { font-size:11px; color:#999; margin-top:2px; }
+.trans-item .ti-amount { font-size:14px; font-weight:600; }
+.ti-income { color:#07c160; }
+.ti-expense { color:#d54941; }
+.tag { font-size:10px; padding:2px 8px; border-radius:8px; flex-shrink:0; }
+.tag-warning { background:#fff3e0; color:#e37318; }
+.tag-info { background:#f0f5ff; color:#0052d9; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; text-decoration:none; color:#999; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
+.pending-item { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#fff; border-radius:8px; margin-bottom:6px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.pending-item .pi-left { display:flex; align-items:center; gap:8px; }
+.pending-item .pi-left .pi-icon { font-size:20px; }
+.pending-item .pi-info .pi-name { font-size:13px; font-weight:500; }
+.pending-item .pi-info .pi-meta { font-size:11px; color:#999; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../customer-mp/index.html">← 返回</a></div>
+<div class="phone">
+  <div class="page">
+    <div class="header-bar">
+      <div class="greeting">👋 李财务，早上好</div>
+      <div class="title">财务工作台</div>
+    </div>
+
+    <div class="balance-card">
+      <div class="bal-label">本月净现金流</div>
+      <div class="bal-amount">¥186,200</div>
+      <div class="bal-row">
+        <div class="bal-item"><div class="bi-label">收入</div><div class="bi-val" style="color:#95d5b2">¥312,800</div></div>
+        <div class="bal-item"><div class="bi-label">支出</div><div class="bi-val" style="color:#f4acb7">¥126,600</div></div>
+        <div class="bal-item"><div class="bi-label">较上月</div><div class="bi-val" style="color:#95d5b2">+8.3%</div></div>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>💰 收支对比（本月）</span>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+        <div class="compare-bar" id="compareBar"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>⏳ 待处理</span>
+      </div>
+      <div id="pendingList"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>📋 最近交易</span>
+        <span class="section-more" onclick="showToast('查看全部流水')">更多 →</span>
+      </div>
+      <div id="recentTransactions"></div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><div class="nav-icon">💰</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="showToast('财务报表')"><div class="nav-icon">📊</div><div class="nav-label">报表</div></div>
+    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+
+<script>
+const statsData = [
+  { label:'本月收入', value:'¥31.3万', sub:'较上月+5.2%', cls:'blue' },
+  { label:'本月支出', value:'¥12.7万', sub:'较上月+2.1%', cls:'red' },
+  { label:'待对账', value:'3笔', sub:'美团2笔·抖音1笔', cls:'orange' },
+  { label:'待结算', value:'1家', sub:'盈丰店未完成', cls:'orange' },
+];
+
+const categories = [
+  { label:'房费收入', amount:184500, pct:59, color:'#0052d9' },
+  { label:'茶品销售', amount:68200, pct:22, color:'#07c160' },
+  { label:'商品零售', amount:32100, pct:10, color:'#e37318' },
+  { label:'其他收入', amount:28000, pct:9, color:'#9c27b0' },
+];
+
+const expenses = [
+  { label:'房租水电', amount:48600, pct:38, color:'#d54941' },
+  { label:'人力成本', amount:35200, pct:28, color:'#e37318' },
+  { label:'采购成本', amount:22800, pct:18, color:'#0052d9' },
+  { label:'营销费用', amount:20000, pct:16, color:'#9c27b0' },
+];
+
+const pendingItems = [
+  { icon:'🔄', name:'盈丰店月结对账', meta:'待处理 · 已逾期2天', tag:'紧急', tagClass:'tag-warning' },
+  { icon:'📋', name:'美团平台对账（4月）', meta:'差异3笔共¥1,280', tag:'待处理', tagClass:'tag-info' },
+  { icon:'🧾', name:'抖音平台对账（4月）', meta:'差异1笔共¥360', tag:'待处理', tagClass:'tag-info' },
+];
+
+const recentTx = [
+  { icon:'📅', name:'大茶室C预订', meta:'05/10 14:00-18:00', amount:'+¥480', isIncome:true },
+  { icon:'🍃', name:'古树普洱销售', meta:'05/10 线上订单', amount:'+¥288', isIncome:true },
+  { icon:'💰', name:'空调维修费', meta:'05/09 设备维护', amount:'-¥2,500', isIncome:false },
+  { icon:'📅', name:'大会议室预订', meta:'05/09 09:00-12:00', amount:'+¥600', isIncome:true },
+  { icon:'🍃', name:'明前龙井采购', meta:'05/08 供应商结算', amount:'-¥8,400', isIncome:false },
+];
+
+document.getElementById('statsGrid').innerHTML = statsData.map(function(s) {
+  return '<div class="stat-card ' + s.cls + '"><div class="stat-label">' + s.label + '</div><div class="stat-value">' + s.value + '</div><div class="stat-sub">' + s.sub + '</div></div>';
+}).join('');
+
+var maxCat = Math.max(...categories.map(c => c.pct));
+document.getElementById('compareBar').innerHTML = '<div style="flex:1"><div style="font-size:12px;color:#999;margin-bottom:6px">收入构成</div>' +
+  categories.map(function(c) {
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+      '<span style="font-size:11px;width:60px;color:#666">' + c.label + '</span>' +
+      '<div style="flex:1;height:14px;background:#f0f0f0;border-radius:10px;overflow:hidden">' +
+        '<div style="height:100%;width:' + c.pct + '%;background:' + c.color + ';border-radius:10px"></div></div>' +
+      '<span style="font-size:11px;color:#999;width:50px;text-align:right">' + c.pct + '%</span>' +
+    '</div>';
+  }).join('') + '</div>' +
+  '<div style="flex:1"><div style="font-size:12px;color:#999;margin-bottom:6px">支出构成</div>' +
+  expenses.map(function(c) {
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+      '<span style="font-size:11px;width:60px;color:#666">' + c.label + '</span>' +
+      '<div style="flex:1;height:14px;background:#f0f0f0;border-radius:10px;overflow:hidden">' +
+        '<div style="height:100%;width:' + c.pct + '%;background:' + c.color + ';border-radius:10px"></div></div>' +
+      '<span style="font-size:11px;color:#999;width:50px;text-align:right">' + c.pct + '%</span>' +
+    '</div>';
+  }).join('') + '</div>';
+
+document.getElementById('pendingList').innerHTML = pendingItems.map(function(p) {
+  return '<div class="pending-item">' +
+    '<div class="pi-left"><div class="pi-icon">' + p.icon + '</div><div class="pi-info"><div class="pi-name">' + p.name + '</div><div class="pi-meta">' + p.meta + '</div></div></div>' +
+    '<span class="tag ' + p.tagClass + '">' + p.tag + '</span>' +
+  '</div>';
+}).join('');
+
+document.getElementById('recentTransactions').innerHTML = recentTx.map(function(t) {
+  return '<div class="trans-item">' +
+    '<div class="ti-icon" style="background:#f0f5ff">' + t.icon + '</div>' +
+    '<div class="ti-body"><div class="ti-name">' + t.name + '</div><div class="ti-meta">' + t.meta + '</div></div>' +
+    '<div class="ti-amount ' + (t.isIncome ? 'ti-income' : 'ti-expense') + '">' + t.amount + '</div>' +
+  '</div>';
+}).join('');
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.className = 'toast'; t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(function() { t.style.display = 'none'; }, 2000);
+}
+</script>
+<style>
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+</style>
+<div class="toast" id="toast"></div>
+</body>
+</html>

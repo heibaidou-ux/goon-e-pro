@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>总经理工作台</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
+.phone { width:375px; min-height:812px; background:#f8f9fc; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.header-bar { background:linear-gradient(135deg,#1a1a2e,#16213e); padding:20px 16px 16px; color:#fff; }
+.header-bar .greeting { font-size:14px; opacity:.8; }
+.header-bar .title { font-size:22px; font-weight:700; margin-top:4px; }
+.stats-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:16px; }
+.stat-card { background:#fff; border-radius:12px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.stat-card .stat-label { font-size:12px; color:#999; }
+.stat-card .stat-value { font-size:22px; font-weight:700; margin-top:4px; }
+.stat-card .stat-sub { font-size:11px; color:#aaa; margin-top:2px; }
+.stat-card.green .stat-value { color:#07c160; }
+.stat-card.orange .stat-value { color:#e37318; }
+.stat-card.blue .stat-value { color:#0052d9; }
+.stat-card.red .stat-value { color:#d54941; }
+.section { padding:0 16px; margin-bottom:16px; }
+.section-title { font-size:15px; font-weight:600; color:#1a1a1a; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.section-more { font-size:12px; color:#0052d9; cursor:pointer; }
+.chart-bar { display:flex; align-items:flex-end; gap:6px; height:80px; padding:10px 0; }
+.chart-bar-item { flex:1; display:flex; flex-direction:column; align-items:center; }
+.chart-bar-item .bar { width:100%; max-width:28px; border-radius:4px 4px 0 0; min-height:4px; transition:height .3s; }
+.chart-bar-item .bar-label { font-size:9px; color:#999; margin-top:4px; }
+.chart-bar-item .bar-value { font-size:9px; color:#666; margin-bottom:2px; }
+.approval-item { display:flex; align-items:center; padding:12px; background:#fff; border-radius:10px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.approval-item .av { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.approval-item .body { flex:1; margin:0 10px; }
+.approval-item .body .name { font-size:13px; font-weight:500; }
+.approval-item .body .meta { font-size:11px; color:#999; margin-top:2px; }
+.approval-item .tag { font-size:10px; padding:2px 8px; border-radius:8px; flex-shrink:0; }
+.tag-danger { background:#fef0ef; color:#d54941; }
+.tag-warning { background:#fff3e0; color:#e37318; }
+.rooms-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.room-mini { background:#fff; border-radius:10px; padding:12px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.room-mini .rm-icon { font-size:24px; }
+.room-mini .rm-name { font-size:12px; font-weight:500; margin-top:4px; }
+.room-mini .rm-status { font-size:10px; margin-top:2px; }
+.status-active { color:#07c160; }
+.status-idle { color:#e37318; }
+.status-offline { color:#d54941; }
+.alert-badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; background:#fef0ef; color:#d54941; padding:2px 8px; border-radius:10px; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; text-decoration:none; color:#999; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
+.kpi-row { display:flex; gap:8px; padding:0 16px 12px; }
+.kpi-card { flex:1; background:rgba(255,255,255,.15); border-radius:8px; padding:10px; text-align:center; }
+.kpi-card .kpi-val { font-size:16px; font-weight:700; }
+.kpi-card .kpi-label { font-size:10px; opacity:.7; margin-top:2px; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../customer-mp/index.html">← 返回</a></div>
+<div class="phone">
+  <div class="page">
+    <div class="header-bar">
+      <div class="greeting">👋 赵总，欢迎回来</div>
+      <div class="title">总经理工作台</div>
+      <div class="kpi-row" id="kpiRow"></div>
+    </div>
+
+    <div class="stats-row" id="statsRow"></div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>📈 本周营收趋势</span>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+        <div class="chart-bar" id="revenueChart"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>⏳ 待审批事项</span>
+        <span class="section-more" onclick="location.href='../approval-center/index.html'">查看全部 →</span>
+      </div>
+      <div id="pendingApprovals"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>🛏️ 包间状态</span>
+      </div>
+      <div class="rooms-grid" id="roomGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>⚠️ 告警概览</span>
+        <span class="section-more" onclick="location.href='../alert-center/index.html'">查看全部 →</span>
+      </div>
+      <div id="alertSummary"></div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../room-detail/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+
+<script>
+// ── Mock Data ──
+const dailyRevenue = [
+  { day:'周一', amount:8600 }, { day:'周二', amount:7200 }, { day:'周三', amount:9800 },
+  { day:'周四', amount:10500 }, { day:'周五', amount:13200 }, { day:'周六', amount:15800 }, { day:'周日', amount:12100 },
+];
+
+const rooms = [
+  { name:'大会议室', status:'使用中', icon:'💼', statusClass:'status-active' },
+  { name:'中茶室A', status:'空闲', icon:'🍵', statusClass:'status-idle' },
+  { name:'中茶室B', status:'使用中', icon:'🍵', statusClass:'status-active' },
+  { name:'大茶室C', status:'空闲', icon:'🫖', statusClass:'status-idle' },
+];
+
+const pendingTasks = [
+  { type:'采购审批', title:'普洱茶叶采购单', priority:'高', node:'财务审批', icon:'📦', tagClass:'tag-danger' },
+  { type:'支出审批', title:'4月空调维修费', priority:'高', node:'财务审批', icon:'💰', tagClass:'tag-danger' },
+  { type:'营销活动', title:'618限时折扣活动', priority:'普通', node:'总部运营', icon:'🎯', tagClass:'tag-warning' },
+];
+
+const alerts = [
+  { type:'设备离线', desc:'盈隆店-门锁YL-LOCK-02离线', level:'严重' },
+  { type:'库存预警', desc:'明前龙井库存低于安全库存', level:'提醒' },
+];
+
+// ── Render ──
+const maxRev = Math.max(...dailyRevenue.map(d => d.amount));
+const minRev = Math.min(...dailyRevenue.map(d => d.amount));
+const range = maxRev - minRev || 1;
+
+document.getElementById('kpiRow').innerHTML = [
+  { label:'入住率', val:'78%' },
+  { label:'本月营收', val:'¥38.6万' },
+  { label:'净利率', val:'32%' },
+  { label:'客单价', val:'¥286' },
+].map(k => '<div class="kpi-card"><div class="kpi-val">' + k.val + '</div><div class="kpi-label">' + k.label + '</div></div>').join('');
+
+document.getElementById('statsRow').innerHTML = [
+  { label:'今日营收', value:'¥11,200', sub:'较昨日+12.3%', cls:'green' },
+  { label:'本月累计', value:'¥38.6万', sub:'完成月目标68%', cls:'blue' },
+  { label:'待审批', value:'3项', sub:'高优先级1项', cls:'orange' },
+  { label:'告警', value:'2条', sub:'设备离线', cls:'red' },
+].map(s => '<div class="stat-card ' + s.cls + '"><div class="stat-label">' + s.label + '</div><div class="stat-value">' + s.value + '</div><div class="stat-sub">' + s.sub + '</div></div>').join('');
+
+document.getElementById('revenueChart').innerHTML = dailyRevenue.map(function(d) {
+  var h = Math.max(4, ((d.amount - minRev) / range) * 60);
+  return '<div class="chart-bar-item"><div class="bar-value">¥' + (d.amount / 1000).toFixed(1) + 'k</div><div class="bar" style="height:' + h + 'px;background:#0052d9;"></div><div class="bar-label">' + d.day + '</div></div>';
+}).join('');
+
+document.getElementById('pendingApprovals').innerHTML = pendingTasks.map(function(t) {
+  return '<div class="approval-item">' +
+    '<div class="av" style="background:#f0f5ff">' + t.icon + '</div>' +
+    '<div class="body"><div class="name">' + t.title + '</div><div class="meta">' + t.type + ' · 当前节点:' + t.node + '</div></div>' +
+    '<span class="tag ' + t.tagClass + '">' + t.priority + '</span>' +
+  '</div>';
+}).join('');
+
+document.getElementById('roomGrid').innerHTML = rooms.map(function(r) {
+  return '<div class="room-mini"><div class="rm-icon">' + r.icon + '</div><div class="rm-name">' + r.name + '</div><div class="rm-status ' + r.statusClass + '">' + r.status + '</div></div>';
+}).join('');
+
+document.getElementById('alertSummary').innerHTML = alerts.map(function(a) {
+  return '<div class="approval-item">' +
+    '<div class="av" style="background:#fef0ef">⚠️</div>' +
+    '<div class="body"><div class="name">' + a.desc + '</div><div class="meta">' + a.level + '</div></div>' +
+    '<span class="tag tag-danger">' + a.level + '</span>' +
+  '</div>';
+}).join('');
+</script>
+</body>
+</html>

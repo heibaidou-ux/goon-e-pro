@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>门店巡检 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; min-height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:0 8px 0 0; }
+.nav-title { flex:1; font-size:16px; font-weight:600; }
+.page { flex:1; overflow-y:auto; padding:16px; padding-bottom:60px; }
+.plan-card { background:linear-gradient(135deg,#0052d9,#366ef4); border-radius:14px; padding:16px; color:#fff; margin-bottom:14px; }
+.plan-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.plan-name { font-size:18px; font-weight:700; }
+.plan-status { font-size:12px; padding:4px 10px; border-radius:10px; background:rgba(255,255,255,.2); }
+.plan-time { font-size:13px; opacity:.85; }
+.plan-progress { margin-top:10px; display:flex; align-items:center; gap:8px; }
+.plan-bar { flex:1; height:4px; background:rgba(255,255,255,.3); border-radius:2px; overflow:hidden; }
+.plan-fill { height:100%; background:#fff; border-radius:2px; transition:width .3s; }
+.plan-count { font-size:12px; opacity:.85; white-space:nowrap; }
+.cat-section { background:#fff; border-radius:14px; padding:16px; margin-bottom:12px; }
+.cat-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.cat-icon { font-size:20px; }
+.cat-name { font-size:15px; font-weight:600; color:#333; }
+.cat-badge { font-size:11px; padding:2px 8px; border-radius:8px; background:#f0f0f0; color:#999; }
+.check-item { display:flex; align-items:flex-start; padding:12px 0; border-bottom:1px solid #f5f5f5; }
+.check-item:last-child { border-bottom:none; }
+.check-radio { display:flex; gap:12px; margin-right:12px; flex-shrink:0; }
+.radio-btn { padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; color:#999; transition:all .15s; font-weight:500; }
+.radio-btn.normal.active { background:#e8f5e9; color:#00a870; border-color:#00a870; }
+.radio-btn.abnormal.active { background:#ffebee; color:#d54941; border-color:#d54941; }
+.check-info { flex:1; min-width:0; }
+.check-label { font-size:14px; color:#333; font-weight:500; }
+.check-standard { font-size:11px; color:#999; margin-top:2px; }
+.check-abnormal { margin-top:8px; display:none; }
+.check-abnormal.show { display:block; }
+.abnormal-input { width:100%; padding:8px; border:1px solid #ffcdd2; border-radius:8px; font-size:12px; margin-bottom:6px; color:#d54941; }
+.abnormal-input::placeholder { color:#ef9a9a; }
+.photo-btn { padding:6px 12px; border-radius:6px; border:1px dashed #d54941; background:#fff; color:#d54941; font-size:12px; cursor:pointer; }
+.photo-preview { display:flex; gap:4px; margin-top:6px; }
+.photo-thumb { width:48px; height:48px; border-radius:6px; background:#fce4ec; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.submit-section { margin-top:8px; }
+.submit-btn { width:100%; padding:16px; border-radius:12px; background:#0052d9; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; }
+.submit-btn:active { opacity:.8; }
+.submit-btn:disabled { background:#ccc; }
+.history-card { background:#fff; border-radius:14px; padding:16px; margin-bottom:10px; border-left:3px solid #00a870; }
+.history-card.warn { border-left-color:#e37318; }
+.history-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.history-name { font-size:14px; font-weight:600; }
+.history-status { font-size:11px; padding:2px 8px; border-radius:8px; }
+.his-status-done { background:#e8f5e9; color:#00a870; }
+.his-status-warn { background:#fff3e0; color:#e37318; }
+.history-meta { font-size:12px; color:#999; }
+.tab-row { display:flex; background:#f0f0f0; border-radius:10px; padding:2px; margin-bottom:14px; }
+.tab-item { flex:1; text-align:center; padding:10px; border-radius:8px; font-size:13px; cursor:pointer; color:#999; font-weight:500; }
+.tab-item.active { background:#fff; color:#333; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item.active { color:#0052d9; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:310px; }
+.modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
+.modal p { font-size:13px;color:#666;margin-bottom:12px;line-height:1.5; }
+.modal-buttons { display:flex;gap:8px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#0052d9;color:#fff; }
+.modal-btn.danger { background:#d54941;color:#fff; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">门店巡检</span>
+  </div>
+  <div class="page">
+    <div class="tab-row">
+      <div class="tab-item active" onclick="switchTab('current',this)">今日巡检</div>
+      <div class="tab-item" onclick="switchTab('history',this)">历史记录</div>
+    </div>
+    <div id="mainContent"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../room-status/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">房态</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../scene-control/index.html'"><div class="nav-icon">🎬</div><div class="nav-label">场景</div></div>
+    <div class="nav-item active"><div class="nav-icon">🔍</div><div class="nav-label">巡检</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="submitModal">
+  <div class="modal">
+    <h3>提交巡检报告？</h3>
+    <p id="submitMsg"></p>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="hideModal()">再检查</button>
+      <button class="modal-btn confirm" onclick="doSubmit()">确认提交</button>
+    </div>
+  </div>
+</div>
+<script>
+let currentTab = 'current';
+
+const checklist = [
+  { cat:'经营规范', icon:'👔', items:[
+    { id:'op1', label:'员工在岗情况', standard:'当班员工全部在岗，着装统一' },
+    { id:'op2', label:'迎宾服务', standard:'客人到店5分钟内完成接待' },
+    { id:'op3', label:'包间状态', standard:'空闲包间已完成保洁，整洁无异味' },
+    { id:'op4', label:'外卖订单处理', standard:'已接单外卖按时完成打包' },
+  ]},
+  { cat:'服务质量', icon:'⭐', items:[
+    { id:'sv1', label:'客人满意度', standard:'在店客人无未处理的投诉/差评' },
+    { id:'sv2', label:'响应时效', standard:'客人呼叫后店员5分钟内响应' },
+  ]},
+  { cat:'消防', icon:'🧯', items:[
+    { id:'fire1', label:'灭火器', standard:'压力正常，未过期，摆放位置正确' },
+    { id:'fire2', label:'消防通道', standard:'通道畅通无杂物，应急灯正常' },
+    { id:'fire3', label:'烟感报警器', standard:'指示灯正常，无遮挡' },
+  ]},
+  { cat:'卫生', icon:'🧹', items:[
+    { id:'hy1', label:'公共区域', standard:'地面整洁，垃圾桶未满溢' },
+    { id:'hy2', label:'洗手间', standard:'无异味，纸巾/洗手液充足' },
+    { id:'hy3', label:'包间卫生', standard:'地毯/家具无污渍，茶具已消毒' },
+  ]},
+  { cat:'设备', icon:'🔧', items:[
+    { id:'dev1', label:'门锁', standard:'在线正常，电量充足' },
+    { id:'dev2', label:'空调/灯光', standard:'可正常远程控制，无异常噪音' },
+    { id:'dev3', label:'网络设备', standard:'路由器/交换机指示灯正常，WiFi可用' },
+  ]},
+];
+
+// State: track each item's result
+let results = {};
+let photos = {}; // simulated photo uploads
+
+function initResults() {
+  checklist.forEach(cat => {
+    cat.items.forEach(item => {
+      if (!results[item.id]) results[item.id] = 'unchecked';
+      if (!photos[item.id]) photos[item.id] = [];
+    });
+  });
+}
+initResults();
+
+function getProgress() {
+  let total = 0, done = 0, abnormal = 0;
+  checklist.forEach(cat => {
+    cat.items.forEach(item => {
+      total++;
+      if (results[item.id] === 'normal' || results[item.id] === 'abnormal') done++;
+      if (results[item.id] === 'abnormal') abnormal++;
+    });
+  });
+  return { total, done, abnormal, pct: total ? Math.round(done/total*100) : 0 };
+}
+
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function render() {
+  const container = document.getElementById('mainContent');
+  if (currentTab === 'history') { renderHistory(container); return; }
+
+  const p = getProgress();
+  let html = `
+    <div class="plan-card">
+      <div class="plan-header">
+        <span class="plan-name">📋 ${new Date().getHours() < 14 ? '早班' : '晚班'}巡检</span>
+        <span class="plan-status">进行中</span>
+      </div>
+      <div class="plan-time">巡检人: 店长 小林 · ${new Date().toLocaleDateString('zh-CN')}</div>
+      <div class="plan-progress">
+        <div class="plan-bar"><div class="plan-fill" style="width:${p.pct}%"></div></div>
+        <span class="plan-count">${p.done}/${p.total} 项 ${p.abnormal > 0 ? '⚠ '+p.abnormal+'项异常' : ''}</span>
+      </div>
+    </div>`;
+
+  checklist.forEach(cat => {
+    const catDone = cat.items.filter(i => results[i.id] !== 'unchecked').length;
+    html += `<div class="cat-section">
+      <div class="cat-header">
+        <span class="cat-icon">${cat.icon}</span>
+        <span class="cat-name">${cat.cat}</span>
+        <span class="cat-badge">${catDone}/${cat.items.length}</span>
+      </div>`;
+
+    cat.items.forEach(item => {
+      const r = results[item.id];
+      const isAbnormal = r === 'abnormal';
+      html += `<div class="check-item">
+        <div class="check-radio">
+          <button class="radio-btn normal ${r==='normal'?'active':''}" onclick="setResult('${item.id}','normal')">✓ 正常</button>
+          <button class="radio-btn abnormal ${isAbnormal?'active':''}" onclick="setResult('${item.id}','abnormal')">✗ 异常</button>
+        </div>
+        <div class="check-info">
+          <div class="check-label">${item.label}</div>
+          <div class="check-standard">检查标准: ${item.standard}</div>
+          <div class="check-abnormal ${isAbnormal?'show':''}" id="ab-${item.id}">
+            <input class="abnormal-input" placeholder="描述异常情况及位置..." id="desc-${item.id}" value="${getAbnormalDesc(item.id)}" onchange="saveDesc('${item.id}',this.value)">
+            <button class="photo-btn" onclick="simPhoto('${item.id}')">📷 拍照记录</button>
+            <div class="photo-preview" id="photos-${item.id}">${(photos[item.id]||[]).map(() => '<div class="photo-thumb">📸</div>').join('')}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  const allChecked = p.done === p.total;
+  html += `<div class="submit-section">
+    <button class="submit-btn" ${allChecked?'':'disabled'} onclick="submitReport()">
+      ${allChecked ? `✓ 提交巡检报告` + (p.abnormal > 0 ? ` (含${p.abnormal}项异常)` : ' (全部正常)') : '请完成所有检查项后提交'}
+    </button>
+    <div style="text-align:center;font-size:12px;color:#999;margin-top:8px;">巡检报告提交后将推送至店长审核</div>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+let abnormalDescs = {};
+function getAbnormalDesc(id) { return abnormalDescs[id] || ''; }
+function saveDesc(id, val) { abnormalDescs[id] = val; }
+
+function setResult(itemId, value) {
+  results[itemId] = value;
+  if (value === 'normal') { photos[itemId] = []; abnormalDescs[itemId] = ''; }
+  render();
+}
+
+function simPhoto(itemId) {
+  photos[itemId] = photos[itemId] || [];
+  photos[itemId].push('photo_' + Date.now());
+  showToast('照片已拍摄 ✓');
+  render();
+}
+
+function submitReport() {
+  const p = getProgress();
+  if (p.done !== p.total) { showToast('请完成所有检查项'); return; }
+  document.getElementById('submitMsg').textContent = p.abnormal > 0
+    ? `共检查 ${p.total} 项，其中 ${p.abnormal} 项异常。异常项将自动生成整改工单，请确认后提交。`
+    : `全部 ${p.total} 项检查正常，确认提交巡检报告？`;
+  document.getElementById('submitModal').style.display = 'flex';
+}
+
+function doSubmit() {
+  // Save to localStorage as completed inspection
+  const p = getProgress();
+  const report = {
+    date: new Date().toLocaleDateString('zh-CN'),
+    time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}),
+    inspector: '店长 小林',
+    total: p.total,
+    abnormal: p.abnormal,
+    results: {...results},
+    descs: {...abnormalDescs},
+    status: p.abnormal > 0 ? 'warn' : 'done'
+  };
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('mp_inspection_history') || '[]'); } catch(e) {}
+  history.unshift(report);
+  localStorage.setItem('mp_inspection_history', JSON.stringify(history.slice(0, 20)));
+
+  showToast('巡检报告已提交！');
+  hideModal();
+  // Re-init for next inspection
+  results = {}; abnormalDescs = {}; photos = {};
+  initResults();
+  render();
+}
+
+function renderHistory(container) {
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('mp_inspection_history') || '[]'); } catch(e) {}
+
+  if (!history.length) {
+    container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#999;"><p style="font-size:48px;">📋</p><p>暂无巡检记录</p><p style="font-size:12px;margin-top:4px;">完成首次巡检后在此查看历史</p></div>';
+    return;
+  }
+
+  container.innerHTML = history.map((r, idx) => `
+    <div class="history-card ${r.status==='warn'?'warn':''}">
+      <div class="history-header">
+        <span class="history-name">📋 第${history.length - idx}次巡检 · ${r.date} ${r.time}</span>
+        <span class="history-status ${r.status==='done'?'his-status-done':'his-status-warn'}">${r.status==='done'?'✓ 全部正常':'⚠ '+r.abnormal+'项异常'}</span>
+      </div>
+      <div class="history-meta">巡检人: ${r.inspector} · 共${r.total}项 · 已提交店长审核</div>
+    </div>
+  `).join('');
+}
+
+function hideModal() { document.getElementById('submitModal').style.display = 'none'; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2000);
+}
+
+render();
+</script>
+</body>
+</html>

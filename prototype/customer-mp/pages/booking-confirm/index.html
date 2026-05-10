@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>预约确认</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; min-height:812px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
+.nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
+.page { flex:1; overflow-y:auto; padding:20px 16px; padding-bottom:80px; }
+
+.order-summary { background:#f9fafb; border-radius:14px; padding:16px; margin-bottom:16px; }
+.summary-row { display:flex; justify-content:space-between; padding:8px 0; font-size:14px; color:#666; border-bottom:1px solid #f0f0f0; }
+.summary-row:last-child { border-bottom:none; }
+.summary-row .label { color:#999; }
+.summary-row .value { font-weight:500; color:#333; }
+.summary-row .price { font-weight:700; color:#e37318; font-size:16px; }
+
+.payment-section { margin-bottom:16px; }
+.section-title { font-size:14px; font-weight:600; color:#333; margin-bottom:12px; }
+.payment-methods { display:flex; flex-direction:column; gap:8px; }
+.pay-method { display:flex; align-items:center; padding:14px; border-radius:12px; border:2px solid #e5e5e5; cursor:pointer; transition:all .15s; background:#fff; gap:12px; }
+.pay-method:hover { border-color:#07c160; }
+.pay-method.selected { border-color:#07c160; background:#f0fdf4; }
+.pay-method-icon { font-size:24px; width:36px; text-align:center; }
+.pay-method-info { flex:1; }
+.pay-method-name { font-size:14px; font-weight:500; }
+.pay-method-desc { font-size:11px; color:#999; margin-top:2px; }
+.pay-method-check { font-size:18px; color:#07c160; display:none; }
+.pay-method.selected .pay-method-check { display:block; }
+
+.balance-warning { background:#fffbf0; border-radius:10px; padding:12px; margin-top:12px; border:1px solid #ffe0a0; text-align:center; }
+.balance-warning-text { font-size:13px; color:#e37318; margin-bottom:8px; }
+.balance-topup-btn { padding:8px 20px; border-radius:8px; background:#0052d9; color:#fff; border:none; font-size:13px; cursor:pointer; font-weight:600; }
+
+.coupon-input { background:#fff; border-radius:12px; padding:14px; margin-bottom:16px; border:2px solid #e5e5e5; display:none; }
+.coupon-input.active { display:block; border-color:#07c160; }
+.coupon-row { display:flex; gap:8px; }
+.coupon-field { flex:1; padding:10px; border:1.5px solid #e5e5e5; border-radius:8px; font-size:14px; }
+.coupon-verify-btn { padding:10px 16px; border-radius:8px; background:#07c160; color:#fff; border:none; font-size:13px; cursor:pointer; }
+.coupon-result { font-size:12px; margin-top:8px; }
+.coupon-result.success { color:#07c160; }
+.coupon-result.error { color:#d54941; }
+
+.total-section { background:#fff; border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid #07c160; }
+.total-row { display:flex; justify-content:space-between; align-items:center; }
+.total-label { font-size:14px; color:#333; }
+.total-amount { font-size:28px; font-weight:800; color:#e37318; }
+.discount-row { display:flex; justify-content:space-between; font-size:12px; color:#07c160; margin-top:4px; }
+
+.actions { display:flex; gap:10px; margin-top:8px; }
+.action-btn { flex:1; padding:14px 0; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; border:none; transition:opacity .15s; text-align:center; }
+.action-btn:active { opacity:.8; }
+.action-btn.primary { background:#07c160; color:#fff; }
+.action-btn.ghost { background:#f5f5f5; color:#666; }
+
+.tips { background:#fffbf0; border-radius:12px; padding:14px; margin-bottom:16px; }
+.tips-title { font-size:13px; font-weight:600; color:#e37318; margin-bottom:8px; }
+.tips-item { font-size:12px; color:#999; padding:3px 0; }
+.tips-item::before { content:"· "; }
+
+/* Success page */
+.success-icon { font-size:56px; margin-bottom:12px; }
+.success-title { font-size:20px; font-weight:700; color:#1a1a1a; margin-bottom:4px; }
+.success-sub { font-size:13px; color:#999; margin-bottom:20px; }
+.door-section { background:linear-gradient(135deg,#07c160,#00a854); border-radius:14px; padding:20px; color:#fff; margin-bottom:20px; }
+.door-label { font-size:13px; opacity:.9; margin-bottom:8px; }
+.door-code { display:flex; justify-content:center; gap:12px; margin-bottom:12px; }
+.door-digit { width:48px; height:56px; background:rgba(255,255,255,.2); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800; font-family:"Courier New",monospace; }
+.door-validity { font-size:12px; opacity:.8; margin-bottom:16px; }
+.copy-btn { background:rgba(255,255,255,.25); color:#fff; border:1.5px solid rgba(255,255,255,.5); padding:10px 24px; border-radius:20px; font-size:14px; cursor:pointer; transition:all .15s; }
+.copy-btn:active { background:rgba(255,255,255,.4); }
+.address-card { background:#f0fdf4; border-radius:12px; padding:14px; text-align:left; margin-bottom:20px; }
+.address-title { font-size:14px; font-weight:600; color:#333; margin-bottom:4px; }
+.address-detail { font-size:12px; color:#666; }
+.nav-btn { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e5e5e5; padding:10px 20px; border-radius:20px; font-size:13px; cursor:pointer; margin-top:10px; color:#333; }
+
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item.active { color:#07c160; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <span class="nav-title" id="pageTitle">确认预约</span>
+  </div>
+  <div class="page" id="mainPage">
+    <!-- Confirmation view -->
+    <div id="confirmView">
+      <div class="section-title">📋 预约详情</div>
+      <div class="order-summary">
+        <div class="summary-row"><span class="label">包间</span><span class="value" id="infoRoom">—</span></div>
+        <div class="summary-row"><span class="label">日期</span><span class="value" id="infoDate">—</span></div>
+        <div class="summary-row"><span class="label">时段</span><span class="value" id="infoTime">—</span></div>
+        <div class="summary-row"><span class="label">人数</span><span class="value" id="infoPersons">—</span></div>
+        <div class="summary-row"><span class="label">金额</span><span class="price" id="infoPrice">¥0</span></div>
+      </div>
+
+      <div class="payment-section">
+        <div class="section-title">💳 支付方式</div>
+        <div class="payment-methods" id="payMethods">
+          <div class="pay-method selected" onclick="selectPay('wechat',this)" id="payWechat">
+            <span class="pay-method-icon">💚</span>
+            <div class="pay-method-info"><div class="pay-method-name">微信支付</div><div class="pay-method-desc">微信零钱/银行卡</div></div>
+            <span class="pay-method-check">✓</span>
+          </div>
+          <div class="pay-method" onclick="selectPay('alipay',this)" id="payAlipay">
+            <span class="pay-method-icon">💙</span>
+            <div class="pay-method-info"><div class="pay-method-name">支付宝</div><div class="pay-method-desc">支付宝余额/花呗</div></div>
+            <span class="pay-method-check">✓</span>
+          </div>
+          <div class="pay-method" onclick="selectPay('balance',this)" id="payBalance">
+            <span class="pay-method-icon">💰</span>
+            <div class="pay-method-info"><div class="pay-method-name">会员余额</div><div class="pay-method-desc" id="balanceDesc">当前余额 ¥280</div></div>
+            <span class="pay-method-check">✓</span>
+          </div>
+          <div class="pay-method" onclick="selectPay('meituan',this)" id="payMeituan">
+            <span class="pay-method-icon">🟡</span>
+            <div class="pay-method-info"><div class="pay-method-name">美团</div><div class="pay-method-desc">美团支付/月付</div></div>
+            <span class="pay-method-check">✓</span>
+          </div>
+          <div class="pay-method" onclick="selectPay('dianping',this)" id="payDianping">
+            <span class="pay-method-icon">⭐</span>
+            <div class="pay-method-info"><div class="pay-method-name">大众点评</div><div class="pay-method-desc">点评团购/买单</div></div>
+            <span class="pay-method-check">✓</span>
+          </div>
+          <div class="pay-method" onclick="selectPay('douyin',this)" id="payDouyin">
+            <span class="pay-method-icon">🎵</span>
+            <div class="pay-method-info"><div class="pay-method-name">抖音验券</div><div class="pay-method-desc">输入抖音团购券码</div></div>
+            <span class="pay-method-check">✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coupon input for Douyin -->
+      <div class="coupon-input" id="couponBox">
+        <div class="coupon-row">
+          <input class="coupon-field" id="couponCode" placeholder="输入抖音团购券码">
+          <button class="coupon-verify-btn" onclick="verifyCoupon()">验券</button>
+        </div>
+        <div class="coupon-result" id="couponResult"></div>
+      </div>
+
+      <!-- Balance warning / Combined payment -->
+      <div class="balance-warning" id="balanceWarning" style="display:none;">
+        <div class="balance-warning-text" id="balanceWarningText">余额不足</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button class="balance-topup-btn" onclick="goTopup()">立即充值</button>
+          <button class="balance-topup-btn" id="combinedPayBtn" style="background:#07c160;display:none;" onclick="selectCombinedPay()">组合支付</button>
+        </div>
+        <div id="combinedPayInfo" style="display:none;margin-top:8px;font-size:12px;color:#07c160;"></div>
+      </div>
+
+      <div class="total-section">
+        <div class="total-row"><span class="total-label">应付</span><span class="total-amount" id="finalPrice">¥0</span></div>
+        <div class="discount-row" id="discountInfo" style="display:none;"></div>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">温馨提示</div>
+        <div class="tips-item">包间将于预约时间前5分钟预开空调</div>
+        <div class="tips-item">开始前2小时以上可免费取消；2小时内取消收取定金的50%作为违约金</div>
+        <div class="tips-item">到店后通过订单页查看门禁密码</div>
+        <div class="tips-item">门店24小时营业</div>
+      </div>
+
+      <div class="actions">
+        <button class="action-btn ghost" onclick="goBack()">返回修改</button>
+        <button class="action-btn primary" id="confirmPayBtn" onclick="confirmPay()">确认支付</button>
+      </div>
+
+      <div style="text-align:center;padding-top:16px;">
+        <div class="address-card">
+          <div class="address-title">📍 盈隆店</div>
+          <div class="address-detail">广州市天河区盈隆广场3楼 · 富力盈隆大厦</div>
+          <button class="nav-btn" onclick="showToast('已为您规划到盈隆店的路线')">🗺 查看导航</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success view -->
+    <div id="successView" style="display:none;text-align:center;">
+      <div class="success-icon" id="successIcon">✅</div>
+      <div class="success-title" id="successTitle">支付成功！</div>
+      <div class="success-sub" id="successSub">订单已确认，祝您愉快</div>
+
+      <div class="order-summary" style="text-align:left;">
+        <div class="summary-row"><span class="label">包间</span><span class="value" id="succRoom">—</span></div>
+        <div class="summary-row"><span class="label">日期</span><span class="value" id="succDate">—</span></div>
+        <div class="summary-row"><span class="label">时段</span><span class="value" id="succTime">—</span></div>
+        <div class="summary-row"><span class="label">金额</span><span class="price" id="succPrice">¥0</span></div>
+        <div class="summary-row"><span class="label">支付方式</span><span class="value" id="succPayMethod">—</span></div>
+      </div>
+
+      <div class="door-section">
+        <div class="door-label">门禁密码</div>
+        <div class="door-code" id="doorCode"></div>
+        <div class="door-validity">有效期至所约订单结束时间</div>
+        <button class="copy-btn" onclick="copyCode()">📋 复制密码</button>
+      </div>
+
+      <div class="actions" style="flex-wrap:wrap;">
+        <button class="action-btn ghost" onclick="location.href='../home/index.html'">返回首页</button>
+        <button class="action-btn primary" onclick="location.href='../room-control/index.html'">房内智控</button>
+        <button class="action-btn ghost" onclick="location.href='../my-orders/index.html'">查看订单</button>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../home/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
+    <div class="nav-item active"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
+    <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const params = new URLSearchParams(window.location.search);
+const roomId = params.get('roomId') || 'RM004';
+	const sessionType = params.get('sessionType') || 'standard';
+	const roomName = params.get('roomName') || '大茶室C';
+const dateStr = params.get('date') || new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+const slot = params.get('slot') || '10:00-11:30';
+const price = parseInt(params.get('price') || '180');
+const duration = params.get('duration') || '90';
+const personCount = params.get('personCount') || '2';
+
+// User balance from localStorage or default
+let userBalance = parseInt(localStorage.getItem('mp_balance') || '280');
+
+let selectedPay = 'wechat';
+let couponVerified = false;
+let couponDiscount = 0;
+let isCombinedPay = false;
+let combinedBalancePart = 0;
+
+document.getElementById('infoRoom').textContent = roomName;
+document.getElementById('infoDate').textContent = dateStr;
+document.getElementById('infoTime').textContent = slot + ' · ' + duration + '分钟';
+document.getElementById('infoPersons').textContent = personCount + '人';
+document.getElementById('infoPrice').textContent = '¥' + price;
+document.getElementById('finalPrice').textContent = '¥' + price;
+document.getElementById('balanceDesc').textContent = '当前余额 ¥' + userBalance;
+
+function selectPay(method, el) {
+  selectedPay = method;
+  isCombinedPay = false;
+  combinedBalancePart = 0;
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+
+  document.getElementById('couponBox').classList.toggle('active', method === 'douyin');
+
+  const warn = document.getElementById('balanceWarning');
+  const final = document.getElementById('finalPrice');
+  const combinedBtn = document.getElementById('combinedPayBtn');
+  const combinedInfo = document.getElementById('combinedPayInfo');
+
+  if (method === 'balance') {
+    if (userBalance < price) {
+      warn.style.display = 'block';
+      const shortage = price - userBalance;
+      document.getElementById('balanceWarningText').textContent = '余额不足（当前¥' + userBalance + '，需¥' + price + '，差额¥' + shortage + '），请充值或使用组合支付';
+      combinedBtn.style.display = 'inline-block';
+      combinedInfo.style.display = 'block';
+      combinedInfo.textContent = '组合支付：余额抵扣 ¥' + userBalance + ' + 微信/支付宝补差额 ¥' + shortage;
+      combinedBtn.textContent = '组合支付（余额+微信）';
+    } else {
+      warn.style.display = 'none';
+      combinedBtn.style.display = 'none';
+      combinedInfo.style.display = 'none';
+    }
+    final.textContent = '¥' + price;
+    document.getElementById('discountInfo').style.display = 'none';
+  } else {
+    warn.style.display = 'none';
+    combinedBtn.style.display = 'none';
+    combinedInfo.style.display = 'none';
+    final.textContent = '¥' + (price - couponDiscount);
+    if (couponDiscount > 0) {
+      document.getElementById('discountInfo').style.display = 'block';
+      document.getElementById('discountInfo').textContent = '券抵扣 ¥' + couponDiscount + ' · 实付 ¥' + (price - couponDiscount);
+    } else {
+      document.getElementById('discountInfo').style.display = 'none';
+    }
+  }
+}
+
+function selectCombinedPay() {
+  isCombinedPay = true;
+  combinedBalancePart = userBalance;
+  document.getElementById('balanceWarning').style.display = 'none';
+  document.getElementById('discountInfo').style.display = 'block';
+  document.getElementById('discountInfo').textContent = '余额抵扣 ¥' + userBalance + ' + 微信支付 ¥' + (price - userBalance);
+  document.getElementById('finalPrice').textContent = '¥' + price;
+  showToast('已选择组合支付：余额¥' + userBalance + ' + 微信¥' + (price - userBalance));
+}
+
+function verifyCoupon() {
+  const code = document.getElementById('couponCode').value.trim();
+  const result = document.getElementById('couponResult');
+  if (code.length < 4) {
+    result.className = 'coupon-result error';
+    result.textContent = '请输入有效券码';
+    couponVerified = false;
+    couponDiscount = 0;
+  } else {
+    // Simulate coupon verification - discount 20%
+    couponVerified = true;
+    couponDiscount = Math.round(price * 0.2);
+    result.className = 'coupon-result success';
+    result.textContent = '✓ 券码验证通过，可抵扣 ¥' + couponDiscount;
+    selectPay('douyin', document.getElementById('payDouyin'));
+  }
+}
+
+function goTopup() {
+  location.href = '../my-orders/index.html?tab=member&action=topup';
+}
+
+function confirmPay() {
+  // Balance protection: balance cannot go negative
+  if (selectedPay === 'balance' && !isCombinedPay) {
+    if (userBalance < price) {
+      showToast('余额不足，请选择组合支付或先充值');
+      return;
+    }
+    userBalance -= price;
+    localStorage.setItem('mp_balance', String(userBalance));
+  }
+
+  // Combined payment: use all balance + wechat for remaining
+  if (isCombinedPay && combinedBalancePart > 0) {
+    const shortage = price - combinedBalancePart;
+    if (shortage <= 0) {
+      // Balance covers full amount, just deduct
+      userBalance -= price;
+    } else {
+      // Deduct all balance, rest via wechat
+      userBalance = 0;
+    }
+    localStorage.setItem('mp_balance', String(userBalance));
+  }
+
+  const payMethodLabels = { wechat:'微信支付', alipay:'支付宝', balance:'会员余额', meituan:'美团', dianping:'大众点评', douyin:'抖音验券' };
+
+  document.getElementById('confirmView').style.display = 'none';
+  document.getElementById('successView').style.display = 'block';
+  document.getElementById('pageTitle').textContent = '预约成功';
+  document.getElementById('succRoom').textContent = roomName;
+  document.getElementById('succDate').textContent = dateStr;
+  document.getElementById('succTime').textContent = slot + ' · ' + duration + '分钟';
+  document.getElementById('succPrice').textContent = '¥' + price;
+
+  if (isCombinedPay) {
+    const shortage = price - combinedBalancePart;
+    if (shortage <= 0) {
+      document.getElementById('succPayMethod').textContent = '会员余额';
+      document.getElementById('successSub').textContent = '已从余额扣除 ¥' + price + '，余额 ¥' + userBalance;
+    } else {
+      document.getElementById('succPayMethod').textContent = '余额 + 微信支付';
+      document.getElementById('successSub').textContent = '余额抵扣 ¥' + combinedBalancePart + ' + 微信支付 ¥' + shortage + '，余额 ¥' + userBalance;
+    }
+  } else {
+    document.getElementById('succPayMethod').textContent = payMethodLabels[selectedPay] || selectedPay;
+  }
+
+  if (selectedPay === 'douyin' && couponVerified) {
+    document.getElementById('successIcon').textContent = '🎫';
+    document.getElementById('successTitle').textContent = '验券成功！';
+    document.getElementById('successSub').textContent = '抖音团购券已核销，订单已确认';
+  } else if (selectedPay === 'balance' && !isCombinedPay) {
+    document.getElementById('successSub').textContent = '已从余额扣除 ¥' + price + '，余额 ¥' + userBalance;
+  }
+
+
+  // Save booking to localStorage for my-orders page
+  var bookings = JSON.parse(localStorage.getItem('mp_bookings') || '[]');
+  var doorCode = String(Math.floor(Math.random()*9000+1000));
+  var endTime = slot.split('-')[1] || '';
+  bookings.unshift({
+    id: 'ORD' + Date.now(),
+    roomId: roomId,
+    roomName: roomName,
+    date: dateStr,
+    time: slot,
+    price: price,
+    duration: duration,
+    personCount: personCount,
+    doorCode: doorCode,
+    status: 'Booked',
+    sessionType: sessionType,
+    endTime: endTime,
+    payment: isCombinedPay ? '余额+微信' : payMethodLabels[selectedPay]
+  });
+  localStorage.setItem('mp_bookings', JSON.stringify(bookings));
+  const code = doorCode; // use the same code saved to localStorage
+  document.getElementById('doorCode').innerHTML = code.split('').map(d => `<div class="door-digit">${d}</div>`).join('');
+}
+
+function copyCode() {
+  const code = Array.from(document.querySelectorAll('.door-digit')).map(d => d.textContent).join('');
+  navigator.clipboard?.writeText(code).then(() => showToast('密码已复制: ' + code)).catch(() => showToast('密码: ' + code));
+}
+
+function goBack() {
+  if (document.getElementById('successView').style.display === 'block') {
+    location.href = '../home/index.html';
+  } else {
+    history.back();
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2000);
+}
+</script>
+</body>
+</html>

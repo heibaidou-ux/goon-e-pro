@@ -1,0 +1,18 @@
+{
+  "stores": [
+    {
+      "storeId": "ST001",
+      "storeCode": "YL",
+      "name": "盈隆店",
+      "address": "广州市天河区盈隆广场3楼",
+      "phone": "020-88888888",
+      "rating": 4.8,
+      "distance": 2.3,
+      "coverImage": "/images/store-cover.png",
+      "description": "高空茶室，180°落地窗，俯瞰城市天际线",
+      "openingHours": "08:00-24:00",
+      "status": "Active",
+      "rooms": ["RM001", "RM002", "RM003", "RM004", "RM005", "RM006"]
+    }
+  ]
+}

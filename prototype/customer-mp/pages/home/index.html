@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高岸茶室 - 首页</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
+.phone { width:375px; min-height:812px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; position:relative; }
+.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.store-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#fff; }
+.store-name { font-size:18px; font-weight:700; color:#1a1a1a; }
+.store-select { font-size:13px; color:#0052d9; display:flex; align-items:center; gap:4px; cursor:pointer; padding:4px 8px; border-radius:6px; background:#f0f5ff; }
+
+/* Carousel */
+.carousel { position:relative; height:200px; overflow:hidden; }
+.carousel-track { display:flex; height:100%; transition:transform .4s ease; }
+.carousel-slide { min-width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:16px; color:#fff; position:relative; }
+.carousel-slide::after { content:''; position:absolute; bottom:0; left:0; right:0; height:60%; background:linear-gradient(transparent,rgba(0,0,0,.5)); pointer-events:none; }
+.carousel-slide .slide-title { font-size:20px; font-weight:700; position:relative; z-index:1; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+.carousel-slide .slide-desc { font-size:14px; margin-top:4px; opacity:.9; position:relative; z-index:1; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+.carousel-slide .slide-tags { display:flex; gap:8px; margin-top:8px; position:relative; z-index:1; }
+.carousel-slide .slide-tag { background:rgba(255,255,255,.2); padding:2px 8px; border-radius:10px; font-size:11px; }
+.carousel-dots { position:absolute; bottom:8px; right:16px; display:flex; gap:6px; z-index:2; }
+.carousel-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.4); transition:all .2s; cursor:pointer; }
+.carousel-dot.active { background:#fff; width:18px; border-radius:10px; }
+.quick-actions { display:flex; gap:12px; padding:16px; }
+.quick-btn { flex:1; padding:16px; border-radius:12px; text-align:center; cursor:pointer; border:none; font-size:14px; font-weight:600; transition:transform .15s; }
+.quick-btn:active { transform:scale(.97); }
+.quick-btn.primary { background:#07c160; color:#fff; }
+.quick-btn.outline { background:#f0fdf4; color:#07c160; border:1.5px solid #07c160; }
+.section { padding:0 16px; margin-bottom:20px; }
+.section-title { font-size:15px; font-weight:600; margin-bottom:12px; color:#1a1a1a; }
+.room-card { display:flex; padding:14px; border-radius:12px; background:#f9fafb; margin-bottom:10px; cursor:pointer; transition:box-shadow .15s; }
+.room-card:hover { box-shadow:0 2px 12px rgba(0,0,0,.08); }
+.room-card-avatar { width:72px; height:72px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:28px; }
+.room-card-body { margin-left:12px; flex:1; }
+.room-card-name { font-size:15px; font-weight:600; }
+.room-card-meta { font-size:12px; color:#999; margin-top:4px; }
+.room-card-price { font-size:16px; font-weight:700; color:#e37318; margin-top:4px; }
+.room-card-arrow { color:#ccc; font-size:14px; align-self:center; }
+
+/* Tea products */
+.tea-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.tea-card { background:#fff; border-radius:12px; overflow:hidden; border:1px solid #f0f0f0; cursor:pointer; transition:box-shadow .15s; }
+.tea-card:hover { box-shadow:0 2px 12px rgba(0,0,0,.08); }
+.tea-card-img { height:100px; display:flex; align-items:center; justify-content:center; font-size:40px; }
+.tea-card-body { padding:10px; }
+.tea-card-name { font-size:13px; font-weight:600; }
+.tea-card-desc { font-size:11px; color:#999; margin-top:2px; }
+.tea-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+.tea-card-price { font-size:15px; font-weight:700; color:#e37318; }
+.tea-card-btn { padding:4px 12px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:11px; cursor:pointer; }
+.tea-card-btn:active { opacity:.8; }
+
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; transition:color .15s; text-decoration:none; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
+.nav-item:not(.active) { color:#999; }
+
+/* Modal */
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:24px;width:320px;text-align:center;max-height:90vh;overflow-y:auto; }
+.modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
+.modal p { font-size:14px;color:#666;margin-bottom:8px; }
+.modal .amount { font-size:32px;font-weight:800;color:#e37318; }
+.modal-close { margin-top:16px;padding:10px 24px;border-radius:8px;border:none;background:#07c160;color:#fff;font-size:14px;cursor:pointer;width:100%; }
+
+/* Login */
+.login-tabs { display:flex; margin-bottom:16px; border-radius:8px; overflow:hidden; border:1px solid #e5e5e5; }
+.login-tab { flex:1; padding:10px; cursor:pointer; font-size:13px; background:#f5f5f5; color:#999; border:none; transition:all .15s; }
+.login-tab.active { background:#07c160; color:#fff; }
+.form-item { margin-bottom:12px; text-align:left; }
+.form-label { font-size:12px; color:#999; margin-bottom:4px; display:block; }
+.form-input { width:100%; padding:10px 12px; border:1.5px solid #e5e5e5; border-radius:8px; font-size:14px; outline:none; transition:border-color .15s; }
+.form-input:focus { border-color:#07c160; }
+.form-btn { width:100%; padding:12px; border-radius:8px; border:none; background:#07c160; color:#fff; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
+.form-btn:active { opacity:.8; }
+.form-switch { font-size:12px; color:#0052d9; margin-top:12px; cursor:pointer; }
+
+/* Store selector */
+.store-option { display:flex; align-items:center; justify-content:space-between; padding:14px; border-bottom:1px solid #f0f0f0; cursor:pointer; font-size:14px; }
+.store-option:last-child { border-bottom:none; }
+.store-option.active { color:#07c160; font-weight:600; }
+.store-option.coming { color:#999; cursor:default; }
+.store-coming-tag { font-size:10px; padding:2px 6px; border-radius:8px; background:#fff3e0; color:#e37318; }
+
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+
+.user-badge { font-size:12px; color:#07c160; margin-left:8px; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="page">
+    <div class="store-header">
+      <span class="store-name">高岸茶室<span class="user-badge" id="userBadge" style="display:none">已登录</span></span>
+      <span class="store-select" onclick="showStoreSelector()">盈隆店 ▾</span>
+    </div>
+    <div class="carousel" id="carousel">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="carousel-slide" style="background:url('../../images/茶荟头图-空间-诗梳风大茶室.jpg') center/cover no-repeat;">
+          <div class="slide-title">高空茶室</div>
+          <div class="slide-desc">超宽落地窗，俯瞰城市天际线</div>
+          <div class="slide-tags"><span class="slide-tag">★ 4.8分</span><span class="slide-tag">距2.3km</span><span class="slide-tag">24小时营业</span></div>
+        </div>
+        <div class="carousel-slide" style="background:url('../../images/头图四-店面招牌.jpg') center/cover no-repeat;">
+          <div class="slide-title">精选好茶</div>
+          <div class="slide-desc">古树普洱 · 明前龙井 · 武夷岩茶</div>
+          <div class="slide-tags"><span class="slide-tag">新品到店</span><span class="slide-tag">限时特惠</span></div>
+        </div>
+        <div class="carousel-slide" style="background:url('../../images/中英文标题LOGO-蓝天白云-16比9-A.jpg') center/cover no-repeat;">
+          <div class="slide-title">商务会议</div>
+          <div class="slide-desc">投影 · K歌 · 茶台 · 高端私密空间</div>
+          <div class="slide-tags"><span class="slide-tag">大会议室</span><span class="slide-tag">可容纳10人</span></div>
+        </div>
+        <div class="carousel-slide" style="background:url('../../images/金德大诗梳风004.jpg') center/cover no-repeat;">
+          <div class="slide-title">雅致茶空间</div>
+          <div class="slide-desc">传统茶道 · 香道体验 · 高端社交</div>
+          <div class="slide-tags"><span class="slide-tag">特色体验</span><span class="slide-tag">VIP专属</span></div>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots">
+        <span class="carousel-dot active" onclick="goSlide(0)"></span>
+        <span class="carousel-dot" onclick="goSlide(1)"></span>
+        <span class="carousel-dot" onclick="goSlide(2)"></span>
+        <span class="carousel-dot" onclick="goSlide(3)"></span>
+      </div>
+    </div>
+    <div class="quick-actions">
+      <button class="quick-btn primary" onclick="handleBooking()">立即预约</button>
+      <button class="quick-btn outline" onclick="goMember()">会员中心</button>
+    </div>
+    <div class="section">
+      <div class="section-title">可预约包间</div>
+      <div id="roomList"></div>
+    </div>
+    <div class="section">
+      <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>🍵 精选茶品</span>
+        <span style="font-size:12px;font-weight:400;color:#07c160;cursor:pointer;display:flex;align-items:center;gap:4px;" onclick="goCart()">
+          🛒 购物车<span id="cartBadge" style="background:#e37318;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;display:none;">0</span>
+        </span>
+      </div>
+      <div class="tea-grid" id="teaGrid"></div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
+    <div class="nav-item" onclick="location.href='../room-detail/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
+    <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+
+<!-- Store Selector Modal -->
+<div class="modal-overlay" id="storeModal" onclick="if(event.target===this)hideStoreSelector()">
+  <div class="modal">
+    <h3>选择门店</h3>
+    <div class="store-option active" onclick="selectStore('盈隆店','YL')">📍 盈隆店 <span style="color:#07c160;">✓ 当前</span></div>
+    <div class="store-option coming" onclick="showToast('珠江新城店正在筹备中，将由高岸ERP全面接管，敬请期待')">📍 珠江新城店 <span class="store-coming-tag">即将上线</span></div>
+    <div class="store-option coming" onclick="showToast('琶洲店正在筹备中，将由高岸ERP全面接管，敬请期待')">📍 琶洲店 <span class="store-coming-tag">即将上线</span></div>
+    <button class="modal-close" onclick="hideStoreSelector()">关闭</button>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <h3 id="loginTitle">登录</h3>
+    <div class="login-tabs">
+      <button class="login-tab active" id="loginTab" onclick="switchLoginTab('login')">登录</button>
+      <button class="login-tab" id="registerTab" onclick="switchLoginTab('register')">注册</button>
+    </div>
+    <div id="loginContent"></div>
+    <div id="registerContent" style="display:none;"></div>
+    <p style="font-size:11px;color:#bbb;margin-top:12px;">演示环境，任意手机号即可登录</p>
+  </div>
+</div>
+
+<script>
+// ── state ──
+let isLoggedIn = localStorage.getItem('mp_logged_in') === 'true';
+let currentUser = null;
+let loginMode = 'login';
+let pendingAction = null;
+
+const stores = [
+  { id:'YL', name:'盈隆店', active:true },
+  { id:'ZJ', name:'珠江新城店', active:false },
+  { id:'PZ', name:'琶洲店', active:false },
+];
+
+const rooms = [
+  { roomId:"RM004", name:"大茶室C", type:"茶室", capacity:6, area:25, facilities:"茶台·K歌·投影·落地窗", pricePerHour:120 },
+  { roomId:"RM001", name:"大会议室", type:"会议室", capacity:10, area:30, facilities:"投影·会议桌·K歌设备·落地窗", pricePerHour:200 },
+  { roomId:"RM002", name:"中茶室A", type:"茶室", capacity:4, area:18, facilities:"茶台·落地窗·茶具套装", pricePerHour:80 },
+  { roomId:"RM003", name:"中茶室B", type:"茶室", capacity:4, area:18, facilities:"茶台·落地窗·茶具套装", pricePerHour:80 },
+];
+const colors = { '茶室':'#e8f5e9', '会议室':'#e3f2fd' };
+const icons = { '茶室':'🍵', '会议室':'💼' };
+
+// ── init ──
+if (isLoggedIn) {
+  currentUser = JSON.parse(localStorage.getItem('mp_user') || 'null');
+  if (currentUser) {
+    document.getElementById('userBadge').style.display = 'inline';
+    document.getElementById('userBadge').textContent = currentUser.name || '已登录';
+  }
+}
+
+document.getElementById('roomList').innerHTML = rooms.map(function(r) {
+  return '<div class="room-card" onclick="goRoom(\'' + r.roomId + '\')">' +
+    '<div class="room-card-avatar" style="background:' + (colors[r.type]||'#f0f0f0') + '">' + (icons[r.type]||'🏠') + '</div>' +
+    '<div class="room-card-body">' +
+      '<div class="room-card-name">' + r.name + '</div>' +
+      '<div class="room-card-meta">' + r.capacity + '人 · ' + r.area + '㎡ · ' + r.facilities + '</div>' +
+      '<div class="room-card-price">¥' + r.pricePerHour + '/时</div>' +
+    '</div>' +
+    '<div class="room-card-arrow">›</div>' +
+  '</div>';
+}).join('');
+
+// Tea products
+const teaProducts = [
+  { id:'T01', name:'明前龙井', type:'绿茶', desc:'2026年新茶 · 清香甘醇', price:168, icon:'🍃', bg:'#e8f5e9' },
+  { id:'T02', name:'古树普洱', type:'普洱', desc:'勐海古树 · 陈香醇厚', price:288, icon:'🪵', bg:'#efebe9' },
+  { id:'T03', name:'武夷岩茶', type:'乌龙', desc:'大红袍 · 岩骨花香', price:358, icon:'🏔️', bg:'#fff3e0' },
+  { id:'T04', name:'福鼎白茶', type:'白茶', desc:'白毫银针 · 清甜回甘', price:198, icon:'🌿', bg:'#f1f8e9' },
+  { id:'T05', name:'金骏眉', type:'红茶', desc:'芽头金毫 · 蜜香甘醇', price:328, icon:'🫖', bg:'#fce4ec' },
+  { id:'T06', name:'茉莉花茶', type:'花茶', desc:'三窨一提 · 花香茶韵', price:128, icon:'🌸', bg:'#f3e5f5' },
+];
+
+// Cart management
+let teaCart = JSON.parse(localStorage.getItem('mp_tea_cart') || '[]');
+
+function addToCart(product) {
+  var existing = null;
+  for (var i = 0; i < teaCart.length; i++) {
+    if (teaCart[i].id === product.id) { existing = teaCart[i]; break; }
+  }
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    teaCart.push({ id:product.id, name:product.name, price:product.price, qty:1, icon:product.icon });
+  }
+  localStorage.setItem('mp_tea_cart', JSON.stringify(teaCart));
+  var totalItems = 0;
+  var totalPrice = 0;
+  for (var i = 0; i < teaCart.length; i++) {
+    totalItems += teaCart[i].qty;
+    totalPrice += teaCart[i].price * teaCart[i].qty;
+  }
+  renderCartBadge();
+  showToast('已加入购物车: ' + product.name + '（共' + totalItems + '件 ¥' + totalPrice + '）');
+}
+
+function renderCartBadge() {
+  var totalItems = 0;
+  for (var i = 0; i < teaCart.length; i++) { totalItems += teaCart[i].qty; }
+  var badge = document.getElementById('cartBadge');
+  if (badge) {
+    badge.textContent = totalItems;
+    badge.style.display = totalItems > 0 ? '' : 'none';
+  }
+}
+
+function goCart() {
+  if (teaCart.length === 0) { showToast('购物车为空'); return; }
+  location.href = '../tea-shop/index.html?tab=cart';
+}
+
+function renderTeaGrid() {
+  document.getElementById('teaGrid').innerHTML = teaProducts.map(function(t) {
+    return '<div class="tea-card">' +
+      '<div class="tea-card-img" style="background:' + t.bg + ';">' + t.icon + '</div>' +
+      '<div class="tea-card-body">' +
+        '<div class="tea-card-name">' + t.name + '</div>' +
+        '<div class="tea-card-desc">' + t.desc + '</div>' +
+        '<div class="tea-card-footer">' +
+          '<span class="tea-card-price">¥' + t.price + '</span>' +
+          '<button class="tea-card-btn" onclick="event.stopPropagation();addToCart(teaProducts[' + teaProducts.indexOf(t) + '])">+ 加购</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+renderTeaGrid();
+renderCartBadge();
+
+// Carousel
+let currentSlide = 0;
+const totalSlides = 4;
+
+function goSlide(idx) {
+  currentSlide = idx;
+  document.getElementById('carouselTrack').style.transform = 'translateX(-' + (idx * 100) + '%)';
+  document.querySelectorAll('.carousel-dot').forEach(function(d,i) { d.classList.toggle('active', i===idx); });
+}
+
+function nextSlide() {
+  goSlide((currentSlide + 1) % totalSlides);
+}
+
+setInterval(nextSlide, 3500);
+
+// Touch swipe for carousel
+let touchStartX = 0;
+document.getElementById('carousel').addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; });
+document.getElementById('carousel').addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].clientX;
+  if (diff > 40) goSlide((currentSlide + 1) % totalSlides);
+  else if (diff < -40) goSlide((currentSlide - 1 + totalSlides) % totalSlides);
+});
+
+// ── booking flow ──
+function handleBooking() {
+  if (isLoggedIn) {
+    document.querySelector('.section').scrollIntoView({ behavior:'smooth' });
+  } else {
+    pendingAction = 'booking';
+    showLogin();
+  }
+}
+
+function goRoom(roomId) {
+  if (!isLoggedIn) {
+    pendingAction = 'room-' + roomId;
+    showLogin();
+    return;
+  }
+  location.href = '../room-detail/index.html?id=' + roomId;
+}
+
+// ── login ──
+function showLogin() {
+  document.getElementById('loginModal').style.display = 'flex';
+  renderLoginForm();
+}
+
+function switchLoginTab(mode) {
+  loginMode = mode;
+  document.getElementById('loginTab').classList.toggle('active', mode==='login');
+  document.getElementById('registerTab').classList.toggle('active', mode==='register');
+  document.getElementById('loginTitle').textContent = mode==='login' ? '登录' : '注册';
+  renderLoginForm();
+}
+
+function renderLoginForm() {
+  var container = document.getElementById('loginContent');
+  var regContainer = document.getElementById('registerContent');
+
+  if (loginMode === 'login') {
+    container.style.display = 'block';
+    regContainer.style.display = 'none';
+    container.innerHTML =
+      '<div class="form-item"><label class="form-label">手机号</label><input class="form-input" id="loginPhone" type="tel" placeholder="请输入手机号" value="138****8888"></div>' +
+      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="loginCode" placeholder="验证码" value="8888"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #07c160;background:#fff;color:#07c160;font-size:12px;cursor:pointer;" onclick="showToast(\'验证码已发送: 8888\')">获取验证码</button></div></div>' +
+      '<button class="form-btn" onclick="doLogin()">登 录</button>' +
+      '<div class="form-switch" onclick="switchLoginTab(\'register\')">没有账号？立即注册 →</div>';
+  } else {
+    container.style.display = 'none';
+    regContainer.style.display = 'block';
+    regContainer.innerHTML =
+      '<div class="form-item"><label class="form-label">手机号</label><input class="form-input" id="regPhone" type="tel" placeholder="请输入手机号"></div>' +
+      '<div class="form-item"><label class="form-label">昵称</label><input class="form-input" id="regName" placeholder="请输入昵称"></div>' +
+      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="regCode" placeholder="验证码"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #07c160;background:#fff;color:#07c160;font-size:12px;cursor:pointer;" onclick="showToast(\'验证码已发送\')">获取验证码</button></div></div>' +
+      '<button class="form-btn" onclick="doRegister()">注 册</button>' +
+      '<div class="form-switch" onclick="switchLoginTab(\'login\')">已有账号？立即登录 →</div>';
+  }
+}
+
+function doLogin() {
+  var phone = document.getElementById('loginPhone') ? document.getElementById('loginPhone').value : '138****8888';
+  currentUser = { phone:phone, name:'张先生', memberLevel:'金牌会员', balance:280, totalSpent:3680, bookingCount:12 };
+  completeLogin();
+}
+
+function doRegister() {
+  var name = document.getElementById('regName') ? document.getElementById('regName').value : '新用户';
+  var phone = document.getElementById('regPhone') ? document.getElementById('regPhone').value : '130****0000';
+  currentUser = { phone:phone, name:name, memberLevel:'普通会员', balance:0, totalSpent:0, bookingCount:0 };
+  completeLogin();
+}
+
+function completeLogin() {
+  isLoggedIn = true;
+  localStorage.setItem('mp_logged_in', 'true');
+  localStorage.setItem('mp_user', JSON.stringify(currentUser));
+  document.getElementById('loginModal').style.display = 'none';
+  document.getElementById('userBadge').style.display = 'inline';
+  document.getElementById('userBadge').textContent = currentUser.name;
+  showToast('登录成功');
+
+  if (pendingAction) {
+    if (pendingAction === 'booking') {
+      setTimeout(function() { document.querySelector('.section').scrollIntoView({ behavior:'smooth' }); }, 300);
+    } else if (pendingAction.indexOf('room-') === 0) {
+      var roomId = pendingAction.replace('room-', '');
+      setTimeout(function() { location.href = '../room-detail/index.html?id=' + roomId; }, 300);
+    }
+    pendingAction = null;
+  }
+}
+
+// ── store selector ──
+function showStoreSelector() { document.getElementById('storeModal').style.display = 'flex'; }
+function hideStoreSelector() { document.getElementById('storeModal').style.display = 'none'; }
+function selectStore(name) { hideStoreSelector(); showToast('当前门店: ' + name); }
+
+// ── member ──
+function goMember() {
+  if (!isLoggedIn) {
+    pendingAction = 'member';
+    showLogin();
+    return;
+  }
+  location.href = '../member-center/index.html';
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.className = 'toast';
+    t.id = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(function() { t.style.display = 'none'; }, 2000);
+}
+
+// init login form
+renderLoginForm();
+</script>
+<div class="toast" id="toast"></div>
+</body>
+</html>

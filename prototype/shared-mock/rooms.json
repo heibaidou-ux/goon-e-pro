@@ -1,0 +1,84 @@
+{
+  "rooms": [
+    {
+      "roomId": "RM001",
+      "roomCode": "R01",
+      "name": "大会议室",
+      "type": "MeetingRoom",
+      "capacity": 10,
+      "area": 30,
+      "facilities": ["投影", "会议桌", "K歌设备", "落地窗"],
+      "pricePerHour": 200,
+      "pricePerHalfHour": 120,
+      "images": ["/images/room-meeting.png"],
+      "status": "Active"
+    },
+    {
+      "roomId": "RM002",
+      "roomCode": "R02",
+      "name": "中茶室A",
+      "type": "TeaRoom",
+      "capacity": 4,
+      "area": 18,
+      "facilities": ["茶台", "落地窗", "茶具套装"],
+      "pricePerHour": 80,
+      "pricePerHalfHour": 50,
+      "images": ["/images/room-tea-a.png"],
+      "status": "Active"
+    },
+    {
+      "roomId": "RM003",
+      "roomCode": "R03",
+      "name": "中茶室B",
+      "type": "TeaRoom",
+      "capacity": 4,
+      "area": 18,
+      "facilities": ["茶台", "落地窗", "茶具套装"],
+      "pricePerHour": 80,
+      "pricePerHalfHour": 50,
+      "images": ["/images/room-tea-b.png"],
+      "status": "Active"
+    },
+    {
+      "roomId": "RM004",
+      "roomCode": "R04",
+      "name": "大茶室C",
+      "type": "TeaRoom",
+      "capacity": 6,
+      "area": 25,
+      "facilities": ["茶台", "K歌", "投影", "落地窗"],
+      "pricePerHour": 120,
+      "pricePerHalfHour": 75,
+      "images": ["/images/room-tea-c.png"],
+      "status": "Active"
+    },
+    {
+      "roomId": "RM005",
+      "roomCode": "R05",
+      "name": "展厅",
+      "type": "Exhibition",
+      "capacity": 20,
+      "area": 40,
+      "facilities": ["前台", "收银", "茶具展示", "休闲区"],
+      "pricePerHour": 0,
+      "pricePerHalfHour": 0,
+      "images": [],
+      "status": "Active",
+      "bookable": false
+    },
+    {
+      "roomId": "RM006",
+      "roomCode": "R06",
+      "name": "工作间",
+      "type": "Workspace",
+      "capacity": 2,
+      "area": 12,
+      "facilities": ["储物", "机柜"],
+      "pricePerHour": 0,
+      "pricePerHalfHour": 0,
+      "images": [],
+      "status": "Active",
+      "bookable": false
+    }
+  ]
+}

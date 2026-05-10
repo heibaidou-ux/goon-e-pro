@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高岸ERP - 交互原型导航</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#f5f7fa 0%,#e8ecf1 100%); min-height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; display:flex; justify-content:center; padding:40px 20px; }
+.container { max-width:900px; width:100%; }
+h1 { font-size:28px; font-weight:800; color:#1a1a1a; margin-bottom:8px; letter-spacing:1px; }
+.subtitle { font-size:14px; color:#999; margin-bottom:32px; }
+.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:40px; }
+@media (max-width:700px) { .grid { grid-template-columns:1fr; } }
+.card { background:#fff; border-radius:16px; padding:24px; box-shadow:0 2px 16px rgba(0,0,0,.06); transition:transform .15s,box-shadow .15s; }
+.card:hover { transform:translateY(-2px); box-shadow:0 4px 24px rgba(0,0,0,.1); }
+.card-icon { font-size:32px; margin-bottom:12px; }
+.card-title { font-size:18px; font-weight:700; color:#1a1a1a; margin-bottom:4px; }
+.card-desc { font-size:13px; color:#999; margin-bottom:16px; }
+.card-links { display:flex; flex-direction:column; gap:6px; }
+.card-link { display:block; padding:10px 14px; border-radius:8px; font-size:13px; color:#0052d9; text-decoration:none; background:#f0f5ff; transition:background .15s; }
+.card-link:hover { background:#e3edff; }
+.card-link .link-arrow { float:right; color:#ccc; }
+.badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:600; margin-left:6px; }
+.badge.web { background:#e3f2fd; color:#0052d9; }
+.badge.mp { background:#e8f5e9; color:#00a870; }
+.footer { text-align:center; color:#bbb; font-size:12px; margin-top:20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>高岸ERP · 交互原型</h1>
+  <p class="subtitle">盈隆店智能管理系统 — 三个端全覆盖。基于 UI-01 交互原型设计文档 (V1.0, 2026-05-08)</p>
+
+  <div class="grid">
+    <!-- Admin Web -->
+    <div class="card">
+      <div class="card-icon">🖥️</div>
+      <div class="card-title">管理后台<span class="badge web">Vue 3</span></div>
+      <div class="card-desc">门店管理员使用的 Web 后台（需先启动 Vite 开发服务器）</div>
+      <div class="card-links">
+        <a class="card-link" href="http://localhost:5173" target="_blank">启动管理后台 <span class="link-arrow">↗</span></a>
+        <a class="card-link" href="http://localhost:5173/#/dashboard" target="_blank">门店总览 Dashboard<span class="link-arrow">→</span></a>
+        <a class="card-link" href="http://localhost:5173/#/rooms" target="_blank">房间管理<span class="link-arrow">→</span></a>
+        <a class="card-link" href="http://localhost:5173/#/devices" target="_blank">IoT设备管理<span class="link-arrow">→</span></a>
+        <a class="card-link" href="http://localhost:5173/#/scenes" target="_blank">场景配置<span class="link-arrow">→</span></a>
+        <a class="card-link" href="http://localhost:5173/#/alerts" target="_blank">告警中心<span class="link-arrow">→</span></a>
+        <a class="card-link" href="http://localhost:5173/#/audit" target="_blank">操作审计<span class="link-arrow">→</span></a>
+      </div>
+    </div>
+
+    <!-- Customer Mini Program -->
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <div class="card-title">客人端小程序<span class="badge mp">原型</span></div>
+      <div class="card-desc">客人预约包间、控制设备、查看订单的微信小程序交互原型</div>
+      <div class="card-links">
+        <a class="card-link" href="customer-mp/pages/home/index.html" target="_blank">首页<span class="link-arrow">→</span></a>
+        <a class="card-link" href="customer-mp/pages/room-detail/index.html?id=RM004" target="_blank">包间详情·预约<span class="link-arrow">→</span></a>
+        <a class="card-link" href="customer-mp/pages/booking-confirm/index.html" target="_blank">预约成功·门禁密码<span class="link-arrow">→</span></a>
+        <a class="card-link" href="customer-mp/pages/room-control/index.html" target="_blank">包间内控制·场景切换<span class="link-arrow">→</span></a>
+        <a class="card-link" href="customer-mp/pages/my-orders/index.html" target="_blank">我的订单<span class="link-arrow">→</span></a>
+      </div>
+    </div>
+
+    <!-- Staff Mini Program -->
+    <div class="card">
+      <div class="card-icon">👨‍💼</div>
+      <div class="card-title">店员端小程序<span class="badge mp">原型</span></div>
+      <div class="card-desc">店员管理房态、监控设备、控制场景、处理保洁的微信小程序交互原型</div>
+      <div class="card-links">
+        <a class="card-link" href="staff-mp/pages/dashboard/index.html" target="_blank">工作台 Dashboard<span class="link-arrow">→</span></a>
+        <a class="card-link" href="staff-mp/pages/room-status/index.html" target="_blank">房态看板<span class="link-arrow">→</span></a>
+        <a class="card-link" href="staff-mp/pages/device-monitor/index.html" target="_blank">设备监控<span class="link-arrow">→</span></a>
+        <a class="card-link" href="staff-mp/pages/device-control/index.html" target="_blank">设备控制（门锁/空调/灯光/窗帘/音响）<span class="link-arrow">→</span></a>
+        <a class="card-link" href="staff-mp/pages/scene-control/index.html" target="_blank">场景控制<span class="link-arrow">→</span></a>
+        <a class="card-link" href="staff-mp/pages/cleaning-task/index.html" target="_blank">保洁任务·故障上报<span class="link-arrow">→</span></a>
+      </div>
+    </div>
+
+    <!-- Role Workbenches -->
+    <div class="card">
+      <div class="card-icon">👤</div>
+      <div class="card-title">角色专属工作台<span class="badge mp">原型</span></div>
+      <div class="card-desc">各业务角色的数据看板，为总经理、财务、投资人、技术团队量身打造</div>
+      <div class="card-links">
+        <a class="card-link" href="customer-mp/pages/gm-workbench/index.html" target="_blank">总经理工作台 · 运营总览与审批<span class="link-arrow">→</span></a>
+        <a class="card-link" href="customer-mp/pages/finance-workbench/index.html" target="_blank">财务工作台 · 收支与对账<span class="link-arrow">→</span></a>
+        <a class="card-link" href="customer-mp/pages/investor-workbench/index.html" target="_blank">投资人看板 · 分红与ROI<span class="link-arrow">→</span></a>
+        <a class="card-link" href="customer-mp/pages/technician-workbench/index.html" target="_blank">技术运维中心 · 设备与告警<span class="link-arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer">高岸ERP · 盈隆店 · 交互原型 V1.0 · 2026年5月<br>基于 UI-01 设计文档覆盖 客人端5页面 + 店员端6页面 + 管理端6页面 | 12个边界状态</p>
+</div>
+</body>
+</html>

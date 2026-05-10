@@ -1,0 +1,64 @@
+{
+  "customers": [
+    {
+      "customerId": "CUS001",
+      "name": "张先生",
+      "phone": "138****8888",
+      "avatar": "/images/avatar-male-01.png",
+      "level": "VIP",
+      "totalOrders": 12,
+      "totalSpent": 3680,
+      "tags": ["茶友", "高频"],
+      "preferredRoomType": "TeaRoom",
+      "createdAt": "2025-11-15"
+    },
+    {
+      "customerId": "CUS002",
+      "name": "李总",
+      "phone": "139****9999",
+      "avatar": "/images/avatar-male-02.png",
+      "level": "VIP",
+      "totalOrders": 8,
+      "totalSpent": 5200,
+      "tags": ["商务", "大额"],
+      "preferredRoomType": "MeetingRoom",
+      "createdAt": "2025-12-01"
+    },
+    {
+      "customerId": "CUS003",
+      "name": "王女士",
+      "phone": "136****7777",
+      "avatar": "/images/avatar-female-01.png",
+      "level": "Regular",
+      "totalOrders": 3,
+      "totalSpent": 560,
+      "tags": ["新客"],
+      "preferredRoomType": "TeaRoom",
+      "createdAt": "2026-03-20"
+    },
+    {
+      "customerId": "CUS004",
+      "name": "陈先生",
+      "phone": "135****6666",
+      "avatar": "/images/avatar-male-03.png",
+      "level": "Regular",
+      "totalOrders": 5,
+      "totalSpent": 960,
+      "tags": ["茶友"],
+      "preferredRoomType": "TeaRoom",
+      "createdAt": "2026-01-10"
+    },
+    {
+      "customerId": "CUS005",
+      "name": "赵总",
+      "phone": "137****5555",
+      "avatar": "/images/avatar-male-04.png",
+      "level": "VIP",
+      "totalOrders": 15,
+      "totalSpent": 8900,
+      "tags": ["商务", "高频", "大额"],
+      "preferredRoomType": "MeetingRoom",
+      "createdAt": "2025-10-08"
+    }
+  ]
+}

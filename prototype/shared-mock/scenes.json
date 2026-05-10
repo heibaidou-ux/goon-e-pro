@@ -1,0 +1,83 @@
+{
+  "scenes": [
+    {
+      "sceneId": "SC001",
+      "name": "Welcome",
+      "label": "欢迎",
+      "icon": "door",
+      "triggerType": "Auto",
+      "applicableRoomTypes": ["TeaRoom", "MeetingRoom"],
+      "rules": [
+        { "sequence": 1, "deviceType": "Light", "action": "On", "params": { "brightness": 80 } },
+        { "sequence": 2, "deviceType": "AC", "action": "Temperature", "params": { "temperature": 24 } },
+        { "sequence": 3, "deviceType": "Speaker", "action": "Volume", "params": { "source": "bgm", "volume": 50 } }
+      ]
+    },
+    {
+      "sceneId": "SC002",
+      "name": "TeaSession",
+      "label": "品茶",
+      "icon": "tea",
+      "triggerType": "Manual",
+      "applicableRoomTypes": ["TeaRoom"],
+      "rules": [
+        { "sequence": 1, "deviceType": "Light", "action": "ColorTemp", "params": { "brightness": 80, "colorTemp": 3000 } },
+        { "sequence": 2, "deviceType": "AC", "action": "Temperature", "params": { "temperature": 24 } },
+        { "sequence": 3, "deviceType": "Speaker", "action": "Volume", "params": { "source": "bgm", "volume": 40 } }
+      ],
+      "defaultParams": { "temperature": 24, "colorTemp": 3000, "volume": 40 }
+    },
+    {
+      "sceneId": "SC003",
+      "name": "Meeting",
+      "label": "会议",
+      "icon": "meeting",
+      "triggerType": "Manual",
+      "applicableRoomTypes": ["MeetingRoom"],
+      "rules": [
+        { "sequence": 1, "deviceType": "Light", "action": "ColorTemp", "params": { "brightness": 90, "colorTemp": 4000 } },
+        { "sequence": 2, "deviceType": "Speaker", "action": "Mute", "params": {} }
+      ],
+      "defaultParams": { "colorTemp": 4000, "mute": true }
+    },
+    {
+      "sceneId": "SC004",
+      "name": "Karaoke",
+      "label": "K歌",
+      "icon": "music",
+      "triggerType": "Manual",
+      "applicableRoomTypes": ["TeaRoom", "MeetingRoom"],
+      "rules": [
+        { "sequence": 1, "deviceType": "Light", "action": "Color", "params": { "brightness": 60, "effect": "color-cycle" } },
+        { "sequence": 2, "deviceType": "Speaker", "action": "Volume", "params": { "source": "ktv", "volume": 80 } }
+      ],
+      "defaultParams": { "volume": 80 }
+    },
+    {
+      "sceneId": "SC005",
+      "name": "EnergySave",
+      "label": "节能",
+      "icon": "power",
+      "triggerType": "Auto",
+      "applicableRoomTypes": ["TeaRoom", "MeetingRoom", "Exhibition"],
+      "rules": [
+        { "sequence": 1, "deviceType": "Speaker", "action": "Off", "params": {} },
+        { "sequence": 2, "deviceType": "AC", "action": "Off", "params": {} },
+        { "sequence": 3, "deviceType": "Light", "action": "Off", "params": {} },
+        { "sequence": 4, "deviceType": "Curtain", "action": "Close", "params": {} }
+      ]
+    },
+    {
+      "sceneId": "SC006",
+      "name": "PreOpen",
+      "label": "预开",
+      "icon": "clock",
+      "triggerType": "Schedule",
+      "applicableRoomTypes": ["TeaRoom", "MeetingRoom"],
+      "rules": [
+        { "sequence": 1, "deviceType": "AC", "action": "On", "params": { "temperature": 24 } },
+        { "sequence": 2, "deviceType": "Light", "action": "On", "params": { "brightness": 50 } }
+      ]
+    }
+  ]
+}

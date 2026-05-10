@@ -1,0 +1,127 @@
+{
+  "resources": [
+    { "resourceId": "MENU_DASHBOARD", "type": "menu", "label": "门店总览", "route": "/dashboard" },
+    { "resourceId": "MENU_ROOMS", "type": "menu", "label": "房间管理", "route": "/rooms" },
+    { "resourceId": "MENU_PRODUCTS", "type": "menu", "label": "商品目录", "route": "/products" },
+    { "resourceId": "MENU_PURCHASES", "type": "menu", "label": "采购配货", "route": "/purchases" },
+    { "resourceId": "MENU_INVENTORY", "type": "menu", "label": "库存管理", "route": "/inventory" },
+    { "resourceId": "MENU_SUPPLIERS", "type": "menu", "label": "供应商管理", "route": "/suppliers" },
+    { "resourceId": "MENU_REVENUE", "type": "menu", "label": "收入管理", "route": "/revenue" },
+    { "resourceId": "MENU_EXPENSE", "type": "menu", "label": "支出管理", "route": "/expense" },
+    { "resourceId": "MENU_SETTLEMENT", "type": "menu", "label": "自动月结", "route": "/settlement" },
+    { "resourceId": "MENU_RECONCILIATION", "type": "menu", "label": "智能对账", "route": "/reconciliation" },
+    { "resourceId": "MENU_DIVIDENDS", "type": "menu", "label": "股东分红", "route": "/dividends" },
+    { "resourceId": "MENU_REPORTS", "type": "menu", "label": "报表体系", "route": "/reports" },
+    { "resourceId": "MENU_ASSETS", "type": "menu", "label": "固定资产", "route": "/assets" },
+    { "resourceId": "MENU_EMPLOYEES", "type": "menu", "label": "员工档案", "route": "/employees" },
+    { "resourceId": "MENU_EXTERNAL_PERSONNEL", "type": "menu", "label": "外聘人员", "route": "/external-personnel" },
+    { "resourceId": "MENU_SCHEDULING", "type": "menu", "label": "智能排班", "route": "/scheduling" },
+    { "resourceId": "MENU_ATTENDANCE", "type": "menu", "label": "考勤管理", "route": "/attendance" },
+    { "resourceId": "MENU_PAYROLL", "type": "menu", "label": "薪资核算", "route": "/payroll" },
+    { "resourceId": "MENU_PERFORMANCE", "type": "menu", "label": "绩效考核", "route": "/performance" },
+    { "resourceId": "MENU_CLEANER", "type": "menu", "label": "保洁员管理", "route": "/cleaner" },
+    { "resourceId": "MENU_CAMPAIGNS", "type": "menu", "label": "营销活动", "route": "/campaigns" },
+    { "resourceId": "MENU_COUPONS", "type": "menu", "label": "优惠券管理", "route": "/coupons" },
+    { "resourceId": "MENU_PLATFORM_ACTIVITIES", "type": "menu", "label": "平台活动", "route": "/platform-activities" },
+    { "resourceId": "MENU_ANALYSIS", "type": "menu", "label": "效果分析", "route": "/analysis" },
+    { "resourceId": "MENU_DEVICES", "type": "menu", "label": "IoT设备管理", "route": "/devices" },
+    { "resourceId": "MENU_SCENES", "type": "menu", "label": "场景配置", "route": "/scenes" },
+    { "resourceId": "MENU_ALERTS", "type": "menu", "label": "告警中心", "route": "/alerts" },
+    { "resourceId": "MENU_AUDIT", "type": "menu", "label": "操作审计", "route": "/audit" },
+    { "resourceId": "MENU_WORKFLOW_DEFS", "type": "menu", "label": "流程定义", "route": "/workflow-defs" },
+    { "resourceId": "MENU_APPROVAL_TASKS", "type": "menu", "label": "审批中心", "route": "/approval-tasks" },
+    { "resourceId": "MENU_ROLES", "type": "menu", "label": "角色管理", "route": "/roles" },
+    { "resourceId": "MENU_PERMISSIONS", "type": "menu", "label": "权限配置", "route": "/permissions" },
+    { "resourceId": "MENU_USER_ROLES", "type": "menu", "label": "用户角色分配", "route": "/user-roles" },
+    { "resourceId": "BTN_APPROVE", "type": "button", "label": "审批通过", "action": "approve" },
+    { "resourceId": "BTN_REJECT", "type": "button", "label": "驳回", "action": "reject" },
+    { "resourceId": "BTN_CREATE", "type": "button", "label": "创建", "action": "create" },
+    { "resourceId": "BTN_EDIT", "type": "button", "label": "编辑", "action": "edit" },
+    { "resourceId": "BTN_DELETE", "type": "button", "label": "删除", "action": "delete" },
+    { "resourceId": "BTN_EXPORT", "type": "button", "label": "导出", "action": "export" },
+    { "resourceId": "BTN_DISPOSE", "type": "button", "label": "资产处置", "action": "dispose" },
+    { "resourceId": "BTN_PAY", "type": "button", "label": "确认付款", "action": "pay" }
+  ],
+  "roles": [
+    { "roleId": "store_manager", "name": "店长", "description": "门店最高管理者，负责日常运营审批", "isSystem": true, "color": "#0052D9" },
+    { "roleId": "waiter", "name": "店员", "description": "门店一线服务人员", "isSystem": true, "color": "#00A870" },
+    { "roleId": "technician", "name": "技术员", "description": "设备维护和技术支持", "isSystem": true, "color": "#E37318" },
+    { "roleId": "finance", "name": "财务", "description": "总部财务人员，负责对账/月结/审批", "isSystem": true, "color": "#D54941" },
+    { "roleId": "head_office", "name": "总部运营", "description": "总部的运营管理人员", "isSystem": true, "color": "#9C27B0" },
+    { "roleId": "admin", "name": "系统管理员", "description": "系统运维与权限管理", "isSystem": true, "color": "#333333" },
+    { "roleId": "investor", "name": "投资人", "description": "查看投资门店的财务和分红数据", "isSystem": false, "color": "#2D9C9C" },
+    { "roleId": "head_gm", "name": "总部总经理", "description": "总部最高业务管理者，审批权限涵盖所有业务域", "isSystem": true, "color": "#F59B23" },
+    { "roleId": "head_dgm", "name": "总部副总经理", "description": "总部副总，协助总经理处理日常审批和业务管理", "isSystem": true, "color": "#E88B2A" }
+  ],
+  "rolePermissions": [
+    { "roleId": "admin", "permissions": ["*"] },
+    { "roleId": "store_manager", "permissions": [
+      "MENU_DASHBOARD", "MENU_ROOMS", "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
+      "MENU_REVENUE", "MENU_EXPENSE", "MENU_SETTLEMENT", "MENU_RECONCILIATION", "MENU_DIVIDENDS", "MENU_REPORTS",
+      "MENU_EMPLOYEES", "MENU_SCHEDULING", "MENU_ATTENDANCE", "MENU_PAYROLL", "MENU_PERFORMANCE", "MENU_CLEANER",
+      "MENU_DEVICES", "MENU_SCENES", "MENU_ALERTS",
+      "MENU_APPROVAL_TASKS",
+      "BTN_APPROVE", "BTN_REJECT", "BTN_CREATE", "BTN_EDIT"
+    ] },
+    { "roleId": "waiter", "permissions": [
+      "MENU_DASHBOARD", "MENU_ROOMS",
+      "MENU_INVENTORY",
+      "MENU_ATTENDANCE", "MENU_PERFORMANCE",
+      "MENU_DEVICES", "MENU_ALERTS",
+      "MENU_APPROVAL_TASKS"
+    ] },
+    { "roleId": "technician", "permissions": [
+      "MENU_DEVICES", "MENU_SCENES", "MENU_ALERTS", "MENU_ROOMS"
+    ] },
+    { "roleId": "finance", "permissions": [
+      "MENU_REVENUE", "MENU_EXPENSE", "MENU_SETTLEMENT", "MENU_RECONCILIATION", "MENU_DIVIDENDS", "MENU_REPORTS", "MENU_ASSETS",
+      "MENU_PURCHASES", "MENU_INVENTORY",
+      "MENU_PAYROLL",
+      "MENU_APPROVAL_TASKS",
+      "BTN_APPROVE", "BTN_REJECT", "BTN_PAY", "BTN_EXPORT"
+    ] },
+    { "roleId": "head_office", "permissions": [
+      "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
+      "MENU_DASHBOARD", "MENU_REPORTS", "MENU_SETTLEMENT",
+      "MENU_CAMPAIGNS", "MENU_COUPONS", "MENU_PLATFORM_ACTIVITIES", "MENU_ANALYSIS",
+      "MENU_EMPLOYEES", "MENU_PAYROLL", "MENU_PERFORMANCE",
+      "MENU_APPROVAL_TASKS",
+      "BTN_APPROVE", "BTN_REJECT", "BTN_CREATE", "BTN_EDIT", "BTN_EXPORT"
+    ] },
+    { "roleId": "investor", "permissions": [
+      "MENU_DASHBOARD", "MENU_REPORTS", "MENU_DIVIDENDS"
+    ] },
+    { "roleId": "head_gm", "permissions": [
+      "MENU_DASHBOARD", "MENU_ROOMS",
+      "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
+      "MENU_REVENUE", "MENU_EXPENSE", "MENU_SETTLEMENT", "MENU_RECONCILIATION", "MENU_DIVIDENDS", "MENU_REPORTS", "MENU_ASSETS",
+      "MENU_EMPLOYEES", "MENU_EXTERNAL_PERSONNEL", "MENU_SCHEDULING", "MENU_ATTENDANCE", "MENU_PAYROLL", "MENU_PERFORMANCE", "MENU_CLEANER",
+      "MENU_CAMPAIGNS", "MENU_COUPONS", "MENU_PLATFORM_ACTIVITIES", "MENU_ANALYSIS",
+      "MENU_DEVICES", "MENU_SCENES", "MENU_ALERTS", "MENU_AUDIT",
+      "MENU_APPROVAL_TASKS", "MENU_WORKFLOW_DEFS",
+      "BTN_APPROVE", "BTN_REJECT", "BTN_CREATE", "BTN_EDIT", "BTN_EXPORT", "BTN_PAY", "BTN_DISPOSE"
+    ] },
+    { "roleId": "head_dgm", "permissions": [
+      "MENU_DASHBOARD", "MENU_ROOMS",
+      "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
+      "MENU_REVENUE", "MENU_EXPENSE", "MENU_SETTLEMENT", "MENU_RECONCILIATION", "MENU_DIVIDENDS", "MENU_REPORTS", "MENU_ASSETS",
+      "MENU_EMPLOYEES", "MENU_EXTERNAL_PERSONNEL", "MENU_SCHEDULING", "MENU_ATTENDANCE", "MENU_PAYROLL", "MENU_PERFORMANCE", "MENU_CLEANER",
+      "MENU_CAMPAIGNS", "MENU_COUPONS", "MENU_PLATFORM_ACTIVITIES", "MENU_ANALYSIS",
+      "MENU_DEVICES", "MENU_SCENES", "MENU_ALERTS", "MENU_AUDIT",
+      "MENU_APPROVAL_TASKS", "MENU_WORKFLOW_DEFS",
+      "BTN_APPROVE", "BTN_REJECT", "BTN_EXPORT"
+    ] }
+  ],
+  "userRoles": [
+    { "userId": "E001", "name": "张店长", "roles": ["store_manager"], "store": "盈隆店" },
+    { "userId": "E002", "name": "小林", "roles": ["waiter"], "store": "盈隆店" },
+    { "userId": "E003", "name": "小陈", "roles": ["waiter"], "store": "盈隆店" },
+    { "userId": "E004", "name": "阿强", "roles": ["technician"], "store": "盈隆店" },
+    { "userId": "E006", "name": "李财务", "roles": ["finance"], "store": "总部" },
+    { "userId": "E007", "name": "王运营", "roles": ["head_office", "admin"], "store": "总部" },
+    { "userId": "SYS_ADMIN", "name": "系统管理员", "roles": ["admin"], "store": "总部" },
+    { "userId": "SYS_ADMIN_ALT", "name": "admin", "roles": ["admin"], "store": "总部" },
+    { "userId": "E008", "name": "赵总", "roles": ["head_gm"], "store": "总部" },
+    { "userId": "E009", "name": "钱副总", "roles": ["head_dgm"], "store": "总部" }
+  ]
+}

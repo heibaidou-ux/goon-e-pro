@@ -1,0 +1,94 @@
+{
+  "cleaningTasks": [
+    {
+      "taskId": "CLN001",
+      "roomId": "RM002",
+      "roomName": "中茶室A",
+      "status": "Pending",
+      "priority": "High",
+      "createdAt": "2026-05-08T11:55:00",
+      "assignedTo": "EMP004",
+      "assignedName": "小芳",
+      "checklist": [
+        { "item": "茶台清洁", "category": "surface", "done": false },
+        { "item": "地面清扫", "category": "floor", "done": false },
+        { "item": "茶具清洗消毒", "category": "utensil", "done": false },
+        { "item": "垃圾桶清空", "category": "waste", "done": false },
+        { "item": "落地窗擦拭", "category": "glass", "done": false }
+      ],
+      "deviceIssues": [
+        { "deviceId": "DEV008", "deviceCode": "YL-LOCK-02", "issue": "门锁离线，电池电量0%", "reported": true }
+      ],
+      "dueBy": "2026-05-08T12:30:00"
+    },
+    {
+      "taskId": "CLN002",
+      "roomId": "RM001",
+      "roomName": "大会议室",
+      "status": "InProgress",
+      "priority": "Normal",
+      "createdAt": "2026-05-08T12:00:00",
+      "assignedTo": "EMP004",
+      "assignedName": "小芳",
+      "checklist": [
+        { "item": "会议桌擦拭", "category": "surface", "done": true },
+        { "item": "地面清扫", "category": "floor", "done": true },
+        { "item": "投影设备检查", "category": "equipment", "done": false },
+        { "item": "垃圾桶清空", "category": "waste", "done": true },
+        { "item": "白板清洁", "category": "surface", "done": false }
+      ],
+      "deviceIssues": [
+        { "deviceId": "DEV005", "deviceCode": "YL-CURTAIN-01", "issue": "窗帘电机异响，电流异常", "reported": true }
+      ],
+      "dueBy": "2026-05-08T13:00:00",
+      "startedAt": "2026-05-08T12:05:00"
+    },
+    {
+      "taskId": "CLN003",
+      "roomId": "RM004",
+      "roomName": "大茶室C",
+      "status": "Pending",
+      "priority": "Normal",
+      "createdAt": "2026-05-08T10:30:00",
+      "assignedTo": "EMP004",
+      "assignedName": "小芳",
+      "checklist": [
+        { "item": "茶台清洁", "category": "surface", "done": false },
+        { "item": "地面清扫", "category": "floor", "done": false },
+        { "item": "K歌设备擦拭", "category": "equipment", "done": false },
+        { "item": "投影镜头清洁", "category": "equipment", "done": false },
+        { "item": "垃圾桶清空", "category": "waste", "done": false },
+        { "item": "落地窗擦拭", "category": "glass", "done": false }
+      ],
+      "deviceIssues": [],
+      "dueBy": "2026-05-08T11:30:00"
+    },
+    {
+      "taskId": "CLN004",
+      "roomId": "RM003",
+      "roomName": "中茶室B",
+      "status": "Completed",
+      "priority": "Normal",
+      "createdAt": "2026-05-08T09:00:00",
+      "assignedTo": "EMP004",
+      "assignedName": "小芳",
+      "checklist": [
+        { "item": "茶台清洁", "category": "surface", "done": true },
+        { "item": "地面清扫", "category": "floor", "done": true },
+        { "item": "茶具清洗消毒", "category": "utensil", "done": true },
+        { "item": "垃圾桶清空", "category": "waste", "done": true }
+      ],
+      "deviceIssues": [
+        { "deviceId": "DEV016", "deviceCode": "YL-LIGHT-03A", "issue": "主灯面板无响应，Modbus超时", "reported": true }
+      ],
+      "dueBy": "2026-05-08T10:00:00",
+      "startedAt": "2026-05-08T09:05:00",
+      "completedAt": "2026-05-08T09:45:00"
+    }
+  ],
+  "taskStats": {
+    "pending": 2,
+    "inProgress": 1,
+    "completed": 1
+  }
+}

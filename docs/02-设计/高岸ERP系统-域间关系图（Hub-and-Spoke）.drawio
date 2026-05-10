@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram id="domains" name="域间关系图-Hub-and-Spoke">
+    <mxGraphModel dx="1000" dy="700" grid="1" gridSize="10" page="1" pageWidth="800" pageHeight="500">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="t" value="高岸ERP 八域关系图（Hub-and-Spoke）" style="text;html=1;strokeColor=none;align=center;fontSize=15;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="200" y="10" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ====== 外围节点（7域） ====== -->
+
+        <!-- D04 市场营销域（上方） -->
+        <mxCell id="mkt" value="D04 市场营销域&#xA;获客·活动·渠道" style="rounded=1;whiteSpace=wrap;fillColor=#FDF2F8;strokeColor=#EC4899;strokeWidth=2;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="330" y="60" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- D03 门店运营域（右上） -->
+        <mxCell id="ops" value="D03 门店运营域&#xA;消费·房态·巡检" style="rounded=1;whiteSpace=wrap;fillColor=#EFF6FF;strokeColor=#3B82F6;strokeWidth=2;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="560" y="95" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- D08 技术域（右） -->
+        <mxCell id="tec" value="D08 技术域&#xA;IoT·场景·预警" style="rounded=1;whiteSpace=wrap;fillColor=#ECFEFF;strokeColor=#06B6D4;strokeWidth=2;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="580" y="240" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- D05 供应链域（右下） -->
+        <mxCell id="scp" value="D05 供应链域&#xA;采购·库存·供应商" style="rounded=1;whiteSpace=wrap;fillColor=#FFF7ED;strokeColor=#F97316;strokeWidth=2;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="500" y="370" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- D07 人力资源域（下方） -->
+        <mxCell id="hr" value="D07 人力资源域&#xA;考勤·薪资·档案" style="rounded=1;whiteSpace=wrap;fillColor=#F1F5F9;strokeColor=#64748B;strokeWidth=2;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="330" y="390" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- D06 财务域（左下） -->
+        <mxCell id="fin" value="D06 财务域&#xA;月结·对账·报表" style="rounded=1;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#22C55E;strokeWidth=2;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="120" y="320" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- D02 门店拓展域（左上） -->
+        <mxCell id="exp" value="D02 门店拓展域&#xA;选址·建设·配置" style="rounded=1;whiteSpace=wrap;fillColor=#FFF7ED;strokeColor=#D97706;strokeWidth=2;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="100" y="170" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ====== 中心Hub：D01 品牌运营域 ====== -->
+        <mxCell id="hq" value="D01 品牌运营域&#xA;品牌战略·发展·标准" style="rounded=1;whiteSpace=wrap;fillColor=#EEF2FF;strokeColor=#6366F1;strokeWidth=3;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="320" y="200" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ====== Spoke连线：中心→外围 ====== -->
+        <mxCell id="s1" value="" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6366F1;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" source="hq" target="mkt" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s2" value="" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6366F1;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" source="hq" target="ops" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" value="" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6366F1;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" source="hq" target="tec" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s4" value="" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6366F1;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" source="hq" target="scp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s5" value="" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6366F1;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" source="hq" target="hr" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s6" value="" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6366F1;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" source="hq" target="fin" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s7" value="" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#6366F1;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" source="hq" target="exp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== 域间协作关系线 ====== -->
+        <mxCell id="c1" value="协作" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94A3B8;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" source="mkt" target="ops" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="业务数据" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94A3B8;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" source="ops" target="fin" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="物料" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94A3B8;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" source="ops" target="scp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="采购成本" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94A3B8;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" source="scp" target="fin" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="人力成本" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94A3B8;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" source="hr" target="fin" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" value="设备控制" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94A3B8;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" source="tec" target="ops" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" value="拓展指令" style="html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#94A3B8;strokeWidth=1;endArrow=classic;dashed=1;fontSize=9;" edge="1" source="hq" target="exp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
