@@ -56,7 +56,9 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .time-cell .t-label { font-weight:500; }
 .time-cell .t-price { font-size:9px; display:block; color:#999; }
 .time-cell.selected .t-price { color:rgba(255,255,255,.7); }
-.time-cell.disabled { opacity:.35; cursor:not-allowed; background:#f5f5f5; border-color:#e0e0e0; }
+.time-cell.disabled { cursor:not-allowed; }
+.time-cell.disabled.booked { opacity:.35; background:#f5f5f5; border-color:#e0e0e0; }
+.time-cell.disabled.cleaning { opacity:.7; background:#fff8e1; border-color:#ffe082; }
 
 /* Special */
 .special-section { padding:6px 12px 4px; }
@@ -203,7 +205,7 @@ if (!room.bookable) {
     <div class="divider"></div>
     <div class="date-bar" id="dateBar"></div>
     <div class="person-bar"><div class="person-bar-label">选择人数（左右滑动）</div><div class="person-scroll" id="personScroll"></div></div>
-    <div class="time-section"><div class="time-section-label" id="timeSectionLabel">选择时段 — 点击起点，再点击终点（前后含15分钟保洁缓冲）</div><div class="time-grid" id="timeGrid"></div></div>
+    <div class="time-section"><div class="time-section-label" id="timeSectionLabel">选择时段 — 点击起点，再点击终点</div><div class="time-grid" id="timeGrid"></div><div style="font-size:10px;color:#999;margin-top:6px;display:flex;gap:12px"><span style="display:inline-flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fff8e1;border:1px solid #ffe082"></span> 保洁准备中(15min)</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f5f5f5"></span> 已预约</span></div></div>
     <div class="special-section" id="specialSection"></div>
     <div class="night-picker" id="nightPicker"><div class="night-picker-label">夜间开始时间（23:59-05:00，3小时）</div><div class="night-grid" id="nightGrid"></div></div>`;
 
@@ -305,19 +307,30 @@ if (!room.bookable) {
 
   function isTimeBlocked(checkStart, checkEnd, roomId, dateStr) {
     const blocks = getBookedBlocks(roomId, dateStr);
-    // Add next day's bookings too (for overnight)
     const nextDate = new Date(dateStr);
     nextDate.setDate(nextDate.getDate() + 1);
     const nextDateStr = nextDate.getFullYear() + '-' + String(nextDate.getMonth()+1).padStart(2,'0') + '-' + String(nextDate.getDate()).padStart(2,'0');
     const nextBlocks = getBookedBlocks(roomId, nextDateStr);
     const allBlocks = blocks.concat(nextBlocks);
-
     for (const b of allBlocks) {
-      // Booking occupies [start, end] and cleaning occupies [end, end+15]
       const cleaningEnd = b.endMin + 15;
       if (checkStart < cleaningEnd && checkEnd > b.startMin) return true;
     }
     return false;
+  }
+
+  // Check if cell is specifically in cleaning buffer (not the booking itself)
+  function getCellStatus(cMin, cEnd, roomId, dateStr) {
+    const blocks = getBookedBlocks(roomId, dateStr);
+    const nextDate = new Date(dateStr);
+    nextDate.setDate(nextDate.getDate() + 1);
+    const nextDateStr = nextDate.getFullYear() + '-' + String(nextDate.getMonth()+1).padStart(2,'0') + '-' + String(nextDate.getDate()).padStart(2,'0');
+    const allBlocks = blocks.concat(getBookedBlocks(roomId, nextDateStr));
+    for (const b of allBlocks) {
+      if (cMin < b.endMin && cEnd > b.startMin) return 'booked';   // actual booking
+      if (cMin < b.endMin + 15 && cEnd > b.endMin) return 'cleaning'; // buffer zone
+    }
+    return 'free';
   }
 
   // ── Time grid ──
@@ -354,12 +367,22 @@ if (!room.bookable) {
       if (selectedEnd && c.time === selectedEnd && (eMin > 24*60 ? c.dayOffset === 1 : c.dayOffset === 0)) cls += ' selected';
       if (selectedStart && selectedEnd && cMin > sMin && cMin < eMin) cls += ' in-range';
 
-      // Check if this cell falls within a booked+cleaning buffer block
+      // Check cell status: free / booked(预约) / cleaning(准备中)
       const cellEnd = cMin + 30;
-      const blocked = isTimeBlocked(cMin, cellEnd, roomId, dateStr);
-      if (blocked) cls += ' disabled';
+      const cellStatus = getCellStatus(cMin, cellEnd, roomId, dateStr);
+      let label = displayTime;
+      let priceLabel = '¥'+halfPrice;
+      if (cellStatus === 'booked') {
+        cls += ' disabled booked';
+        label = '已预约';
+        priceLabel = '';
+      } else if (cellStatus === 'cleaning') {
+        cls += ' disabled cleaning';
+        label = '🧹 准备中';
+        priceLabel = '保洁';
+      }
 
-      return '<div class="'+cls+'" onclick="pickTimeCell(\''+c.time+'\','+c.dayOffset+')"><span class="t-label">'+displayTime+'</span><span class="t-price">¥'+halfPrice+'</span></div>';
+      return '<div class="'+cls+'" onclick="pickTimeCell(\''+c.time+'\','+c.dayOffset+')"><span class="t-label">'+label+'</span><span class="t-price">' + priceLabel + '</span></div>';
     }).join('');
   }
 

@@ -28,7 +28,7 @@
 
     <t-row :gutter="16" style="margin-bottom:20px">
       <t-col :span="2" v-for="stat in stats" :key="stat.label">
-        <t-card :bordered="true">
+        <t-card :bordered="true" :class="{ 'queue-active': stat.key === 'queue' && stat.value > 0 }">
           <div class="stat-card">
             <div class="stat-num" :style="{ color: stat.color }">{{ stat.value }}</div>
             <div class="stat-label">{{ stat.label }}</div>
@@ -182,6 +182,7 @@ const stats = computed(() => {
     { label: '在线', value: all.filter(d => d.status === 'Online').length, color: '#00A870' },
     { label: '离线', value: all.filter(d => d.status === 'Offline').length, color: '#D54941' },
     { label: '故障', value: all.filter(d => d.status === 'Fault').length, color: '#E37318' },
+    { key: 'queue', label: '指令队列', value: queueLength.value, color: queueLength.value > 0 ? '#E37318' : '#999' },
   ]
 })
 
@@ -264,4 +265,6 @@ const columns = [
 .detail-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #333; }
 .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; color: #666; }
 .control-panel { background: #f9f9f9; padding: 12px; border-radius: 6px; margin-top: 8px; }
+@keyframes queue-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(227,115,24,.4) } 50% { box-shadow: 0 0 0 6px rgba(227,115,24,0) } }
+:deep(.queue-active) { animation: queue-pulse 1.5s infinite; }
 </style>

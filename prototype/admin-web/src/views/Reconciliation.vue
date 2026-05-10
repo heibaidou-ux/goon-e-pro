@@ -110,12 +110,32 @@
         </template>
         <template #actions="{ row }">
           <t-space size="small">
-            <t-button v-if="row.status === '待处理'" size="small" theme="success" variant="text" @click="markResolved(row)">标记已处理</t-button>
+            <t-button v-if="row.status === '待处理' && row.diffAmount === 0" size="small" theme="success" variant="text" @click="markResolved(row)">标记已处理</t-button>
+            <t-button v-if="row.status === '待处理' && row.diffAmount > 0" size="small" theme="warning" variant="text" @click="openManualAlign(row)">手动对齐</t-button>
             <t-button size="small" variant="text" theme="primary" @click="selectedTask=row;taskDetailVisible=true">详情</t-button>
           </t-space>
         </template>
       </t-table>
     </t-card>
+
+    <!-- 手动对齐对话框 -->
+    <t-dialog v-model:visible="alignDialogVisible" header="手动对齐" width="420px" :footer="false">
+      <div v-if="alignTask" class="detail-sections">
+        <t-alert message="差额较小或已知原因时，可手动强行对齐。操作将记录为'人工调账'审计日志。" theme="warning" style="margin-bottom:14px" />
+        <div class="detail-row"><span>工单</span><span>{{ alignTask.taskId }} · {{ alignTask.orderNo }}</span></div>
+        <div class="detail-row"><span>差额</span><span class="diff-amount">¥{{ alignTask.diffAmount }}</span></div>
+        <div class="detail-row"><span>差异原因</span><span>{{ alignTask.diffReason || '—' }}</span></div>
+        <t-form style="margin-top:14px">
+          <t-form-item label="调账备注">
+            <t-textarea v-model="alignRemark" placeholder="请输入调账原因（必填），如：美团满减活动差额、抖音平台服务费差异等" :rows="3" />
+          </t-form-item>
+          <t-space style="margin-top:12px">
+            <t-button theme="warning" @click="confirmManualAlign">确认强行对齐</t-button>
+            <t-button variant="outline" @click="alignDialogVisible=false">取消</t-button>
+          </t-space>
+        </t-form>
+      </div>
+    </t-dialog>
 
     <t-dialog v-model:visible="taskDetailVisible" header="差异工单详情" width="480px" :footer="false">
       <div v-if="selectedTask" class="detail-sections">
@@ -152,6 +172,9 @@ const filterChannel = ref('')
 const activeFunnel = ref('all')
 const taskDetailVisible = ref(false)
 const selectedTask = ref<any>(null)
+const alignDialogVisible = ref(false)
+const alignTask = ref<any>(null)
+const alignRemark = ref('')
 
 const tasks = finance.reconciliationTasks
 const unmatchedTxs = finance.unmatchedTransactions
@@ -211,6 +234,37 @@ function markResolved(row: any) {
   row.status = '已通过'
   row.handler = localStorage.getItem('erp_user') || '店员'
   row.remark = '已核实处理'
+}
+
+function openManualAlign(row: any) {
+  alignTask.value = row
+  alignRemark.value = ''
+  alignDialogVisible.value = true
+}
+
+function confirmManualAlign() {
+  if (!alignRemark.value.trim()) { showToast('请填写调账备注理由'); return }
+  const user = localStorage.getItem('erp_user') || '店员'
+  alignTask.value.status = '已通过'
+  alignTask.value.handler = user
+  alignTask.value.remark = `人工调账: ${alignRemark.value}`
+  alignDialogVisible.value = false
+  // 生成审计日志
+  const auditLogs = JSON.parse(localStorage.getItem('erp_audit_logs') || '[]')
+  auditLogs.push({
+    id: `ADJ${Date.now()}`,
+    type: 'ManualAdjustment',
+    taskId: alignTask.value.taskId,
+    orderNo: alignTask.value.orderNo,
+    platform: alignTask.value.platform,
+    diffAmount: alignTask.value.diffAmount,
+    reason: alignRemark.value,
+    operator: user,
+    createdAt: new Date().toLocaleString('zh-CN'),
+    source: 'Reconciliation',
+  })
+  localStorage.setItem('erp_audit_logs', JSON.stringify(auditLogs))
+  showToast(`✅ 人工调账完成，已记入审计日志`)
 }
 
 function confirmTx(row: any) {
