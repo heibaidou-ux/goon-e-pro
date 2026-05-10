@@ -92,6 +92,8 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
 
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
 
+.qr-context-btn:active { opacity:.8; }
+
 .user-badge { font-size:12px; color:#07c160; margin-left:8px; }
 </style>
 </head>
@@ -103,6 +105,23 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
       <span class="store-name">高岸茶室<span class="user-badge" id="userBadge" style="display:none">已登录</span></span>
       <span class="store-select" onclick="showStoreSelector()">盈隆店 ▾</span>
     </div>
+    <!-- QR Context Card (shown when QR scan detected) -->
+    <div class="qr-context-card" id="qrContextCard" style="display:none;margin:12px 16px;background:#f0fdf4;border-radius:12px;padding:14px;border:1.5px solid #dcedc8;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:24px;">📍</span>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#333;" id="qrContextTitle">您正在 <b>大茶室C</b></div>
+          <div style="font-size:12px;color:#666;margin-top:2px;" id="qrContextDesc">桌号: 2号桌 · 已自动识别位置</div>
+        </div>
+        <button class="qr-context-btn" onclick="goCartWithRoom()" style="padding:8px 16px;border-radius:16px;background:#07c160;color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">点茶品 →</button>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid #dcedc8;">
+        <button style="flex:1;padding:6px;border-radius:8px;background:#fff;border:1px solid #dcedc8;font-size:12px;color:#666;cursor:pointer;" onclick="showRoomBill()">🧾 查看挂账</button>
+        <button style="flex:1;padding:6px;border-radius:8px;background:#fff;border:1px solid #dcedc8;font-size:12px;color:#666;cursor:pointer;" onclick="showProducts()">📋 查看订单</button>
+        <button style="padding:6px 8px;border-radius:8px;background:#fff;border:1px solid #dcedc8;font-size:12px;color:#999;cursor:pointer;" onclick="closeQrContext()">✕</button>
+      </div>
+    </div>
+
     <div class="carousel" id="carousel">
       <div class="carousel-track" id="carouselTrack">
         <div class="carousel-slide" style="background:url('../../images/茶荟头图-空间-诗梳风大茶室.jpg') center/cover no-repeat;">
@@ -185,12 +204,47 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
   </div>
 </div>
 
+<!-- Room Bill Modal -->
+<div class="modal-overlay" id="roomBillModal" onclick="if(event.target===this)hideRoomBill()">
+  <div class="modal" style="text-align:left;">
+    <h3 style="text-align:center;">🧾 房间挂账单</h3>
+    <div id="roomBillContent" style="max-height:300px;overflow-y:auto;"></div>
+    <div id="roomBillTotal" style="text-align:right;font-size:18px;font-weight:700;color:#e37318;padding:10px 0;border-top:1px solid #f0f0f0;margin-top:8px;"></div>
+    <button class="modal-close" onclick="hideRoomBill()">关闭</button>
+  </div>
+</div>
+
+<!-- QR Warning Modal (independent of login modal) -->
+<div class="modal-overlay" id="qrWarningModal" style="display:none;">
+  <div class="modal">
+    <h3 style="color:#D54941;">⚠️ 房间未启用</h3>
+    <p style="font-size:14px;color:#666;margin:12px 0;" id="qrWarningText"></p>
+    <button class="modal-close" onclick="hideQrWarning()">我知道了</button>
+  </div>
+</div>
+
+<!-- QR Debug Panel -->
+<div class="qr-debug" id="qrDebug" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;border-radius:12px;padding:14px;width:340px;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.3);">
+  <div style="font-size:13px;font-weight:600;margin-bottom:8px;">🔧 QR扫码调试</div>
+  <div style="display:flex;gap:6px;margin-bottom:6px;">
+    <input id="debugRoomId" value="RM004" style="flex:1;padding:6px 10px;border-radius:6px;border:none;font-size:12px;" placeholder="房间ID" />
+    <input id="debugTableId" value="1" style="width:60px;padding:6px 10px;border-radius:6px;border:none;font-size:12px;" placeholder="桌号" />
+    <button onclick="debugQrScan()" style="padding:6px 12px;border-radius:6px;background:#07c160;color:#fff;border:none;font-size:12px;cursor:pointer;">模拟扫码</button>
+    <button onclick="document.getElementById('qrDebug').style.display='none'" style="padding:6px 8px;border-radius:6px;background:#666;color:#fff;border:none;font-size:12px;cursor:pointer;">✕</button>
+  </div>
+  <div style="font-size:11px;color:#999;">按 Ctrl+D 隐藏调试面板</div>
+</div>
+
 <script>
 // ── state ──
 let isLoggedIn = localStorage.getItem('mp_logged_in') === 'true';
 let currentUser = null;
 let loginMode = 'login';
 let pendingAction = null;
+
+// QR scan state
+let qrRoomId = null;
+let qrTableId = null;
 
 const stores = [
   { id:'YL', name:'盈隆店', active:true },
@@ -207,7 +261,122 @@ const rooms = [
 const colors = { '茶室':'#e8f5e9', '会议室':'#e3f2fd' };
 const icons = { '茶室':'🍵', '会议室':'💼' };
 
-// ── init ──
+// ── QR scan detection ──
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  qrRoomId = params.get('room_id');
+  qrTableId = params.get('table_id');
+
+  if (qrRoomId) {
+    // Anti-mis-scan: verify room has active order
+    var orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+    var activeOrder = null;
+    for (var i = 0; i < orders.length; i++) {
+      if (orders[i].roomId === qrRoomId && (orders[i].status === 'InUse' || orders[i].status === 'in_use')) {
+        activeOrder = orders[i];
+        break;
+      }
+    }
+
+    if (!activeOrder) {
+      setTimeout(function() {
+        showQrWarning('该房间暂未开启使用，请联系店员开启房间');
+      }, 500);
+    } else {
+      var roomName = qrRoomId;
+      for (var j = 0; j < rooms.length; j++) {
+        if (rooms[j].roomId === qrRoomId) { roomName = rooms[j].name; break; }
+      }
+      showQrContextCard(roomName, qrRoomId, qrTableId);
+    }
+  }
+})();
+
+function showQrWarning(msg) {
+  document.getElementById('qrWarningText').textContent = msg;
+  document.getElementById('qrWarningModal').style.display = 'flex';
+}
+
+function hideQrWarning() {
+  document.getElementById('qrWarningModal').style.display = 'none';
+  qrRoomId = null;
+  qrTableId = null;
+}
+
+function showQrContextCard(roomName, roomId, tableId) {
+  var card = document.getElementById('qrContextCard');
+  card.style.display = 'block';
+  document.getElementById('qrContextTitle').innerHTML = '您正在 <b>' + roomName + '</b>';
+  document.getElementById('qrContextDesc').textContent = '桌号: ' + tableId + '号桌 · 已自动识别位置';
+  localStorage.setItem('erp_qr_context', JSON.stringify({ roomId: roomId, roomName: roomName, tableId: tableId }));
+}
+
+function closeQrContext() {
+  document.getElementById('qrContextCard').style.display = 'none';
+  localStorage.removeItem('erp_qr_context');
+}
+
+function goCartWithRoom() {
+  var ctx = JSON.parse(localStorage.getItem('erp_qr_context') || 'null');
+  var url = '../tea-shop/index.html';
+  if (ctx) {
+    url += '?room_id=' + ctx.roomId + '&room_name=' + encodeURIComponent(ctx.roomName) + '&table_id=' + ctx.tableId;
+  }
+  location.href = url;
+}
+
+function showRoomBill() {
+  var ctx = JSON.parse(localStorage.getItem('erp_qr_context') || 'null');
+  if (!ctx) { showToast('未检测到房间信息'); return; }
+  var roomBills = JSON.parse(localStorage.getItem('erp_room_bills') || '{}');
+  var bill = roomBills[ctx.roomId];
+  if (!bill || !bill.items || bill.items.length === 0) {
+    document.getElementById('roomBillContent').innerHTML = '<div style="text-align:center;padding:30px;color:#ccc;font-size:14px;">暂无挂账记录</div>';
+    document.getElementById('roomBillTotal').textContent = '';
+  } else {
+    var html = '';
+    var total = 0;
+    for (var i = 0; i < bill.items.length; i++) {
+      var item = bill.items[i];
+      total += item.amount || (item.price * item.qty);
+      html += '<div class="pay-item-row" style="padding:6px 0;border-bottom:1px solid #f5f5f5;">' +
+        '<span>' + (item.productName || item.name) + ' ×' + (item.qty || 1) + '</span>' +
+        '<span style="color:#e37318;">¥' + (item.amount || item.price * item.qty) + '</span></div>';
+    }
+    document.getElementById('roomBillContent').innerHTML =
+      '<div style="font-size:12px;color:#999;margin-bottom:6px;">' + ctx.roomName + ' · 挂账明细</div>' + html;
+    document.getElementById('roomBillTotal').textContent = '合计：¥' + (bill.totalAmount || total);
+  }
+  document.getElementById('roomBillModal').style.display = 'flex';
+}
+
+function hideRoomBill() {
+  document.getElementById('roomBillModal').style.display = 'none';
+}
+
+function showProducts() {
+  location.href = '../my-orders/index.html';
+}
+
+// ── Debug panel ──
+if (window.location.search.indexOf('debug=1') >= 0 || localStorage.getItem('erp_debug_mode') === 'true') {
+  document.getElementById('qrDebug').style.display = 'block';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 'd') {
+    var debug = document.getElementById('qrDebug');
+    debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
+    e.preventDefault();
+  }
+});
+
+function debugQrScan() {
+  var roomId = document.getElementById('debugRoomId').value;
+  var tableId = document.getElementById('debugTableId').value;
+  location.href = '?room_id=' + roomId + '&table_id=' + tableId + '&debug=1';
+}
+
+// ── init login and data ──
 if (isLoggedIn) {
   currentUser = JSON.parse(localStorage.getItem('mp_user') || 'null');
   if (currentUser) {
@@ -228,14 +397,14 @@ document.getElementById('roomList').innerHTML = rooms.map(function(r) {
   '</div>';
 }).join('');
 
-// Tea products
+// Tea products (synced with supply-chain.json)
 const teaProducts = [
-  { id:'T01', name:'明前龙井', type:'绿茶', desc:'2026年新茶 · 清香甘醇', price:168, icon:'🍃', bg:'#e8f5e9' },
-  { id:'T02', name:'古树普洱', type:'普洱', desc:'勐海古树 · 陈香醇厚', price:288, icon:'🪵', bg:'#efebe9' },
-  { id:'T03', name:'武夷岩茶', type:'乌龙', desc:'大红袍 · 岩骨花香', price:358, icon:'🏔️', bg:'#fff3e0' },
-  { id:'T04', name:'福鼎白茶', type:'白茶', desc:'白毫银针 · 清甜回甘', price:198, icon:'🌿', bg:'#f1f8e9' },
-  { id:'T05', name:'金骏眉', type:'红茶', desc:'芽头金毫 · 蜜香甘醇', price:328, icon:'🫖', bg:'#fce4ec' },
-  { id:'T06', name:'茉莉花茶', type:'花茶', desc:'三窨一提 · 花香茶韵', price:128, icon:'🌸', bg:'#f3e5f5' },
+  { id:'T01', name:'明前龙井', type:'绿茶', desc:'西湖核心产区 · 清香甘醇', price:168, spec:'250g/罐', icon:'🍃', bg:'#e8f5e9', image:'' },
+  { id:'T02', name:'金骏眉', type:'红茶', desc:'武夷山桐木关 · 蜜香甘醇', price:258, spec:'200g/罐', icon:'🪵', bg:'#fce4ec', image:'' },
+  { id:'T03', name:'铁观音', type:'乌龙', desc:'安溪高山 · 七泡有余香', price:138, spec:'250g/罐', icon:'🏔️', bg:'#fff3e0', image:'' },
+  { id:'T04', name:'云南普洱（生普）', type:'普洱', desc:'勐海古树 · 茶气霸烈', price:198, spec:'357g/饼', icon:'🌿', bg:'#efebe9', image:'' },
+  { id:'T05', name:'云南普洱（熟普）', type:'普洱', desc:'勐海发酵 · 陈香醇厚', price:208, spec:'357g/饼', icon:'🏵️', bg:'#f1f8e9', image:'' },
+  { id:'T06', name:'武夷岩茶', type:'乌龙', desc:'大红袍 · 岩骨花香', price:358, spec:'100g/罐', icon:'🏔️', bg:'#efebe9', image:'' },
 ];
 
 // Cart management
@@ -249,7 +418,7 @@ function addToCart(product) {
   if (existing) {
     existing.qty += 1;
   } else {
-    teaCart.push({ id:product.id, name:product.name, price:product.price, qty:1, icon:product.icon });
+    teaCart.push({ id:product.id, name:product.name, price:product.price, qty:1, icon:product.icon, spec:product.spec || '' });
   }
   localStorage.setItem('mp_tea_cart', JSON.stringify(teaCart));
   var totalItems = 0;
@@ -280,7 +449,10 @@ function goCart() {
 function renderTeaGrid() {
   document.getElementById('teaGrid').innerHTML = teaProducts.map(function(t) {
     return '<div class="tea-card">' +
-      '<div class="tea-card-img" style="background:' + t.bg + ';">' + t.icon + '</div>' +
+      '<div class="tea-card-img" style="background:' + t.bg + ';position:relative;overflow:hidden;">' +
+        (t.image ? '<img src="' + t.image + '" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;" onerror="this.style.display=\'none\'" />' : '') +
+        '<span style="position:relative;z-index:1;">' + t.icon + '</span>' +
+      '</div>' +
       '<div class="tea-card-body">' +
         '<div class="tea-card-name">' + t.name + '</div>' +
         '<div class="tea-card-desc">' + t.desc + '</div>' +

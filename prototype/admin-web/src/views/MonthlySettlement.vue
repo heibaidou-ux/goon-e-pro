@@ -53,26 +53,66 @@
       </t-table>
     </t-card>
 
-    <t-dialog v-model:visible="reportVisible" header="月结报告" width="600px" :footer="false">
+    <t-dialog v-model:visible="reportVisible" header="月结报告" width="760px" :footer="false">
       <div v-if="currentReport">
-        <t-table :data="reportData" :columns="reportColumns" row-key="storeName" size="small" hover stripe />
+        <t-table :data="reportData" :columns="reportColumns" row-key="storeName" size="small" hover stripe>
+          <template #revenue="{ row }">¥{{ row.revenue.toLocaleString() }}</template>
+          <template #platformFee="{ row }">¥{{ row.platformFee.toLocaleString() }}</template>
+          <template #marketingCost="{ row }">¥{{ row.marketingCost.toLocaleString() }}</template>
+          <template #materialCost="{ row }">¥{{ row.materialCost.toLocaleString() }}</template>
+          <template #laborCost="{ row }">¥{{ row.laborCost.toLocaleString() }}</template>
+          <template #depreciation="{ row }">¥{{ row.depreciation.toLocaleString() }}</template>
+          <template #operatingCost="{ row }">¥{{ row.operatingCost.toLocaleString() }}</template>
+          <template #operatingProfit="{ row }">
+            <span :style="{ color: row.operatingProfit >= 0 ? '#00A870' : '#D54941', fontWeight: 600 }">¥{{ row.operatingProfit.toLocaleString() }}</span>
+          </template>
+          <template #subsidy="{ row }">¥{{ (row.subsidy || 0).toLocaleString() }}</template>
+          <template #netProfit="{ row }">
+            <span :style="{ color: row.netProfit >= 0 ? '#00A870' : '#D54941', fontWeight: 600 }">¥{{ row.netProfit.toLocaleString() }}</span>
+          </template>
+        </t-table>
         <t-divider />
         <div class="summary" v-if="reportData.length">
           <div class="summary-row">
+            <span>集团营业收入合计</span>
+            <span class="summary-val" style="color:#0052D9">¥{{ totalGroupRevenue.toLocaleString() }}</span>
+          </div>
+          <div class="summary-row">
+            <span>集团营业利润合计</span>
+            <span class="summary-val" :style="{color:totalGroupOperatingProfit>=0?'#00A870':'#D54941'}">¥{{ totalGroupOperatingProfit.toLocaleString() }}</span>
+          </div>
+          <div class="summary-row">
             <span>集团净利润合计</span>
-            <span class="summary-val" :style="{color:totalGroupProfit>=0?'#00A870':'#D54941'}">
-              ¥{{ totalGroupProfit.toLocaleString() }}
-            </span>
+            <span class="summary-val" style="font-size:20px" :style="{color:totalGroupProfit>=0?'#00A870':'#D54941'}">¥{{ totalGroupProfit.toLocaleString() }}</span>
           </div>
         </div>
       </div>
     </t-dialog>
+
+    <!-- 房间挂账汇总 -->
+    <t-card :bordered="true" style="margin-top:20px" title="房间挂账汇总">
+      <template #subtitle>
+        <t-tag variant="light" theme="warning">{{ roomBills.filter(b => b.settledAt === null).length }}笔未结算</t-tag>
+      </template>
+      <t-table :data="roomBills" :columns="roomBillColumns" row-key="billId" size="small" hover stripe>
+        <template #status="{ row }">
+          <t-tag :theme="row.settledAt ? 'success' : 'warning'" size="small" variant="light">
+            {{ row.settledAt ? '已结算' : '未结算' }}
+          </t-tag>
+        </template>
+        <template #actions="{ row }">
+          <t-button v-if="!row.settledAt" size="small" variant="text" theme="success" @click="settleRoomBill(row)">标记结算</t-button>
+          <span v-else style="color:#999;font-size:12px">{{ row.settledAt }}</span>
+        </template>
+      </t-table>
+    </t-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import finance from '@mock/finance.json'
+import bills from '@mock/bills.json'
 
 const glDate = ref('')
 const glStatus = ref('')
@@ -82,6 +122,7 @@ const currentReport = ref<any>(null)
 const settlements = finance.monthlySettlements
 const glEntries = finance.glEntries
 const monthlyReport = finance.monthlyReport
+const roomBills = ref(bills.bills)
 
 const reportData = computed(() => {
   return monthlyReport.map(r => ({
@@ -91,6 +132,8 @@ const reportData = computed(() => {
   }))
 })
 
+const totalGroupRevenue = computed(() => reportData.value.reduce((s, r) => s + r.revenue, 0))
+const totalGroupOperatingProfit = computed(() => reportData.value.reduce((s, r) => s + r.operatingProfit, 0))
 const totalGroupProfit = computed(() => reportData.value.reduce((s, r) => s + r.netProfit, 0))
 
 const settlementStats = computed(() => {
@@ -134,11 +177,31 @@ const glColumns = [
 ]
 
 const reportColumns = [
-  { colKey: 'storeName', title: '门店', width: 80 },
-  { colKey: 'revenue', title: '营业收入', width: 100 },
-  { colKey: 'operatingProfit', title: '营业利润', width: 100 },
-  { colKey: 'netProfit', title: '净利润', width: 100 },
+  { colKey: 'storeName', title: '门店', width: 70 },
+  { colKey: 'revenue', title: '营业收入', width: 90 },
+  { colKey: 'platformFee', title: '平台费', width: 80 },
+  { colKey: 'marketingCost', title: '营销费', width: 80 },
+  { colKey: 'materialCost', title: '物料成本', width: 80 },
+  { colKey: 'laborCost', title: '人工成本', width: 80 },
+  { colKey: 'depreciation', title: '折旧', width: 80 },
+  { colKey: 'operatingCost', title: '运营费', width: 80 },
+  { colKey: 'operatingProfit', title: '营业利润', width: 90 },
+  { colKey: 'subsidy', title: '补贴', width: 80 },
+  { colKey: 'netProfit', title: '净利润', width: 90 },
 ]
+
+const roomBillColumns = [
+  { colKey: 'roomName', title: '房间', width: 100 },
+  { colKey: 'period', title: '周期', width: 90 },
+  { colKey: 'totalAmount', title: '挂账总额', width: 100 },
+  { colKey: 'roomFee', title: '房费', width: 80 },
+  { colKey: 'status', title: '状态', width: 80 },
+  { colKey: 'actions', title: '操作', width: 120 },
+]
+
+function settleRoomBill(row: any) {
+  row.settledAt = new Date().toLocaleString('zh-CN')
+}
 </script>
 
 <style scoped>

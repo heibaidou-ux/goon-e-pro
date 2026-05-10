@@ -5,7 +5,7 @@
     <!-- 营收卡片 -->
     <t-row :gutter="16" style="margin-bottom:20px">
       <t-col :span="3" v-for="card in revenueCards" :key="card.title">
-        <t-card :bordered="true" hover-shadow @click="card.link ? router.push(card.link) : undefined" :style="{ cursor: card.link ? 'pointer' : 'default' }">
+        <t-card :bordered="true" hover-shadow @click="card.link ? router.push(card.link) : undefined" :style="{ cursor: card.link ? 'pointer' : 'default', height: '100%' }">
           <div class="stat-card">
             <div class="stat-label">{{ card.title }}</div>
             <div class="stat-value" :style="{ color: card.color }">{{ card.value }}</div>
@@ -272,7 +272,7 @@ const alertColumns = [
 <style scoped>
 .page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 
-.stat-card { text-align: center; padding: 8px 0; }
+.stat-card { text-align: center; padding: 8px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .stat-label { font-size: 13px; color: #999; margin-bottom: 8px; }
 .stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
 .stat-sub { font-size: 12px; color: #bbb; }

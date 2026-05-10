@@ -8,11 +8,17 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
 .phone { width:375px; min-height:812px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
-.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+.page { flex:1; overflow-y:auto; padding-bottom:60px; position:relative; }
 .header { padding:16px; background:#fff; border-bottom:1px solid #f0f0f0; position:sticky; top:0; z-index:10; }
 .header-title { font-size:18px; font-weight:700; color:#1a1a1a; text-align:center; }
 .cart-badge { position:absolute; right:16px; top:16px; cursor:pointer; font-size:20px; }
 .cart-badge .badge { position:absolute; top:-6px; right:-6px; background:#e37318; color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; min-width:18px; text-align:center; }
+
+/* Room context banner */
+.room-banner { background:#f0fdf4; padding:10px 16px; border-bottom:1px solid #dcedc8; display:flex; align-items:center; gap:8px; font-size:13px; color:#333; }
+.room-banner-icon { font-size:18px; }
+.room-banner-text { flex:1; }
+.room-banner-close { color:#999; cursor:pointer; font-size:16px; padding:0 4px; }
 
 /* Category Tabs */
 .cat-tabs { display:flex; padding:12px 16px; gap:8px; background:#fff; border-bottom:1px solid #f5f5f5; position:sticky; top:57px; z-index:10; }
@@ -22,9 +28,11 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 /* Products */
 .product-list { padding:12px 16px; }
 .product-card { display:flex; padding:12px; border-radius:12px; background:#fafafa; margin-bottom:10px; cursor:pointer; }
-.product-icon { width:64px; height:64px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; }
+.product-img { width:64px; height:64px; border-radius:10px; object-fit:cover; flex-shrink:0; background:#f0f0f0; }
+.product-img-placeholder { width:64px; height:64px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; }
 .product-body { flex:1; margin-left:12px; }
 .product-name { font-size:14px; font-weight:600; color:#333; }
+.product-spec { font-size:11px; color:#bbb; margin-top:1px; }
 .product-desc { font-size:11px; color:#999; margin-top:2px; }
 .product-footer { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
 .product-price { font-size:16px; font-weight:700; color:#e37318; }
@@ -74,6 +82,14 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .pay-btn-cancel { background:#f5f5f5;color:#666; }
 .pay-btn-confirm { background:#07c160;color:#fff; }
 .pay-btn-confirm:disabled { background:#ccc;cursor:not-allowed; }
+
+/* Story section in detail modal */
+.story-section { background:#f0fdf4;border-radius:8px;padding:10px;margin:10px 0;text-align:left; }
+.story-section .story-title { font-size:12px;font-weight:600;color:#558b2f;margin-bottom:4px; }
+.story-section .story-text { font-size:12px;color:#666;line-height:1.6; }
+.story-section .story-origin { font-size:11px;color:#999;margin-top:4px; }
+.tips-row { display:flex;flex-wrap:wrap;gap:4px;margin-top:6px; }
+.tip-tag { background:#e8f5e9;border-radius:10px;padding:2px 8px;font-size:10px;color:#558b2f; }
 </style>
 </head>
 <body>
@@ -86,10 +102,15 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
         🛒<span class="badge" id="cartBadge" style="display:none">0</span>
       </div>
     </div>
+
+    <!-- Room context banner -->
+    <div class="room-banner" id="roomBanner" style="display:none">
+      <span class="room-banner-icon">📍</span>
+      <span class="room-banner-text" id="roomBannerText"></span>
+      <span class="room-banner-close" onclick="closeRoomBanner()">✕</span>
+    </div>
+
     <div class="cat-tabs" id="catTabs">
-      <button class="cat-tab active" onclick="switchCat('snack')">🍪 茶点</button>
-      <button class="cat-tab" onclick="switchCat('tea')">🍃 茶叶</button>
-      <button class="cat-tab" onclick="switchCat('ware')">🫖 茶具</button>
     </div>
     <div class="product-list" id="productList"></div>
   </div>
@@ -122,9 +143,20 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 <!-- Product Detail Modal -->
 <div class="pay-modal-overlay" id="detailModal">
   <div class="pay-modal" style="text-align:left;">
-    <div style="text-align:center;font-size:56px;margin-bottom:12px;" id="detailIcon"></div>
+    <div style="text-align:center;border-radius:10px;overflow:hidden;margin-bottom:12px;height:160px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;position:relative;">
+      <img id="detailImg" style="width:100%;height:100%;object-fit:cover;display:none;" />
+      <div id="detailPlaceholder" style="font-size:56px;display:flex;"></div>
+    </div>
     <h3 id="detailName" style="text-align:center;"></h3>
+    <div id="detailSpec" style="text-align:center;font-size:12px;color:#bbb;margin-bottom:4px;"></div>
     <p id="detailDesc" style="text-align:center;font-size:13px;color:#666;margin-bottom:8px;"></p>
+    <!-- Story section -->
+    <div class="story-section" id="storySection" style="display:none;">
+      <div class="story-title">📖 产品故事</div>
+      <div class="story-text" id="storyText"></div>
+      <div class="story-origin" id="storyOrigin"></div>
+      <div class="tips-row" id="tipsRow"></div>
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;">
       <span style="font-size:13px;color:#666;">单价</span>
       <span style="font-size:22px;font-weight:800;color:#e37318;" id="detailPrice"></span>
@@ -166,6 +198,11 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
         <span class="pay-method-name">支付宝</span>
         <span class="pay-method-check" id="payCheckAlipay" style="visibility:hidden">✓</span>
       </div>
+      <div class="pay-method" id="payMethodRoom" onclick="selectPayMethod('room')" style="display:none;">
+        <span class="pay-method-icon">🏠</span>
+        <span class="pay-method-name" id="payMethodRoomName">挂账到房间</span>
+        <span class="pay-method-check" id="payCheckRoom" style="visibility:hidden">✓</span>
+      </div>
     </div>
     <div class="pay-modal-btns">
       <button class="pay-btn-cancel" onclick="cancelPay()">取消</button>
@@ -176,42 +213,78 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 
 <script>
 // ── data ──
+// Sync with supply-chain.json: all 12 products with story/brewingTips
 var products = {
   snack: [
-    { id:'S01', name:'绿豆糕', desc:'手工制作 · 清甜细腻', price:38, icon:'🥮', bg:'#fff8e1' },
-    { id:'S02', name:'桂花糕', desc:'桂花清香 · 软糯可口', price:42, icon:'🌸', bg:'#fce4ec' },
-    { id:'S03', name:'龙井茶酥', desc:'龙井茶粉入馅 · 茶香酥脆', price:48, icon:'🍪', bg:'#e8f5e9' },
-    { id:'S04', name:'核桃酥', desc:'传统糕点 · 酥脆香甜', price:35, icon:'🥜', bg:'#efebe9' },
-    { id:'S05', name:'陈皮瓜子', desc:'新会陈皮 · 个大饱满', price:28, icon:'🌰', bg:'#fff3e0' },
-    { id:'S06', name:'果脯拼盘', desc:'四种果脯 · 酸甜可口', price:58, icon:'🍬', bg:'#f3e5f5' },
+    { id:'S01', name:'坚果拼盘', desc:'精选四种坚果 · 轻盐烘焙', price:38, spec:'200g/份', icon:'🌰', bg:'#fff3e0', image:'', story:'精选美国杏仁、新疆核桃、云南松子、东北榛子，轻盐烘焙原香酥脆。', origin:'混合产地' },
+    { id:'S02', name:'绿豆糕（经典款）', desc:'传统苏式 · 细腻绵密', price:25, spec:'150g/盒', icon:'🥮', bg:'#fff8e1', image:'', story:'去皮绿豆蒸制，口感细腻绵密入口即化，甜而不腻。保质期较短建议即买即食。', origin:'江苏苏州' },
   ],
   tea: [
-    { id:'T01', name:'明前龙井', desc:'2026年新茶 · 清香甘醇 · 50g', price:168, icon:'🍃', bg:'#e8f5e9' },
-    { id:'T02', name:'古树普洱', desc:'勐海古树 · 陈香醇厚 · 357g', price:288, icon:'🪵', bg:'#efebe9' },
-    { id:'T03', name:'武夷岩茶', desc:'大红袍 · 岩骨花香 · 100g', price:358, icon:'🏔️', bg:'#fff3e0' },
-    { id:'T04', name:'福鼎白茶', desc:'白毫银针 · 清甜回甘 · 50g', price:198, icon:'🌿', bg:'#f1f8e9' },
-    { id:'T05', name:'金骏眉', desc:'芽头金毫 · 蜜香甘醇 · 50g', price:328, icon:'🫖', bg:'#fce4ec' },
-    { id:'T06', name:'茉莉花茶', desc:'三窨一提 · 花香茶韵 · 100g', price:128, icon:'🌸', bg:'#f3e5f5' },
-    { id:'T07', name:'安溪铁观音', desc:'清香型 · 七泡有余香 · 150g', price:238, icon:'🍂', bg:'#e0f2f1' },
-    { id:'T08', name:'凤凰单丛', desc:'鸭屎香 · 蜜兰香韵 · 100g', price:398, icon:'🏵️', bg:'#f9fbe7' },
+    { id:'T01', name:'明前龙井', desc:'西湖核心产区 · 清香甘醇', price:168, spec:'250g/罐', icon:'🍃', bg:'#e8f5e9', image:'', story:'明前采摘于西湖核心产区，芽叶细嫩色泽翠绿。建议85℃山泉水冲泡，玻璃杯上投法。', origin:'杭州西湖', brewingTips:'85℃水温 · 30-60秒出汤 · 玻璃杯' },
+    { id:'T02', name:'金骏眉', desc:'武夷山桐木关 · 蜜香甘醇', price:258, spec:'200g/罐', icon:'🪵', bg:'#fce4ec', image:'', story:'全芽头制作金毫显露，蜜香与花果香交融汤色金黄透亮。可连泡十余次。', origin:'福建武夷山', brewingTips:'90℃水温 · 即刻出汤 · 白瓷盖碗' },
+    { id:'T03', name:'铁观音', desc:'安溪高山 · 七泡有余香', price:138, spec:'250g/罐', icon:'🏔️', bg:'#fff3e0', image:'', story:'安溪高山生态茶园，传统半发酵工艺兰花香韵清雅回甘悠长。', origin:'福建安溪', brewingTips:'100℃沸水 · 15-30秒 · 盖碗/紫砂壶' },
+    { id:'T04', name:'云南普洱（生普）', desc:'勐海古树 · 茶气霸烈', price:198, spec:'357g/饼', icon:'🌿', bg:'#efebe9', image:'', story:'古树茶园原料传统石磨压饼，茶气霸烈回甘迅猛。紫砂壶冲泡最佳。', origin:'云南勐海', brewingTips:'100℃沸水 · 5-10秒渐增 · 紫砂壶' },
+    { id:'T05', name:'云南普洱（熟普）', desc:'勐海发酵 · 陈香醇厚', price:208, spec:'357g/饼', icon:'🏵️', bg:'#f1f8e9', image:'', story:'传统渥堆发酵工艺陈香醇厚，汤色红浓透亮。茶性温和老少皆宜。', origin:'云南勐海', brewingTips:'100℃沸水 · 10-20秒 · 保温杯可闷泡' },
+    { id:'T06', name:'武夷岩茶', desc:'大红袍 · 岩骨花香', price:358, spec:'100g/罐', icon:'🪨', bg:'#efebe9', image:'', story:'大红袍岩骨花香，韵味悠长。建议用紫砂壶冲泡，前5泡即冲即出。', origin:'福建武夷山', brewingTips:'100℃沸水 · 5-10秒 · 紫砂壶' },
+    { id:'T07', name:'福鼎白茶', desc:'白毫银针 · 清甜回甘', price:198, spec:'50g/罐', icon:'🌸', bg:'#f3e5f5', image:'', story:'白毫银针清甜回甘，越陈越香。可用盖碗冲泡或煮饮。', origin:'福建福鼎', brewingTips:'90℃水温 · 30-60秒 · 盖碗' },
+    { id:'T08', name:'碧螺春', desc:'太湖东山 · 花果香韵', price:218, spec:'200g/罐', icon:'🌱', bg:'#e8f5e9', image:'', story:'一芽一叶精制白毫显露卷曲如螺，花果香馥郁滋味鲜爽回甘。', origin:'苏州太湖', brewingTips:'80℃水温 · 20-40秒 · 玻璃杯下投法' },
   ],
   ware: [
-    { id:'W01', name:'紫砂壶套装', desc:'宜兴紫砂 · 一壶四杯 · 手工制作', price:680, icon:'🫖', bg:'#efebe9' },
-    { id:'W02', name:'白瓷盖碗', desc:'德化白瓷 · 薄胎透光 · 150ml', price:168, icon:'🫗', bg:'#f5f5f5' },
-    { id:'W03', name:'玻璃公道杯', desc:'高硼硅玻璃 · 耐高温 · 300ml', price:89, icon:'🥛', bg:'#e3f2fd' },
-    { id:'W04', name:'竹制茶盘', desc:'天然楠竹 · 防水防霉 · 60×35cm', price:258, icon:'🎋', bg:'#e8f5e9' },
-    { id:'W05', name:'茶道六君子', desc:'六件套 · 黑檀木 · 礼盒装', price:128, icon:'🎯', bg:'#fafafa' },
-    { id:'W06', name:'电陶炉茶炉', desc:'静音设计 · 自动上水 · 文武火', price:458, icon:'🔥', bg:'#fff3e0' },
+    { id:'W01', name:'建盏茶杯', desc:'建阳传统工艺 · 铁胎厚釉', price:58, spec:'单只装', icon:'🏺', bg:'#efebe9', image:'', story:'福建建阳传统工艺烧制，兔毫/油滴纹路自然天成。每只纹理独一无二。', origin:'福建建阳' },
+    { id:'W02', name:'紫砂壶（小号）', desc:'宜兴原矿 · 手工拍打', price:188, spec:'200ml', icon:'🫖', bg:'#f5f5f5', image:'', story:'宜兴原矿紫泥手工拍打成型，小壶聚香适合冲泡高香型乌龙茶。', origin:'江苏宜兴', brewingTips:'一壶一茶专茶专用' },
+    { id:'W03', name:'双人下午茶套餐', desc:'双人茶聚 · 经典之选', price:168, spec:'1份', icon:'🧁', bg:'#fce4ec', image:'', story:'任选2壶茶饮+双色绿豆糕+坚果拼盘+时令水果，适合与友人共度下午茶。', origin:'高岸茶室' },
+    { id:'W04', name:'商务洽谈套餐', desc:'商务会谈 · 尊享体验', price:228, spec:'1份', icon:'💼', bg:'#e3f2fd', image:'', story:'精选岩茶或金骏眉+茶点四色拼盘+商务简餐，私密包间从容会面。', origin:'高岸茶室' },
   ],
 };
 
-var currentCat = 'snack';
+// Room context
+var orderRoomId = null;
+var orderRoomName = null;
+var orderTableId = null;
+var roomBannerVisible = false;
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('room_id')) {
+    orderRoomId = params.get('room_id');
+    orderRoomName = params.get('room_name') || '本包间';
+    orderTableId = params.get('table_id') || '1';
+    roomBannerVisible = true;
+    var banner = document.getElementById('roomBanner');
+    var text = document.getElementById('roomBannerText');
+    text.textContent = '正在为 ' + orderRoomName + ' ' + orderTableId + '号桌 点单';
+    banner.style.display = 'flex';
+    // Show room charge payment option
+    document.getElementById('payMethodRoom').style.display = 'flex';
+    document.getElementById('payMethodRoomName').textContent = '🏠 挂账到' + orderRoomName;
+  }
+})();
+
+function closeRoomBanner() {
+  document.getElementById('roomBanner').style.display = 'none';
+  roomBannerVisible = false;
+}
+
+var currentCat = 'tea';
 var cart = JSON.parse(localStorage.getItem('mp_tea_cart') || '[]');
 var detailProduct = null;
 var detailQty = 1;
+var payMethod = 'balance';
 
-// ── init ──
-// Merge home page cart items if any
+// Init category tabs dynamically
+(function() {
+  var tabs = [
+    { key:'snack', label:'🍪 茶点' },
+    { key:'tea', label:'🍃 茶叶' },
+    { key:'ware', label:'🫖 茶具' },
+  ];
+  var html = '';
+  for (var i = 0; i < tabs.length; i++) {
+    html += '<button class="cat-tab' + (i === 1 ? ' active' : '') + '" onclick="switchCat(\'' + tabs[i].key + '\')">' + tabs[i].label + '</button>';
+  }
+  document.getElementById('catTabs').innerHTML = html;
+})();
+
 renderProducts();
 renderCartBadge();
 
@@ -223,9 +296,8 @@ if (window.location.search.indexOf('tab=cart') >= 0) {
 function switchCat(cat) {
   currentCat = cat;
   var tabs = document.querySelectorAll('.cat-tab');
-  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-  var tabIndex = cat === 'snack' ? 0 : cat === 'tea' ? 1 : 2;
-  tabs[tabIndex].classList.add('active');
+  var keys = ['snack','tea','ware'];
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('active', keys[i] === cat);
   renderProducts();
 }
 
@@ -244,7 +316,7 @@ function addToCart(product) {
   if (existing) {
     existing.qty += 1;
   } else {
-    cart.push({ id:product.id, name:product.name, price:product.price, qty:1, icon:product.icon });
+    cart.push({ id:product.id, name:product.name, price:product.price, qty:1, icon:product.icon, spec:product.spec || '' });
   }
   saveCart();
   renderProducts();
@@ -284,16 +356,20 @@ function renderProducts() {
   for (var i = 0; i < list.length; i++) {
     var p = list[i];
     var qty = getCartQty(p.id);
-    html += '<div class="product-card" onclick="showProductDetail(products.' + currentCat + '[' + i + '])">' +
-      '<div class="product-icon" style="background:' + p.bg + '">' + p.icon + '</div>' +
+    var catVar = 'products.' + currentCat;
+    html += '<div class="product-card" onclick="showProductDetail(' + catVar + '[' + i + '])">' +
+      (p.image
+        ? '<img src="' + p.image + '" class="product-img" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" /><div class="product-img-placeholder" style="display:none;background:' + p.bg + '">' + p.icon + '</div>'
+        : '<div class="product-img-placeholder" style="background:' + p.bg + '">' + p.icon + '</div>') +
       '<div class="product-body">' +
         '<div class="product-name">' + p.name + '</div>' +
+        (p.spec ? '<div class="product-spec">' + p.spec + '</div>' : '') +
         '<div class="product-desc">' + p.desc + '</div>' +
         '<div class="product-footer">' +
           '<span class="product-price">¥' + p.price + '<span class="unit">/件</span></span>' +
           (qty > 0
-            ? '<div class="qty-ctrl"><button class="qty-btn" onclick="event.stopPropagation();removeFromCart(products.' + currentCat + '[' + i + '])">−</button><span class="qty-num">' + qty + '</span><button class="qty-btn" onclick="event.stopPropagation();addToCart(products.' + currentCat + '[' + i + '])">+</button></div>'
-            : '<button style="padding:4px 14px;border-radius:16px;background:#07c160;color:#fff;border:none;font-size:12px;cursor:pointer;" onclick="event.stopPropagation();addToCart(products.' + currentCat + '[' + i + '])">+ 加购</button>') +
+            ? '<div class="qty-ctrl"><button class="qty-btn" onclick="event.stopPropagation();removeFromCart(' + catVar + '[' + i + '])">−</button><span class="qty-num">' + qty + '</span><button class="qty-btn" onclick="event.stopPropagation();addToCart(' + catVar + '[' + i + '])">+</button></div>'
+            : '<button style="padding:4px 14px;border-radius:16px;background:#07c160;color:#fff;border:none;font-size:12px;cursor:pointer;" onclick="event.stopPropagation();addToCart(' + catVar + '[' + i + '])">+ 加购</button>') +
         '</div>' +
       '</div>' +
     '</div>';
@@ -376,8 +452,6 @@ function checkout() {
   showPayModal();
 }
 
-var payMethod = 'balance';
-
 function showPayModal() {
   var total = 0;
   var html = '';
@@ -396,7 +470,8 @@ function showPayModal() {
 
 function selectPayMethod(method) {
   payMethod = method;
-  ['balance','wechat','alipay'].forEach(function(m) {
+  var methods = ['balance','wechat','alipay','room'];
+  methods.forEach(function(m) {
     var el = document.getElementById('payMethod' + m.charAt(0).toUpperCase() + m.slice(1));
     var check = document.getElementById('payCheck' + m.charAt(0).toUpperCase() + m.slice(1));
     if (el) el.classList.toggle('selected', m === method);
@@ -424,16 +499,57 @@ function confirmPay() {
     localStorage.setItem('mp_user', JSON.stringify(user));
   }
 
-  // Determine if order needs shipping (tea/ware = shipping, snack = completed)
-  // Check if any item is a tea or ware product (those need shipping)
+  // Handle room charge
+  if (payMethod === 'room') {
+    // Save to room bills
+    var roomBills = JSON.parse(localStorage.getItem('erp_room_bills') || '{}');
+    if (!roomBills[orderRoomId]) {
+      roomBills[orderRoomId] = { roomId:orderRoomId, roomName:orderRoomName, items:[], totalAmount:0, roomFee:0, createdAt:new Date().toISOString(), settledAt:null };
+    }
+    roomBills[orderRoomId].items = roomBills[orderRoomId].items.concat(items.map(function(item) {
+      return { productName:item.name, qty:item.qty, price:item.price, amount:item.price * item.qty, orderedAt:new Date().toISOString() };
+    }));
+    roomBills[orderRoomId].totalAmount += total;
+    localStorage.setItem('erp_room_bills', JSON.stringify(roomBills));
+
+    // Create order record
+    var shopOrders = JSON.parse(localStorage.getItem('mp_shop_orders') || '[]');
+    var orderId = 'SH' + Date.now();
+    var now = new Date();
+    shopOrders.unshift({
+      orderId: orderId,
+      items: items,
+      totalAmount: total,
+      status: 'RoomCharge',
+      createdAt: now.toISOString(),
+      date: now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0'),
+      time: String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0'),
+      payment: '挂账到房间',
+      roomId: orderRoomId,
+      roomName: orderRoomName,
+      tableId: orderTableId,
+      type: 'room-charge'
+    });
+    localStorage.setItem('mp_shop_orders', JSON.stringify(shopOrders));
+
+    cart = [];
+    saveCart();
+    renderCartBadge();
+    showProducts();
+    renderCart();
+    document.getElementById('payModal').style.display = 'none';
+    showToast('✅ 已挂账至' + orderRoomName + '，请在离店时统一结算');
+    return;
+  }
+
+  // Determine if order needs shipping
   var needsShipping = false;
   for (var i = 0; i < cart.length; i++) {
     var cid = cart[i].id;
-    if (cid && (cid.charAt(0) === 'T' || cid.charAt(0) === 'W')) { needsShipping = true; break; }
+    if (cid && cid.charAt(0) === 'T') { needsShipping = true; break; }
   }
   var orderStatus = needsShipping ? 'Shipping' : 'Completed';
 
-  // Create shop order with proper item structure
   var shopOrders = JSON.parse(localStorage.getItem('mp_shop_orders') || '[]');
   var orderId = 'SH' + Date.now();
   var now = new Date();
@@ -447,12 +563,11 @@ function confirmPay() {
     createdAt: now.toISOString(),
     date: dateStr,
     time: timeStr,
-    payment: payMethod === 'balance' ? '余额支付' : payMethod === 'wechat' ? '微信支付' : '支付宝',
+    payment: payMethod === 'wechat' ? '微信支付' : payMethod === 'alipay' ? '支付宝' : '余额支付',
     type: 'shop'
   });
   localStorage.setItem('mp_shop_orders', JSON.stringify(shopOrders));
 
-  // Clear cart
   cart = [];
   saveCart();
   renderCartBadge();
@@ -471,11 +586,46 @@ function cancelPay() {
 function showProductDetail(product) {
   detailProduct = product;
   detailQty = 1;
-  document.getElementById('detailIcon').textContent = product.icon;
+
+  // Image
+  var imgEl = document.getElementById('detailImg');
+  var phEl = document.getElementById('detailPlaceholder');
+  if (product.image) {
+    imgEl.src = product.image;
+    imgEl.style.display = 'block';
+    phEl.style.display = 'none';
+  } else {
+    imgEl.style.display = 'none';
+    phEl.style.display = 'flex';
+    phEl.textContent = product.icon;
+    phEl.style.background = product.bg || '#f5f5f5';
+  }
+
   document.getElementById('detailName').textContent = product.name;
+  document.getElementById('detailSpec').textContent = product.spec || '';
   document.getElementById('detailDesc').textContent = product.desc;
   document.getElementById('detailPrice').textContent = '¥' + product.price;
   document.getElementById('detailQty').textContent = '1';
+
+  // Story section
+  var storySection = document.getElementById('storySection');
+  if (product.story) {
+    storySection.style.display = 'block';
+    document.getElementById('storyText').textContent = product.story;
+    document.getElementById('storyOrigin').textContent = '📍 ' + (product.origin || '');
+    var tips = product.brewingTips || '';
+    var tipsHtml = '';
+    if (tips) {
+      var parts = tips.split('·');
+      for (var ti = 0; ti < parts.length; ti++) {
+        tipsHtml += '<span class="tip-tag">' + parts[ti].trim() + '</span>';
+      }
+    }
+    document.getElementById('tipsRow').innerHTML = tipsHtml;
+  } else {
+    storySection.style.display = 'none';
+  }
+
   document.getElementById('detailModal').style.display = 'flex';
 }
 
@@ -502,7 +652,7 @@ function detailAddToCart() {
   if (existing) {
     existing.qty += detailQty;
   } else {
-    cart.push({ id: detailProduct.id, name: detailProduct.name, price: detailProduct.price, qty: detailQty, icon: detailProduct.icon });
+    cart.push({ id: detailProduct.id, name: detailProduct.name, price: detailProduct.price, qty: detailQty, icon: detailProduct.icon, spec: detailProduct.spec || '' });
   }
   saveCart();
   renderProducts();

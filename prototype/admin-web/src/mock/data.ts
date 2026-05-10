@@ -7,6 +7,7 @@ import customers from '@mock/customers.json'
 import employees from '@mock/employees.json'
 import alerts from '@mock/alerts.json'
 import cleaningTasks from '@mock/cleaning-tasks.json'
+import bills from '@mock/bills.json'
 
 // Merge static mock orders with customer-mp orders from localStorage
 function mergeOrders() {
@@ -58,6 +59,7 @@ export {
   employees,
   alerts,
   cleaningTasks,
+  bills,
 }
 
 export function getRoomsByStore(storeId: string) {

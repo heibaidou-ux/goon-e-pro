@@ -53,6 +53,7 @@
           <t-space>
             <t-button size="small" variant="text" theme="primary" @click="viewDetail(row)">详情</t-button>
             <t-button size="small" variant="text" theme="primary" @click="editRoom(row)">编辑</t-button>
+            <t-button size="small" variant="text" theme="warning" @click="openQRCode(row)">溯源码</t-button>
           </t-space>
         </template>
       </t-table>
@@ -83,6 +84,43 @@
         </div>
       </div>
     </t-drawer>
+
+    <!-- QR Code Dialog -->
+    <t-dialog v-model:visible="qrDialogVisible" header="生成动态溯源码" width="420px" :footer="false">
+      <div v-if="qrRoom" class="qr-dialog-body">
+        <div class="qr-room-info">
+          <span class="qr-room-name">{{ qrRoom.name }}</span>
+          <t-tag variant="light" size="small">{{ roomTypeLabel(qrRoom.type) }}</t-tag>
+          <t-tag variant="light" size="small">{{ qrRoom.capacity }}人</t-tag>
+        </div>
+
+        <t-form layout="vertical" style="margin-top:16px">
+          <t-form-item label="桌号">
+            <t-radio-group v-model="qrTableId">
+              <t-radio-button v-for="t in qrTableOptions" :key="t" :value="t">{{ t }}号桌</t-radio-button>
+            </t-radio-group>
+          </t-form-item>
+        </t-form>
+
+        <div class="qr-code-area">
+          <img :src="qrCodeUrl" alt="房间溯源码" class="qr-code-img" />
+        </div>
+
+        <div class="qr-url-row">
+          <t-input :value="qrEntryUrl" readonly size="small" />
+          <t-button size="small" variant="outline" @click="copyQrUrl">复制</t-button>
+        </div>
+
+        <t-space style="margin-top:14px" size="small">
+          <t-button theme="primary" variant="outline" @click="copyQrAndPreview" style="flex:1">
+            📋 复制扫码链接
+          </t-button>
+          <t-button variant="outline" @click="downloadQr" style="flex:1">
+            ⬇️ 下载溯源码
+          </t-button>
+        </t-space>
+      </div>
+    </t-dialog>
   </div>
 </template>
 
@@ -94,6 +132,10 @@ const searchText = ref('')
 const filterType = ref('')
 const drawerVisible = ref(false)
 const selectedRoom = ref<any>(null)
+const qrDialogVisible = ref(false)
+const qrRoom = ref<any>(null)
+const qrTableId = ref(1)
+const qrTableOptions = ref([1])
 
 const filteredRooms = computed(() => {
   let list = rooms.rooms
@@ -131,6 +173,59 @@ function getStatusLabel(roomId: string): string {
 
 function getRoomOrder(roomId: string) {
   return orders.orders.find(o => o.roomId === roomId && (o.status === 'InUse' || o.status === 'Booked'))
+}
+
+function openQRCode(room: any) {
+  qrRoom.value = room
+  const tableCount = room.capacity <= 2 ? 1 : room.capacity <= 4 ? 2 : room.capacity <= 6 ? 3 : 4
+  qrTableOptions.value = Array.from({ length: tableCount }, (_, i) => i + 1)
+  qrTableId.value = 1
+  qrDialogVisible.value = true
+}
+
+const qrCodeUrl = computed(() => {
+  if (!qrRoom.value) return ''
+  const params = `room_id=${qrRoom.value.roomId}&table_id=${qrTableId.value}`
+  const data = `https://goon-tea.com/scan?${params}`
+  return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(data)}`
+})
+
+const qrEntryUrl = computed(() => {
+  if (!qrRoom.value) return ''
+  const params = `room_id=${qrRoom.value.roomId}&table_id=${qrTableId.value}`
+  return `../customer-mp/pages/home/index.html?${params}`
+})
+
+function copyQrUrl() {
+  navigator.clipboard.writeText(qrEntryUrl.value).then(() => {
+    showToast('URL已复制')
+  }).catch(() => {
+    showToast('复制失败，请手动复制')
+  })
+}
+
+function copyQrAndPreview() {
+  navigator.clipboard.writeText(qrEntryUrl.value).then(() => {
+    showToast('✅ 扫码链接已复制（管理端禁止直接跳转客人页面）')
+  }).catch(() => {
+    showToast('📋 ' + qrEntryUrl.value)
+  })
+}
+
+function downloadQr() {
+  const link = document.createElement('a')
+  link.href = qrCodeUrl.value
+  link.download = `${qrRoom.value?.roomCode || 'room'}-table${qrTableId.value}-qr.png`
+  link.click()
+  showToast('二维码已开始下载')
+}
+
+function showToast(msg: string) {
+  const el = document.createElement('div')
+  el.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 22px;border-radius:8px;font-size:14px;z-index:9999'
+  el.textContent = msg
+  document.body.appendChild(el)
+  setTimeout(() => el.remove(), 2000)
 }
 
 function roomTypeLabel(type: string): string {
@@ -176,4 +271,11 @@ const columns = [
 .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; color: #666; }
 .device-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
 .device-item:last-child { border-bottom: none; }
+
+.qr-dialog-body { text-align: center; }
+.qr-room-info { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.qr-room-name { font-size: 16px; font-weight: 700; color: #333; }
+.qr-code-area { background: #fff; border-radius: 12px; padding: 16px; margin: 14px 0; display: inline-block; border: 1px solid #f0f0f0; }
+.qr-code-img { width: 220px; height: 220px; display: block; }
+.qr-url-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 </style>
