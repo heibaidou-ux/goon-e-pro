@@ -80,29 +80,44 @@
             {{ deviceStatusLabel(selectedDevice.status) }}
           </t-tag>
         </div>
+        <div class="detail-row" v-if="queueLength > 0">
+          <span>指令队列</span>
+          <t-tag variant="light" theme="warning">⏳ {{ queueLength }} 条待执行</t-tag>
+        </div>
         <t-divider />
         <div v-if="selectedDevice.type === 'Lock'" class="control-panel">
           <h4>门锁控制</h4>
           <div class="detail-row"><span>电量</span><span>{{ selectedDevice.batteryLevel }}%</span></div>
-          <t-button block theme="primary" style="margin-top:12px">远程开门</t-button>
+          <t-button block theme="primary" style="margin-top:12px" :disabled="sending" @click="sendCmd('unlock')">
+            {{ sending ? '执行中...' : '远程开门' }}
+          </t-button>
         </div>
         <div v-else-if="selectedDevice.type === 'AC'" class="control-panel">
           <h4>空调控制</h4>
           <div class="detail-row"><span>当前温度</span><span>{{ selectedDevice.temperature }}°C</span></div>
           <div class="detail-row"><span>运行模式</span><span>{{ modeLabel(selectedDevice.mode) }}</span></div>
+          <t-space style="margin-top:12px">
+            <t-button size="small" :disabled="sending" @click="sendCmd('cool')">制冷</t-button>
+            <t-button size="small" :disabled="sending" @click="sendCmd('heat')">制热</t-button>
+            <t-button size="small" :disabled="sending" @click="sendCmd('off')">关闭</t-button>
+          </t-space>
         </div>
         <div v-else-if="selectedDevice.type === 'Light'" class="control-panel">
           <h4>灯光控制</h4>
           <div class="detail-row"><span>亮度</span><span>{{ selectedDevice.brightness }}%</span></div>
           <div class="detail-row"><span>色温</span><span>{{ selectedDevice.colorTemp }}K</span></div>
+          <t-space style="margin-top:12px">
+            <t-button size="small" :disabled="sending" @click="sendCmd('on')">开灯</t-button>
+            <t-button size="small" :disabled="sending" @click="sendCmd('off')">关灯</t-button>
+          </t-space>
         </div>
         <div v-else-if="selectedDevice.type === 'Curtain'" class="control-panel">
           <h4>窗帘控制</h4>
           <div class="detail-row"><span>位置</span><span>{{ selectedDevice.position }}</span></div>
           <t-space style="margin-top:12px">
-            <t-button size="small">打开</t-button>
-            <t-button size="small">关闭</t-button>
-            <t-button size="small">停止</t-button>
+            <t-button size="small" :disabled="sending" @click="sendCmd('open')">打开</t-button>
+            <t-button size="small" :disabled="sending" @click="sendCmd('close')">关闭</t-button>
+            <t-button size="small" :disabled="sending" @click="sendCmd('stop')">停止</t-button>
           </t-space>
         </div>
         <div v-else-if="selectedDevice.type === 'Speaker'" class="control-panel">
@@ -111,9 +126,15 @@
           <div class="detail-row"><span>状态</span><span>{{ selectedDevice.playing ? '播放中' : '已停止' }}</span></div>
           <div class="detail-row"><span>音源</span><span>{{ selectedDevice.source }}</span></div>
           <t-space style="margin-top:12px">
-            <t-button size="small">{{ selectedDevice.playing ? '暂停' : '播放' }}</t-button>
-            <t-button size="small">静音</t-button>
+            <t-button size="small" :disabled="sending" @click="sendCmd(selectedDevice.playing ? 'pause' : 'play')">
+              {{ selectedDevice.playing ? '暂停' : '播放' }}
+            </t-button>
+            <t-button size="small" :disabled="sending" @click="sendCmd('mute')">静音</t-button>
           </t-space>
+        </div>
+        <div v-if="lastCmdStatus" style="margin-top:10px;padding:8px 12px;border-radius:6px;font-size:13px;text-align:center"
+          :style="{ background: lastCmdStatus === 'success' ? '#e8f5e9' : lastCmdStatus === 'failed' ? '#fef0ef' : '#fff3e0', color: lastCmdStatus === 'success' ? '#2e7d32' : lastCmdStatus === 'failed' ? '#d54941' : '#e37318' }">
+          {{ lastCmdStatus === 'success' ? '✅ 指令执行成功' : lastCmdStatus === 'sending' ? '⏳ 指令发送中...' : '❌ 指令执行失败' }}
         </div>
       </div>
     </t-drawer>
@@ -123,12 +144,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { devices, rooms } from '@/mock/data'
+import commandQueue from '@/utils/command-queue'
 
 const filterRoom = ref('')
 const filterType = ref('')
 const filterStatus = ref('')
 const drawerVisible = ref(false)
 const selectedDevice = ref<any>(null)
+const sending = ref(false)
+const lastCmdStatus = ref<'success' | 'failed' | 'sending' | ''>('')
+const queueLength = ref(0)
 
 const filteredDevices = computed(() => {
   let list = devices.devices
@@ -192,6 +217,32 @@ function viewDetail(device: any) {
 function troubleshoot(device: any) {
   selectedDevice.value = device
   drawerVisible.value = true
+}
+
+function sendCmd(action: string) {
+  if (!selectedDevice.value) return
+  sending.value = true
+  lastCmdStatus.value = 'sending'
+  const cmd = {
+    deviceId: selectedDevice.value.deviceId,
+    deviceName: selectedDevice.value.deviceCode,
+    roomName: getRoomName(selectedDevice.value.roomId),
+    type: selectedDevice.value.type as any,
+    action,
+    operator: localStorage.getItem('erp_user') || '店员',
+    sourceIp: window.location.hostname,
+  }
+  commandQueue.onEach((c) => {
+    queueLength.value = commandQueue.length
+    if (c.deviceId === cmd.deviceId) {
+      lastCmdStatus.value = c.status
+      if (c.status === 'success' || c.status === 'failed') {
+        setTimeout(() => { sending.value = false }, 500)
+      }
+    }
+  })
+  commandQueue.enqueue(cmd)
+  queueLength.value = commandQueue.length
 }
 
 const columns = [

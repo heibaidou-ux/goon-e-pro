@@ -103,6 +103,10 @@
           <t-tag v-if="alertCount" theme="danger" variant="light" style="cursor:pointer" @click="router.push('/alerts')">
             ⚠ {{ alertCount }} 条告警
           </t-tag>
+          <t-tag :theme="heartbeatStatus === 'good' ? 'success' : heartbeatStatus === 'slow' ? 'warning' : 'danger'" variant="light" :style="{ cursor:'pointer' }" @click="resetHeartbeat">
+            <span :class="['heartbeat-dot', heartbeatStatus]"></span>
+            {{ heartbeatLabel }}
+          </t-tag>
           <t-tag theme="success" variant="light">系统运行中</t-tag>
           <t-tag variant="light">{{ currentTime }}</t-tag>
           <span class="user-info" v-if="currentUser">
@@ -130,6 +134,17 @@ const route = useRoute()
 
 const isCollapsed = ref(false)
 const currentTime = ref('')
+const heartbeatStatus = ref<'good' | 'slow' | 'dead'>('good')
+const heartbeatLabel = ref('IoT延迟 12ms')
+
+// Simulate IoT heartbeat check (in production, ping HA or MQTT broker)
+function checkHeartbeat() {
+  const latency = Math.floor(Math.random() * 100 + 5)
+  if (latency < 50) { heartbeatStatus.value = 'good'; heartbeatLabel.value = `IoT延迟 ${latency}ms` }
+  else if (latency < 200) { heartbeatStatus.value = 'slow'; heartbeatLabel.value = `IoT延迟 ${latency}ms ⚠` }
+  else { heartbeatStatus.value = 'dead'; heartbeatLabel.value = `IoT延迟 ${latency}ms 🚫` }
+}
+function resetHeartbeat() { heartbeatStatus.value = 'good'; heartbeatLabel.value = 'IoT延迟 12ms' }
 let timer: ReturnType<typeof setInterval>
 
 const isLoginPage = computed(() => route.meta.noAuth === true)
@@ -159,13 +174,26 @@ function updateTime() {
   currentTime.value = now.toLocaleString('zh-CN', { hour12: false })
 }
 
+function handleResize() {
+  if (window.innerWidth < 1024) isCollapsed.value = true
+}
+let hbTimer: ReturnType<typeof setInterval>
+
 onMounted(() => {
   updateTime()
   timer = setInterval(updateTime, 1000)
+  // Heartbeat check every 5 seconds
+  checkHeartbeat()
+  hbTimer = setInterval(checkHeartbeat, 5000)
+  // Responsive sidebar
+  handleResize()
+  window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
   clearInterval(timer)
+  clearInterval(hbTimer)
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -279,6 +307,14 @@ onUnmounted(() => {
   color: #333;
   font-weight: 500;
 }
+
+.heartbeat-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; vertical-align:middle; }
+.heartbeat-dot.good { background:#00A870; box-shadow:0 0 6px rgba(0,168,112,.5); animation: pulse-green 2s infinite; }
+.heartbeat-dot.slow { background:#E37318; box-shadow:0 0 6px rgba(227,115,24,.5); animation: pulse-orange 1.5s infinite; }
+.heartbeat-dot.dead { background:#D54941; box-shadow:0 0 6px rgba(213,73,65,.5); animation: pulse-red 1s infinite; }
+@keyframes pulse-green { 0%,100% { opacity:1 } 50% { opacity:0.5 } }
+@keyframes pulse-orange { 0%,100% { opacity:1; transform:scale(1) } 50% { opacity:0.6; transform:scale(1.3) } }
+@keyframes pulse-red { 0%,100% { opacity:1; transform:scale(1) } 50% { opacity:0.4; transform:scale(1.5) } }
 
 .app-content {
   flex: 1;

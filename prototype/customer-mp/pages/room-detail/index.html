@@ -56,6 +56,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .time-cell .t-label { font-weight:500; }
 .time-cell .t-price { font-size:9px; display:block; color:#999; }
 .time-cell.selected .t-price { color:rgba(255,255,255,.7); }
+.time-cell.disabled { opacity:.35; cursor:not-allowed; background:#f5f5f5; border-color:#e0e0e0; }
 
 /* Special */
 .special-section { padding:6px 12px 4px; }
@@ -202,7 +203,7 @@ if (!room.bookable) {
     <div class="divider"></div>
     <div class="date-bar" id="dateBar"></div>
     <div class="person-bar"><div class="person-bar-label">选择人数（左右滑动）</div><div class="person-scroll" id="personScroll"></div></div>
-    <div class="time-section"><div class="time-section-label" id="timeSectionLabel">选择时段 — 点击起点，再点击终点</div><div class="time-grid" id="timeGrid"></div></div>
+    <div class="time-section"><div class="time-section-label" id="timeSectionLabel">选择时段 — 点击起点，再点击终点（前后含15分钟保洁缓冲）</div><div class="time-grid" id="timeGrid"></div></div>
     <div class="special-section" id="specialSection"></div>
     <div class="night-picker" id="nightPicker"><div class="night-picker-label">夜间开始时间（23:59-05:00，3小时）</div><div class="night-grid" id="nightGrid"></div></div>`;
 
@@ -282,6 +283,43 @@ if (!room.bookable) {
     renderPersonBar(); renderTimeGrid(); updateTotal();
   };
 
+  // ── Booking buffer: 15 min cleaning buffer between bookings ──
+  const existingBookings = {
+    RD004: [{ date:'2026-05-10', start:'08:00', end:'10:00' }, { date:'2026-05-10', start:'14:00', end:'16:00' }],
+    RM001: [{ date:'2026-05-10', start:'09:00', end:'12:00' }],
+    RM002: [{ date:'2026-05-10', start:'10:00', end:'12:30' }],
+    RM003: [],
+    RM005: [], RM006: [],
+  };
+
+  function getBookedBlocks(roomId, dateStr) {
+    const blocks = existingBookings[roomId] || [];
+    return blocks.filter(b => b.date === dateStr).map(b => {
+      const sp = b.start.split(':'), ep = b.end.split(':');
+      const sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
+      let eMin = parseInt(ep[0])*60 + parseInt(ep[1]);
+      if (eMin <= sMin) eMin += 24*60;
+      return { startMin: sMin, endMin: eMin };
+    });
+  }
+
+  function isTimeBlocked(checkStart, checkEnd, roomId, dateStr) {
+    const blocks = getBookedBlocks(roomId, dateStr);
+    // Add next day's bookings too (for overnight)
+    const nextDate = new Date(dateStr);
+    nextDate.setDate(nextDate.getDate() + 1);
+    const nextDateStr = nextDate.getFullYear() + '-' + String(nextDate.getMonth()+1).padStart(2,'0') + '-' + String(nextDate.getDate()).padStart(2,'0');
+    const nextBlocks = getBookedBlocks(roomId, nextDateStr);
+    const allBlocks = blocks.concat(nextBlocks);
+
+    for (const b of allBlocks) {
+      // Booking occupies [start, end] and cleaning occupies [end, end+15]
+      const cleaningEnd = b.endMin + 15;
+      if (checkStart < cleaningEnd && checkEnd > b.startMin) return true;
+    }
+    return false;
+  }
+
   // ── Time grid ──
   function renderTimeGrid() {
     const isToday = selectedDate.toDateString() === today.toDateString();
@@ -306,6 +344,8 @@ if (!room.bookable) {
     if (selectedStart) { const sp = selectedStart.split(':'); sMin = parseInt(sp[0])*60 + parseInt(sp[1]); }
     if (selectedEnd) { const ep = selectedEnd.split(':'); eMin = parseInt(ep[0])*60 + parseInt(ep[1]); if (eMin <= sMin) eMin += 24*60; }
 
+    const dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
+
     document.getElementById('timeGrid').innerHTML = cells.map(c => {
       const cMin = c.minutes;
       let cls = 'time-cell';
@@ -313,13 +353,28 @@ if (!room.bookable) {
       if (selectedStart && c.time === selectedStart && c.dayOffset === 0) cls += ' selected';
       if (selectedEnd && c.time === selectedEnd && (eMin > 24*60 ? c.dayOffset === 1 : c.dayOffset === 0)) cls += ' selected';
       if (selectedStart && selectedEnd && cMin > sMin && cMin < eMin) cls += ' in-range';
+
+      // Check if this cell falls within a booked+cleaning buffer block
+      const cellEnd = cMin + 30;
+      const blocked = isTimeBlocked(cMin, cellEnd, roomId, dateStr);
+      if (blocked) cls += ' disabled';
+
       return '<div class="'+cls+'" onclick="pickTimeCell(\''+c.time+'\','+c.dayOffset+')"><span class="t-label">'+displayTime+'</span><span class="t-price">¥'+halfPrice+'</span></div>';
     }).join('');
   }
 
   window.pickTimeCell = function(time, dayOffset) {
+    const dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
     if (sessionType !== 'standard') { sessionType = 'standard'; nightStartTime = null; renderSpecial(); }
     if (!selectedStart || (selectedStart && selectedEnd)) {
+      // Check if the clicked start time is within a blocked (booked+cleaning) period
+      const sp = time.split(':');
+      const sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
+      const cellEnd = sMin + 30;
+      if (isTimeBlocked(sMin, cellEnd, roomId, dateStr)) {
+        showToast('该时段已被占用（含15分钟保洁缓冲），请选择其他时段');
+        return;
+      }
       selectedStart = time; selectedEnd = null;
     } else {
       const sp = selectedStart.split(':');
@@ -327,6 +382,12 @@ if (!room.bookable) {
       let sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
       let eMin = parseInt(ep[0])*60 + parseInt(ep[1]) + dayOffset * 24*60;
       if (eMin <= sMin) { showToast('结束时间必须晚于开始时间'); return; }
+
+      // Check if the selected range conflicts with any booking+cleaning buffer
+      if (isTimeBlocked(sMin, eMin, roomId, dateStr)) {
+        showToast('该时段与已有预约冲突（含前后15分钟保洁缓冲），请调整时间');
+        return;
+      }
       selectedEnd = time;
     }
     renderTimeGrid(); updateTotal();
