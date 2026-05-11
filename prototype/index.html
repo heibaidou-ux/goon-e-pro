@@ -43,7 +43,7 @@ h1 { font-size:28px; font-weight:800; color:#1a1a1a; margin-bottom:8px; letter-s
     <div class="card">
       <div class="card-icon">🖥️</div>
       <div class="card-title">管理后台<span class="badge web">Vue 3</span></div>
-      <div class="card-desc">门店管理员使用的 Web 后台（手机/电脑均可直接访问）</div>
+      <div class="card-desc" id="adminDesc">门店管理员使用的 Web 后台（需先启动 Vite 开发服务器）</div>
       <div class="card-links">
         <a class="card-link" href="admin-web-dist/" target="_blank">启动管理后台 <span class="link-arrow">↗</span></a>
         <a class="card-link" href="admin-web-dist/#/dashboard" target="_blank">门店总览 Dashboard<span class="link-arrow">→</span></a>
@@ -116,5 +116,27 @@ h1 { font-size:28px; font-weight:800; color:#1a1a1a; margin-bottom:8px; letter-s
 
   <p class="footer">高岸ERP · 盈隆店 · 交互原型 V1.0 · 2026年5月<br>基于 UI-01 设计文档覆盖 客人端5页面 + 店员端6页面 + 管理端6页面 | 12个边界状态</p>
 </div>
+
+<script>
+(function() {
+  // Auto-detect: file:// → local dev server; GitHub Pages → admin-web-dist
+  var isLocal = location.protocol === 'file:';
+  var baseUrl = isLocal ? 'http://localhost:5173' : 'admin-web-dist';
+  var links = document.querySelectorAll('.card-links a[href*="admin-web-dist"]');
+  for (var i = 0; i < links.length; i++) {
+    var href = links[i].getAttribute('href');
+    links[i].setAttribute('href', href.replace('admin-web-dist', baseUrl));
+  }
+  // Show environment indicator
+  var desc = document.querySelector('.card .card-desc');
+  if (desc && isLocal) {
+    desc.textContent = '门店管理员使用的 Web 后台（需先启动 Vite 开发服务器）';
+    var status = document.createElement('div');
+    status.style.cssText = 'background:#fff3e0;color:#e37318;font-size:12px;padding:6px 10px;border-radius:6px;margin-bottom:12px;text-align:center;';
+    status.textContent = '⚠ 本地模式：请确保已运行 npx vite（端口 5173）';
+    document.querySelector('.card .card-links').before(status);
+  }
+})();
+</script>
 </body>
 </html>
