@@ -60,7 +60,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
 </style>
 </head>
 <body>
-<div class="nav-top"><a href="../../../customer-mp/index.html">← 返回</a></div>
+<div class="nav-top"><a href="../../../index.html">← 返回</a></div>
 <div class="phone">
   <div class="page">
     <div class="header-bar">
@@ -83,7 +83,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
     <div class="section">
       <div class="section-title">
         <span>⏳ 待审批事项</span>
-        <span class="section-more" onclick="location.href='../approval-center/index.html'">查看全部 →</span>
+        <span class="section-more" onclick="showToast('审批中心（开发中）')">查看全部 →</span>
       </div>
       <div id="pendingApprovals"></div>
     </div>
@@ -98,7 +98,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
     <div class="section">
       <div class="section-title">
         <span>⚠️ 告警概览</span>
-        <span class="section-more" onclick="location.href='../alert-center/index.html'">查看全部 →</span>
+        <span class="section-more" onclick="showToast('告警中心（开发中）')">查看全部 →</span>
       </div>
       <div id="alertSummary"></div>
     </div>

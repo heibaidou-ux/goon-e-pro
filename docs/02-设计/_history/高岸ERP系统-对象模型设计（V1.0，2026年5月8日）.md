@@ -1,10 +1,10 @@
 # 高岸ERP系统-对象模型设计
 
-**版本**：V1.1
-**日期**：2026年5月10日
+**版本**：V1.0
+**日期**：2026年5月8日
 **文档状态**：草稿
 **编制依据**：
-- 《高岸ERP系统-需求说明书（V10.10，2026年5月10日）》全文，特别是第二章业务域划分、第三章功能需求
+- 《高岸ERP系统-需求说明书（V10.8，2026年5月8日）》全文，特别是第二章业务域划分、第三章功能需求
 - 《高岸ERP系统-CDM实体映射说明书（V1.1，2026年5月7日）》
 - 《面向对象建模方法论》
 
@@ -72,8 +72,8 @@
 | D05 供应链域 | 16 | Product, PurchaseOrder, Supplier, InventoryOnHand, InventoryLot |
 | D06 财务域 | 20 | RevenueFlow, ExpenseRecord, JournalEntry, MonthlySettlement, AccountsPayable |
 | D07 人力资源域 | 15 | Employee, ExternalStaff, Attendance, Payroll, Schedule |
-| D08 技术域 | 15 | IoTDevice, SmartScene, UserAccount, AlertRecord, AuditLog, CommandQueue, HeartbeatRecord |
-| **合计** | **111** | — |
+| D08 技术域 | 13 | IoTDevice, SmartScene, UserAccount, AlertRecord, AuditLog |
+| **合计** | **109** | — |
 
 ### 3.2 域间关系总览（Hub-and-Spoke）
 
@@ -3628,35 +3628,17 @@ classDiagram
 |--------|------|------|------|------|
 | logId | String(32) | 是 | 日志唯一标识 | PK |
 | userId | String(32) | 是 | 操作人 | FK→UserAccount |
-| operation | String(50) | 是 | 操作类型 | ForceCheckout/RemoteUnlock/ManualStatusChange/SceneOverride/DeviceControl/RoomSetup/ManualAdjustment等 |
-| resourceType | String(50) | 是 | 资源类型 | 如room/device/order/reconciliation |
+| operation | String(50) | 是 | 操作类型 | 如refund/approve/forceOpen/roleChange |
+| resourceType | String(50) | 是 | 资源类型 | — |
 | resourceId | String(32) | 是 | 资源ID | — |
 | oldValue | JSON | 否 | 变更前值 | — |
 | newValue | JSON | 否 | 变更后值 | — |
-| operatorName | String(50) | 否 | 操作人姓名 | 冗余字段，便于快速展示 |
-| operatorRole | String(20) | 否 | 操作人角色 | Staff/Manager/Finance等 |
-| roomName | String(50) | 否 | 房间名称 | 冗余字段，便于快速展示 |
-| reason | String(500) | 否 | 操作原因 | — |
-| targetStatus | String(30) | 否 | 目标状态 | — |
-| previousStatus | String(30) | 否 | 原状态 | — |
-| remote | Boolean | 否 | 是否远程操作 | true=远程(Web/API)，false=本地(门店) |
-| sourceIp | String(45) | 否 | 来源IP | 远程操作时记录公网IP，本地操作记录内网IP |
-| executionStatus | Enum | 否 | 执行结果 | success(成功)/failed(失败)/pending(待确认) |
-| failureReason | String(200) | 否 | 失败原因 | executionStatus=failed时必填 |
-| ipAddress | String(45) | 否 | 操作IP（兼容旧字段） | — |
+| ipAddress | String(45) | 否 | 操作IP | — |
 | deviceInfo | String(200) | 否 | 设备信息 | — |
-| reviewStatus | Enum | 否 | 抽查状态 | Pending(待抽查)/Reviewed(已通过)/Flagged(异常标记) |
-| reviewedBy | String(50) | 否 | 审核人 | — |
-| reviewedAt | DateTime | 否 | 审核时间 | — |
-| reviewNote | String(200) | 否 | 审核备注 | — |
 | timestamp | DateTime | 是 | 操作时间 | — |
 
 **业务约束**：
-- 关键操作（退款/修改金额/审批/强制开门/角色变更/远程控制/手动调账等）必须记录审计日志
-- 远程操作自动标记remote=true并记录sourceIp
-- 执行失败的操作需填写failureReason
-- 高危操作（手动房态变更/强制退房）的reviewStatus默认为Pending，需店长24h内抽查复核
-- 抽查复核比例不低于20%，系统随机抽样
+- 关键操作（退款/修改金额/审批/强制开门/角色变更等）必须记录审计日志
 - 日志保留至少1年
 
 ---
@@ -3744,62 +3726,6 @@ classDiagram
 - 每日全量备份完成自动通知管理员
 - 连续2次备份失败自动告警
 - 恢复操作需双人确认
-
----
-
-#### 11.2.14 CommandQueue — 指令队列
-
-| CDM映射 | 自定义 — 概念映射 |
-|----------|--------------------|
-
-| 属性名 | 类型 | 必填 | 说明 | 约束 |
-|--------|------|------|------|------|
-| cmdId | String(32) | 是 | 指令唯一标识 | PK |
-| deviceId | String(32) | 是 | 目标设备 | FK→IoTDevice |
-| storeId | String(32) | 是 | 所属门店 | FK→Store |
-| roomId | String(32) | 否 | 关联包间 | FK→Room |
-| cmdType | Enum | 是 | 操作类型：unlock/lock/open/close/on/off/cool/heat/play/pause/mute/stop | — |
-| status | Enum | 是 | pending(待处理)/sending(发送中)/success(成功)/failed(失败) | — |
-| sequence | Integer | 是 | 队列序号，FIFO排序 | INDEX |
-| operatorId | String(32) | 是 | 操作人 | FK→UserAccount |
-| operatorName | String(50) | 否 | 操作人姓名 | 冗余字段 |
-| sourceIp | String(45) | 否 | 操作来源IP | — |
-| payload | JSON | 否 | 指令参数 | 如{"temperature":24,"brightness":80} |
-| isBatch | Boolean | 否 | 是否批量指令 | 场景联动时为true |
-| batchId | String(32) | 否 | 批次ID | 同一场景联动的指令共享批次ID |
-| conflictWith | String(32) | 否 | 冲突指令ID | 检测到冲突时记录 |
-| errorMessage | String(200) | 否 | 失败原因 | status=failed时填写 |
-| retryCount | Integer | 否 | 重试次数 | 默认0 |
-| enqueuedAt | DateTime | 是 | 入队时间 | — |
-| processedAt | DateTime | 否 | 处理时间 | — |
-| completedAt | DateTime | 否 | 完成时间 | — |
-
-**业务约束**：
-- 同一设备+同一cmdType的指令30秒内去重（防抖）
-- 互斥指令对（open↔close、on↔off、lock↔unlock、play↔pause）自动冲突检测
-- 单条指令超时（默认5秒无响应）自动标记为failed
-- FIFO顺序执行，前一条完成后取下一条
-- 场景联动的批量指令共享batchId，按设备类型顺序执行
-- 执行完成的指令保留24小时后自动归档
-
-#### 11.2.15 HeartbeatRecord — 心跳记录
-
-| CDM映射 | 自定义 — 概念映射 |
-|----------|--------------------|
-
-| 属性名 | 类型 | 必填 | 说明 | 约束 |
-|--------|------|------|------|------|
-| heartbeatId | String(32) | 是 | 记录唯一标识 | PK |
-| storeId | String(32) | 是 | 门店 | FK→Store |
-| gatewayId | String(32) | 否 | 网关ID | — |
-| latency | Integer | 是 | 延迟（毫秒） | — |
-| status | Enum | 是 | good(正常)/slow(缓慢)/dead(异常) | good=<50ms, slow=50-200ms, dead=>200ms |
-| checkedAt | DateTime | 是 | 检测时间 | INDEX |
-
-**业务约束**：
-- 默认每5秒检测一次
-- 连续3次dead触发设备离线告警
-- 保留最近24小时数据，供网络波动排查
 
 ---
 
@@ -4069,11 +3995,6 @@ classDiagram
 | **AlertSeverity** | Low / Medium / High | AlertRecord |
 | **JobType** | DailySettlement / MonthlySettlement / Reconciliation / DataSync / Backup / AlertScan | SystemJob |
 | **BackupType** | Full / Incremental / Sensitive / Config / Remote | BackupRecord |
-| **CmdType** | unlock / lock / open / close / on / off / cool / heat / play / pause / mute / stop | CommandQueue |
-| **CmdStatus** | pending / sending / success / failed | CommandQueue |
-| **HeartbeatStatus** | good / slow / dead | HeartbeatRecord |
-| **AuditExecutionStatus** | success / failed / pending | AuditLog |
-| **AuditReviewStatus** | Pending / Reviewed / Flagged | AuditLog |
 
 ### 14.2 收入渠道枚举（RevenueFlow.accountType）
 
@@ -4104,7 +4025,6 @@ classDiagram
 | V1.0 | 2026-05-08 | 初稿：基于REQ-01 V10.8构建8大业务域共104个实体定义，含域内类图、跨域关联矩阵、8个关键状态机、共享枚举与码表 | Claude Code |
 | V1.0 | 2026-05-10 | 5.2.8 Room.type枚举扩展：新增Exhibition（展厅）、Workspace（工作间）两种不可预订型，支持设备远程控制但不参与预约流程和保洁任务生成 | Claude Code |
 | V1.0 | 2026-05-10 | 根据REQ-01 V10.9 §3.2动态价格体系重构D02域定价模型：RoomPricing简化为基准价，新增RoomPersonPricing（人数差异化定价）、TimeSlotCoefficient（时段系数）、HolidayCalendar（节日日历）、ActivityCalendar（自定义活动）、DurationDiscountRule（长时折扣）、NightPackage（夜间/通宵套餐）共6个新实体，D02实体数9→14，总计104→109 | Claude Code |
-| V1.1 | 2026-05-10 | 根据REQ-01 V10.10架构强化同步：11.2.9 AuditLog大幅增强（新增operatorName/operatorRole/roomName/reason/remote/sourceIp/executionStatus/reviewStatus等12个字段）；新增11.2.14 CommandQueue指令队列实体（FIFO去重/冲突检测/状态追踪）；新增11.2.15 HeartbeatRecord心跳记录实体（三态检测/24h保留）；D08实体数13→15，总计109→111；枚举表新增CmdType/CmdStatus/HeartbeatStatus/AuditExecutionStatus/AuditReviewStatus；实体索引新增CommandQueue/HeartbeatRecord | Claude Code + Gemini评审 |
 
 ### B. CDM映射交叉引用
 
@@ -4140,7 +4060,6 @@ classDiagram
 | Channel | 渠道/平台 | D04 | 7.2.10 |
 | CleanerAssessment | 保洁员考核 | D07 | 10.2.15 |
 | CleaningTask | 保洁任务 | D03 | 6.2.9 |
-| CommandQueue | 指令队列 | D08 | 11.2.14 |
 | ConstructionCost | 建设费用 | D02 | 5.2.6 |
 | Contract | 加盟合同 | D01 | 4.2.5 |
 | Coupon | 优惠券 | D04 | 7.2.3 |
@@ -4161,7 +4080,6 @@ classDiagram
 | FiscalCalendar | 会计日历 | D06 | 9.2.2 |
 | FixedAsset | 固定资产 | D06 | 9.2.17 |
 | GoalMetric | 目标指标 | D01 | 4.2.3 |
-| HeartbeatRecord | 心跳记录 | D08 | 11.2.15 |
 | HolidayCalendar | 节日/活动日历 | D02 | 5.2.12 |
 | InspectionItemResult | 巡检项结果 | D03 | 6.2.12 |
 | InspectionTask | 巡检任务 | D03 | 6.2.11 |
