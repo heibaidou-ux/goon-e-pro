@@ -332,10 +332,10 @@ function onCategoryChange(val: string) {
   formData.subCategory = opts[0]
 }
 
-const products = supplyChain.products
+const products = ref([...supplyChain.products])
 
 const filteredProducts = computed(() => {
-  let list = products
+  let list = products.value
   if (searchText.value) list = list.filter(p => p.name.includes(searchText.value) || p.code.includes(searchText.value))
   if (filterCategory.value) list = list.filter(p => p.category === filterCategory.value)
   if (filterStatus.value) list = list.filter(p => p.status === filterStatus.value)
@@ -461,9 +461,9 @@ function saveProduct() {
     if (formData.imageData) p.image = formData.imageData
   } else {
     // Add new
-    const id = 'P' + String(products.length + 1).padStart(3, '0')
+    const id = 'P' + String(products.value.length + 1).padStart(3, '0')
     const code = formData.category === '茶叶' ? 'TEA-' : formData.category === '茶具' ? 'CUP-' : formData.category === '茶点' ? 'SNK-' : 'PKG-'
-    products.push({
+    products.value.push({
       productId: id,
       code: code + 'NEW-' + id,
       name: formData.name,

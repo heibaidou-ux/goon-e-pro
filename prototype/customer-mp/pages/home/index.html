@@ -448,7 +448,7 @@ function goCart() {
 
 function renderTeaGrid() {
   document.getElementById('teaGrid').innerHTML = teaProducts.map(function(t) {
-    return '<div class="tea-card">' +
+    return '<div class="tea-card" onclick="location.href=\'../tea-shop/index.html\'" style="cursor:pointer;">' +
       '<div class="tea-card-img" style="background:' + t.bg + ';position:relative;overflow:hidden;">' +
         (t.image ? '<img src="' + t.image + '" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;" onerror="this.style.display=\'none\'" />' : '') +
         '<span style="position:relative;z-index:1;">' + t.icon + '</span>' +

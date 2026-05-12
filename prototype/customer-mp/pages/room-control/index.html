@@ -269,16 +269,15 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 <script>
 // ── State ──
 var ctrlParams = new URLSearchParams(window.location.search);
-	var ctrlRoomId = ctrlParams.get('roomId') || 'RM004';
-	var ctrlRoomName = ctrlParams.get('roomName') || '大茶室C';
-	var ctrlDuration = parseInt(ctrlParams.get('duration') || '90');
-	remaining = ctrlDuration * 60;
-	document.getElementById('roomCtrlTitle').textContent = ctrlRoomName;
-	document.getElementById('bt-device-name').textContent = '高岸-' + ctrlRoomName;
+var ctrlRoomId = ctrlParams.get('roomId') || 'RM004';
+var ctrlRoomName = ctrlParams.get('roomName') || '大茶室C';
+var ctrlDuration = parseInt(ctrlParams.get('duration') || '90');
+document.getElementById('roomCtrlTitle').textContent = ctrlRoomName;
+document.querySelector('.bt-device-name').textContent = '高岸-' + ctrlRoomName;
 let activeScene = '品茗';
 let isPlaying = true;
 let volume = 70;
-let remaining = 45 * 60;
+let remaining = ctrlDuration * 60;
 let isBluetooth = false;
 let pendingScene = null;
 let selectedExtendTime = null;
