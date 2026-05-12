@@ -122,7 +122,13 @@
       "Bash(git ls-remote *)",
       "Bash(git ls-tree *)",
       "Bash(git fetch *)",
-      "Bash(git commit -m '@ *)"
+      "Bash(git commit -m '@ *)",
+      "Bash(git -c http.postBuffer=524288000 push github-pages master:master --force)",
+      "Bash(npx http-server *)",
+      "Bash(node _audit.js)",
+      "Bash(node _audit2.js)",
+      "Bash(node _audit3.js)",
+      "Bash(node -e ' *)"
     ],
     "mode": "bypassPermissions"
   }
