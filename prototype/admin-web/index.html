@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>"use strict";!function(){var p=location.pathname,e=document.createElement("base");p.endsWith("/")||(p=p.lastIndexOf(".")>p.lastIndexOf("/")?p.substring(0,p.lastIndexOf("/")+1):p+"/"),e.href=p,document.head.insertBefore(e,document.head.firstChild)}()</script>
+    <script>"use strict";!function(){var p=location.pathname,e=document.createElement("base");p.endsWith("/")||(p=p.lastIndexOf(".")>p.lastIndexOf("/")?p.substring(0,p.lastIndexOf("/")+1):p+"/"),e.href=p,document.head.insertBefore(e,document.head.firstChild)}()
+!function(){var q=location.search;if(q.indexOf("forceLogout")>=0){for(var k in localStorage)localStorage.removeItem(k);var l=location.pathname.replace(/\/+$/,"");location.replace(l+"/#/login")}}()</script>
     <title>高岸ERP - 智能管理系统</title>
   </head>
   <body>

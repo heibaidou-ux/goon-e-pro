@@ -61,7 +61,7 @@
       </t-col>
       <t-col :span="3">
         <t-card title="员工状态" :bordered="true">
-          <div v-for="emp in employees.employees" :key="emp.employeeId" class="emp-row">
+          <div v-for="emp in empArr" :key="emp.employeeId" class="emp-row">
             <t-avatar size="small">{{ emp.name.charAt(0) }}</t-avatar>
             <span class="emp-name">{{ emp.name }}</span>
             <span class="emp-role">{{ emp.roleLabel }}</span>
@@ -161,24 +161,33 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onErrorCaptured } from 'vue'
 import { useRouter } from 'vue-router'
 import { rooms, orders, devices, alerts, employees, getRoomStatusColor, getRoomStatusLabel } from '@/mock/data'
 
 const router = useRouter()
 
-const bookableRooms = rooms.rooms.filter(r => r.bookable !== false)
+// Safe data access wrappers — prevent setup crashes from null/undefined data
+function safe<T>(val: T | null | undefined, fallback: T): T { return val ?? fallback }
+function safeArr<T>(val: T[] | null | undefined): T[] { return Array.isArray(val) ? val : [] }
+const roomArr = safeArr(rooms?.rooms)
+const orderArr = safeArr(orders?.orders)
+const deviceArr = safeArr(devices?.devices)
+const alertArr = safeArr(alerts?.alerts)
+const empArr = safeArr(employees?.employees)
+
+const bookableRooms = roomArr.filter(r => r.bookable !== false)
 const totalBookable = bookableRooms.length
 
 const inUseRooms = computed(() => bookableRooms.filter(r => {
-  const order = orders.orders.find(o => o.roomId === r.roomId && o.status === 'InUse')
+  const order = orderArr.find(o => o.roomId === r.roomId && o.status === 'InUse')
   return !!order
 }).length)
 
-const unresolvedAlerts = computed(() => alerts.alerts.filter(a => a.status === 'Unresolved'))
+const unresolvedAlerts = computed(() => alertArr.filter(a => a.status === 'Unresolved'))
 
 const todayStats = computed(() => {
-  const todayOrders = orders.orders.filter(o => o.date === '2026-05-08')
+  const todayOrders = orderArr.filter(o => o.date === '2026-05-08')
   const inUse = todayOrders.filter(o => o.status === 'InUse').length
   const booked = todayOrders.filter(o => o.status === 'Booked').length
   const completed = todayOrders.filter(o => o.status === 'Completed').length
@@ -194,50 +203,56 @@ const revenueCards = computed(() => [
   { title: '设备在线率', value: `${deviceOnlineRate.value}%`, sub: `${deviceOnlineCount.value}/${deviceTotalCount.value} 在线 · 告警 ${unresolvedAlerts.value.length} 条`, color: '#366EF4', link: '/alerts' },
 ])
 
-const deviceTotalCount = computed(() => devices.devices.length)
-const deviceOnlineCount = computed(() => devices.devices.filter(d => d.status === 'Online').length)
+const deviceTotalCount = computed(() => deviceArr.length)
+const deviceOnlineCount = computed(() => deviceArr.filter(d => d.status === 'Online').length)
 const deviceOnlineRate = computed(() => {
   if (deviceTotalCount.value === 0) return 0
   return Math.round(deviceOnlineCount.value / deviceTotalCount.value * 100)
 })
 
-const roomList = rooms.rooms
+const roomList = roomArr
 
 function isBookable(room: any): boolean {
-  return room.bookable !== false
+  return room ? room.bookable !== false : false
 }
 
 function getRoomColor(roomId: string): string {
-  const room = rooms.rooms.find(r => r.roomId === roomId)
-  if (!isBookable(room)) return '#999'
-  if (room && room.status !== 'Active') return getRoomStatusColor(room.status)
-  const order = orders.orders.find(o => o.roomId === roomId && o.status === 'InUse')
+  const room = roomArr.find(r => r.roomId === roomId)
+  if (!room || !isBookable(room)) return '#999'
+  if (room.status !== 'Active') return getRoomStatusColor(room.status)
+  const order = orderArr.find(o => o.roomId === roomId && o.status === 'InUse')
   if (order) return '#366EF4'
-  const booked = orders.orders.find(o => o.roomId === roomId && o.status === 'Booked')
+  const booked = orderArr.find(o => o.roomId === roomId && o.status === 'Booked')
   if (booked) return '#9C27B0'
   return '#00A870'
 }
 
 function getRoomStatusText(roomId: string): string {
-  const room = rooms.rooms.find(r => r.roomId === roomId)
-  if (!isBookable(room)) return '非包间'
-  if (room && room.status !== 'Active') return getRoomStatusLabel(room.status)
-  const order = orders.orders.find(o => o.roomId === roomId && o.status === 'InUse')
+  const room = roomArr.find(r => r.roomId === roomId)
+  if (!room || !isBookable(room)) return '非包间'
+  if (room.status !== 'Active') return getRoomStatusLabel(room.status)
+  const order = orderArr.find(o => o.roomId === roomId && o.status === 'InUse')
   if (order) return '使用中'
-  const booked = orders.orders.find(o => o.roomId === roomId && o.status === 'Booked')
+  const booked = orderArr.find(o => o.roomId === roomId && o.status === 'Booked')
   if (booked) return '已预定'
   return '空闲'
 }
 
+const dashboardError = ref<string | null>(null)
+onErrorCaptured((err) => {
+  dashboardError.value = (err as Error)?.message || String(err)
+  return false
+})
+
 function getRoomOrders(roomId: string) {
-  return orders.orders
+  return orderArr
     .filter(o => o.roomId === roomId)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5)
 }
 
 function getRoomDevices(roomId: string) {
-  return devices.devices.filter(d => d.roomId === roomId)
+  return deviceArr.filter(d => d.roomId === roomId)
 }
 
 function deviceTypeLabel(type: string): string {
@@ -249,7 +264,7 @@ function goRoomDetail(room: any) {
   router.push('/room-detail/' + room.roomId)
 }
 
-const recentAlerts = alerts.alerts.slice(0, 5)
+const recentAlerts = alertArr.slice(0, 5)
 
 function severityTheme(severity: string) {
   return severity === 'Error' ? 'danger' : severity === 'Warning' ? 'warning' : 'primary'

@@ -164,8 +164,8 @@ function onMenuChange(value: string) {
 }
 
 function handleLogout() {
-  localStorage.removeItem('erp_logged_in')
-  localStorage.removeItem('erp_user')
+  // Clear ALL app-localStorage keys
+  ;['erp_logged_in','erp_user','erp_room_bills','mp_orders','mp_cart'].forEach(k => localStorage.removeItem(k))
   router.push('/login')
 }
 
