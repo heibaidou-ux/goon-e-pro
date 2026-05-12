@@ -105,15 +105,20 @@ router.beforeEach((to, _from, next) => {
     return
   }
   const loggedIn = localStorage.getItem('erp_logged_in')
-  if (loggedIn !== 'true') {
+  const user = localStorage.getItem('erp_user')
+
+  // Stale auth: loggedIn=true but no user → clear up and force re-login
+  if (loggedIn !== 'true' || !user) {
+    localStorage.removeItem('erp_logged_in')
+    localStorage.removeItem('erp_user')
     next('/login')
     return
   }
 
-  // Permission check
+  // Permission check — redirect to login if user lacks access
   const resourceId = getRouteResourceId(to.path)
   if (resourceId && !hasPermission(resourceId)) {
-    next('/dashboard') // Redirect to dashboard if no permission
+    next('/login')
     return
   }
 
