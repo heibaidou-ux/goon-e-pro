@@ -90,8 +90,20 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .shop-item-price { font-size:14px; font-weight:700; color:#e37318; }
 .shop-item-btn { width:100%; margin-top:8px; padding:8px; border-radius:6px; border:1.5px solid #07c160; background:#fff; color:#07c160; font-size:12px; font-weight:600; cursor:pointer; }
 .shop-item-btn:active { background:#f0fdf4; }
+/* Qty control inside shop item */
+.shop-qty-ctrl { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:8px; }
+.shop-qty-btn { width:26px; height:26px; border-radius:50%; border:1px solid #ddd; background:#fff; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#333; }
+.shop-qty-btn:active { background:#f0f0f0; }
+.shop-qty-num { font-size:14px; font-weight:600; min-width:20px; text-align:center; color:#333; }
 .cart-summary { background:#fff; border-radius:12px; padding:14px; margin-top:12px; }
 .cart-item { display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:13px; border-bottom:1px solid #f5f5f5; }
+.cart-item .ci-left { display:flex; align-items:center; gap:6px; flex:1; }
+.cart-item .ci-name { font-size:13px; }
+.cart-item .ci-ctrl { display:flex; align-items:center; gap:4px; margin:0 4px; }
+.cart-item .ci-ctrl button { width:22px; height:22px; border-radius:50%; border:1px solid #ddd; background:#fff; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#333; padding:0; line-height:1; }
+.cart-item .ci-ctrl button:active { background:#f0f0f0; }
+.cart-item .ci-ctrl .ci-qty { font-size:12px; font-weight:600; min-width:16px; text-align:center; }
+.cart-item .ci-price { font-weight:600; color:#e37318; white-space:nowrap; margin-left:8px; }
 .cart-total { display:flex; justify-content:space-between; align-items:center; padding-top:8px; font-weight:700; font-size:15px; }
 
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
@@ -485,14 +497,19 @@ function switchShopCat(cat, el) {
 
 function renderShop() {
   const filtered = shopCat === 'all' ? products : products.filter(p => p.cat === shopCat);
-  document.getElementById('shopGrid').innerHTML = filtered.map(p => `
-    <div class="shop-item">
+  document.getElementById('shopGrid').innerHTML = filtered.map(p => {
+    const c = cart.find(c => c.id === p.id);
+    const qty = c ? c.qty : 0;
+    return `<div class="shop-item">
       <div class="shop-item-emoji">${p.emoji}</div>
       <div class="shop-item-name">${p.name}</div>
       <div class="shop-item-desc">${p.desc}</div>
       <div class="shop-item-price">¥${p.price}</div>
-      <button class="shop-item-btn" onclick="addToCart('${p.id}')">加入购物车 +</button>
-    </div>`).join('');
+      ${qty > 0
+        ? `<div class="shop-qty-ctrl"><button class="shop-qty-btn" onclick="event.stopPropagation();decQty('${p.id}')">−</button><span class="shop-qty-num">${qty}</span><button class="shop-qty-btn" onclick="event.stopPropagation();addToCart('${p.id}')">+</button></div>`
+        : `<button class="shop-item-btn" onclick="addToCart('${p.id}')">加入购物车 +</button>`}
+    </div>`;
+  }).join('');
   renderCart();
 }
 
@@ -502,8 +519,16 @@ function addToCart(id) {
   const existing = cart.find(c => c.id === id);
   if (existing) existing.qty++;
   else cart.push({ ...p, qty: 1 });
-  renderCart();
+  renderShop();
   showToast(p.name + ' 已加入购物车');
+}
+
+function decQty(id) {
+  const idx = cart.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  cart[idx].qty--;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  renderShop();
 }
 
 function renderCart() {
@@ -515,7 +540,17 @@ function renderCart() {
   } else {
     container.innerHTML = `
       <div style="font-size:14px;font-weight:600;margin-bottom:8px;">购物车</div>
-      ${cart.map(c => `<div class="cart-item"><span>${c.name} ×${c.qty}</span><span>¥${c.price * c.qty}</span></div>`).join('')}
+      ${cart.map(c => `<div class="cart-item">
+        <div class="ci-left">
+          <span class="ci-name">${c.name}</span>
+          <div class="ci-ctrl">
+            <button onclick="decQty('${c.id}')">−</button>
+            <span class="ci-qty">${c.qty}</span>
+            <button onclick="addToCart('${c.id}')">+</button>
+          </div>
+        </div>
+        <span class="ci-price">¥${c.price * c.qty}</span>
+      </div>`).join('')}
       <div class="cart-total"><span>合计</span><span style="color:#e37318;">¥${total}</span></div>`;
     document.getElementById('checkoutCartBtn').disabled = false;
   }
