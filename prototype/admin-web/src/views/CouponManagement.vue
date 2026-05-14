@@ -91,7 +91,6 @@ const couponColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .tag-card { text-align: center; padding: 8px 0; }
 .tag-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
 .tag-count { font-size: 24px; font-weight: 700; color: #0052D9; margin-bottom: 4px; }

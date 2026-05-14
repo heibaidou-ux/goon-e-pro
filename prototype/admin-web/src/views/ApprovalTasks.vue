@@ -255,10 +255,7 @@ const taskColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
-.stat-card { text-align: center; padding: 8px 0; }
-.stat-num { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: #999; }
+/* .page-header, .stat-card, .stat-num, .stat-label from global */
 
 .approve-task-info { padding: 4px 0; }
 .approve-task-header { display: flex; gap: 8px; margin-bottom: 8px; }

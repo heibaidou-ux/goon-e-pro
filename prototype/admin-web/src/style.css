@@ -1,1 +1,124 @@
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+/* ===== 高岸ERP 全局样式 ===== */
+
+/* Font & reset */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ===== 页面通用 ===== */
+/* .page-header — 每个页面顶部的标题 */
+.page-header {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* ===== 统计卡片 (Stat Card Row) ===== */
+.stat-card {
+  text-align: center;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.stat-num {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 12px;
+  color: #999;
+}
+/* stat-num variants used in revenue management */
+.stat-num.large {
+  font-size: 28px;
+}
+
+/* ===== 详情抽屉/面板 ===== */
+.detail-sections {
+  padding: 8px 0;
+}
+.detail-section {
+  margin-bottom: 8px;
+}
+.detail-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 13px;
+  color: #666;
+}
+.detail-row .price {
+  color: #0052D9;
+  font-weight: 600;
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  text-align: center;
+  color: #ccc;
+  padding: 24px 0;
+  font-size: 13px;
+}
+
+/* ===== 页面标题区域（含返回按钮） ===== */
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.detail-header .page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* ===== 房间网格 (Dashboard) ===== */
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+/* ===== 实用工具类 ===== */
+.text-right {
+  text-align: right;
+}
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gap-8 {
+  gap: 8px;
+}
+.gap-12 {
+  gap: 12px;
+}
+.mt-12 {
+  margin-top: 12px;
+}
+.mb-16 {
+  margin-bottom: 16px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}

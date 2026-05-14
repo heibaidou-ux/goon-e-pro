@@ -208,7 +208,6 @@ const columns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .section-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 14px; }
 .node-card { margin-bottom: 0; }
 .node-card-inner { margin-bottom: 0; }

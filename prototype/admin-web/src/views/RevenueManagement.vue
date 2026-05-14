@@ -114,7 +114,6 @@ const revenueColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .chart-placeholder { display: flex; align-items: flex-end; gap: 6px; height: 180px; padding: 10px 0; }
 .bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
 .bar { width: 100%; min-height: 4px; border-radius: 4px 4px 0 0; }

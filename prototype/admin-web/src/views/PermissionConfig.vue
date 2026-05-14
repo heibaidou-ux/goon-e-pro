@@ -121,7 +121,6 @@ function savePerms() {
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .perm-group { margin-bottom: 20px; }
 .perm-group-header { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px; padding: 6px 10px; background: #f5f7fa; border-radius: 4px; }
 .perm-items { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 10px; }

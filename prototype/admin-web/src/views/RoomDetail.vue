@@ -164,17 +164,13 @@ const alertColumns = [
 </script>
 
 <style scoped>
-.detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-.page-title { font-size: 20px; font-weight: 600; }
+/* .detail-header, .page-title, .empty-state from global */
 h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #333; }
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .info-item { display: flex; flex-direction: column; gap: 2px; }
 .info-label { font-size: 12px; color: #999; }
 .info-val { font-size: 13px; color: #333; }
-.current-order { }
-.order-status { margin-bottom: 4px; }
 .device-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
 .device-row:last-child { border-bottom: none; }
 .device-code { font-weight: 500; }
-.empty-state { text-align: center; color: #ccc; padding: 24px 0; font-size: 13px; }
 </style>

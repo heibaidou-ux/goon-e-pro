@@ -107,7 +107,6 @@ function actionLabel(action: string) {
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .scene-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.15s; }
 .scene-item:hover { background: #f5f7fa; }
 .scene-left { display: flex; align-items: center; gap: 12px; }

@@ -224,10 +224,6 @@ const columns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
-.stat-card { text-align: center; padding: 8px 0; }
-.stat-num { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: #999; }
 .operator-cell { display: flex; flex-direction: column; gap: 2px; }
 .operator-name { font-weight: 500; }
 .operator-role { font-size: 11px; color: #999; display: flex; align-items: center; gap: 4px; }

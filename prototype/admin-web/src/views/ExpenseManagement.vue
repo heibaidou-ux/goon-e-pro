@@ -97,10 +97,6 @@ const expenseColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
-.stat-card { text-align: center; padding: 8px 0; }
-.stat-num { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: #999; }
 .detail-sections { padding: 8px 0; }
 .detail-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #333; }
 .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 13px; color: #666; }

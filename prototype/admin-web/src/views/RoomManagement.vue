@@ -263,7 +263,6 @@ const columns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 
 .room-detail { padding: 8px 0; }
 .detail-section { margin-bottom: 12px; }

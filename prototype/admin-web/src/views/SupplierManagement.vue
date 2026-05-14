@@ -109,7 +109,6 @@ const columns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .detail-sections { padding: 8px 0; }
 .detail-section { margin-bottom: 8px; }
 .detail-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #333; }

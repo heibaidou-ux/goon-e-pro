@@ -96,7 +96,6 @@ const recordColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .profit-label { font-size: 14px; color: #666; }
 .profit-val { font-size: 16px; font-weight: 700; color: #00A870; }
 </style>

@@ -152,7 +152,7 @@ const filterStatus = ref('')
 const drawerVisible = ref(false)
 const selectedDevice = ref<any>(null)
 const sending = ref(false)
-const lastCmdStatus = ref<'success' | 'failed' | 'sending' | ''>('')
+const lastCmdStatus = ref<string>('')
 const queueLength = ref(0)
 
 const filteredDevices = computed(() => {
@@ -257,13 +257,8 @@ const columns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
-.stat-card { text-align: center; padding: 8px 0; }
-.stat-num { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: #999; }
-.detail-section { padding: 8px 0; }
-.detail-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #333; }
-.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; color: #666; }
+/* .page-header, .stat-card, .stat-num, .stat-label from global */
+/* .detail-section from global */
 .control-panel { background: #f9f9f9; padding: 12px; border-radius: 6px; margin-top: 8px; }
 @keyframes queue-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(227,115,24,.4) } 50% { box-shadow: 0 0 0 6px rgba(227,115,24,0) } }
 :deep(.queue-active) { animation: queue-pulse 1.5s infinite; }

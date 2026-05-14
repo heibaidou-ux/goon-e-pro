@@ -71,5 +71,4 @@ const scheduleColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 </style>

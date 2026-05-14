@@ -115,10 +115,6 @@ const couponColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
-.stat-card { text-align: center; padding: 8px 0; }
-.stat-num { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: #999; }
 
 .trend-chart { display: flex; align-items: flex-end; gap: 16px; height: 180px; padding: 10px 0; }
 .trend-bar-group { flex: 1; display: flex; align-items: flex-end; gap: 4px; justify-content: center; }

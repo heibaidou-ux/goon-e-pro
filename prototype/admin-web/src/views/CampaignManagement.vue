@@ -140,7 +140,6 @@ function submitCampaign() { showCreateCampaign.value = false }
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .campaign-card { padding: 4px 0; }
 .campaign-card.ended { opacity: 0.7; }
 .campaign-header { margin-bottom: 8px; }

@@ -485,7 +485,7 @@ function saveProduct() {
       image: formData.imageData || '',
       story: formData.story,
       origin: formData.origin,
-      brewingTips: null,
+      brewingTips: null as any,
     })
   }
 
@@ -495,7 +495,6 @@ function saveProduct() {
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 
 /* Image upload zone */
 .upload-zone { width: 200px; height: 160px; border: 2px dashed #dcdcdc; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; background: #fafafa; position: relative; outline: none; }

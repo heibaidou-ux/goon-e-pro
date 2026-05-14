@@ -186,8 +186,9 @@ const inUseRooms = computed(() => bookableRooms.filter(r => {
 
 const unresolvedAlerts = computed(() => alertArr.filter(a => a.status === 'Unresolved'))
 
+const todayStr = new Date().toISOString().slice(0, 10)
 const todayStats = computed(() => {
-  const todayOrders = orderArr.filter(o => o.date === '2026-05-08')
+  const todayOrders = orderArr.filter(o => o.date === todayStr)
   const inUse = todayOrders.filter(o => o.status === 'InUse').length
   const booked = todayOrders.filter(o => o.status === 'Booked').length
   const completed = todayOrders.filter(o => o.status === 'Completed').length
@@ -285,8 +286,7 @@ const alertColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
-
+/* Revenue cards */
 .stat-card { text-align: center; padding: 8px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .stat-label { font-size: 13px; color: #999; margin-bottom: 8px; }
 .stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
@@ -310,7 +310,6 @@ const alertColumns = [
 .price-detail { color: #0052D9; flex: 1; }
 .price-capacity { font-size: 11px; color: #999; }
 
-.room-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .room-card { cursor: pointer; transition: box-shadow 0.2s; }
 .room-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
 .room-card.room-non-bookable { opacity: 0.85; }

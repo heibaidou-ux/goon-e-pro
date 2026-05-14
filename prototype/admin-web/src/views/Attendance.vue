@@ -92,7 +92,6 @@ const attendanceColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .leave-item { padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
 .leave-item:last-child { border-bottom: none; }
 .leave-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }

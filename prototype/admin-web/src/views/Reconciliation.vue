@@ -287,15 +287,10 @@ function showToast(msg: string) {
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .stat-card-wrap { cursor: pointer; transition: transform .15s; }
 .stat-card-wrap:hover { transform: translateY(-2px); }
 .stat-active { box-shadow: 0 0 0 2px #0052D9; border-radius: 8px; }
-.stat-card { text-align: center; padding: 8px 0; }
-.stat-num { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: #999; }
+/* .stat-card, .stat-num, .stat-label, .detail-sections, .detail-row from global */
 .stat-sub { font-size: 11px; color: #bbb; margin-top: 2px; }
-.detail-sections { padding: 8px 0; }
-.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; color: #666; }
 .diff-amount { color: #D54941; font-weight: 600; }
 </style>

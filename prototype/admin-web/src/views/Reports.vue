@@ -92,7 +92,6 @@ const comparisonColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .report-card { cursor: pointer; text-align: center; padding: 16px 0; transition: box-shadow 0.2s; }
 .report-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
 .report-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px; }

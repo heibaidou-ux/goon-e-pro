@@ -119,7 +119,6 @@ const compareColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
 .detail-sections { padding: 8px 0; }
 .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; color: #666; }
 .detail-row .price { color: #0052D9; font-weight: 600; }

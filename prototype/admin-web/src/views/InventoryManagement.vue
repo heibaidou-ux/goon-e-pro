@@ -120,7 +120,7 @@ const invColumns = [
 </script>
 
 <style scoped>
-.page-header { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
+/* .page-header, .empty-state from global */
 .alert-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 4px 0; }
 .alert-qty { color: #D54941; font-weight: 600; }
 </style>

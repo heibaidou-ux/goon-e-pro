@@ -325,10 +325,7 @@ const columns = [
 
 <style scoped>
 .page-top { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
-.page-header { font-size: 20px; font-weight: 600; margin: 0; }
-.stat-card { text-align: center; padding: 8px 0; }
-.stat-num { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: #999; }
+/* .page-header from global */
 .detail-section { padding: 8px 0; }
 .detail-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #333; }
 .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; color: #666; }
