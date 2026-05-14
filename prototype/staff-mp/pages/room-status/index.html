@@ -7,7 +7,7 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-.phone { width:375px; min-height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
 .nav-top { position:fixed; top:10px; right:20px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
 .header { background:#fff; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0f0f0; }
@@ -63,6 +63,13 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .cleaning-progress { display:flex;align-items:center;gap:8px;font-size:12px;color:#e37318; margin-bottom:8px; }
 .cleaning-bar { flex:1; height:4px; background:#eee; border-radius:2px; overflow:hidden; }
 .cleaning-fill { height:100%; background:#e37318; border-radius:2px; }
+.duration-btn { padding:10px 6px; border-radius:8px; font-size:13px; cursor:pointer; border:2px solid #e0e0e0; background:#fff; color:#333; font-weight:500; text-align:center; line-height:1.3; transition:all .15s; }
+.duration-btn.selected { border-color:#0052d9; background:#e3f2fd; color:#0052d9; }
+.duration-btn small { display:block; font-size:11px; font-weight:400; color:#999; margin-top:2px; }
+.duration-btn.selected small { color:#0052d9; }
+.payment-radio { flex:1; padding:8px 10px; border-radius:8px; font-size:13px; cursor:pointer; border:2px solid #e0e0e0; background:#fff; color:#666; font-weight:500; text-align:center; transition:all .15s; }
+.payment-radio.selected { border-color:#00a870; background:#e8f5e9; color:#00a870; }
+.time-select { padding:8px; border:1px solid #ddd; border-radius:8px; font-size:13px; background:#fff; color:#333; }
 </style>
 </head>
 <body>
@@ -133,7 +140,8 @@ function renderRooms() {
         <button class="action-btn primary" onclick="openAction('${r.roomId}','sceneSwitch')">场景切换</button>
         <button class="action-btn danger" onclick="openAction('${r.roomId}','forceCheckout')">强制退房</button>`;
     } else if (r.status === 'Booked') {
-      detailHtml = `<div class="room-detail-row"><span>客人: ${r.customerName}</span><span>${r.customerPhone}</span></div>`;
+      const staffTag = r.isStaffBooking ? ' <span style="font-size:11px;background:#f3e5f5;color:#9c27b0;padding:2px 6px;border-radius:4px;font-weight:500;">🏪 店员代订</span>' : '';
+      detailHtml = `<div class="room-detail-row"><span>客人: ${r.customerName}${staffTag}</span><span>${r.customerPhone}</span></div>`;
       actionsHtml = `<button class="action-btn success" onclick="quickAction('${r.roomId}','checkin')">确认到店</button>
         <button class="action-btn danger" onclick="openAction('${r.roomId}','cancelBooking')">取消预约</button>`;
     } else if (r.status === 'Cleaning') {
@@ -154,7 +162,7 @@ function renderRooms() {
       }
       detailHtml = `<div class="room-detail-row"><span>${r.time}</span></div>`;
     } else if (r.status === 'Active') {
-      actionsHtml = `<button class="action-btn primary" onclick="openAction('${r.roomId}','setBooked')">设为已预定</button>
+      actionsHtml = `<button class="action-btn primary" onclick="openAction('${r.roomId}','setBooked')">📋 代预订</button>
         <button class="action-btn warning" onclick="openAction('${r.roomId}','setMaintenance')">设为维修</button>`;
     }
 
@@ -197,10 +205,40 @@ function openAction(roomId, action) {
   const modal = document.getElementById('modalContent');
 
   if (action === 'setBooked') {
-    modal.innerHTML = `<h3>设为已预定 - ${room.name}</h3>
-      <p style="font-size:12px;color:#999;">手动登记客人预约信息</p>
-      <input placeholder="客人姓名 *" id="custName"><input placeholder="电话 *" id="custPhone"><input placeholder="预计时段 (如 14:00-16:00)" id="custTime">
-      <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn confirm" onclick="doAction()">确认</button></div>`;
+    const tOpts = [];
+    for (let h = 9; h <= 22; h++) {
+      tOpts.push(`${String(h).padStart(2,'0')}:00`);
+      if (h < 22) tOpts.push(`${String(h).padStart(2,'0')}:30`);
+    }
+    const th = tOpts.map(t => `<option value="${t}">${t}</option>`).join('');
+    modal.innerHTML = `<h3>📋 代预订 - ${room.name}</h3>
+      <p style="font-size:12px;color:#999;margin-bottom:10px;">为客人手动创建预约订单</p>
+      <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;">客人信息</div>
+      <input placeholder="客人姓名 *" id="bkCustName">
+      <input placeholder="联系电话 *" id="bkCustPhone" type="tel">
+      <div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">时段选择</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;" id="durationGroup">
+        <button class="duration-btn selected" data-dur="2" onclick="selectDuration(this,2)">2小时<br><small>¥120</small></button>
+        <button class="duration-btn" data-dur="3" onclick="selectDuration(this,3)">3小时<br><small>¥180</small></button>
+        <button class="duration-btn" data-dur="4" onclick="selectDuration(this,4)">4小时<br><small>¥240</small></button>
+        <button class="duration-btn" data-dur="custom" onclick="selectDuration(this,'custom')">自定义<br><small>¥60/时</small></button>
+      </div>
+      <div id="customTimePicker" style="display:none;margin-top:6px;">
+        <span style="display:flex;align-items:center;gap:4px;">
+          <select class="time-select" id="bkStartTime">${th}</select>
+          <span style="color:#666;font-size:13px;">至</span>
+          <select class="time-select" id="bkEndTime">${th}</select>
+        </span>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">支付状态</div>
+      <div style="display:flex;gap:6px;" id="paymentGroup">
+        <label class="payment-radio selected" data-pay="unpaid" onclick="selectPayment(this)">未支付</label>
+        <label class="payment-radio" data-pay="paid" onclick="selectPayment(this)">已支付</label>
+        <label class="payment-radio" data-pay="room" onclick="selectPayment(this)">挂账到房间</label>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">备注</div>
+      <textarea placeholder="备注信息（选填）" id="bkNotes" style="resize:vertical;"></textarea>
+      <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn confirm" onclick="doProxyBooking()">确认代预订</button></div>`;
   } else if (action === 'setMaintenance') {
     modal.innerHTML = `<h3>设为维修 - ${room.name}</h3>
       <p style="font-size:12px;color:#999;">标记房间为维修状态，暂停使用</p>
@@ -242,15 +280,7 @@ function quickAction(roomId, action) {
 function doAction() {
   const room = rooms.find(r => r.roomId === currentAction.roomId);
   const reason = document.getElementById('reason')?.value || '';
-  const custName = document.getElementById('custName')?.value || '';
-  const custPhone = document.getElementById('custPhone')?.value || '';
-  const custTime = document.getElementById('custTime')?.value || '';
-
-  if (currentAction.action === 'setBooked') {
-    if (!custName || !custPhone) { showToast('请填写客人姓名和电话'); return; }
-    room.status = 'Booked'; room.customerName = custName; room.customerPhone = custPhone; room.time = custTime;
-    showToast(`${room.name} 已设为已预定`);
-  } else if (currentAction.action === 'setMaintenance') {
+  if (currentAction.action === 'setMaintenance') {
     if (reason.length < 5) { showToast('维修原因至少5字'); return; }
     room.status = 'Maintenance'; showToast(`${room.name} 已设为维修中`);
   } else if (currentAction.action === 'forceCheckout') {
@@ -264,6 +294,87 @@ function doAction() {
   hideModal(); renderRooms();
 }
 
+function selectDuration(btn, value) {
+  document.querySelectorAll('#durationGroup .duration-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const picker = document.getElementById('customTimePicker');
+  picker.style.display = (value === 'custom') ? 'block' : 'none';
+}
+
+function selectPayment(el) {
+  document.querySelectorAll('#paymentGroup .payment-radio').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function doProxyBooking() {
+  const room = rooms.find(r => r.roomId === currentAction.roomId);
+  const name = document.getElementById('bkCustName')?.value?.trim() || '';
+  const phone = document.getElementById('bkCustPhone')?.value?.trim() || '';
+  const notes = document.getElementById('bkNotes')?.value?.trim() || '';
+
+  if (!name) { showToast('请输入客人姓名'); return; }
+  if (!phone) { showToast('请输入联系电话'); return; }
+
+  // Duration
+  const selectedDur = document.querySelector('#durationGroup .duration-btn.selected');
+  const durValue = selectedDur ? selectedDur.getAttribute('data-dur') : '2';
+  let duration, startTime, endTime, totalAmount;
+
+  if (durValue === 'custom') {
+    startTime = document.getElementById('bkStartTime')?.value || '09:00';
+    endTime = document.getElementById('bkEndTime')?.value || '11:00';
+    const [sh, sm] = startTime.split(':').map(Number);
+    const [eh, em] = endTime.split(':').map(Number);
+    const startMin = sh * 60 + sm;
+    const endMin = eh * 60 + em;
+    if (endMin <= startMin) { showToast('结束时间必须晚于开始时间'); return; }
+    duration = (endMin - startMin) / 60;
+    totalAmount = Math.round(duration * 60);
+  } else {
+    duration = parseInt(durValue);
+    totalAmount = duration * 60;
+    startTime = '09:00';
+    endTime = `${String(9 + duration).padStart(2,'0')}:00`;
+  }
+
+  // Payment status
+  const payEl = document.querySelector('#paymentGroup .payment-radio.selected');
+  const paymentStatus = payEl ? payEl.getAttribute('data-pay') : 'unpaid';
+
+  // Update room
+  room.status = 'Booked';
+  room.customerName = name;
+  room.customerPhone = phone;
+  room.time = `${startTime}-${endTime}`;
+  room.isStaffBooking = true;
+
+  // Create order
+  let orders = [];
+  try { orders = JSON.parse(localStorage.getItem('mp_staff_orders') || '[]'); } catch(e) {}
+  const order = {
+    orderId: 'ORD' + Date.now(),
+    roomId: room.roomId,
+    roomName: room.name,
+    customerName: name,
+    customerPhone: phone,
+    date: new Date().toISOString().split('T')[0],
+    startTime,
+    endTime,
+    duration,
+    totalAmount,
+    paymentStatus,
+    notes,
+    isStaffBooking: true,
+    createdAt: new Date().toISOString()
+  };
+  orders.push(order);
+  localStorage.setItem('mp_staff_orders', JSON.stringify(orders));
+
+  saveRooms();
+  hideModal();
+  renderRooms();
+  showToast(`代预订成功！已为 ${name} 预订 ${room.name}，${startTime}-${endTime}`);
+}
 function hideModal() { document.getElementById('actionModal').style.display = 'none'; currentAction = null; }
 
 function showToast(msg) {
