@@ -55,6 +55,25 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
 .nav-item .nav-icon { font-size:20px; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
 .nav-item.active { color:#07c160; }
+/* ── 我的页面 ── */
+.my-view { display:none; padding:16px; }
+.my-view .my-header { text-align:center; padding:20px 0; }
+.my-view .my-avatar { width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:32px; }
+.my-view .my-name { font-size:18px; font-weight:700; color:#1a1a1a; }
+.my-view .my-role { font-size:13px; color:#999; margin-top:4px; }
+.my-view .my-info { background:#fff; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,.06); margin-bottom:12px; }
+.my-view .my-info-item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f5f5f5; font-size:14px; }
+.my-view .my-info-item:last-child { border-bottom:none; }
+.my-view .my-info-label { color:#999; }
+.my-view .my-info-value { color:#1a1a1a; font-weight:500; }
+.my-view .my-settings { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); margin-bottom:12px; overflow:hidden; }
+.my-view .my-settings-item { display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid #f5f5f5; cursor:pointer; }
+.my-view .my-settings-item:last-child { border-bottom:none; }
+.my-view .my-settings-item .ms-icon { font-size:18px; margin-right:12px; }
+.my-view .my-settings-item .ms-label { flex:1; font-size:14px; color:#1a1a1a; }
+.my-view .my-settings-item .ms-arrow { font-size:12px; color:#ccc; }
+.my-view .my-back-btn { display:block; width:100%; padding:12px; border:none; background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); font-size:14px; color:#0052d9; cursor:pointer; text-align:center; margin-bottom:12px; }
+.my-view .my-logout-btn { display:block; width:100%; padding:12px; border:none; background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); font-size:14px; color:#d54941; cursor:pointer; text-align:center; }
 </style>
 </head>
 <body>
@@ -93,10 +112,35 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
       <div id="dividendList"></div>
     </div>
   </div>
+
+  <!-- ── 我的页面 ── -->
+  <div class="my-view" id="myView">
+    <div class="my-header">
+      <div class="my-avatar" style="background:linear-gradient(135deg,#4a148c,#7b1fa2);color:#fff;">👤</div>
+      <div class="my-name">投资人</div>
+      <div class="my-role">天使投资人</div>
+    </div>
+    <div class="my-info">
+      <div class="my-info-item"><span class="my-info-label">投资编号</span><span class="my-info-value">INV-001</span></div>
+      <div class="my-info-item"><span class="my-info-label">总投资额</span><span class="my-info-value">¥350万</span></div>
+      <div class="my-info-item"><span class="my-info-label">角色</span><span class="my-info-value">天使投资人</span></div>
+    </div>
+    <div class="my-settings">
+      <div class="my-settings-item" onclick="showToast('查看报告设置（开发中）')">
+        <span class="ms-icon">📊</span><span class="ms-label">查看报告设置</span><span class="ms-arrow">›</span>
+      </div>
+      <div class="my-settings-item" onclick="showToast('分红偏好设置（开发中）')">
+        <span class="ms-icon">💰</span><span class="ms-label">分红偏好</span><span class="ms-arrow">›</span>
+      </div>
+    </div>
+    <button class="my-back-btn" onclick="toggleMyView()">返回看板</button>
+    <button class="my-logout-btn" onclick="logout()">退出登录</button>
+  </div>
+
   <div class="bottom-nav">
     <div class="nav-item active"><div class="nav-icon">📊</div><div class="nav-label">看板</div></div>
     <div class="nav-item" onclick="showToast('分红明细')"><div class="nav-icon">💰</div><div class="nav-label">分红</div></div>
-    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+    <div class="nav-item" onclick="toggleMyView()"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
   </div>
 </div>
 
@@ -148,6 +192,26 @@ function showToast(msg) {
   if (!t) { t = document.createElement('div'); t.className = 'toast'; t.id = 'toast'; document.body.appendChild(t); }
   t.textContent = msg; t.style.display = 'block';
   setTimeout(function() { t.style.display = 'none'; }, 2000);
+}
+
+// ── 我的页面切换 ──
+function toggleMyView() {
+  var pageEl = document.querySelector('.page');
+  var myView = document.getElementById('myView');
+  if (myView.style.display === 'block') {
+    myView.style.display = 'none';
+    pageEl.style.display = 'block';
+  } else {
+    pageEl.style.display = 'none';
+    myView.style.display = 'block';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('erp_user');
+  localStorage.removeItem('erp_token');
+  localStorage.removeItem('erp_logged_in');
+  window.location.href = '../home/index.html';
 }
 </script>
 <style>
