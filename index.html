@@ -10,54 +10,80 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 .card { background:rgba(255,255,255,0.95); border-radius:20px; padding:48px; max-width:800px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
 h1 { font-size:28px; font-weight:800; background:linear-gradient(135deg,#0052D9,#00A870); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:4px; letter-spacing:2px; }
 .sub { color:#999; font-size:14px; margin-bottom:32px; }
-.links { display:grid; gap:16px; }
-a { display:flex; align-items:center; gap:16px; padding:20px 24px; border-radius:12px; text-decoration:none; background:#f5f7fa; transition:all .2s; border:1px solid #eee; }
-a:hover { background:#fff; border-color:#0052D9; transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,82,217,0.12); }
-.icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.section-label { font-size:12px; font-weight:600; color:#bbb; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; margin-top:24px; }
+.section-label:first-of-type { margin-top:0; }
+.links { display:grid; gap:10px; }
+a { display:flex; align-items:center; gap:14px; padding:16px 20px; border-radius:10px; text-decoration:none; background:#f5f7fa; transition:all .2s; border:1px solid #eee; }
+a:hover { background:#fff; border-color:#0052D9; transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,82,217,0.1); }
+.icon { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
 .info { flex:1; }
-.title { font-weight:700; font-size:16px; color:#333; margin-bottom:2px; }
-.desc { font-size:13px; color:#999; }
-.arrow { color:#ccc; font-size:18px; flex-shrink:0; }
+.title { font-weight:600; font-size:15px; color:#333; margin-bottom:1px; }
+.desc { font-size:12px; color:#aaa; }
+.arrow { color:#ccc; font-size:16px; flex-shrink:0; }
 .admin .icon { background:#e8f0fe; color:#0052D9; }
 .staff .icon { background:#e6f7ed; color:#00A870; }
-.customer .icon { background:#fef7e6; color:#E37318; }
-.docs .icon { background:#f3e8fe; color:#9C27B0; }
+.gm .icon { background:#fef7e6; color:#E37318; }
+.finance .icon { background:#fce4ec; color:#D54941; }
+.investor .icon { background:#f3e8fe; color:#9C27B0; }
+.tech .icon { background:#e0f7fa; color:#00838F; }
 </style>
 </head>
 <body>
 <div class="card">
   <h1>高岸ERP</h1>
   <div class="sub">盈隆店 · 智能管理系统 — 原型导航</div>
+
+  <div class="section-label">管理后台</div>
   <div class="links">
     <a class="admin" href="./prototype/admin-web-dist/" target="_blank">
       <div class="icon">&#x1f4ca;</div>
       <div class="info">
         <div class="title">管理后台</div>
-        <div class="desc">门店总览、房间管理、IoT设备、财务、人事、权限配置</div>
+        <div class="desc">门店总览、房间管理、IoT设备、财务人事、权限配置</div>
       </div>
       <div class="arrow">&#x203A;</div>
     </a>
+  </div>
+
+  <div class="section-label">角色工作台（移动端）</div>
+  <div class="links">
     <a class="staff" href="./prototype/staff-mp/pages/dashboard/" target="_blank">
       <div class="icon">&#x1f9d1;&#x200d;&#x1f3eb;</div>
       <div class="info">
-        <div class="title">员工端</div>
-        <div class="desc">工作台、房态管理、设备监控、保洁任务、巡检</div>
+        <div class="title">店员端</div>
+        <div class="desc">工作台、房态管理、设备控制、保洁任务</div>
       </div>
       <div class="arrow">&#x203A;</div>
     </a>
-    <a class="customer" href="./prototype/customer-mp/pages/home/" target="_blank">
-      <div class="icon">&#x1f375;</div>
+    <a class="gm" href="./prototype/customer-mp/pages/gm-workbench/" target="_blank">
+      <div class="icon">&#x1f3e2;</div>
       <div class="info">
-        <div class="title">顾客端</div>
-        <div class="desc">在线预约、房间控制、优惠券、订单查询</div>
+        <div class="title">总经理工作台</div>
+        <div class="desc">运营KPI、收入分析、审批处理</div>
       </div>
       <div class="arrow">&#x203A;</div>
     </a>
-    <a class="docs" href="./docs/README.md" target="_blank">
-      <div class="icon">&#x1f4c4;</div>
+    <a class="finance" href="./prototype/customer-mp/pages/finance-workbench/" target="_blank">
+      <div class="icon">&#x1f4b0;</div>
       <div class="info">
-        <div class="title">项目文档</div>
-        <div class="desc">需求、设计、开发、测试、部署运维文档索引</div>
+        <div class="title">财务工作台</div>
+        <div class="desc">营收统计、财务审批、月结管理</div>
+      </div>
+      <div class="arrow">&#x203A;</div>
+    </a>
+    <a class="investor" href="./prototype/customer-mp/pages/investor-workbench/" target="_blank">
+      <div class="icon">&#x1f4c8;</div>
+      <div class="info">
+        <div class="title">投资人看板</div>
+        <div class="desc">门店分红、财务报表、投资收益</div>
+      </div>
+      <div class="arrow">&#x203A;</div>
+    </a>
+    <a class="tech" href="./prototype/customer-mp/pages/technician-workbench/" target="_blank">
+      <div class="icon">&#x1f527;</div>
+      <div class="info">
+        <div class="title">技术运维中心</div>
+        <div class="desc">设备监控、告警处理、系统维护</div>
       </div>
       <div class="arrow">&#x203A;</div>
     </a>
