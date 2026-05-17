@@ -248,7 +248,7 @@ function renderControl() {
       <div class="slider-group"><div class="slider-label"><span>🔈</span><span>${deviceState.volume}%</span><span>🔊</span></div>
       <input type="range" class="slider" min="0" max="100" value="${deviceState.volume}" oninput="setVolume(this.value)" ${isOffline?'disabled':''}></div></div>
       <div class="control-section"><div class="section-title">音源</div>
-      <div class="source-grid">${['bgm','bluetooth','tv'].map(s => `<button class="source-btn ${deviceState.source===s?'active':''}" onclick="setSource('${s}')" ${isOffline?'disabled':''}>${{bgm:'背景音乐',bluetooth:'蓝牙',tv:'TV音频'}[s]}</button>`).join('')}</div></div>
+      <div class="source-grid">${['bgm','bluetooth','tv'].map(s => `<button class="source-btn ${deviceState.source===s?'active':''}" onclick="setSource('${s}')" ${isOffline?'disabled':''}>${{bgm:'背景音乐',bluetooth:'蓝牙音频',tv:'TV音频'}[s]}</button>`).join('')}</div></div>
       <button class="big-btn" style="background:#f5f5f5;color:#666;" onclick="toggleMute()" ${isOffline?'disabled':''}>🔇 ${deviceState.muted?'取消静音':'静音'}</button>`;
   }
 
@@ -269,7 +269,7 @@ function setColorTemp(k) { deviceState.colorTemp = k; renderControl(); showToast
 function toggleLight(on) { deviceState.power = on; renderControl(); showToast(on ? '灯光已开启' : '灯光已关闭'); }
 function setVolume(v) { deviceState.volume = parseInt(v); if (document.querySelector('.slider-label span:nth-child(2)')) document.querySelector('.slider-label span:nth-child(2)').textContent = v+'%'; }
 function togglePlay() { deviceState.playing = !deviceState.playing; renderControl(); showToast(deviceState.playing ? '开始播放' : '已暂停'); }
-function setSource(s) { deviceState.source = s; renderControl(); showToast(`音源: ${{bgm:'背景音乐',bluetooth:'蓝牙',tv:'TV音频'}[s]}`); }
+function setSource(s) { deviceState.source = s; renderControl(); showToast(`音源: ${{bgm:'背景音乐',bluetooth:'蓝牙音频',tv:'TV音频'}[s]}`); }
 function toggleMute() { deviceState.muted = !deviceState.muted; renderControl(); showToast(deviceState.muted ? '已静音' : '已取消静音'); }
 
 function confirmAction(action, title) {

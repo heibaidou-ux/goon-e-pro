@@ -4,8 +4,14 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>"use strict";!function(){var p=location.pathname,e=document.createElement("base");p.endsWith("/")||(p=p.lastIndexOf(".")>p.lastIndexOf("/")?p.substring(0,p.lastIndexOf("/")+1):p+"/"),e.href=p,document.head.insertBefore(e,document.head.firstChild)}()
-!function(){var q=location.search;if(q.indexOf("forceLogout")>=0){for(var k in localStorage)localStorage.removeItem(k);var l=location.pathname.replace(/\/+$/,"");location.replace(l+"/#/login")}}()</script>
+    <script>"use strict";
+!function(){var p=location.pathname,e=document.createElement("base");p.endsWith("/")||(p=p.lastIndexOf(".")>p.lastIndexOf("/")?p.substring(0,p.lastIndexOf("/")+1):p+"/"),e.href=p,document.head.insertBefore(e,document.head.firstChild)}();
+!function(){var q=location.search+location.hash;if(q.indexOf("forceLogout")>=0){for(var k in localStorage)localStorage.removeItem(k);location.replace(location.pathname.replace(/\/+$/,"")+"/#/login")}}();
+!function(){var d=document.createElement("div");d.id="__err";d.style.cssText="position:fixed;top:0;left:0;right:0;background:#D54941;color:#fff;padding:16px;z-index:99999;font-size:14px;font-family:monospace;white-space:pre-wrap;display:none";
+function show(t){d.textContent=t;d.style.display="block";document.documentElement.appendChild(d)}
+window.addEventListener("error",function(e){var t=e.error?e.error.stack||e.error:e.message||"Resource load failed: "+e.target&&e.target.src;show("JS ERROR: "+t)});
+window.addEventListener("unhandledrejection",function(e){show("PROMISE REJ: "+(e.reason&&(e.reason.stack||e.reason)))});
+}()</script>
     <title>高岸ERP - 智能管理系统</title>
   </head>
   <body>
