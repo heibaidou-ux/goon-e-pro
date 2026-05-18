@@ -111,8 +111,19 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
 .qr-context-btn:active { opacity:.8; }
 
+/* Parking modal */
+.parking-content { text-align:left; padding:4px 0; }
+.parking-section { margin-bottom:14px; }
+.parking-section:last-child { margin-bottom:0; }
+.parking-section .ps-title { font-size:13px; font-weight:600; color:#333; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+.parking-section .ps-text { font-size:13px; color:#666; line-height:1.6; }
+.parking-section .ps-tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:6px; margin:2px 4px 2px 0; }
+.ps-tag.free { background:#e8f5e9; color:#00a870; }
+.ps-tag.paid { background:#fff3e0; color:#e37318; }
+.ps-tag.info { background:#e3f2fd; color:#0052d9; }
+
 /* Bottom nav */
-.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; flex-shrink:0; z-index:10; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
@@ -170,6 +181,16 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
         <span class="carousel-dot" onclick="goSlide(1)"></span>
         <span class="carousel-dot" onclick="goSlide(2)"></span>
         <span class="carousel-dot" onclick="goSlide(3)"></span>
+      </div>
+    </div>
+
+    <!-- Store Info Bar -->
+    <div style="padding:8px 16px;font-size:12px;color:#999;line-height:1.8;background:#fafafa;">
+      <div>📍 广州市天河区珠江新城华夏路28号盈隆大厦16层 · <a href="javascript:openNavigation()" style="color:#0052d9;text-decoration:none;">🗺</a></div>
+      <div>
+        📞 <a href="tel:020-8888-8888" style="color:#666;text-decoration:none;">020-8888-8888</a>
+        · <a href="javascript:showParkingInfo()" style="color:#666;text-decoration:none;">🅿️ 停车</a>
+        · 🕐 09:00-23:00
       </div>
     </div>
 
@@ -240,6 +261,38 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
     <div class="store-option coming" onclick="showToast('珠江新城店正在筹备中，将由高岸ERP全面接管，敬请期待')">📍 珠江新城店 <span class="store-coming-tag">即将上线</span></div>
     <div class="store-option coming" onclick="showToast('琶洲店正在筹备中，将由高岸ERP全面接管，敬请期待')">📍 琶洲店 <span class="store-coming-tag">即将上线</span></div>
     <button class="modal-close" onclick="hideStoreSelector()">关闭</button>
+  </div>
+</div>
+
+<!-- Parking Info Modal -->
+<div class="modal-overlay" id="parkingModal" onclick="if(event.target===this)hideParkingInfo()">
+  <div class="modal" style="width:340px;text-align:left;">
+    <h3 style="text-align:center;">🅿️ 停车指引</h3>
+    <div class="parking-content">
+      <div class="parking-section">
+        <div class="ps-title">📍 停车场位置</div>
+        <div class="ps-text">盈隆大厦地下停车场（B2-B4层）<br>入口位于大厦东侧华夏路辅路</div>
+      </div>
+      <div class="parking-section">
+        <div class="ps-title">💰 收费标准</div>
+        <div class="ps-text">
+          <span class="ps-tag free">前30分钟免费</span>
+          <span class="ps-tag paid">¥8/小时</span>
+          <span class="ps-tag paid">¥64/天封顶</span><br>
+          夜间（22:00-08:00）：¥4/小时<br>
+          本店消费满 ¥200 可兑换 <b>1小时免费停车券</b>（详询前台）
+        </div>
+      </div>
+      <div class="parking-section">
+        <div class="ps-title">🚗 车位信息</div>
+        <div class="ps-text">总车位：约300个<br>新能源充电桩：B3层东区（快充20个，慢充30个）<br>无障碍车位：B2层电梯口旁（2个）</div>
+      </div>
+      <div class="parking-section">
+        <div class="ps-title">📌 温馨提示</div>
+        <div class="ps-text">高峰时段（周末14:00-18:00）车位较紧张，建议绿色出行。<br>地铁：3号线/5号线珠江新城站A1出口步行约5分钟</div>
+      </div>
+    </div>
+    <button class="modal-close" onclick="hideParkingInfo()">我知道了</button>
   </div>
 </div>
 
@@ -480,6 +533,40 @@ function showRoomBill() {
 
 function hideRoomBill() { document.getElementById('roomBillModal').style.display = 'none'; }
 function showProducts() { location.href = '../my-orders/index.html'; }
+
+// ── Store info actions ──
+var storeInfo = {
+  name: '高岸茶室·盈隆店',
+  address: '广州市天河区珠江新城华夏路28号盈隆大厦16层1601-1608',
+  phone: '020-8888-8888',
+  lat: 23.1265,
+  lng: 113.3218,
+  parking: {
+    location: '盈隆大厦地下停车场（B2-B4层），入口位于大厦东侧华夏路辅路',
+    fees: '前30分钟免费，¥8/小时，¥64/天封顶；夜间（22:00-08:00）¥4/小时',
+    spots: '总车位约300个，新能源充电桩B3层东区（快充20个，慢充30个），无障碍车位B2层电梯口旁',
+    tips: '消费满¥200可兑换1小时免费停车券，详询前台'
+  }
+};
+
+function openNavigation() {
+  UI.toast('🗺 正在打开导航...');
+  // Try to open Amap (Gaode) or Apple Maps
+  var url = 'https://uri.amap.com/marker?position=' + storeInfo.lng + ',' + storeInfo.lat + '&name=' + encodeURIComponent(storeInfo.name);
+  window.open(url, '_blank');
+}
+
+function callStore() {
+  window.location.href = 'tel:' + storeInfo.phone;
+}
+
+function showParkingInfo() {
+  document.getElementById('parkingModal').style.display = 'flex';
+}
+
+function hideParkingInfo() {
+  document.getElementById('parkingModal').style.display = 'none';
+}
 
 // ── Debug panel ──
 if (window.location.search.indexOf('debug=1') >= 0 || localStorage.getItem('erp_debug_mode') === 'true') {

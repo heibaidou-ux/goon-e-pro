@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>验券预约</title>
+<script src="../../js/sdk.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; background:#fff; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
+.nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; padding:16px 16px 60px; }
+.page::-webkit-scrollbar { display:none; }
+
+/* Step indicator */
+.steps { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; }
+.step { display:flex; align-items:center; gap:4px; font-size:12px; color:#999; }
+.step.active { color:#07c160; font-weight:600; }
+.step .step-num { width:22px; height:22px; border-radius:50%; background:#e5e5e5; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; }
+.step.active .step-num { background:#07c160; }
+.step-done .step-num { background:#07c160; }
+.step-line { width:24px; height:1px; background:#e5e5e5; }
+
+/* Step 1: coupon input */
+.coupon-input-section { margin-bottom:20px; }
+.coupon-input-section h3 { font-size:15px; font-weight:600; margin-bottom:12px; }
+.coupon-field-row { display:flex; gap:8px; }
+.coupon-field { flex:1; padding:14px; border:2px solid #e5e5e5; border-radius:10px; font-size:16px; text-align:center; letter-spacing:4px; outline:none; transition:border-color .15s; }
+.coupon-field:focus { border-color:#07c160; }
+.coupon-verify-btn { padding:14px 24px; border-radius:10px; background:#07c160; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; }
+
+/* Ticket card */
+.ticket-card { background:linear-gradient(135deg,#fff3e0,#ffe0b2); border-radius:12px; padding:16px; margin-bottom:12px; cursor:pointer; border:2px solid transparent; transition:all .15s; }
+.ticket-card.selected { border-color:#e37318; }
+.ticket-card-header { display:flex; justify-content:space-between; align-items:center; }
+.ticket-source { font-size:12px; font-weight:600; color:#e37318; }
+.ticket-title { font-size:15px; font-weight:700; margin-top:4px; }
+.ticket-desc { font-size:12px; color:#666; margin-top:2px; }
+.ticket-expiry { font-size:11px; color:#999; margin-top:6px; }
+
+/* Platform selector */
+.platform-grid { display:flex; gap:10px; margin-bottom:16px; }
+.platform-chip { flex:1; padding:14px; border-radius:10px; text-align:center; cursor:pointer; border:2px solid #e5e5e5; background:#fff; font-size:13px; font-weight:500; transition:all .15s; }
+.platform-chip.selected { border-color:#07c160; background:#f0fdf4; color:#07c160; }
+.platform-chip .plat-icon { font-size:24px; display:block; margin-bottom:4px; }
+
+/* Step 2: room match */
+.room-match-section { display:none; }
+.room-match-section.show { display:block; }
+.match-result { text-align:center; padding:16px; background:#f0fdf4; border-radius:12px; margin-bottom:16px; }
+.match-icon { font-size:32px; margin-bottom:8px; }
+.match-title { font-size:16px; font-weight:600; color:#333; }
+.match-sub { font-size:13px; color:#666; margin-top:4px; }
+
+.room-option { display:flex; align-items:center; gap:12px; padding:14px; border:2px solid #e5e5e5; border-radius:12px; margin-bottom:8px; cursor:pointer; transition:all .15s; }
+.room-option.selected { border-color:#07c160; background:#f0fdf4; }
+.room-option-icon { font-size:28px; }
+.room-option-info { flex:1; }
+.room-option-name { font-size:14px; font-weight:600; }
+.room-option-meta { font-size:12px; color:#999; margin-top:2px; }
+.room-option-price { font-size:14px; font-weight:700; color:#e37318; }
+
+/* Step 3: time select */
+.time-select-section { display:none; }
+.time-select-section.show { display:block; }
+.time-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.time-header-label { font-size:13px; color:#666; }
+.now-btn { padding:6px 14px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; }
+.time-grid { display:flex; flex-wrap:wrap; gap:4px; border:1.5px solid #e5e5e5; padding:8px; }
+.time-cell { padding:8px 4px; border-radius:6px; text-align:center; cursor:pointer; border:1px solid #eee; background:#fff; font-size:11px; width:calc(25% - 3px); }
+.time-cell.selected { background:#07c160; color:#fff; border-color:#07c160; }
+.time-cell .t-label { font-weight:500; }
+
+/* Bottom action */
+.bottom-action { padding:16px 0 8px; }
+.book-btn { width:100%; padding:16px; border-radius:10px; background:#07c160; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; }
+.book-btn:disabled { background:#ccc; cursor:not-allowed; }
+.book-btn:active { opacity:.8; }
+
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
+.nav-item .nav-icon { font-size:20px; display:block; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
+/* Confirm modal */
+.confirm-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.confirm-modal { background:#fff;border-radius:14px;padding:20px;width:300px;text-align:center; }
+.confirm-modal h3 { font-size:16px;margin-bottom:4px;color:#333; }
+.confirm-modal .coupon-preview { font-size:13px;color:#666;margin:8px 0 16px;padding:10px;background:#f9fafb;border-radius:8px; }
+.confirm-modal-buttons { display:flex;gap:10px; }
+.confirm-modal-btn { flex:1;padding:12px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.confirm-modal-btn.cancel { background:#f5f5f5;color:#666; }
+.confirm-modal-btn.confirm { background:#07c160;color:#fff; }
+.room-card-fixed { display:flex;align-items:center;gap:12px;padding:14px;border:2px solid #e5e5e5;border-radius:12px;margin-bottom:8px;background:#f9fafb; }
+.room-card-fixed .room-icon { font-size:28px; }
+.room-card-fixed .room-info { flex:1; }
+.room-card-fixed .room-name { font-size:14px;font-weight:600; }
+.room-card-fixed .room-meta { font-size:12px;color:#999;margin-top:2px; }
+.room-card-fixed .room-tag { font-size:11px;color:#07c160;background:#e8f5e9;padding:2px 10px;border-radius:10px; }
+.empty-room-msg { text-align:center;padding:24px;background:#fff8e1;border-radius:12px;margin-bottom:12px; }
+.empty-room-msg .empty-icon { font-size:32px;margin-bottom:8px; }
+.empty-room-msg .empty-title { font-size:14px;font-weight:600;color:#e37318;margin-bottom:4px; }
+.empty-room-msg .empty-desc { font-size:12px;color:#999; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">验券预约</span>
+  </div>
+  <div class="page">
+    <!-- Step indicator -->
+    <div class="steps">
+      <div class="step active" id="step1Label"><span class="step-num">1</span> 选券</div>
+      <span class="step-line"></span>
+      <div class="step" id="step2Label"><span class="step-num">2</span> 选房</div>
+      <span class="step-line"></span>
+      <div class="step" id="step3Label"><span class="step-num">3</span> 时段</div>
+    </div>
+
+    <!-- Step 1: Select platform and enter coupon -->
+    <div class="coupon-input-section" id="step1Content">
+      <h3>选择券平台</h3>
+      <div class="platform-grid">
+        <div class="platform-chip selected" onclick="selectPlatform('meituan',this)">
+          <span class="plat-icon">🟡</span>美团
+        </div>
+        <div class="platform-chip" onclick="selectPlatform('douyin',this)">
+          <span class="plat-icon">🎵</span>抖音
+        </div>
+        <div class="platform-chip" onclick="selectPlatform('dianping',this)">
+          <span class="plat-icon">⭐</span>大众点评
+        </div>
+      </div>
+
+      <h3>输入券码</h3>
+      <div class="coupon-field-row">
+        <div style="flex:1;position:relative;">
+          <input class="coupon-field" id="couponInput" placeholder="请输入券码" maxlength="12" oninput="autoVerifyCoupon()" style="width:100%;padding-right:44px;">
+          <label style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;cursor:pointer;z-index:2;opacity:.45;line-height:1;" title="扫码识别">🔲
+            <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="scanQR(this)">
+          </label>
+        </div>
+        <button class="coupon-verify-btn" onclick="verifyCoupon()">验券</button>
+      </div>
+      <div style="font-size:11px;color:#999;margin-top:6px;" id="formatHint">美团券码格式：MT + 6位数字，如 MT001298</div>
+
+      <div style="margin-top:16px;">
+        <div style="font-size:13px;color:#999;margin-bottom:8px;">可用的券</div>
+        <div class="ticket-card" onclick="selectDemoCoupon(this,'MT001298')">
+          <div class="ticket-card-header"><span class="ticket-source">🟡 美团</span></div>
+          <div class="ticket-title">茶室双人体验套餐</div>
+          <div class="ticket-desc">适用大茶室C/中茶室A · 含2小时+茶饮</div>
+          <div class="ticket-expiry">有效期至 2026-06-30</div>
+        </div>
+        <div class="ticket-card" onclick="selectDemoCoupon(this,'DY003456')">
+          <div class="ticket-card-header"><span class="ticket-source">🎵 抖音</span></div>
+          <div class="ticket-title">商务会议3小时套餐</div>
+          <div class="ticket-desc">适用大会议室 · 含投影+茶歇</div>
+          <div class="ticket-expiry">有效期至 2026-06-15</div>
+        </div>
+        <div class="ticket-card" onclick="selectDemoCoupon(this,'DP007891')">
+          <div class="ticket-card-header"><span class="ticket-source">⭐ 大众点评</span></div>
+          <div class="ticket-title">中茶室休闲体验</div>
+          <div class="ticket-desc">适用中茶室A/中茶室B · 含1壶茶</div>
+          <div class="ticket-expiry">有效期至 2026-07-01</div>
+        </div>
+      </div>
+
+      <!-- My coupons from system -->
+      <div style="margin-top:16px;border-top:1px solid #f0f0f0;padding-top:12px;">
+        <div style="font-size:13px;color:#333;font-weight:600;margin-bottom:8px;">🎫 我的优惠券</div>
+        <div id="myCouponList"></div>
+      </div>
+    </div>
+
+    <!-- Step 2: Confirm matched room (fixed, not selectable) -->
+    <div class="room-match-section" id="step2Content">
+      <div class="match-result" id="matchResult">
+        <div class="match-icon">✅</div>
+        <div class="match-title">券已核验通过</div>
+        <div class="match-sub" id="matchedCouponInfo">茶室双人体验套餐</div>
+      </div>
+      <div id="matchedRooms"></div>
+      <div class="bottom-action">
+        <button class="book-btn" id="step2Btn" onclick="goToTimeSelect()">选择时段</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Select time and confirm -->
+    <div class="time-select-section" id="step3Content">
+      <div class="time-header">
+        <span class="time-header-label">选择开始时段</span>
+        <button class="now-btn" onclick="pickNow()">⚡ 现在开始</button>
+      </div>
+      <div class="time-grid" id="timeSelectGrid"></div>
+      <div class="bottom-action">
+        <button class="book-btn" id="step3Btn" disabled onclick="confirmBooking()">确认预约</button>
+      </div>
+    </div>
+  </div>
+  <!-- Confirm coupon use modal -->
+  <div class="confirm-overlay" id="confirmModal">
+    <div class="confirm-modal">
+      <h3>确认使用此券</h3>
+      <div class="coupon-preview" id="confirmPreview">券详情</div>
+      <div class="confirm-modal-buttons">
+        <button class="confirm-modal-btn cancel" onclick="hideConfirmModal()">取消</button>
+        <button class="confirm-modal-btn confirm" onclick="confirmCouponUse()">确认使用</button>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="location.href='../home/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
+    <div class="nav-item" onclick="location.href='../room-list/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
+    <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ── SDK init ──
+var SDK = window.ERP.SDK;
+var API = SDK.API;
+var UI = SDK.UI;
+var Utils = SDK.Utils;
+
+// State
+var selectedPlatform = 'meituan';
+var verifiedCouponCode = '';
+var matchedRooms = [];
+var selectedRoom = null;
+var selectedTime = null;
+var now = new Date();
+var pendingCouponCode = ''; // for confirmation flow
+var _verifying = false; // prevent double modal trigger
+
+// Coupon → room matching rules
+var couponDB = {
+  'MT001298': { source:'美团', title:'茶室双人体验套餐', matchRooms:['RM004','RM002'], price:168, duration:120 },
+  'MT002456': { source:'美团', title:'茶室单人品茗券', matchRooms:['RM002','RM003'], price:68, duration:60 },
+  'MT003789': { source:'美团', title:'商务会议3小时套餐', matchRooms:['RM001'], price:358, duration:180 },
+  'DY003456': { source:'抖音', title:'商务会议3小时套餐', matchRooms:['RM001'], price:358, duration:180 },
+  'DY007891': { source:'抖音', title:'茶室双人体验套餐', matchRooms:['RM004','RM002'], price:168, duration:120 },
+  'DP007891': { source:'大众点评', title:'中茶室休闲体验', matchRooms:['RM002','RM003'], price:88, duration:120 },
+};
+
+var rooms = {
+  RM004: { name:'大茶室C', type:'茶室', capacity:6, pricePerHour:120, icon:'🍵' },
+  RM001: { name:'大会议室', type:'会议室', capacity:10, pricePerHour:200, icon:'💼' },
+  RM002: { name:'中茶室A', type:'茶室', capacity:4, pricePerHour:80, icon:'🍵' },
+  RM003: { name:'中茶室B', type:'茶室', capacity:4, pricePerHour:80, icon:'🍵' },
+  RM005: { name:'展厅', type:'展厅', capacity:20, pricePerHour:0, icon:'🏛️' },
+  RM006: { name:'工作间', type:'工作间', capacity:2, pricePerHour:0, icon:'🔧' },
+};
+
+// Platform prefix map
+var platformPrefix = { meituan:'MT', douyin:'DY', dianping:'DP' };
+var platformHints = { meituan:'美团券码格式：MT + 6位数字，如 MT001298', douyin:'抖音券码格式：DY + 6位数字，如 DY003456', dianping:'大众点评券码格式：DP + 6位数字，如 DP007891' };
+
+renderMyCoupons();
+
+function selectPlatform(platform, el) {
+  selectedPlatform = platform;
+  document.querySelectorAll('.platform-chip').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  document.getElementById('formatHint').textContent = platformHints[platform] || '';
+}
+
+function autoVerifyCoupon() {
+  if (_verifying) return;
+  var code = document.getElementById('couponInput').value.trim();
+  if (code.length >= 7 && couponDB[code]) {
+    pendingCouponCode = code;
+    showConfirmModal(code);
+  }
+}
+
+function verifyCoupon() {
+  var code = document.getElementById('couponInput').value.trim();
+  if (!code) { UI.toast('请输入券码'); return; }
+
+  var prefix = platformPrefix[selectedPlatform];
+  var validPrefix = code.substring(0, 2).toUpperCase();
+  if (validPrefix !== prefix) {
+    UI.toast('券码格式错误：' + platformHints[selectedPlatform]);
+    return;
+  }
+  if (code.length < 7 || code.length > 12) {
+    UI.toast('券码长度错误：' + platformHints[selectedPlatform]);
+    return;
+  }
+
+  if (!couponDB[code]) {
+    UI.toast('该券码暂未在系统中登记，请联系客服确认');
+    return;
+  }
+
+  pendingCouponCode = code;
+  showConfirmModal(code);
+}
+
+function showConfirmModal(code) {
+  _verifying = true;
+  var info = couponDB[code];
+  if (!info) return;
+  document.getElementById('confirmPreview').innerHTML =
+    '<strong>' + info.title + '</strong><br>' +
+    '适用：' + info.matchRooms.map(function(rid) { return rooms[rid] ? rooms[rid].name : rid; }).join('、') +
+    '<br>价值 ¥' + info.price + ' · ' + info.duration + '分钟';
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+
+function hideConfirmModal() {
+  _verifying = false;
+  document.getElementById('confirmModal').style.display = 'none';
+  pendingCouponCode = '';
+}
+
+function confirmCouponUse() {
+  var code = pendingCouponCode;
+  hideConfirmModal();
+  if (code) doVerify(code);
+}
+
+function isRoomAvailable(roomId) {
+  var bookings = Utils.lsGet('bookings', []);
+  var today = new Date();
+  var dateStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  var nowMin = today.getHours() * 60 + today.getMinutes();
+  for (var i = 0; i < bookings.length; i++) {
+    var b = bookings[i];
+    if (b.roomId !== roomId || b.date !== dateStr) continue;
+    if (b.status === 'Cancelled' || b.status === 'Completed') continue;
+    var parts = (b.time || '').split('-');
+    if (parts.length < 2) continue;
+    var start = parseInt(parts[0].split(':')[0])*60 + parseInt(parts[0].split(':')[1]);
+    var end = parseInt(parts[1].split(':')[0])*60 + parseInt(parts[1].split(':')[1]);
+    if (nowMin >= start && nowMin < end) return false;
+  }
+  return true;
+}
+
+function doVerify(code) {
+  verifiedCouponCode = code;
+  var info = couponDB[code];
+  matchedRooms = info.matchRooms;
+  usedCouponId = ''; // Reset system coupon tracking for platform coupons
+
+  // Check if any matched rooms exist, are bookable, and are currently free
+  var availableRooms = matchedRooms.filter(function(rid) { return rooms[rid] && rooms[rid].type !== '展厅' && rooms[rid].type !== '工作间' && isRoomAvailable(rid); });
+
+  document.getElementById('matchedCouponInfo').textContent = info.title + ' · 价值 ¥' + info.price;
+
+  if (availableRooms.length === 0) {
+    // No available rooms — block verification, stay on step 1
+    UI.toast('该券适用包间当前均不可用，请联系客服 020-88888888');
+    return;
+  } else if (availableRooms.length === 1) {
+    // Single room — show as fixed card
+    selectedRoom = availableRooms[0];
+    var r0 = rooms[availableRooms[0]];
+    document.getElementById('matchedRooms').innerHTML =
+      '<div class="room-card-fixed">' +
+      '<div class="room-icon">' + (r0.icon||'🏠') + '</div>' +
+      '<div class="room-info"><div class="room-name">' + r0.name + '</div><div class="room-meta">可容纳' + r0.capacity + '人 · 系统匹配</div></div>' +
+      '<div class="room-tag">已锁定</div></div>';
+    document.getElementById('step2Btn').style.display = '';
+  } else {
+    // Multiple rooms — guest selects one
+    selectedRoom = availableRooms[0]; // pre-select first
+    document.getElementById('matchedRooms').innerHTML = availableRooms.map(function(rid, idx) {
+      var r = rooms[rid];
+      if (!r) return '';
+      var selected = idx === 0 ? ' selected' : '';
+      return '<div class="room-option' + selected + '" onclick="selectCouponRoom(\'' + rid + '\', this)">' +
+        '<div class="room-option-icon">' + (r.icon||'🏠') + '</div>' +
+        '<div class="room-option-info"><div class="room-option-name">' + r.name + '</div><div class="room-option-meta">可容纳' + r.capacity + '人</div></div>' +
+        '<div style="font-size:12px;color:#07c160;font-weight:600;">请选择 →</div></div>';
+    }).join('');
+    document.getElementById('step2Btn').style.display = '';
+  }
+
+  // Show step 2
+  document.getElementById('step1Content').style.display = 'none';
+  document.getElementById('step2Content').classList.add('show');
+  updateSteps(2);
+  UI.toast('验券成功！');
+}
+
+function selectCouponRoom(roomId, el) {
+  selectedRoom = roomId;
+  document.querySelectorAll('#matchedRooms .room-option').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function goToTimeSelect() {
+  if (!selectedRoom) return;
+  document.getElementById('step2Content').classList.remove('show');
+  document.getElementById('step3Content').classList.add('show');
+  updateSteps(3);
+  renderTimeGrid();
+}
+
+function renderTimeGrid() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var now2 = new Date();
+  var startMin = 0;
+  if (today.toDateString() === now2.toDateString()) {
+    var curMin = now2.getHours() * 60 + now2.getMinutes();
+    // Show from now (rounded down), not next half-hour
+    startMin = Math.ceil(curMin / 30) * 30;
+  }
+  var cells = [];
+  for (var m = startMin; m < 24*60; m += 30) {
+    cells.push(String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0'));
+  }
+  document.getElementById('timeSelectGrid').innerHTML = cells.map(function(t) {
+    var cls = 'time-cell';
+    if (t === selectedTime) cls += ' selected';
+    return '<div class="time-cell ' + cls + '" onclick="selectTime(\'' + t + '\', this)"><span class="t-label">' + t + '</span></div>';
+  }).join('');
+
+  // Auto-select current time as default
+  if (!selectedTime && cells.length > 0) {
+    // Find the cell closest to current time
+    var curH = now2.getHours(), curM = now2.getMinutes();
+    var rounded = Math.floor(curM / 30) * 30;
+    if (curM >= 30) rounded = 30; else rounded = 0;
+    var nowStr = String(curH).padStart(2,'0') + ':' + String(rounded).padStart(2,'0');
+    // If nowStr is in cells, select it; otherwise select first cell
+    if (cells.indexOf(nowStr) >= 0) {
+      selectedTime = nowStr;
+    } else {
+      selectedTime = cells[0];
+    }
+    // Update UI
+    document.querySelectorAll('#timeSelectGrid .time-cell').forEach(function(c) {
+      if (c.querySelector('.t-label').textContent === selectedTime) c.classList.add('selected');
+    });
+    document.getElementById('step3Btn').disabled = false;
+  }
+}
+
+function selectTime(time, el) {
+  selectedTime = time;
+  document.querySelectorAll('#timeSelectGrid .time-cell').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  document.getElementById('step3Btn').disabled = false;
+}
+
+function pickNow() {
+  // "现在开始" uses current time
+  var n = new Date();
+  var h = n.getHours();
+  var m = n.getMinutes();
+  var t = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  selectedTime = t;
+  document.querySelectorAll('#timeSelectGrid .time-cell').forEach(function(c) { c.classList.remove('selected'); });
+  var cells = document.querySelectorAll('#timeSelectGrid .time-cell');
+  for (var i = 0; i < cells.length; i++) {
+    if (cells[i].querySelector('.t-label').textContent === t) {
+      cells[i].classList.add('selected'); break;
+    }
+  }
+  document.getElementById('step3Btn').disabled = false;
+  UI.toast('已选择 ' + t + ' 开始 · 时长以券约定为准');
+}
+
+function confirmBooking() {
+  if (!selectedRoom || !selectedTime) { UI.toast('请选择时段'); return; }
+  var info = couponDB[verifiedCouponCode];
+  var r = rooms[selectedRoom];
+  if (!info || !r) { UI.toast('预约信息有误'); return; }
+
+  // End time = start time + coupon duration
+  var startParts = selectedTime.split(':');
+  var startMin = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
+  var endMin = startMin + info.duration;
+  var endH = Math.floor(endMin / 60) % 24;
+  var endM = endMin % 60;
+  var endTime = String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0');
+
+  var today = new Date();
+  var dateStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  var doorCode = String(Math.floor(Math.random()*9000+1000));
+
+  // Save booking
+  var bookings = Utils.lsGet('bookings', []);
+  bookings.unshift({
+    id: 'ORD' + Date.now(), roomId: selectedRoom, roomName: r.name,
+    date: dateStr, time: selectedTime + '-' + endTime,
+    price: info.price, duration: String(info.duration),
+    doorCode: doorCode, status: 'Booked',
+    payment: verifiedCouponCode + '(' + info.source + '券)',
+    couponCode: verifiedCouponCode
+  });
+  Utils.lsSet('bookings', bookings);
+
+  // Mark system coupon as used if applicable
+  var allCoupons = Utils.lsGet('coupons', []);
+  var usedCpn = null;
+  allCoupons.forEach(function(c) {
+    if (c.status === 'unused' && c.id === usedCouponId) { c.status = 'used'; usedCpn = c; }
+  });
+  if (usedCpn) localStorage.setItem('mp_coupons', JSON.stringify(allCoupons));
+
+  UI.toast('预约成功！');
+  setTimeout(function() {
+    location.href = '../booking-confirm/index.html?roomName=' + encodeURIComponent(r.name) +
+      '&date=' + dateStr + '&slot=' + encodeURIComponent(selectedTime + '-' + endTime) +
+      '&price=0&duration=' + info.duration + '&roomId=' + selectedRoom +
+      '&sessionType=standard&payment=' + encodeURIComponent(verifiedCouponCode + '(' + info.source + '券)') +
+      '&noPayment=1';
+  }, 500);
+}
+
+// Confirmation for demo coupon click
+function selectDemoCoupon(el, code) {
+  if (!couponDB[code]) { UI.toast('该券不可用'); return; }
+  // Select the card visually
+  document.querySelectorAll('.ticket-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  // Show confirmation
+  document.getElementById('couponInput').value = code;
+  pendingCouponCode = code;
+  showConfirmModal(code);
+}
+
+var usedCouponId = ''; // Track which system coupon was used
+
+// Use a system coupon for verification
+function useMyCoupon(couponId, el) {
+  var coupons = Utils.lsGet('coupons', []);
+  var coupon = coupons.find(function(c) { return c.id === couponId; });
+  if (!coupon || coupon.status !== 'unused') { UI.toast('该优惠券不可用'); return; }
+  usedCouponId = couponId;
+  // Map to a demo ticket for the verification flow
+  var code = 'MT001298';
+  document.getElementById('couponInput').value = code;
+  document.querySelectorAll('.ticket-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  pendingCouponCode = code;
+  showConfirmModal(code);
+}
+
+function updateSteps(step) {
+  for (var i = 1; i <= 3; i++) {
+    var label = document.getElementById('step' + i + 'Label');
+    label.classList.remove('active');
+    if (i < step) label.classList.add('step-done');
+    if (i === step) label.classList.add('active');
+  }
+}
+
+// QR code scan simulation — upload image to simulate scanning
+function scanQR(input) {
+  if (!input.files || !input.files[0]) return;
+  // Simulate QR decode — randomly pick a coupon based on current platform
+  var prefix = platformPrefix[selectedPlatform];
+  var platformCodes = Object.keys(couponDB).filter(function(k) { return k.startsWith(prefix); });
+  if (platformCodes.length === 0) platformCodes = Object.keys(couponDB);
+  var demoCode = platformCodes[Math.floor(Math.random() * platformCodes.length)];
+  document.getElementById('couponInput').value = demoCode;
+  input.value = '';
+  UI.toast('📷 扫码识别成功');
+  autoVerifyCoupon();
+}
+
+// Render my coupons from localStorage
+function renderMyCoupons() {
+  var coupons = Utils.lsGet('coupons', []);
+  var el = document.getElementById('myCouponList');
+  if (!el) return;
+  if (coupons.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:#999;text-align:center;padding:12px;">暂无优惠券，首次充值可获赠</div>';
+    return;
+  }
+  var now2 = new Date();
+  var unused = coupons.filter(function(c) {
+    if (c.status === 'unused' && new Date(c.expiry) < now2) c.status = 'expired';
+    return c.status === 'unused';
+  });
+  Utils.lsSet('coupons', coupons);
+
+  if (unused.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:#999;text-align:center;padding:12px;">暂无可用优惠券</div>';
+    return;
+  }
+  el.innerHTML = unused.slice(0, 5).map(function(c) {
+    var expiryDate = new Date(c.expiry);
+    var expiryStr = expiryDate.getFullYear() + '-' + String(expiryDate.getMonth()+1).padStart(2,'0') + '-' + String(expiryDate.getDate()).padStart(2,'0');
+    return '<div class="ticket-card" onclick="useMyCoupon(\'' + c.id + '\', this)" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">' +
+      '<div class="ticket-card-header"><span class="ticket-source" style="color:#07c160;">🏷️ 系统券</span><span style="font-size:18px;font-weight:800;color:#07c160;">¥' + c.value + '</span></div>' +
+      '<div class="ticket-title" style="font-size:13px;">' + c.source + ' · 全场通用</div>' +
+      '<div class="ticket-expiry">有效期至 ' + expiryStr + '</div></div>';
+  }).join('');
+  if (unused.length > 5) {
+    el.innerHTML += '<div style="font-size:12px;color:#07c160;text-align:center;padding:8px;cursor:pointer;" onclick="location.href=\'../my-coupons/index.html\'">查看全部 ' + unused.length + ' 张 ›</div>';
+  }
+}
+
+// Using SDK.UI.toast
+</script>
+</body>
+</html>

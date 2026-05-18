@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:0 8px 0 0; }
+.nav-title { flex:1; font-size:16px; font-weight:600; }
+.page { flex:1; overflow-y:auto; padding:16px; padding-bottom:60px; }
+.page::-webkit-scrollbar { display:none; }
+.profile-header { background:linear-gradient(135deg,#0052d9,#366ef4); border-radius:16px; padding:20px; text-align:center; color:#fff; margin-bottom:16px; }
+.profile-avatar { font-size:56px; margin-bottom:8px; }
+.profile-name { font-size:20px; font-weight:700; }
+.profile-role { font-size:13px; opacity:.8; margin-top:4px; }
+.profile-store { font-size:12px; opacity:.7; margin-top:2px; }
+.section-card { background:#fff; border-radius:14px; overflow:hidden; margin-bottom:12px; }
+.section-card-title { padding:14px 16px 6px; font-size:13px; color:#999; font-weight:500; }
+.menu-item { display:flex; align-items:center; padding:14px 16px; cursor:pointer; border-bottom:1px solid #f5f5f5; }
+.menu-item:last-child { border-bottom:none; }
+.menu-item:active { background:#f9f9f9; }
+.menu-icon { font-size:20px; margin-right:12px; width:24px; text-align:center; }
+.menu-text { flex:1; font-size:14px; color:#333; }
+.menu-value { font-size:13px; color:#999; }
+.menu-arrow { color:#ccc; font-size:14px; margin-left:8px; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal-overlay.active { display:flex; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:310px; }
+.modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
+.modal p { font-size:13px;color:#666;margin-bottom:12px; }
+.modal input { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:13px; margin-bottom:8px; font-family:inherit; }
+.modal-buttons { display:flex;gap:8px;margin-top:10px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#0052d9;color:#fff; }
+.modal-btn.danger { background:#d54941;color:#fff; }
+.logout-btn { width:100%; padding:16px; border-radius:12px; background:#ffebee; color:#d54941; border:none; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
+.logout-btn:active { opacity:.8; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item.active { color:#0052d9; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+</style>
+<script src="../../js/sdk.js"></script>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">我的</span>
+  </div>
+  <div class="page">
+    <div class="profile-header">
+      <div class="profile-avatar" id="pAvatar">👩‍💼</div>
+      <div class="profile-name" id="pName">小林</div>
+      <div class="profile-role" id="pRole">店长</div>
+      <div class="profile-store" id="pStore">高岸茶室·盈隆店</div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-title">账号信息</div>
+      <div class="menu-item" onclick="showEditProfile()">
+        <span class="menu-icon">👤</span>
+        <span class="menu-text">个人资料</span>
+        <span class="menu-value" id="pProfileShort">小林 · 138****0000</span>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="showChangePassword()">
+        <span class="menu-icon">🔒</span>
+        <span class="menu-text">修改密码</span>
+        <span class="menu-value"></span>
+        <span class="menu-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-title">设置</div>
+      <div class="menu-item" onclick="showToast('消息通知已开启')">
+        <span class="menu-icon">🔔</span>
+        <span class="menu-text">消息通知</span>
+        <span class="menu-value">已开启</span>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="showAbout()">
+        <span class="menu-icon">📄</span>
+        <span class="menu-text">关于</span>
+        <span class="menu-value">V1.0.0</span>
+        <span class="menu-arrow">›</span>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="doLogout()">退出登录</button>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal">
+    <h3>编辑个人资料</h3>
+    <input id="epName" placeholder="姓名">
+    <input id="epPhone" placeholder="手机号" type="tel">
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="closeModal('editProfileModal')">取消</button>
+      <button class="modal-btn confirm" onclick="saveProfile()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="changePwdModal">
+  <div class="modal">
+    <h3>修改密码</h3>
+    <input id="cpOld" placeholder="当前密码" type="password">
+    <input id="cpNew" placeholder="新密码（至少6位）" type="password">
+    <input id="cpConfirm" placeholder="确认新密码" type="password">
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="closeModal('changePwdModal')">取消</button>
+      <button class="modal-btn confirm" onclick="savePassword()">确认修改</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var showToast = StaffSDK.UI.toast;
+
+function getStaffProfile() {
+  var p = StaffSDK.Utils.lsGet('staff_profile', null);
+  if (!p) {
+    p = { name:'小林', phone:'13800138000', role:'店长', store:'高岸茶室·盈隆店', avatar:'👩‍💼' };
+    StaffSDK.Utils.lsSet('staff_profile', p);
+  }
+  return p;
+}
+
+function loadProfile() {
+  var p = getStaffProfile();
+  document.getElementById('pAvatar').textContent = p.avatar || '👩‍💼';
+  document.getElementById('pName').textContent = p.name;
+  document.getElementById('pRole').textContent = p.role;
+  document.getElementById('pStore').textContent = p.store;
+  document.getElementById('pProfileShort').textContent = p.name + ' · ' + (p.phone ? p.phone.slice(0,3) + '****' + p.phone.slice(-4) : '');
+}
+
+function showEditProfile() {
+  var p = getStaffProfile();
+  document.getElementById('epName').value = p.name;
+  document.getElementById('epPhone').value = p.phone || '';
+  document.getElementById('editProfileModal').classList.add('active');
+}
+
+function saveProfile() {
+  var name = document.getElementById('epName').value.trim();
+  var phone = document.getElementById('epPhone').value.trim();
+  if (!name) { showToast('请输入姓名'); return; }
+  if (phone && !/^1\d{10}$/.test(phone)) { showToast('请输入正确的手机号'); return; }
+  var p = getStaffProfile();
+  p.name = name;
+  p.phone = phone;
+  StaffSDK.Utils.lsSet('staff_profile', p);
+  closeModal('editProfileModal');
+  loadProfile();
+  showToast('资料已更新');
+}
+
+function showChangePassword() {
+  document.getElementById('cpOld').value = '';
+  document.getElementById('cpNew').value = '';
+  document.getElementById('cpConfirm').value = '';
+  document.getElementById('changePwdModal').classList.add('active');
+}
+
+function savePassword() {
+  var old = document.getElementById('cpOld').value;
+  var pwd = StaffSDK.Utils.lsGet('staff_password', '123456');
+  if (old !== pwd) { showToast('当前密码不正确'); return; }
+  var np = document.getElementById('cpNew').value;
+  if (np.length < 6) { showToast('新密码至少6位'); return; }
+  if (np !== document.getElementById('cpConfirm').value) { showToast('两次密码不一致'); return; }
+  StaffSDK.Utils.lsSet('staff_password', np);
+  closeModal('changePwdModal');
+  showToast('密码已修改');
+}
+
+function showAbout() {
+  StaffSDK.UI.confirm('关于', '高岸茶室店员端\n版本: V1.0.0\n\n高岸智能管理系统\n为连锁茶室提供全流程数字化管理').then(function(){});
+}
+
+function doLogout() {
+  StaffSDK.UI.confirm('退出登录', '确定退出当前账号吗？').then(function(ok) {
+    if (!ok) return;
+    StaffSDK.API.staffLogout().then(function() {
+      location.href = '../login/index.html';
+    });
+  });
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(function(m) {
+  m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+});
+
+loadProfile();
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -10,12 +10,11 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
 .nav-top { position:fixed; top:10px; right:20px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
-.header { background:#fff; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0f0f0; }
-.header-title { font-size:17px; font-weight:700; }
-.view-toggle { display:flex; background:#f0f0f0; border-radius:8px; padding:2px; }
-.toggle-btn { padding:6px 14px; border-radius:6px; font-size:12px; cursor:pointer; border:none; background:transparent; color:#999; font-weight:500; }
-.toggle-btn.active { background:#fff; color:#333; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
+.nav-title { font-size:16px; font-weight:600; flex:1; }
 .page { flex:1; overflow-y:auto; padding:12px 16px; padding-bottom:60px; }
+.page::-webkit-scrollbar { display:none; }
 .room-card { background:#fff; border-radius:14px; padding:16px; margin-bottom:10px; border-left:4px solid #ccc; }
 .room-card.inuse { border-left-color:#00a870; }
 .room-card.booked { border-left-color:#9c27b0; }
@@ -47,7 +46,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .nav-item .nav-icon { font-size:20px; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
-.modal { background:#fff;border-radius:14px;padding:20px;width:310px; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:310px;max-height:85vh;overflow-y:auto; }
 .modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
 .modal p { font-size:13px;color:#666;margin-bottom:4px; }
 .modal input,.modal textarea { width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:8px; }
@@ -60,336 +59,594 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .modal-btn.success { background:#00a870;color:#fff; }
 .modal-btn.warning { background:#e37318;color:#fff; }
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
-.cleaning-progress { display:flex;align-items:center;gap:8px;font-size:12px;color:#e37318; margin-bottom:8px; }
-.cleaning-bar { flex:1; height:4px; background:#eee; border-radius:2px; overflow:hidden; }
-.cleaning-fill { height:100%; background:#e37318; border-radius:2px; }
 .duration-btn { padding:10px 6px; border-radius:8px; font-size:13px; cursor:pointer; border:2px solid #e0e0e0; background:#fff; color:#333; font-weight:500; text-align:center; line-height:1.3; transition:all .15s; }
 .duration-btn.selected { border-color:#0052d9; background:#e3f2fd; color:#0052d9; }
 .duration-btn small { display:block; font-size:11px; font-weight:400; color:#999; margin-top:2px; }
 .duration-btn.selected small { color:#0052d9; }
 .payment-radio { flex:1; padding:8px 10px; border-radius:8px; font-size:13px; cursor:pointer; border:2px solid #e0e0e0; background:#fff; color:#666; font-weight:500; text-align:center; transition:all .15s; }
 .payment-radio.selected { border-color:#00a870; background:#e8f5e9; color:#00a870; }
+.pay-method-btn { padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer; border:2px solid #e0e0e0; background:#fff; color:#666; font-weight:500; text-align:center; transition:all .15s; display:inline-block; flex:1; }
+.pay-method-btn.selected { border-color:#00a870; background:#e8f5e9; color:#00a870; }
+.maint-reason-btn { flex:1; padding:12px; border-radius:8px; font-size:14px; cursor:pointer; border:2px solid #e0e0e0; background:#fff; color:#333; font-weight:600; text-align:center; transition:all .15s; }
+.maint-reason-btn.selected { border-color:#e37318; background:#fff3e0; color:#e37318; }
 .time-select { padding:8px; border:1px solid #ddd; border-radius:8px; font-size:13px; background:#fff; color:#333; }
+/* Device control styles */
+.remaining-bar { background:#fff; border-radius:12px; padding:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; }
+.remaining-text { font-size:13px; color:#666; }
+.remaining-time { font-size:24px; font-weight:700; color:#e37318; }
+.remaining-end { font-size:11px; color:#999; }
+.action-cards { display:flex; gap:12px; margin-bottom:16px; }
+.action-card { flex:1; padding:18px 14px; border-radius:14px; text-align:center; cursor:pointer; border:none; display:flex; flex-direction:column; align-items:center; gap:6px; transition:transform .15s; font-family:inherit; }
+.action-card:active { transform:scale(.97); }
+.action-card .ac-icon { font-size:28px; }
+.action-card .ac-label { font-size:14px; font-weight:600; }
+.action-card .ac-sub { font-size:11px; opacity:.7; }
+.action-card.primary { background:#0052d9; color:#fff; }
+.action-card.secondary { background:#fff3e0; color:#e37318; border:1px solid #ffe0b2; }
+.device-grid { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+.device-card { background:#fff; border-radius:14px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+.device-info { display:flex; align-items:center; gap:12px; }
+.device-icon-box { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.device-icon-box.curtain { background:#e3f2fd; }
+.device-icon-box.ac { background:#fce4ec; }
+.device-icon-box.light { background:#fff8e1; }
+.device-name { font-size:14px; font-weight:600; }
+.device-status { font-size:11px; color:#999; margin-top:2px; }
+.toggle-switch { width:48px; height:28px; border-radius:14px; background:#e5e5e5; cursor:pointer; position:relative; transition:background .2s; flex-shrink:0; }
+.toggle-switch.on { background:#07c160; }
+.toggle-switch::after { content:''; position:absolute; top:2px; left:2px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.15); transition:transform .2s; }
+.toggle-switch.on::after { transform:translateX(20px); }
+.ctrl-back-btn { display:block; width:100%; padding:12px; border-radius:10px; border:1px solid #e0e0e0; background:#fff; color:#666; font-size:14px; cursor:pointer; text-align:center; font-family:inherit; }
+.ctrl-back-btn:active { background:#f5f5f5; }
 </style>
+<script src="../../js/sdk.js"></script>
 </head>
 <body>
 <div class="nav-top"><a href="../../../index.html">返回导航</a></div>
 <div class="phone">
-  <div class="header">
-    <span class="header-title">房态看板</span>
-    <div class="view-toggle">
-      <button class="toggle-btn active" onclick="switchView('list',this)">📋 列表</button>
-      <button class="toggle-btn" onclick="switchView('floor',this)">🏠 平面</button>
-    </div>
+  <div class="nav-bar" id="navBar">
+    <button class="back-btn" id="navBackBtn" onclick="handleNavBack()">←</button>
+    <span class="nav-title" id="navTitle">房态看板</span>
   </div>
   <div class="page" id="roomList"></div>
   <div class="bottom-nav">
     <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
-    <div class="nav-item active"><div class="nav-icon">🏠</div><div class="nav-label">房态</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
     <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
-    <div class="nav-item" onclick="location.href='../scene-control/index.html'"><div class="nav-icon">🎬</div><div class="nav-label">场景</div></div>
     <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
 <div class="modal-overlay" id="actionModal"><div class="modal" id="modalContent"></div></div>
+<!-- Extend modal -->
+<div class="modal-overlay" id="extendModal">
+  <div class="modal">
+    <h3>续订</h3>
+    <p id="extendInfo" style="font-size:13px;color:#666;">选择续订时长</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;" id="extendOptions"></div>
+    <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideExtend()">取消</button><button class="modal-btn confirm" onclick="doExtend()">确认续订</button></div>
+  </div>
+</div>
 
 <script>
-// Load rooms from localStorage or use defaults
-const defaultRooms = [
-  { roomId:"RM001", name:"大会议室", type:"bookable", status:"InUse", customerName:"李明", customerPhone:"138****1234", time:"13:00-15:00", remaining:80 },
-  { roomId:"RM002", name:"中茶室A", type:"bookable", status:"Cleaning", customerName:"", customerPhone:"", time:"上单:王芳 10:00-10:30", cleaningStaff:"小芳", cleaningProgress:60 },
-  { roomId:"RM003", name:"中茶室B", type:"bookable", status:"Active", customerName:"", customerPhone:"", time:"" },
-  { roomId:"RM004", name:"大茶室C", type:"bookable", status:"InUse", customerName:"张华", customerPhone:"139****5678", time:"10:00-11:30", remaining:45 },
-  { roomId:"RM005", name:"展厅", type:"Exhibition", status:"Active", customerName:"", time:"开放区域" },
-  { roomId:"RM006", name:"工作间", type:"Workspace", status:"Active", customerName:"", time:"员工专用" },
-];
+// ---- 使用SDK ----
+var showToast = StaffSDK.UI.toast;
 
-function loadRooms() {
-  try {
-    const saved = localStorage.getItem('mp_staff_rooms');
-    if (saved) { const arr = JSON.parse(saved); if (arr.length) return arr; }
-  } catch(e) {}
-  return JSON.parse(JSON.stringify(defaultRooms));
-}
-
-function saveRooms() {
-  localStorage.setItem('mp_staff_rooms', JSON.stringify(rooms));
-}
-
-let rooms = loadRooms();
+let currentAction = null;
+let deviceCtrlRoom = null; // set when in device control view
 
 const statusLabels = { InUse:'使用中', Booked:'已预定', Active:'空闲', Cleaning:'待打扫', Maintenance:'维修中' };
 const statusBadges = { InUse:'badge-inuse', Booked:'badge-booked', Active:'badge-active', Cleaning:'badge-cleaning', Maintenance:'badge-maintenance' };
 const lockDeviceMap = { RM001:'DEV001', RM002:'DEV008', RM003:'DEV014', RM004:'DEV020' };
+const priceMap = { RM001:200, RM002:80, RM003:80, RM004:120 };
 
-let currentAction = null;
-let currentView = 'list';
+// Normalize time string so hours never exceed 23 (fix stored "25:00" data)
+function normT(t) {
+  if (!t) return t;
+  var p = t.split(':').map(Number);
+  if (p.length < 2) return t;
+  var h = p[0] % 24, m = p[1] || 0;
+  return ((h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m);
+}
+
+function loadRooms() {
+  var statuses = StaffSDK.API.getAllRoomStatus();
+  var bookings = StaffSDK.Utils.lsGet('bookings', []);
+  // Fix any stored endTimes that overflow past midnight (e.g. "25:00")
+  bookings.forEach(function(b) { if (b.endTime) b.endTime = normT(b.endTime); });
+
+  function getBookingForRoom(roomId) {
+    var found = null;
+    bookings.forEach(function(b) {
+      if (b.roomId === roomId && (b.status === 'InUse' || b.status === 'Booked')) found = b;
+    });
+    return found;
+  }
+
+  return statuses.map(function(s) {
+    var roomDef = StaffSDK.MOCK ? StaffSDK.MOCK.rooms.find(function(r) { return r.roomId === s.roomId; }) : null;
+    var isBookable = roomDef ? roomDef.bookable !== false : (s.roomId !== 'RM005' && s.roomId !== 'RM006');
+    var booking = getBookingForRoom(s.roomId);
+    var customerName = booking ? (booking.customerName || booking.name || '') : '';
+    var customerPhone = booking ? (booking.phone || '') : '';
+    var time = '';
+    var remaining = 0;
+
+    if (s.status === 'InUse' && booking) {
+      time = (booking.startTime || '').slice(0,5) + '-' + (booking.endTime || '').slice(0,5);
+      var now = new Date();
+      var ep = (booking.endTime || '00:00').split(':').map(Number);
+      var endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), ep[0] % 24, ep[1]);
+      remaining = Math.max(0, Math.round((endDate - now) / 60000));
+    }
+
+    return {
+      roomId: s.roomId, name: s.name, type: isBookable ? 'bookable' : 'other', status: s.status,
+      customerName: customerName, customerPhone: customerPhone,
+      time: time, remaining: remaining, bookable: isBookable,
+      isStaffBooking: booking ? booking.isStaffBooking : false
+    };
+  }).filter(function(r) {
+    return r.roomId !== 'RM005' && r.roomId !== 'RM006';
+  });
+}
 
 function renderRooms() {
-  const container = document.getElementById('roomList');
-  if (currentView === 'floor') { renderFloorPlan(container); return; }
+  deviceCtrlRoom = null;
+  document.getElementById('navTitle').textContent = '房态看板';
+  var container = document.getElementById('roomList');
+  var rooms = loadRooms();
 
-  container.innerHTML = rooms.map(r => {
-    let detailHtml = '', actionsHtml = '';
+  container.innerHTML = rooms.map(function(r) {
+    var detailHtml = '', actionsHtml = '';
 
     if (r.status === 'InUse') {
-      detailHtml = `<div class="room-detail-row"><span>客人: ${r.customerName}</span><span>${r.customerPhone}</span></div>
-        <div class="room-detail-row"><span>时段: ${r.time}</span><span>剩余: ${r.remaining}分钟</span></div>`;
-      actionsHtml = `<button class="action-btn success" onclick="quickAction('${r.roomId}','unlock')">开门</button>
-        <button class="action-btn primary" onclick="openAction('${r.roomId}','sceneSwitch')">场景切换</button>
-        <button class="action-btn danger" onclick="openAction('${r.roomId}','forceCheckout')">强制退房</button>`;
+      detailHtml = '<div class="room-detail-row"><span>客人: ' + (r.customerName || '---') + '</span><span>' + (r.customerPhone || '') + '</span></div>' +
+        '<div class="room-detail-row"><span>时段: ' + r.time + '</span><span>剩余: ' + r.remaining + '分钟</span></div>';
+      actionsHtml = '<button class="action-btn success" onclick="openAction(\'' + r.roomId + '\',\'doorUnlock\')">开门</button>' +
+        '<button class="action-btn primary" onclick="openAction(\'' + r.roomId + '\',\'setBooked\')">📋 代预订</button>' +
+        '<button class="action-btn danger" onclick="openAction(\'' + r.roomId + '\',\'forceCheckout\')">强制退房</button>';
     } else if (r.status === 'Booked') {
-      const staffTag = r.isStaffBooking ? ' <span style="font-size:11px;background:#f3e5f5;color:#9c27b0;padding:2px 6px;border-radius:4px;font-weight:500;">🏪 店员代订</span>' : '';
-      detailHtml = `<div class="room-detail-row"><span>客人: ${r.customerName}${staffTag}</span><span>${r.customerPhone}</span></div>`;
-      actionsHtml = `<button class="action-btn success" onclick="quickAction('${r.roomId}','checkin')">确认到店</button>
-        <button class="action-btn danger" onclick="openAction('${r.roomId}','cancelBooking')">取消预约</button>`;
+      var staffTag = r.isStaffBooking ? ' <span style="font-size:11px;background:#f3e5f5;color:#9c27b0;padding:2px 6px;border-radius:4px;font-weight:500;">🏪 店员代订</span>' : '';
+      detailHtml = '<div class="room-detail-row"><span>客人: ' + (r.customerName || '---') + staffTag + '</span><span>' + (r.customerPhone || '') + '</span></div>';
+      actionsHtml = '<button class="action-btn success" onclick="quickAction(\'' + r.roomId + '\',\'checkin\')">确认到店</button>' +
+        '<button class="action-btn danger" onclick="openAction(\'' + r.roomId + '\',\'cancelBooking\')">取消预约</button>';
     } else if (r.status === 'Cleaning') {
-      detailHtml = `<div class="room-detail-row"><span>${r.time}</span></div>
-        <div class="cleaning-progress"><span>保洁: ${r.cleaningStaff}</span><div class="cleaning-bar"><div class="cleaning-fill" style="width:${r.cleaningProgress}%"></div></div><span>${r.cleaningProgress}%</span></div>`;
-      actionsHtml = `<button class="action-btn success" onclick="quickAction('${r.roomId}','completeCleaning')">确认打扫完成</button>
-        <button class="action-btn warning" onclick="openAction('${r.roomId}','setMaintenance')">设为维修</button>`;
+      detailHtml = '<div class="room-detail-row"><span>待打扫</span></div>';
+      actionsHtml = '<button class="action-btn success" onclick="quickAction(\'' + r.roomId + '\',\'completeCleaning\')">确认打扫完成</button>' +
+        '<button class="action-btn warning" onclick="openAction(\'' + r.roomId + '\',\'setMaintenance\')">设为维修</button>';
     } else if (r.status === 'Maintenance') {
-      detailHtml = `<div class="room-detail-row"><span>维修中</span></div>`;
-      actionsHtml = `<button class="action-btn success" onclick="quickAction('${r.roomId}','restoreActive')">恢复空闲</button>`;
-    }
-
-    // Non-bookable rooms have limited actions
-    if (r.type === 'Exhibition' || r.type === 'Workspace') {
-      if (r.status === 'Active' || r.status === 'InUse') {
-            actionsHtml = (r.type === 'Exhibition' ? '<span class="note">开放区域，自由使用</span>' : '<span class="note">员工专用空间</span>') + ' <button class="action-btn primary" onclick="location.href=\'../device-control/index.html?roomId=' + r.roomId + '&roomName=' + encodeURIComponent(r.name) + '\'">设备控制</button>';
-        if (r.status === 'Active') actionsHtml += `<button class="action-btn warning" style="margin-left:6px;" onclick="openAction('${r.roomId}','setMaintenance')">设为维修</button>`;
-      }
-      detailHtml = `<div class="room-detail-row"><span>${r.time}</span></div>`;
+      detailHtml = '<div class="room-detail-row"><span>维修中</span></div>';
+      actionsHtml = '<button class="action-btn success" onclick="quickAction(\'' + r.roomId + '\',\'restoreActive\')">恢复空闲</button>';
     } else if (r.status === 'Active') {
-      actionsHtml = `<button class="action-btn primary" onclick="openAction('${r.roomId}','setBooked')">📋 代预订</button>
-        <button class="action-btn warning" onclick="openAction('${r.roomId}','setMaintenance')">设为维修</button>`;
+      actionsHtml = '<button class="action-btn primary" onclick="openAction(\'' + r.roomId + '\',\'setBooked\')">📋 代预订</button>' +
+        '<button class="action-btn warning" onclick="openAction(\'' + r.roomId + '\',\'setMaintenance\')">设为维修</button>';
     }
 
-    return `<div class="room-card ${r.status.toLowerCase()}">
-      <div class="room-header"><span class="room-name">${r.name}</span>
-        <span class="room-status-badge ${statusBadges[r.status]}">${statusLabels[r.status]}</span></div>
-      <div class="room-detail">${detailHtml}</div>
-      <div class="room-actions">${actionsHtml}</div></div>`;
+    return '<div class="room-card ' + r.status.toLowerCase() + '">' +
+      '<div class="room-header"><span class="room-name">' + r.name + '</span>' +
+      '<span class="room-status-badge ' + (statusBadges[r.status] || 'badge-active') + '">' + (statusLabels[r.status] || r.status) + '</span></div>' +
+      '<div class="room-detail">' + detailHtml + '</div>' +
+      '<div class="room-actions">' + actionsHtml + '</div></div>';
   }).join('');
 }
 
-function switchView(view, el) {
-  currentView = view;
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderRooms();
-}
-
-function renderFloorPlan(container) {
-  const roomColors = { InUse:'#e8f5e9', Booked:'#f3e5f5', Active:'#e3f2fd', Cleaning:'#fff3e0', Maintenance:'#ffebee' };
-  const emoji = { InUse:'🟢', Booked:'🟣', Active:'🔵', Cleaning:'🟡', Maintenance:'🔴' };
-  container.innerHTML = `
-    <div style="background:#fff;border-radius:14px;padding:16px;">
-      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">🏠 盈隆店平面图</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        ${rooms.map(r => `
-          <div onclick="location.href='../device-control/index.html?roomId=${r.roomId}&roomName=${encodeURIComponent(r.name)}'" style="cursor:pointer;background:${roomColors[r.status]};border-radius:10px;padding:12px;text-align:center;border:2px solid ${r.status==='InUse'?'#00a870':r.status==='Cleaning'?'#e37318':r.status==='Maintenance'?'#d54941':'#e0e0e0'};">
-            <div style="font-size:20px;">${emoji[r.status]}</div>
-            <div style="font-size:13px;font-weight:600;margin-top:4px;">${r.name}</div>
-            <div style="font-size:11px;color:#999;">${statusLabels[r.status]}${r.time?' '+r.time:''}</div>
-          </div>`).join('')}
-      </div>
-      <div style="font-size:11px;color:#999;margin-top:12px;text-align:center;">注: 正式版将基于盈隆店实际平面布局绘制</div>
-    </div>`;
+function handleNavBack() {
+  if (deviceCtrlRoom) {
+    renderRooms();
+  } else {
+    history.back();
+  }
 }
 
 function openAction(roomId, action) {
-  currentAction = { roomId, action };
-  const room = rooms.find(r => r.roomId === roomId);
-  const modal = document.getElementById('modalContent');
+  currentAction = { roomId: roomId, action: action };
+  var rooms = loadRooms();
+  var room = null;
+  rooms.forEach(function(r) { if (r.roomId === roomId) room = r; });
+  if (!room) return;
+  var modal = document.getElementById('modalContent');
 
   if (action === 'setBooked') {
-    const tOpts = [];
-    for (let h = 9; h <= 22; h++) {
-      tOpts.push(`${String(h).padStart(2,'0')}:00`);
-      if (h < 22) tOpts.push(`${String(h).padStart(2,'0')}:30`);
+    var price = priceMap[roomId] || 60;
+    var halfHourPrice = Math.round(price / 2);
+    var tOpts = ['now'];
+    for (var h = 9; h <= 22; h++) {
+      tOpts.push((h < 10 ? '0' : '') + h + ':00');
+      if (h < 22) tOpts.push((h < 10 ? '0' : '') + h + ':30');
     }
-    const th = tOpts.map(t => `<option value="${t}">${t}</option>`).join('');
-    modal.innerHTML = `<h3>📋 代预订 - ${room.name}</h3>
-      <p style="font-size:12px;color:#999;margin-bottom:10px;">为客人手动创建预约订单</p>
-      <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;">客人信息</div>
-      <input placeholder="客人姓名 *" id="bkCustName">
-      <input placeholder="联系电话 *" id="bkCustPhone" type="tel">
-      <div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">时段选择</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;" id="durationGroup">
-        <button class="duration-btn selected" data-dur="2" onclick="selectDuration(this,2)">2小时<br><small>¥120</small></button>
-        <button class="duration-btn" data-dur="3" onclick="selectDuration(this,3)">3小时<br><small>¥180</small></button>
-        <button class="duration-btn" data-dur="4" onclick="selectDuration(this,4)">4小时<br><small>¥240</small></button>
-        <button class="duration-btn" data-dur="custom" onclick="selectDuration(this,'custom')">自定义<br><small>¥60/时</small></button>
-      </div>
-      <div id="customTimePicker" style="display:none;margin-top:6px;">
-        <span style="display:flex;align-items:center;gap:4px;">
-          <select class="time-select" id="bkStartTime">${th}</select>
-          <span style="color:#666;font-size:13px;">至</span>
-          <select class="time-select" id="bkEndTime">${th}</select>
-        </span>
-      </div>
-      <div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">支付状态</div>
-      <div style="display:flex;gap:6px;" id="paymentGroup">
-        <label class="payment-radio selected" data-pay="unpaid" onclick="selectPayment(this)">未支付</label>
-        <label class="payment-radio" data-pay="paid" onclick="selectPayment(this)">已支付</label>
-        <label class="payment-radio" data-pay="room" onclick="selectPayment(this)">挂账到房间</label>
-      </div>
-      <div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">备注</div>
-      <textarea placeholder="备注信息（选填）" id="bkNotes" style="resize:vertical;"></textarea>
-      <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn confirm" onclick="doProxyBooking()">确认代预订</button></div>`;
+    var th = tOpts.map(function(t) {
+      if (t === 'now') return '<option value="now" selected>现在开始（当前时间）</option>';
+      return '<option value="' + t + '">' + t + '</option>';
+    }).join('');
+
+    modal.innerHTML = '<h3>📋 代客预订 - ' + room.name + '</h3>' +
+      '<p style="font-size:12px;color:#999;margin-bottom:10px;">为客人创建预约订单，参考价 ¥' + price + '/时</p>' +
+      '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;">客人信息</div>' +
+      '<input placeholder="客人姓名 *" id="bkCustName">' +
+      '<input placeholder="联系电话 *" id="bkCustPhone" type="tel">' +
+      '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">开始时间</div>' +
+      '<select class="time-select" id="bkStartTime" style="width:100%;" onchange="updateBookingAmount()">' + th + '</select>' +
+      '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">使用时长</div>' +
+      '<p style="font-size:11px;color:#999;margin-bottom:6px;">请选择使用时长</p>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;" id="durationGroup">' +
+      '<button class="duration-btn" data-dur="1" onclick="selectDuration(this,1);updateBookingAmount()">1小时<br><small>¥' + (price*1) + '</small></button>' +
+      '<button class="duration-btn" data-dur="2" onclick="selectDuration(this,2);updateBookingAmount()">2小时<br><small>¥' + (price*2) + '</small></button>' +
+      '<button class="duration-btn" data-dur="3" onclick="selectDuration(this,3);updateBookingAmount()">3小时<br><small>¥' + (price*3) + '</small></button>' +
+      '<button class="duration-btn" data-dur="4" onclick="selectDuration(this,4);updateBookingAmount()">4小时<br><small>¥' + (price*4) + '</small></button>' +
+      '</div>' +
+      '<div id="amountDisplay" style="margin:10px 0;padding:12px;background:#f0f5ff;border-radius:10px;text-align:center;">' +
+      '<span style="font-size:14px;color:#666;">预估金额: </span>' +
+      '<span style="font-size:22px;font-weight:800;color:#0052d9;" id="orderAmount">¥0</span></div>' +
+      '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">支付状态</div>' +
+      '<div style="display:flex;gap:6px;" id="paymentGroup">' +
+      '<label class="payment-radio selected" data-pay="unpaid" onclick="selectPayment(this)">未支付</label>' +
+      '<label class="payment-radio" data-pay="paid" onclick="selectPayment(this)">已支付</label></div>' +
+      '<div id="payMethodGroup" style="display:none;margin-top:8px;">' +
+      '<div style="font-size:12px;color:#666;margin-bottom:4px;">支付方式</div>' +
+      '<div style="display:flex;gap:6px;">' +
+      '<label class="pay-method-btn" data-method="微信" onclick="selectPayMethod(this)">微信</label>' +
+      '<label class="pay-method-btn" data-method="支付宝" onclick="selectPayMethod(this)">支付宝</label>' +
+      '<label class="pay-method-btn" data-method="现金" onclick="selectPayMethod(this)">现金</label>' +
+      '<label class="pay-method-btn" data-method="其他" onclick="selectPayMethod(this)">其他</label></div></div>' +
+      '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">备注</div>' +
+      '<textarea placeholder="备注信息（选填）" id="bkNotes" style="resize:vertical;"></textarea>' +
+      '<div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn confirm" onclick="doProxyBooking()">确认代预订</button></div>';
+    document.getElementById('actionModal').style.display = 'flex';
   } else if (action === 'setMaintenance') {
-    modal.innerHTML = `<h3>设为维修 - ${room.name}</h3>
-      <p style="font-size:12px;color:#999;">标记房间为维修状态，暂停使用</p>
-      <textarea placeholder="维修原因 * (≥5字)" id="reason"></textarea><input placeholder="预计恢复时间" id="restoreTime">
-      <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn warning" onclick="doAction()">确认设为维修</button></div>`;
+    modal.innerHTML = '<h3>设为维修 - ' + room.name + '</h3>' +
+      '<p style="font-size:12px;color:#999;">请选择维修原因</p>' +
+      '<div id="maintenanceReasons" style="display:flex;gap:8px;margin-top:10px;">' +
+      '<button class="maint-reason-btn selected" data-reason="停电" onclick="selectMaintReason(this)">停电</button>' +
+      '<button class="maint-reason-btn" data-reason="检修" onclick="selectMaintReason(this)">检修</button>' +
+      '<button class="maint-reason-btn" data-reason="其他" onclick="selectMaintReason(this)">其他</button></div>' +
+      '<div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn warning" onclick="doAction()">确认设为维修</button></div>';
+    document.getElementById('actionModal').style.display = 'flex';
+  } else if (action === 'doorUnlock') {
+    renderDeviceControl(room);
   } else if (action === 'forceCheckout') {
-    modal.innerHTML = `<h3>⚠ 强制退房 - ${room.name}</h3>
-      <p style="color:#d54941;">将结束当前订单、触发节能关闭所有设备，房间转为待打扫。此操作将被审计。</p>
-      <textarea placeholder="操作原因 * (≥5字)" id="reason"></textarea>
-      <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn danger" onclick="doAction()">确认强制退房</button></div>`;
+    modal.innerHTML = '<h3>⚠ 强制退房 - ' + room.name + '</h3>' +
+      '<p style="color:#d54941;">将结束当前订单、触发节能关闭所有设备，房间转为待打扫。此操作将被审计。</p>' +
+      '<p style="font-size:12px;color:#999;margin-top:10px;">请选择退房原因</p>' +
+      '<div id="checkoutReasons" style="display:flex;gap:8px;margin-top:6px;">' +
+      '<button class="maint-reason-btn selected" data-reason="客人提前离场" onclick="selectCheckoutReason(this)">客人提前离场</button>' +
+      '<button class="maint-reason-btn" data-reason="设备故障" onclick="selectCheckoutReason(this)">设备故障</button>' +
+      '<button class="maint-reason-btn" data-reason="其他" onclick="selectCheckoutReason(this)">其他</button></div>' +
+      '<div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn danger" onclick="doAction()">确认强制退房</button></div>';
+    document.getElementById('actionModal').style.display = 'flex';
   } else if (action === 'cancelBooking') {
-    modal.innerHTML = `<h3>取消预约 - ${room.name}</h3><p style="font-size:13px;color:#666;">将取消当前预约，房间恢复空闲</p>
-      <textarea placeholder="取消原因 *" id="reason"></textarea>
-      <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">保留</button><button class="modal-btn danger" onclick="doAction()">确认取消</button></div>`;
-  } else if (action === 'sceneSwitch') {
-    modal.innerHTML = `<h3>场景切换 - ${room.name}</h3><p style="font-size:13px;color:#666;">手动触发场景（覆盖当前自动场景）</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
-        <button class="modal-btn confirm" onclick="doScene('品茗')" style="background:#e8f5e9;color:#00a870;">🍵 品茗</button>
-        <button class="modal-btn confirm" onclick="doScene('会议')">💡 会议</button>
-        <button class="modal-btn confirm" onclick="doScene('K歌')" style="background:#fff3e0;color:#e37318;">🎤 K歌</button>
-        <button class="modal-btn confirm" onclick="doScene('蓝牙音乐')" style="background:#e3f2fd;color:#0052d9;">🎵 蓝牙音乐</button>
-        <button class="modal-btn confirm" onclick="doScene('节能')" style="background:#ffebee;color:#d54941;">♻ 节能</button>
-      </div><button class="modal-btn cancel" style="margin-top:8px;width:100%;" onclick="hideModal()">取消</button>`;
+    modal.innerHTML = '<h3>取消预约 - ' + room.name + '</h3><p style="font-size:13px;color:#666;">将取消当前预约，房间恢复空闲</p>' +
+      '<textarea placeholder="取消原因 *" id="reason"></textarea>' +
+      '<div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">保留</button><button class="modal-btn danger" onclick="doAction()">确认取消</button></div>';
+    document.getElementById('actionModal').style.display = 'flex';
   }
-  document.getElementById('actionModal').style.display = 'flex';
 }
 
-function doScene(name) { showToast(`${rooms.find(r => r.roomId === currentAction.roomId)?.name} 已切换到${name}模式`); hideModal(); }
+// ── Device Control View ──
+var devCtx = { curtainOpen: false, acOn: true, lightOn: true, trackIdx: 0, isPlaying: true, volume: 70, remainSec: 0, endTimeStr: '', roomName: '', custName: '' };
 
-function quickAction(roomId, action) {
-  const room = rooms.find(r => r.roomId === roomId);
-  if (action === 'checkin') { room.status = 'InUse'; room.customerName = room.customerName || '到店客人'; room.remaining = 90; showToast(`${room.name} 已确认到店，触发欢迎场景`); }
-  else if (action === 'unlock') { const lockId = lockDeviceMap[roomId]; if (lockId) { location.href = `../device-control/index.html?deviceId=${lockId}&type=Lock&roomId=${roomId}&roomName=${encodeURIComponent(room.name)}`; } }
-  else if (action === 'completeCleaning') { room.status = 'Active'; room.cleaningStaff = ''; room.cleaningProgress = 0; showToast(`${room.name} 保洁完成，房间恢复空闲`); }
-  else if (action === 'restoreActive') { room.status = 'Active'; showToast(`${room.name} 维修完成，已恢复空闲`); }
-  saveRooms(); renderRooms();
+function renderDeviceControl(room) {
+  deviceCtrlRoom = room.roomId;
+  document.getElementById('navTitle').textContent = room.name;
+
+  var inuseBooking = null;
+  var allBks = StaffSDK.Utils.lsGet('bookings', []);
+  allBks.forEach(function(b) { if (b.roomId === room.roomId && b.status === 'InUse') inuseBooking = b; });
+  var custName = inuseBooking ? (inuseBooking.customerName || inuseBooking.name || '') : '';
+  var endT = inuseBooking ? (inuseBooking.endTime || '').slice(0,5) : '';
+  // Normalize end time
+  endT = normT(endT);
+  var now = new Date();
+  var ep = (endT || '00:00').split(':').map(Number);
+  var eDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), ep[0] % 24, ep[1]);
+  var remainMin = Math.max(0, Math.round((eDate - now) / 60000));
+  var hh = Math.floor(remainMin / 60), mm = remainMin % 60;
+
+  devCtx.remainSec = remainMin * 60;
+  devCtx.endTimeStr = endT;
+  devCtx.roomName = room.name;
+  devCtx.custName = custName;
+  devCtx.curtainOpen = false;
+  devCtx.acOn = true;
+  devCtx.lightOn = true;
+
+  document.getElementById('roomList').innerHTML =
+    '<div class="remaining-bar">' +
+      '<div><div class="remaining-text">剩余时间</div><div class="remaining-time" id="devRemainTime">' +
+        (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm +
+      '</div></div>' +
+      '<div class="remaining-end">' + endT + ' 结束</div>' +
+    '</div>' +
+    '<div class="action-cards">' +
+      '<button class="action-card primary" onclick="doUnlockDoor(\'' + room.roomId + '\')">' +
+        '<span class="ac-icon">🔓</span><span class="ac-label">开门</span><span class="ac-sub">点击开启门锁</span>' +
+      '</button>' +
+      '<button class="action-card secondary" onclick="showExtendModal()">' +
+        '<span class="ac-icon">⏱</span><span class="ac-label">续订</span><span class="ac-sub">延长使用时间</span>' +
+      '</button>' +
+    '</div>' +
+    '<div class="device-grid">' +
+      '<div class="device-card">' +
+        '<div class="device-info"><span class="device-icon-box curtain">🪟</span>' +
+        '<div><div class="device-name">电动窗帘</div><div class="device-status" id="devCurtainStatus">已关闭</div></div></div>' +
+        '<div class="toggle-switch" id="devCurtainToggle" onclick="toggleCurtain()"></div>' +
+      '</div>' +
+      '<div class="device-card">' +
+        '<div class="device-info"><span class="device-icon-box ac">❄️</span>' +
+        '<div><div class="device-name">空调</div><div class="device-status" id="devAcStatus">制冷 24°C</div></div></div>' +
+        '<div class="toggle-switch on" id="devAcToggle" onclick="toggleAC()"></div>' +
+      '</div>' +
+      '<div class="device-card">' +
+        '<div class="device-info"><span class="device-icon-box light">💡</span>' +
+        '<div><div class="device-name">灯光</div><div class="device-status" id="devLightStatus">已开启</div></div></div>' +
+        '<div class="toggle-switch on" id="devLightToggle" onclick="toggleLight()"></div>' +
+      '</div>' +
+    '</div>' +
+    '<button class="ctrl-back-btn" onclick="renderRooms()">← 返回房态列表</button>';
+
+  if (remainMin > 0) {
+    setTimeout(countdownTick, 1000);
+  }
 }
 
-function doAction() {
-  const room = rooms.find(r => r.roomId === currentAction.roomId);
-  const reason = document.getElementById('reason')?.value || '';
-  if (currentAction.action === 'setMaintenance') {
-    if (reason.length < 5) { showToast('维修原因至少5字'); return; }
-    room.status = 'Maintenance'; showToast(`${room.name} 已设为维修中`);
-  } else if (currentAction.action === 'forceCheckout') {
-    if (reason.length < 5) { showToast('强制退房原因至少5字'); return; }
-    room.status = 'Cleaning'; room.cleaningStaff = '待分配'; room.cleaningProgress = 0;
-    showToast(`${room.name} 已强制退房，转待打扫，已记录审计日志`);
-  } else if (currentAction.action === 'cancelBooking') {
-    room.status = 'Active'; room.customerName = ''; room.customerPhone = ''; room.time = '';
-    showToast(`${room.name} 预约已取消`);
+function countdownTick() {
+  if (!deviceCtrlRoom) return;
+  devCtx.remainSec--;
+  if (devCtx.remainSec < 0) return;
+  var m = Math.floor(devCtx.remainSec / 60), s = devCtx.remainSec % 60;
+  var el = document.getElementById('devRemainTime');
+  if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  if (devCtx.remainSec > 0) {
+    setTimeout(countdownTick, 1000);
   }
-  hideModal(); renderRooms();
+}
+
+function toggleCurtain() {
+  devCtx.curtainOpen = !devCtx.curtainOpen;
+  document.getElementById('devCurtainToggle').classList.toggle('on', devCtx.curtainOpen);
+  document.getElementById('devCurtainStatus').textContent = devCtx.curtainOpen ? '已开启' : '已关闭';
+  showToast(devCtx.roomName + ' 窗帘' + (devCtx.curtainOpen ? '已开启' : '已关闭'));
+}
+
+function toggleAC() {
+  devCtx.acOn = !devCtx.acOn;
+  document.getElementById('devAcToggle').classList.toggle('on', devCtx.acOn);
+  document.getElementById('devAcStatus').textContent = devCtx.acOn ? '制冷 24°C' : '已关闭';
+  showToast(devCtx.roomName + ' 空调' + (devCtx.acOn ? '已开启' : '已关闭'));
+}
+
+function toggleLight() {
+  devCtx.lightOn = !devCtx.lightOn;
+  document.getElementById('devLightToggle').classList.toggle('on', devCtx.lightOn);
+  document.getElementById('devLightStatus').textContent = devCtx.lightOn ? '已开启' : '已关闭';
+  showToast(devCtx.roomName + ' 灯光' + (devCtx.lightOn ? '已开启' : '已关闭'));
+}
+
+function doUnlockDoor(roomId) {
+  var lockId = lockDeviceMap[roomId];
+  if (lockId) {
+    showToast('🔓 门锁已开启（' + roomId + '）');
+  } else {
+    showToast('该房间无智能门锁');
+  }
+}
+
+// ── Extend ──
+function showExtendModal() {
+  var now = new Date();
+  var curMin = now.getHours() * 60 + now.getMinutes() + Math.floor(devCtx.remainSec / 60);
+  var roundedMin = Math.ceil(curMin / 30) * 30;
+  var price = priceMap[deviceCtrlRoom] || 60;
+  var opts = [];
+  for (var i = 1; i <= 6; i++) {
+    var totalMin = roundedMin + i * 30;
+    var h = Math.floor(totalMin / 60) % 24;
+    var m = totalMin % 60;
+    var extPrice = Math.round(price * i * 0.5);
+    opts.push({ label: (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m, min: i * 30, price: extPrice });
+  }
+  document.getElementById('extendOptions').innerHTML = opts.map(function(o, idx) {
+    return '<button class="duration-btn" data-ext="' + idx + '" onclick="selectExtend(this,' + idx + ')">至 ' + o.label + '<br><small>+' + o.min + '分 ¥' + o.price + '</small></button>';
+  }).join('');
+  document.getElementById('extendModal').style.display = 'flex';
+}
+
+var selectedExtendIdx = null;
+function selectExtend(btn, idx) {
+  document.querySelectorAll('#extendOptions .duration-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  selectedExtendIdx = idx;
+}
+
+function doExtend() {
+  if (selectedExtendIdx === null) { showToast('请选择续订时长'); return; }
+  var allBk = StaffSDK.Utils.lsGet('bookings', []);
+  var booking = null;
+  allBk.forEach(function(b) { if (b.roomId === deviceCtrlRoom && b.status === 'InUse') booking = b; });
+  if (!booking) { showToast('未找到使用中的订单'); return; }
+  var extMin = (selectedExtendIdx + 1) * 30;
+  var ep = (booking.endTime || '00:00').split(':').map(Number);
+  var totalMin = ep[0] * 60 + ep[1] + extMin;
+  var h = Math.floor(totalMin / 60) % 24;
+  var m = totalMin % 60;
+  booking.endTime = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  StaffSDK.Utils.lsSet('bookings', allBk);
+  var price = priceMap[deviceCtrlRoom] || 60;
+  var extPrice = Math.round(price * (selectedExtendIdx + 1) * 0.5);
+  hideExtend();
+  showToast('续订成功 +' + extMin + '分钟，¥' + extPrice + ' 已计入账单');
+  var rooms = loadRooms();
+  var room = null;
+  rooms.forEach(function(r) { if (r.roomId === deviceCtrlRoom) room = r; });
+  if (room) renderDeviceControl(room);
+}
+
+function hideExtend() { document.getElementById('extendModal').style.display = 'none'; selectedExtendIdx = null; }
+
+// ── Booking helpers ──
+function updateBookingAmount() {
+  var price = priceMap[currentAction.roomId] || 60;
+  var halfHourPrice = Math.round(price / 2);
+  var durEl = document.querySelector('#durationGroup .duration-btn.selected');
+  if (!durEl) { document.getElementById('orderAmount').textContent = '¥0'; return; }
+  var dur = parseInt(durEl.getAttribute('data-dur'));
+  var total = dur * 2 * halfHourPrice;
+  document.getElementById('orderAmount').textContent = '¥' + total;
 }
 
 function selectDuration(btn, value) {
-  document.querySelectorAll('#durationGroup .duration-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('#durationGroup .duration-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
-  const picker = document.getElementById('customTimePicker');
-  picker.style.display = (value === 'custom') ? 'block' : 'none';
 }
 
 function selectPayment(el) {
-  document.querySelectorAll('#paymentGroup .payment-radio').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('#paymentGroup .payment-radio').forEach(function(b) { b.classList.remove('selected'); });
+  el.classList.add('selected');
+  var methodGroup = document.getElementById('payMethodGroup');
+  if (methodGroup) {
+    methodGroup.style.display = el.getAttribute('data-pay') === 'paid' ? 'block' : 'none';
+  }
+}
+
+function selectPayMethod(el) {
+  document.querySelectorAll('#payMethodGroup .pay-method-btn').forEach(function(b) { b.classList.remove('selected'); });
   el.classList.add('selected');
 }
 
+function selectMaintReason(el) {
+  document.querySelectorAll('#maintenanceReasons .maint-reason-btn').forEach(function(b) { b.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function selectCheckoutReason(el) {
+  document.querySelectorAll('#checkoutReasons .maint-reason-btn').forEach(function(b) { b.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function quickAction(roomId, action) {
+  if (action === 'checkin') {
+    var bkList = StaffSDK.Utils.lsGet('bookings', []);
+    var found = null;
+    bkList.forEach(function(b) { if (b.roomId === roomId && b.status === 'Booked') found = b; });
+    if (found) {
+      StaffSDK.API.checkIn(found.orderId).then(function() {
+        showToast(found.roomName + ' 已确认到店，触发欢迎场景');
+        renderRooms();
+      }).catch(function() { showToast('操作失败'); renderRooms(); });
+    } else {
+      showToast('未找到待入住的预订');
+      renderRooms();
+    }
+    return;
+  }
+  if (action === 'completeCleaning') { showToast('保洁完成，房间恢复空闲'); renderRooms(); return; }
+  if (action === 'restoreActive') { StaffSDK.API.clearMaintenance(roomId); showToast('维修完成，已恢复空闲'); renderRooms(); return; }
+}
+
+function doAction() {
+  if (currentAction.action === 'setMaintenance') {
+    var reasonBtn = document.querySelector('#maintenanceReasons .maint-reason-btn.selected');
+    var reason = reasonBtn ? reasonBtn.getAttribute('data-reason') : '';
+    if (!reason) { showToast('请选择维修原因'); return; }
+    StaffSDK.API.setMaintenance(currentAction.roomId, reason).catch(function(){});
+    showToast('已设为维修中');
+  } else if (currentAction.action === 'forceCheckout') {
+    var reasonBtn = document.querySelector('#checkoutReasons .maint-reason-btn.selected');
+    var reason = reasonBtn ? reasonBtn.getAttribute('data-reason') : '';
+    if (!reason) { showToast('请选择退房原因'); return; }
+    var allBk = StaffSDK.Utils.lsGet('bookings', []);
+    allBk.forEach(function(b) { if (b.roomId === currentAction.roomId && b.status === 'InUse') b.status = 'Completed'; });
+    StaffSDK.Utils.lsSet('bookings', allBk);
+    StaffSDK.API.addAuditLog(currentAction.roomId, 'forceCheckout', reason);
+    showToast('已强制退房，转待打扫，已记录审计日志');
+  } else if (currentAction.action === 'cancelBooking') {
+    var reason = (document.getElementById('reason') && document.getElementById('reason').value) || '';
+    var allBk = StaffSDK.Utils.lsGet('bookings', []);
+    allBk.forEach(function(b) { if (b.roomId === currentAction.roomId && b.status === 'Booked') b.status = 'Cancelled'; });
+    StaffSDK.Utils.lsSet('bookings', allBk);
+    showToast('预约已取消');
+  }
+  hideModal();
+  renderRooms();
+}
+
 function doProxyBooking() {
-  const room = rooms.find(r => r.roomId === currentAction.roomId);
-  const name = document.getElementById('bkCustName')?.value?.trim() || '';
-  const phone = document.getElementById('bkCustPhone')?.value?.trim() || '';
-  const notes = document.getElementById('bkNotes')?.value?.trim() || '';
+  var roomName = '';
+  var rooms = StaffSDK.API.getAllRoomStatus();
+  rooms.forEach(function(r) { if (r.roomId === currentAction.roomId) roomName = r.name; });
+
+  var name = (document.getElementById('bkCustName') && document.getElementById('bkCustName').value.trim()) || '';
+  var phone = (document.getElementById('bkCustPhone') && document.getElementById('bkCustPhone').value.trim()) || '';
+  var notes = (document.getElementById('bkNotes') && document.getElementById('bkNotes').value.trim()) || '';
 
   if (!name) { showToast('请输入客人姓名'); return; }
   if (!phone) { showToast('请输入联系电话'); return; }
   if (!/^1\d{10}$/.test(phone)) { showToast('请输入正确的11位手机号'); return; }
 
-  // Duration
-  const selectedDur = document.querySelector('#durationGroup .duration-btn.selected');
-  const durValue = selectedDur ? selectedDur.getAttribute('data-dur') : '2';
-  let duration, startTime, endTime, totalAmount;
+  var price = priceMap[currentAction.roomId] || 60;
+  var halfHourPrice = Math.round(price / 2);
+  var selectedDur = document.querySelector('#durationGroup .duration-btn.selected');
+  if (!selectedDur) { showToast('请选择使用时长'); return; }
+  var duration = parseInt(selectedDur.getAttribute('data-dur'));
 
-  if (durValue === 'custom') {
-    startTime = document.getElementById('bkStartTime')?.value || '09:00';
-    endTime = document.getElementById('bkEndTime')?.value || '11:00';
-    const [sh, sm] = startTime.split(':').map(Number);
-    const [eh, em] = endTime.split(':').map(Number);
-    const startMin = sh * 60 + sm;
-    const endMin = eh * 60 + em;
-    if (endMin <= startMin) { showToast('结束时间必须晚于开始时间'); return; }
-    duration = (endMin - startMin) / 60;
-    totalAmount = Math.round(duration * 60);
-  } else {
-    duration = parseInt(durValue);
-    totalAmount = duration * 60;
-    // 基于当前时间计算开始时段（向上取整到最近的30分钟）
-    const now = new Date();
-    let startH = now.getHours();
-    let startM = Math.ceil(now.getMinutes() / 30) * 30;
-    if (startM >= 60) { startH += 1; startM = 0; }
-    if (startH < 9) { startH = 9; startM = 0; }
-    if (startH >= 22) { startH = 22; startM = 0; }
-    startTime = `${String(startH).padStart(2,'0')}:${String(startM).padStart(2,'0')}`;
-    const endH = startH + duration;
-    endTime = `${String(endH).padStart(2,'0')}:${String(startM).padStart(2,'0')}`;
+  var startTime = document.getElementById('bkStartTime').value;
+  var startNow = false;
+  if (startTime === 'now') {
+    startNow = true;
+    var now = new Date();
+    var h = now.getHours(), m = now.getMinutes();
+    startTime = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+  var sp = startTime.split(':').map(Number);
+  var startMin = sp[0] * 60 + sp[1];
+  var endMin = startMin + duration * 60;
+  var endH = Math.floor(endMin / 60) % 24;
+  var endM = endMin % 60;
+  var endTime = (endH < 10 ? '0' : '') + endH + ':' + (endM < 10 ? '0' : '') + endM;
+
+  // Check if end time wraps past midnight (end hour < start hour)
+  if (endH < sp[0] || (endH === sp[0] && endM < sp[1])) {
+    if (!confirm('预订结束时间为 ' + endTime + '（次日），已跨过午夜。是否继续？')) {
+      showToast('请另选开始时段');
+      return;
+    }
   }
 
-  // Payment status
-  const payEl = document.querySelector('#paymentGroup .payment-radio.selected');
-  const paymentStatus = payEl ? payEl.getAttribute('data-pay') : 'unpaid';
+  var amount = duration * 2 * halfHourPrice;
 
-  // Update room
-  room.status = 'Booked';
-  room.customerName = name;
-  room.customerPhone = phone;
-  room.time = `${startTime}-${endTime}`;
-  room.isStaffBooking = true;
+  var payEl = document.querySelector('#paymentGroup .payment-radio.selected');
+  var paymentStatus = payEl ? payEl.getAttribute('data-pay') : 'unpaid';
+  var paymentMethod = null;
+  if (paymentStatus === 'paid') {
+    var methodEl = document.querySelector('#payMethodGroup .pay-method-btn.selected');
+    paymentMethod = methodEl ? methodEl.getAttribute('data-method') : '其他';
+  }
 
-  // Create order
-  let orders = [];
-  try { orders = JSON.parse(localStorage.getItem('mp_staff_orders') || '[]'); } catch(e) {}
-  const order = {
-    orderId: 'ORD' + Date.now(),
-    roomId: room.roomId,
-    roomName: room.name,
+  StaffSDK.API.createStaffBooking({
+    roomId: currentAction.roomId,
+    roomName: roomName,
     customerName: name,
-    customerPhone: phone,
-    date: new Date().toISOString().split('T')[0],
-    startTime,
-    endTime,
-    duration,
-    totalAmount,
-    paymentStatus,
-    notes,
-    isStaffBooking: true,
-    createdAt: new Date().toISOString()
-  };
-  orders.push(order);
-  localStorage.setItem('mp_staff_orders', JSON.stringify(orders));
-
-  saveRooms();
-  hideModal();
-  renderRooms();
-  showToast(`代预订成功！已为 ${name} 预订 ${room.name}，${startTime}-${endTime}`);
+    name: name,
+    phone: phone,
+    date: StaffSDK.Utils.todayStr(),
+    startTime: startTime,
+    endTime: endTime,
+    duration: duration,
+    amount: amount,
+    paymentStatus: paymentStatus,
+    paymentMethod: paymentMethod,
+    notes: notes,
+    startNow: startNow
+  }).then(function(order) {
+    hideModal();
+    renderRooms();
+    var payInfo = paymentStatus === 'paid' ? '，已付(' + paymentMethod + ')' : '，未支付';
+    showToast('代预订成功！已为 ' + name + ' 预订 ' + roomName + '，' + startTime + '-' + endTime + payInfo);
+  }).catch(function(err) {
+    showToast('预订失败: ' + (err.message || '未知错误'));
+  });
 }
+
 function hideModal() { document.getElementById('actionModal').style.display = 'none'; currentAction = null; }
-
-function showToast(msg) {
-  const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2000);
-}
 
 renderRooms();
 </script>

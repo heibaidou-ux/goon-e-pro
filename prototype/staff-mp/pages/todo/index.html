@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>待办任务 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:0 8px 0 0; }
+.nav-title { flex:1; font-size:16px; font-weight:600; }
+.page { flex:1; overflow-y:auto; padding:16px; padding-bottom:60px; }
+.page::-webkit-scrollbar { display:none; }
+.summary-bar { display:flex; gap:10px; margin-bottom:16px; }
+.summary-item { flex:1; background:#fff; border-radius:12px; padding:14px; text-align:center; cursor:pointer; }
+.summary-item:active { transform:scale(.96); }
+.si-num { font-size:24px; font-weight:800; color:#1a1a1a; }
+.si-label { font-size:11px; color:#999; margin-top:2px; }
+.si-red .si-num { color:#d54941; }
+.si-yellow .si-num { color:#e37318; }
+.si-blue .si-num { color:#0052d9; }
+.si-green .si-num { color:#00a870; }
+.section-card { background:#fff; border-radius:14px; overflow:hidden; margin-bottom:12px; }
+.section-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 10px; }
+.section-header-left { display:flex; align-items:center; gap:8px; }
+.section-icon { font-size:18px; }
+.section-title { font-size:14px; font-weight:600; color:#333; }
+.section-count { font-size:12px; padding:2px 8px; border-radius:8px; }
+.sc-red { background:#ffebee; color:#d54941; }
+.sc-yellow { background:#fff3e0; color:#e37318; }
+.sc-gray { background:#f5f5f5; color:#999; }
+.section-link { font-size:12px; color:#0052d9; text-decoration:none; font-weight:500; padding:4px 8px; }
+.task-item { display:flex; align-items:center; padding:12px 16px; border-top:1px solid #f5f5f5; cursor:pointer; }
+.task-item:active { background:#f9f9f9; }
+.task-dot { width:8px; height:8px; border-radius:50%; margin-right:10px; flex-shrink:0; }
+.task-content { flex:1; }
+.task-title { font-size:13px; color:#333; }
+.task-meta { font-size:11px; color:#999; margin-top:2px; }
+.task-action { font-size:11px; color:#0052d9; font-weight:500; }
+.empty-state { text-align:center; padding:30px 16px; color:#999; font-size:13px; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item.active { color:#0052d9; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+</style>
+<script src="../../js/sdk.js"></script>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">待办任务</span>
+    <span style="font-size:11px;color:#999;" id="todoTotal">共 0 项</span>
+  </div>
+  <div class="page">
+    <!-- 汇总 -->
+    <div class="summary-bar">
+      <div class="summary-item si-red" onclick="scrollToSection('cleaning')">
+        <div class="si-num" id="sumCleaning">0</div>
+        <div class="si-label">保洁</div>
+      </div>
+      <div class="summary-item si-yellow" onclick="scrollToSection('reconciliation')">
+        <div class="si-num" id="sumRecon">0</div>
+        <div class="si-label">对账</div>
+      </div>
+      <div class="summary-item si-red" onclick="scrollToSection('alerts')">
+        <div class="si-num" id="sumAlerts">0</div>
+        <div class="si-label">告警</div>
+      </div>
+      <div class="summary-item si-blue" onclick="scrollToSection('inspection')">
+        <div class="si-num" id="sumInspection">0</div>
+        <div class="si-label">巡检</div>
+      </div>
+    </div>
+
+    <!-- 保洁任务 -->
+    <div class="section-card" id="secCleaning">
+      <div class="section-header">
+        <div class="section-header-left"><span class="section-icon">🧹</span><span class="section-title">保洁任务</span><span class="section-count sc-red" id="badgeCleaning">0</span></div>
+        <a class="section-link" href="../cleaning-task/index.html">查看全部 →</a>
+      </div>
+      <div id="listCleaning"></div>
+    </div>
+
+    <!-- 对账工单 -->
+    <div class="section-card" id="secReconciliation">
+      <div class="section-header">
+        <div class="section-header-left"><span class="section-icon">📊</span><span class="section-title">对账工单</span><span class="section-count sc-yellow" id="badgeRecon">0</span></div>
+        <a class="section-link" href="../reconciliation/index.html">查看全部 →</a>
+      </div>
+      <div id="listRecon"></div>
+    </div>
+
+    <!-- 设备告警 -->
+    <div class="section-card" id="secAlerts">
+      <div class="section-header">
+        <div class="section-header-left"><span class="section-icon">🔔</span><span class="section-title">设备告警</span><span class="section-count sc-red" id="badgeAlerts">0</span></div>
+        <a class="section-link" href="../device-monitor/index.html">查看全部 →</a>
+      </div>
+      <div id="listAlerts"></div>
+    </div>
+
+    <!-- 巡检任务 -->
+    <div class="section-card" id="secInspection">
+      <div class="section-header">
+        <div class="section-header-left"><span class="section-icon">📋</span><span class="section-title">巡检任务</span><span class="section-count sc-yellow" id="badgeInspection">0</span></div>
+        <a class="section-link" href="../inspection/index.html">查看全部 →</a>
+      </div>
+      <div id="listInspection"></div>
+    </div>
+
+    <!-- 待审核 -->
+    <div class="section-card" id="secAudit">
+      <div class="section-header">
+        <div class="section-header-left"><span class="section-icon">👀</span><span class="section-title">待抽查审核</span><span class="section-count sc-gray" id="badgeAudit">0</span></div>
+        <a class="section-link" href="../reconciliation/index.html">查看全部 →</a>
+      </div>
+      <div id="listAudit"></div>
+    </div>
+
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+
+<script>
+var showToast = StaffSDK.UI.toast;
+
+function loadData() {
+  // Cleaning tasks from bookings
+  var bookings = StaffSDK.Utils.lsGet('bookings', []);
+  var cleaningTasks = bookings.filter(function(b) { return b.status === 'Cleaning' || b.status === 'Completed'; });
+  // Count rooms needing cleaning from room status
+  var statuses = StaffSDK.API.getAllRoomStatus();
+  var cleaningRooms = 0;
+  statuses.forEach(function(r) { if (r.status === 'Cleaning') cleaningRooms++; });
+
+  // Reconciliation orders
+  var recOrders = [];
+  try {
+    recOrders = StaffSDK.API.getReconciliationOrders ? StaffSDK.API.getReconciliationOrders() : [];
+  } catch(e) {}
+  var pendingRec = 0;
+  if (recOrders && recOrders.forEach) {
+    recOrders.forEach(function(o) { if (o.status === 'Pending') pendingRec++; });
+  }
+
+  // Alerts
+  var alerts = 0;
+  try { var stats = StaffSDK.API.getTodayStats ? StaffSDK.API.getTodayStats() : null; if (stats) alerts = stats.alerts || 0; } catch(e) {}
+
+  // Inspection tasks (assigned)
+  var inspTasks = StaffSDK.Utils.lsGet('inspection_tasks', []);
+  var pendingInsp = 0;
+  inspTasks.forEach(function(t) { if (t.status === 'pending') pendingInsp++; });
+
+  // Audit
+  var auditCount = 0;
+  try { var s = StaffSDK.API.getTodayStats ? StaffSDK.API.getTodayStats() : null; if (s) auditCount = s.pendingAudit || 0; } catch(e) {}
+
+  // Update summary
+  document.getElementById('sumCleaning').textContent = cleaningRooms;
+  document.getElementById('sumRecon').textContent = pendingRec;
+  document.getElementById('sumAlerts').textContent = alerts;
+  document.getElementById('sumInspection').textContent = pendingInsp;
+
+  var total = cleaningRooms + pendingRec + alerts + pendingInsp + auditCount;
+  document.getElementById('todoTotal').textContent = '共 ' + total + ' 项';
+
+  // Update badges
+  document.getElementById('badgeCleaning').textContent = cleaningRooms;
+  document.getElementById('badgeRecon').textContent = pendingRec;
+  document.getElementById('badgeAlerts').textContent = alerts;
+  document.getElementById('badgeInspection').textContent = pendingInsp;
+  document.getElementById('badgeAudit').textContent = auditCount;
+
+  // ── Cleaning list ──
+  var cl = document.getElementById('listCleaning');
+  if (cleaningRooms === 0) {
+    cl.innerHTML = '<div class="empty-state">✅ 暂无待保洁房间</div>';
+  } else {
+    var rooms = [];
+    statuses.forEach(function(s) {
+      if (s.status === 'Cleaning') rooms.push(s);
+    });
+    cl.innerHTML = rooms.map(function(r) {
+      return '<div class="task-item" onclick="location.href=\'../cleaning-task/index.html\'">' +
+        '<div class="task-dot" style="background:#d54941;"></div>' +
+        '<div class="task-content"><div class="task-title">' + r.name + ' 待打扫</div>' +
+        '<div class="task-meta">退房后待保洁</div></div>' +
+        '<span class="task-action">去处理 →</span></div>';
+    }).join('');
+  }
+
+  // ── Reconciliation list ──
+  var rl = document.getElementById('listRecon');
+  if (pendingRec === 0) {
+    rl.innerHTML = '<div class="empty-state">✅ 无差异工单</div>';
+  } else {
+    rl.innerHTML = recOrders.filter(function(o) { return o.status === 'Pending'; }).slice(0, 3).map(function(o) {
+      return '<div class="task-item" onclick="location.href=\'../reconciliation/index.html\'">' +
+        '<div class="task-dot" style="background:#e37318;"></div>' +
+        '<div class="task-content"><div class="task-title">' + (o.roomName || '') + ' 差异 ¥' + (o.diff || 0) + '</div>' +
+        '<div class="task-meta">' + (o.orderRef || '') + ' · 系统¥' + (o.systemAmount||0) + ' vs 平台¥' + (o.platformAmount||0) + '</div></div>' +
+        '<span class="task-action">去处理 →</span></div>';
+    }).join('');
+  }
+
+  // ── Alerts list ──
+  var al = document.getElementById('listAlerts');
+  if (alerts === 0) {
+    al.innerHTML = '<div class="empty-state">✅ 设备运行正常</div>';
+  } else {
+    var devices = StaffSDK.Utils.lsGet('devices', []);
+    var offlineDevs = [];
+    devices.forEach(function(d) { if (d.status === 'offline') offlineDevs.push(d); });
+    if (!offlineDevs.length) {
+      al.innerHTML = '<div class="task-item" onclick="location.href=\'../device-monitor/index.html\'">' +
+        '<div class="task-dot" style="background:#e37318;"></div>' +
+        '<div class="task-content"><div class="task-title">' + alerts + ' 个告警</div>' +
+        '<div class="task-meta">请前往设备监控查看</div></div>' +
+        '<span class="task-action">查看 →</span></div>';
+    } else {
+      al.innerHTML = offlineDevs.slice(0, 3).map(function(d) {
+        return '<div class="task-item" onclick="location.href=\'../device-monitor/index.html\'">' +
+          '<div class="task-dot" style="background:#d54941;"></div>' +
+          '<div class="task-content"><div class="task-title">' + (d.name || d.deviceId) + ' 离线</div>' +
+          '<div class="task-meta">' + (d.location || '') + ' · ' + (d.type || '') + '</div></div>' +
+          '<span class="task-action">查看 →</span></div>';
+      }).join('');
+    }
+  }
+
+  // ── Inspection list ──
+  var il = document.getElementById('listInspection');
+  if (pendingInsp === 0) {
+    il.innerHTML = '<div class="empty-state">✅ 无待处理巡检任务</div>';
+  } else {
+    il.innerHTML = inspTasks.filter(function(t) { return t.status === 'pending'; }).slice(0, 3).map(function(t) {
+      return '<div class="task-item" onclick="location.href=\'../inspection/index.html\'">' +
+        '<div class="task-dot" style="background:#0052d9;"></div>' +
+        '<div class="task-content"><div class="task-title">巡检任务：' + (t.staffName || '') + '</div>' +
+        '<div class="task-meta">' + t.date + (t.note ? ' · ' + t.note : '') + '</div></div>' +
+        '<span class="task-action">去处理 →</span></div>';
+    }).join('');
+  }
+
+  // ── Audit list ──
+  var aul = document.getElementById('listAudit');
+  if (auditCount === 0) {
+    aul.innerHTML = '<div class="empty-state">✅ 无待审核操作</div>';
+  } else {
+    aul.innerHTML = '<div class="task-item" onclick="location.href=\'../reconciliation/index.html\'">' +
+      '<div class="task-dot" style="background:#ccc;"></div>' +
+      '<div class="task-content"><div class="task-title">' + auditCount + ' 条操作待店长抽查确认</div>' +
+      '<div class="task-meta">手动设置房态等操作需24小时内抽查</div></div>' +
+      '<span class="task-action">去审核 →</span></div>';
+  }
+}
+
+function scrollToSection(id) {
+  var el = document.getElementById('sec' + id.charAt(0).toUpperCase() + id.slice(1));
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+loadData();
+</script>
+</body>
+</html>

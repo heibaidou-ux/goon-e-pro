@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>可预约包间</title>
+<script src="../../js/sdk.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; padding-bottom:60px; }
+.page::-webkit-scrollbar { display:none; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+
+/* Header */
+.page-header { padding:16px; border-bottom:1px solid #f0f0f0; background:#fff; }
+.page-header .title { font-size:18px; font-weight:700; color:#1a1a1a; }
+.page-header .sub { font-size:12px; color:#999; margin-top:2px; }
+
+/* Room list */
+.room-section { padding:16px; }
+.room-card { display:flex; padding:14px; background:#f9fafb; margin-bottom:10px; cursor:pointer; transition:box-shadow .15s; border-radius:12px; }
+.room-card:active { background:#f0f0f0; }
+.room-card-img { width:80px; height:80px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:28px; overflow:hidden; }
+.room-card-body { margin-left:12px; flex:1; display:flex; flex-direction:column; justify-content:space-between; }
+.room-card-name { font-size:15px; font-weight:600; }
+.room-card-meta { font-size:12px; color:#999; margin-top:2px; }
+.room-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+.room-card-price { font-size:16px; font-weight:700; color:#e37318; }
+.room-card-book-btn { padding:6px 14px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; }
+.room-card-book-btn:active { opacity:.8; }
+
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+
+/* Bottom nav */
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; flex-shrink:0; z-index:10; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
+.nav-item .nav-icon { font-size:20px; display:block; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="page">
+    <div class="page-header">
+      <div class="title">可预约包间</div>
+      <div class="sub">选择包间，即刻预订</div>
+    </div>
+    <div class="room-section" id="roomList"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../home/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
+    <div class="nav-item active"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
+    <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SDK init ──
+var SDK = window.ERP.SDK;
+var API = SDK.API;
+var UI = SDK.UI;
+var Utils = SDK.Utils;
+
+var isLoggedIn = API.isLoggedIn();
+let pendingAction = null;
+
+const colors = { 'MeetingRoom':'#e3f2fd', 'TeaRoom':'#e8f5e9', 'Exhibition':'#fff3e0', 'Workspace':'#f5f5f5' };
+const icons = { 'MeetingRoom':'💼', 'TeaRoom':'🍵', 'Exhibition':'🏛️', 'Workspace':'🔧' };
+
+// ── Render rooms ──
+function renderRoomList(rooms) {
+  var el = document.getElementById('roomList');
+  if (!el) return;
+  el.innerHTML = rooms.map(function(r) {
+    var bgColor = colors[r.type] || '#f0f0f0';
+    var icon = icons[r.type] || '🏠';
+    var facilities = (r.facilities || []).join(' · ');
+    var price = r.pricePerHour || r.pricePerHalfHour * 2 || 120;
+    return '<div class="room-card" onclick="goRoom(\'' + r.roomId + '\')">' +
+      '<div class="room-card-img" style="background:' + bgColor + '">' + icon + '</div>' +
+      '<div class="room-card-body">' +
+        '<div class="room-card-name">' + r.name + '</div>' +
+        '<div class="room-card-meta">' + (r.capacity || '—') + '人 · ' + (r.area || '—') + '㎡ · ' + facilities + '</div>' +
+        '<div class="room-card-footer">' +
+          '<span class="room-card-price">¥' + price + '/时</span>' +
+          '<button class="room-card-book-btn" onclick="event.stopPropagation();goRoom(\'' + r.roomId + '\')">立即预约</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function goRoom(roomId) {
+  if (!isLoggedIn) {
+    pendingAction = 'room-' + roomId;
+    UI.toast('请先登录');
+    return;
+  }
+  location.href = '../room-detail/index.html?id=' + roomId;
+}
+
+// ── Init ──
+(function() {
+  var rooms = [
+    { roomId:'RM001', name:'大会议室', type:'MeetingRoom', capacity:10, area:30, facilities:['投影','会议桌','K歌设备','落地窗'], pricePerHour:200 },
+    { roomId:'RM002', name:'中茶室A', type:'TeaRoom', capacity:4, area:18, facilities:['茶台','落地窗','茶具套装'], pricePerHour:80 },
+    { roomId:'RM003', name:'中茶室B', type:'TeaRoom', capacity:4, area:18, facilities:['茶台','落地窗','茶具套装'], pricePerHour:80 },
+    { roomId:'RM004', name:'大茶室C', type:'TeaRoom', capacity:6, area:25, facilities:['茶台','K歌','投影','落地窗'], pricePerHour:120 },
+  ];
+  renderRoomList(rooms);
+
+  // Refresh from API in background
+  API.getRooms(true).then(function(roomsData) {
+    if (roomsData && roomsData.length) renderRoomList(roomsData);
+  });
+})();
+</script>
+</body>
+</html>

@@ -51,6 +51,56 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .order-btn.outline { background:#fff; color:#07c160; border:1.5px solid #07c160; }
 .order-btn.ghost { background:#f5f5f5; color:#666; }
 
+/* Logistics */
+.logistics-card { background:#f8f9fa; border-radius:10px; padding:12px; margin:10px 0; }
+.logistics-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.logistics-carrier { font-size:13px; font-weight:600; color:#333; }
+.logistics-carrier .carrier-icon { font-size:16px; margin-right:4px; }
+.logistics-tracking { font-size:12px; color:#666; }
+.logistics-tracking .tracking-num { color:#0052d9; cursor:pointer; }
+.logistics-tracking .tracking-num:hover { text-decoration:underline; }
+.logistics-status-row { display:flex; align-items:center; gap:6px; margin-top:6px; padding-top:6px; border-top:1px solid #eee; }
+.ls-badge { font-size:11px; padding:2px 8px; border-radius:6px; font-weight:600; }
+.ls-badge.pending { background:#fff3e0; color:#e37318; }
+.ls-badge.transit { background:#e3f2fd; color:#0052d9; }
+.ls-badge.delivered { background:#e8f5e9; color:#00a870; }
+.ls-progress { flex:1; display:flex; align-items:center; gap:2px; }
+.ls-step { flex:1; text-align:center; position:relative; }
+.ls-step-dot { width:8px; height:8px; border-radius:50%; display:inline-block; background:#ddd; }
+.ls-step-dot.active { background:#07c160; }
+.ls-step-dot.current { background:#0052d9; box-shadow:0 0 0 3px rgba(0,82,217,.2); }
+.ls-step-label { font-size:9px; color:#bbb; margin-top:2px; display:block; }
+.ls-step-label.active { color:#07c160; font-weight:600; }
+.ls-step-label.current { color:#0052d9; font-weight:600; }
+.ls-line { position:absolute; top:4px; right:-50%; width:100%; height:2px; background:#ddd; z-index:-1; }
+.ls-line.active { background:#07c160; }
+.ls-estimated { font-size:11px; color:#999; margin-top:4px; }
+.logistics-btn { font-size:12px; color:#0052d9; background:none; border:none; cursor:pointer; font-weight:500; padding:2px 6px; }
+.logistics-btn:active { opacity:.7; }
+
+/* Logistics detail modal */
+.lg-modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.lg-modal { background:#fff;border-radius:14px;width:340px;max-height:85vh;overflow-y:auto; }
+.lg-modal-header { position:sticky;top:0;background:#fff;padding:16px 16px 0;border-radius:14px 14px 0 0;z-index:1;display:flex;justify-content:space-between;align-items:center; }
+.lg-modal-header h3 { font-size:16px; }
+.lg-modal-close { font-size:20px;cursor:pointer;color:#999;padding:0 4px; }
+.lg-track-info { padding:12px 16px;background:#f8f9fa;margin:8px 16px;border-radius:8px; }
+.lg-track-info div { font-size:12px;color:#666;margin-bottom:2px; }
+.lg-track-info .lg-carrier { font-size:14px;font-weight:600;color:#333; }
+.lg-timeline { padding:16px; }
+.lg-tl-item { display:flex; gap:12px; position:relative; padding-bottom:20px; }
+.lg-tl-item:last-child { padding-bottom:0; }
+.lg-tl-dot { width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:2px;position:relative;z-index:1; }
+.lg-tl-dot.done { background:#07c160; }
+.lg-tl-dot.current { background:#0052d9; box-shadow:0 0 0 4px rgba(0,82,217,.2); }
+.lg-tl-dot.pending { background:#ddd; }
+.lg-tl-line { position:absolute;left:5px;top:16px;width:2px;height:calc(100% - 4px);background:#eee; }
+.lg-tl-line.done { background:#07c160; }
+.lg-tl-content { flex:1; }
+.lg-tl-desc { font-size:13px;color:#333; }
+.lg-tl-desc.current { color:#0052d9; font-weight:600; }
+.lg-tl-time { font-size:11px;color:#999;margin-top:2px; }
+
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
 .bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
@@ -110,6 +160,19 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 <div class="modal-overlay" id="detailModal">
   <div class="modal" id="detailContent"></div>
 </div>
+
+<!-- Logistics Detail Modal -->
+<div class="lg-modal-overlay" id="lgModal" onclick="if(event.target===this)hideLogistics()">
+  <div class="lg-modal">
+    <div class="lg-modal-header">
+      <h3>物流详情</h3>
+      <span class="lg-modal-close" onclick="hideLogistics()">✕</span>
+    </div>
+    <div id="lgTrackInfo"></div>
+    <div id="lgTimeline"></div>
+  </div>
+</div>
+
 <script>
 // ── SDK init ──
 var SDK = window.ERP.SDK;
@@ -122,7 +185,178 @@ let cancelTarget = null;
 let extendTarget = null;
 let selectedExtendIdx = null;
 
-var savedBookings = Utils.lsGet('bookings', []);
+// ── Logistics helpers ──
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+function addDays(dateStr, days) {
+  var parts = dateStr.split('-').map(Number);
+  var d = new Date(parts[0], parts[1]-1, parts[2]);
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate());
+}
+
+function getLogistics(order) {
+  var created = order.createdAt || order.date;
+  var baseDate = (created || '').slice(0, 10) || '2026-05-18';
+  // Use orderId hash to generate deterministic tracking number
+  var idStr = order.orderId || order.id || '';
+  var hash = 0;
+  for (var i = 0; i < idStr.length; i++) { hash = ((hash << 5) - hash) + idStr.charCodeAt(i); hash |= 0; }
+  var trackingSuffix = String((Math.abs(hash) % 9000000000) + 1000000000);
+
+  if (order.status === 'Shipping') {
+    // Approx hours since order
+    var now = new Date();
+    var then = new Date(created || now);
+    var hoursSince = (now - then) / 3600000;
+
+    if (hoursSince < 48 || order.manualPending) {
+      // Not shipped yet
+      return {
+        status: 'pending', label: '待发货',
+        carrier: null, trackingNo: null,
+        estimated: '预计3-5个工作日发货',
+        updates: []
+      };
+    } else if (hoursSince < 120) {
+      // In transit
+      var day1 = addDays(baseDate, 1);
+      return {
+        status: 'transit', label: '运输中',
+        carrier: '顺丰速运', trackingNo: 'SF' + trackingSuffix,
+        estimated: '预计1-2天送达',
+        updates: [
+          { time: day1 + ' 20:00', desc: '包裹已被快递员揽收' },
+          { time: day1 + ' 08:15', desc: '包裹已从【杭州仓】发出' }
+        ]
+      };
+    } else {
+      // Should be delivered - upgrade status
+      var d2 = addDays(baseDate, 3);
+      var d1 = addDays(baseDate, 2);
+      return {
+        status: 'delivered', label: '已签收',
+        carrier: '顺丰速运', trackingNo: 'SF' + trackingSuffix,
+        estimated: '已签收',
+        updates: [
+          { time: d2 + ' 18:30', desc: '包裹已被【前台】签收' },
+          { time: d1 + ' 08:15', desc: '包裹已到达【上海分拨中心】' },
+          { time: addDays(d1, -1) + ' 20:00', desc: '包裹已被快递员揽收' }
+        ]
+      };
+    }
+  } else if (order.status === 'Completed' || order.status === 'ShopCompleted') {
+    // Delivered
+    var d2 = addDays(baseDate, 2);
+    return {
+      status: 'delivered', label: '已签收',
+      carrier: '顺丰速运', trackingNo: 'SF' + trackingSuffix,
+      estimated: '已签收',
+      updates: [
+        { time: d2 + ' 18:30', desc: '包裹已被【前台】签收' },
+        { time: addDays(d2, -1) + ' 08:15', desc: '包裹已到达【上海分拨中心】' },
+        { time: baseDate + ' 20:00', desc: '包裹已被快递员揽收' }
+      ]
+    };
+  }
+  return null;
+}
+
+function renderLogisticsCard(lg) {
+  if (!lg) return '';
+  var html = '<div class="logistics-card">';
+
+  if (lg.status === 'pending') {
+    // No tracking yet
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+      '<span style="font-size:13px;color:#999;">📦 物流信息</span>' +
+      '<span class="ls-badge pending">待发货</span></div>' +
+      '<div style="font-size:12px;color:#bbb;margin-top:4px;">' + lg.estimated + '</div>';
+  } else {
+    html += '<div class="logistics-header">' +
+      '<span class="logistics-carrier"><span class="carrier-icon">📦</span>' + (lg.carrier || '') + '</span>' +
+      '<span class="logistics-tracking">' +
+        '<span class="tracking-num" onclick="showLogistics(\'' + (lg._orderId || '') + '\')">' + (lg.trackingNo || '') + ' →</span>' +
+      '</span></div>';
+
+    // Progress dots
+    var steps = [
+      { key: 'shipped', label: '已发货' },
+      { key: 'transit', label: '运输中' },
+      { key: 'delivered', label: '已签收' }
+    ];
+    var statusIdx = lg.status === 'delivered' ? 2 : lg.status === 'transit' ? 1 : 0;
+
+    html += '<div class="ls-progress">';
+    for (var i = 0; i < steps.length; i++) {
+      if (i > 0) html += '<div class="ls-line' + (i <= statusIdx ? ' active' : '') + '"></div>';
+      html += '<div class="ls-step">' +
+        '<span class="ls-step-dot' +
+          (i < statusIdx ? ' active' : '') +
+          (i === statusIdx ? ' current' : '') +
+        '"></span>' +
+        '<span class="ls-step-label' +
+          (i < statusIdx ? ' active' : '') +
+          (i === statusIdx ? ' current' : '') +
+        '">' + steps[i].label + '</span></div>';
+    }
+    html += '</div>';
+
+    html += '<div class="ls-status-row">' +
+      '<span class="ls-badge ' + lg.status + '">' + lg.label + '</span>' +
+      '<span class="ls-estimated">' + lg.estimated + '</span>' +
+      '<button class="logistics-btn" onclick="showLogistics(\'' + (lg._orderId || '') + '\')">查看详情 →</button>' +
+      '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function renderLogisticsModal(lg) {
+  if (!lg) return;
+  var infoHtml = '<div class="lg-track-info">' +
+    '<div class="lg-carrier">📦 ' + (lg.carrier || '待发货') + '</div>' +
+    (lg.trackingNo ? '<div>运单号：' + lg.trackingNo + '</div>' : '') +
+    '<div>状态：<span style="font-weight:600;">' + lg.label + '</span></div>' +
+    '</div>';
+
+  var tlHtml = '<div class="lg-timeline">';
+  if (lg.updates && lg.updates.length) {
+    var totalUpdates = lg.updates.length;
+    for (var i = 0; i < totalUpdates; i++) {
+      var u = lg.updates[i];
+      var isLast = i === totalUpdates - 1;
+      var dotCls = isLast && lg.status !== 'pending' ? 'current' : 'done';
+      var descCls = isLast && lg.status !== 'pending' ? 'current' : '';
+      tlHtml += '<div class="lg-tl-item">' +
+        '<div style="position:relative;">' +
+          '<div class="lg-tl-dot ' + dotCls + '"></div>' +
+          (!isLast ? '<div class="lg-tl-line done"></div>' : '') +
+        '</div>' +
+        '<div class="lg-tl-content">' +
+          '<div class="lg-tl-desc ' + descCls + '">' + u.desc + '</div>' +
+          '<div class="lg-tl-time">' + u.time + '</div>' +
+        '</div></div>';
+    }
+  } else {
+    tlHtml += '<div style="text-align:center;padding:20px;color:#999;font-size:13px;">暂无物流信息</div>';
+  }
+  tlHtml += '</div>';
+
+  document.getElementById('lgTrackInfo').innerHTML = infoHtml;
+  document.getElementById('lgTimeline').innerHTML = tlHtml;
+  document.getElementById('lgModal').style.display = 'flex';
+}
+
+var savedBookings = Utils.lsGet('bookings', []).map(function(b) {
+  // Normalize field names for display:
+  // bookings use startTime/endTime → render code expects "time"
+  // bookings use amount → render code expects "price"
+  if (!b.time && b.startTime) b.time = (b.startTime||'').slice(0,5) + '-' + (b.endTime||'').slice(0,5);
+  if (b.amount !== undefined && b.price === undefined) b.price = b.amount;
+  return b;
+});
 var orders = savedBookings.concat([
   { id:"ORD001", roomId:"RM004", roomName:"大茶室C", date:"2026-05-08", time:"10:00-11:30", price:180, status:"InUse", doorCode:"8264", doorValid:true, remaining:45, endTime:"11:30", duration:"90" },
   { id:"ORD003", roomId:"RM004", roomName:"大茶室C", date:"2026-05-08", time:"16:00-18:00", price:240, status:"Booked", doorCode:null, doorValid:false, endTime:"18:00" },
@@ -143,11 +377,15 @@ function renderOrders() {
   var container = document.getElementById('orderList');
   var shopOrders = Utils.lsGet('shop_orders', []);
   var mappedShopOrders = shopOrders.map(function(s) {
-    return {
+    var mapped = {
       id: s.orderId, roomName: '茶品雅集', date: s.date || '', time: s.time || '',
       price: s.totalAmount, status: s.status, isShop: true, items: s.items,
-      payment: s.payment || '微信支付', createdAt: s.createdAt
+      payment: s.payment || '微信支付', createdAt: s.createdAt,
+      orderId: s.orderId
     };
+    mapped.logistics = getLogistics(mapped);
+    if (mapped.logistics) mapped.logistics._orderId = mapped.orderId || mapped.id;
+    return mapped;
   });
   var allOrders = orders.concat(mappedShopOrders);
   var filtered;
@@ -168,12 +406,12 @@ function renderOrders() {
     if (o.status === 'InUse') {
       html = '<div class="order-card">' +
         '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-inuse">使用中</span></div>' +
-        '<div class="order-time">' + o.date + ' ' + o.time + '</div>' +
-        '<div class="order-price">¥' + o.price + '</div>' +
-        '<div class="door-section">' +
+        '<div class="order-time">' + (o.date||'') + ' ' + (o.time||'') + '</div>' +
+        '<div class="order-price">¥' + (o.price||0) + '</div>' +
+        (o.doorCode ? '<div class="door-section">' +
           '<div><div class="door-label">门禁密码</div><div class="door-code">' + o.doorCode + '</div></div>' +
           '<button class="order-btn ghost" onclick="copyCode(\'' + o.doorCode + '\')">📋 复制</button>' +
-        '</div>' +
+        '</div>' : '') +
         '<div class="big-actions">' +
           '<button class="big-action-btn primary" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'">🚪 开门</button>' +
           '<button class="big-action-btn outline" onclick="showExtendOrder(\'' + o.id + '\')">⏱ 续订</button>' +
@@ -182,8 +420,8 @@ function renderOrders() {
       var isClose = o.date === '2026-05-08';
       html = '<div class="order-card">' +
         '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-booked">已预定</span></div>' +
-        '<div class="order-time">' + o.date + ' ' + o.time + '</div>' +
-        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div class="order-time">' + (o.date||'') + ' ' + (o.time||'') + '</div>' +
+        '<div class="order-price">¥' + (o.price||0) + '</div>' +
         '<div class="door-section"><div class="door-label">门禁密码</div><div class="door-hint">预约前30分钟显示</div></div>' +
         '<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
           '<button class="order-btn outline" onclick="useNow(\'' + o.id + '\')">立即使用</button>' +
@@ -198,13 +436,17 @@ function renderOrders() {
           shipItemsHtml += o.items[si].name + ' ×' + o.items[si].qty;
         }
       }
+      var lgHtml = renderLogisticsCard(o.logistics);
       html = '<div class="order-card">' +
         '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-booked" style="background:#fff3e0;color:#e37318;">待发货</span></div>' +
         '<div class="order-time">' + (o.date||'') + '</div>' +
-        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div class="order-price">¥' + (o.price||0) + '</div>' +
         '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + shipItemsHtml + '</div>' +
-        '<div style="font-size:12px;color:#999;margin-bottom:8px;">预计3-5个工作日发货</div>' +
-        '<button class="order-btn outline" onclick="showShopDetail(\'' + (o.orderId||o.id) + '\')">查看详情</button></div>';
+        lgHtml +
+        '<div style="margin-top:10px;display:flex;gap:8px;">' +
+        '<button class="order-btn outline" style="flex:1;" onclick="showShopDetail(\'' + (o.orderId||o.id) + '\')">查看详情</button>' +
+        (o.logistics && o.logistics.trackingNo ? '<button class="order-btn ghost" style="flex:1;" onclick="showLogistics(\'' + (o.orderId||o.id) + '\')">📦 查看物流</button>' : '') +
+        '</div></div>';
     } else if (o.isShop && o.status === 'RoomCharge') {
       var rcItemsHtml = '';
       if (o.items && o.items.length) {
@@ -216,7 +458,7 @@ function renderOrders() {
       html = '<div class="order-card">' +
         '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-inuse" style="background:#fff3e0;color:#e65100;">挂账中</span></div>' +
         '<div class="order-time">' + (o.date||'') + '</div>' +
-        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div class="order-price">¥' + (o.price||0) + '</div>' +
         '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + rcItemsHtml + '</div>' +
         '<div style="font-size:12px;color:#999;margin-bottom:8px;">离店时统一结算</div>' +
         '<button class="order-btn outline" onclick="showShopDetail(\'' + (o.orderId||o.id) + '\')">查看详情</button></div>';
@@ -229,18 +471,23 @@ function renderOrders() {
           shopItemsHtml += o.items[si2].name + ' ×' + o.items[si2].qty;
         }
       }
+      var clgHtml = renderLogisticsCard(o.logistics);
       html = '<div class="order-card">' +
         '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-inuse" style="background:#e3f2fd;color:#0052d9;">已完成</span></div>' +
         '<div class="order-time">' + (o.date||'') + '</div>' +
-        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div class="order-price">¥' + (o.price||0) + '</div>' +
         '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + shopItemsHtml + '</div>' +
-        '<button class="order-btn outline" onclick="showShopDetail(\'' + (o.orderId||o.id) + '\')">查看详情</button></div>';
+        clgHtml +
+        '<div style="margin-top:10px;display:flex;gap:8px;">' +
+        '<button class="order-btn outline" style="flex:1;" onclick="showShopDetail(\'' + (o.orderId||o.id) + '\')">查看详情</button>' +
+        (o.logistics && o.logistics.trackingNo ? '<button class="order-btn ghost" style="flex:1;" onclick="showLogistics(\'' + (o.orderId||o.id) + '\')">📦 查看物流</button>' : '') +
+        '</div></div>';
     } else {
       html = '<div class="order-card">' +
         '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-completed">已完成</span></div>' +
-        '<div class="order-time">' + o.date + ' ' + o.time + '</div>' +
-        '<div class="order-price">¥' + o.price + '</div>' +
-        '<div style="font-size:13px;color:#666;margin-bottom:8px;">支付方式: ' + o.payment + '</div>' +
+        '<div class="order-time">' + (o.date||'') + ' ' + (o.time||'') + '</div>' +
+        '<div class="order-price">¥' + (o.price||0) + '</div>' +
+        '<div style="font-size:13px;color:#666;margin-bottom:8px;">支付方式: ' + (o.payment||'—') + '</div>' +
         '<button class="order-btn outline" onclick="location.href=\'../room-detail/index.html?id=' + o.roomId + '\'">再次预约</button>' +
         '<button class="order-btn ghost" style="margin-left:8px;" onclick="showDetail(\'' + o.id + '\')">查看详情</button></div>';
     }
@@ -344,9 +591,9 @@ function showDetail(id) {
     '<h3>订单详情</h3>' +
     '<div style="text-align:left;font-size:13px;color:#666;">' +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>包间</span><span>' + o.roomName + '</span></div>' +
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>日期</span><span>' + o.date + '</span></div>' +
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>时间</span><span>' + o.time + '</span></div>' +
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>金额</span><span style="font-weight:700;color:#e37318;">¥' + o.price + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>日期</span><span>' + (o.date||'') + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>时间</span><span>' + (o.time||'') + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>金额</span><span style="font-weight:700;color:#e37318;">¥' + (o.price||0) + '</span></div>' +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>支付方式</span><span>' + (o.payment||'—') + '</span></div>' +
     '</div>' +
     '<button class="modal-btn cancel" style="margin-top:12px;width:100%;" onclick="document.getElementById(\'detailModal\').style.display=\'none\'">关闭</button>';
@@ -381,6 +628,28 @@ function showShopDetail(id) {
     '</div>' +
     '<button class="modal-btn cancel" style="margin-top:12px;width:100%;" onclick="document.getElementById(\'detailModal\').style.display=\'none\'">关闭</button>';
   document.getElementById('detailModal').style.display = 'flex';
+}
+
+// ── Logistics ──
+function showLogistics(orderId) {
+  var shopOrders = Utils.lsGet('shop_orders', []);
+  var o = null;
+  for (var i = 0; i < shopOrders.length; i++) {
+    if (shopOrders[i].orderId === orderId || shopOrders[i].id === orderId) { o = shopOrders[i]; break; }
+  }
+  if (!o) { UI.toast('订单信息未找到'); return; }
+  var mapped = {
+    id: o.orderId, roomName: '茶品雅集', date: o.date || '', time: o.time || '',
+    price: o.totalAmount, status: o.status, isShop: true, items: o.items,
+    payment: o.payment || '微信支付', createdAt: o.createdAt,
+    orderId: o.orderId
+  };
+  var lg = getLogistics(mapped);
+  if (lg) renderLogisticsModal(lg);
+}
+
+function hideLogistics() {
+  document.getElementById('lgModal').style.display = 'none';
 }
 
 function copyCode(code) {

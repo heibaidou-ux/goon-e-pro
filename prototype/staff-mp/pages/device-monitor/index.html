@@ -10,86 +10,113 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
 .nav-top { position:fixed; top:10px; right:20px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
-.header { background:#fff; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0f0f0; }
-.header-title { font-size:17px; font-weight:700; }
-.view-toggle { display:flex; gap:6px; }
-.toggle-btn { padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer; border:none; background:#f5f5f5; color:#999; }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
+.nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
+.view-toggle { display:flex; gap:4px; }
+.toggle-btn { padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; border:none; background:#f5f5f5; color:#999; }
 .toggle-btn.active { background:#0052d9; color:#fff; }
-.page { flex:1; overflow-y:auto; padding:12px 16px; padding-bottom:60px; }
-.alert-bar { background:#ffebee; border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-.alert-bar-text { font-size:13px; color:#d54941; font-weight:500; }
-.alert-bar-arrow { color:#d54941; }
-.room-group { background:#fff; border-radius:14px; padding:14px; margin-bottom:12px; }
-.room-group-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer; user-select:none; }
-.room-group-header .collapse-icon { font-size:14px; transition:transform .2s; display:inline-block; }
+.page { flex:1; overflow-y:auto; padding:12px 16px 60px; }
+.page::-webkit-scrollbar { display:none; }
+
+/* 告警列表 */
+.section-label { font-size:13px; font-weight:600; color:#333; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.section-label .count-badge { font-size:10px; background:#d54941; color:#fff; padding:1px 7px; border-radius:8px; }
+.alert-item { background:#fff; border-radius:12px; padding:12px; margin-bottom:8px; cursor:pointer; border-left:3px solid; transition:all .15s; display:flex; align-items:center; }
+.alert-item:active { transform:scale(.98); }
+.alert-item.error { border-left-color:#d54941; }
+.alert-item.warning { border-left-color:#e37318; }
+.alert-item.info { border-left-color:#0052d9; }
+.alert-icon { font-size:20px; margin-right:10px; flex-shrink:0; }
+.alert-content { flex:1; min-width:0; }
+.alert-title { font-size:13px; font-weight:600; color:#333; }
+.alert-desc { font-size:11px; color:#999; margin-top:2px; display:flex; gap:8px; }
+.alert-arrow { color:#ccc; font-size:14px; flex-shrink:0; }
+.alert-none { text-align:center; padding:30px; color:#00a870; font-size:13px; }
+
+/* 全部设备 (原room view) */
+.device-section-wrap { margin-top:12px; }
+.device-section-toggle { font-size:12px; color:#0052d9; background:none; border:none; cursor:pointer; padding:8px 0; width:100%; text-align:left; font-weight:500; }
+.room-group { background:#fff; border-radius:12px; padding:12px; margin-bottom:8px; }
+.room-group-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; cursor:pointer; user-select:none; }
+.room-group-header .collapse-icon { font-size:12px; transition:transform .2s; display:inline-block; }
 .room-group-header .collapse-icon.open { transform:rotate(90deg); }
-.room-group-name { font-size:15px; font-weight:600; }
-.room-group-summary { font-size:12px; }
+.room-group-name { font-size:14px; font-weight:600; }
+.room-group-summary { font-size:11px; }
 .room-group-summary.allgood { color:#00a870; }
 .room-group-summary.warn { color:#d54941; }
 .room-devices { transition:max-height .3s ease; overflow:hidden; }
 .room-devices.collapsed { max-height:0; }
 .room-devices.expanded { max-height:800px; }
-.sort-info { font-size:11px; color:#999; margin-bottom:10px; text-align:center; }
-.device-row { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #f5f5f5; cursor:pointer; transition:background .15s; }
+.device-row { display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #f5f5f5; cursor:pointer; }
 .device-row:last-child { border-bottom:none; }
-.device-row:hover { background:#fafafa; }
-.device-dot { width:10px; height:10px; border-radius:50%; margin-right:12px; flex-shrink:0; }
+.device-dot { width:8px; height:8px; border-radius:50%; margin-right:10px; flex-shrink:0; }
 .device-dot.online { background:#00a870; }
 .device-dot.offline { background:#d54941; }
 .device-dot.fault { background:#e37318; }
-.device-type-icon { font-size:18px; margin-right:10px; width:28px; text-align:center; }
+.device-type-icon { font-size:16px; margin-right:8px; width:24px; text-align:center; }
 .device-info { flex:1; }
-.device-code { font-size:13px; font-weight:500; }
-.device-state { font-size:11px; color:#999; }
-.device-arrow { color:#ccc; font-size:14px; }
-.type-sections { display:none; }
-.type-sections.active { display:block; }
-.type-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-.type-card-left { display:flex; align-items:center; gap:10px; }
-.type-card-icon { font-size:24px; }
-.type-card-info { display:flex; flex-direction:column; }
-.type-card-name { font-size:14px; font-weight:600; }
-.type-card-stats { font-size:11px; color:#999; }
-.type-card-badge { padding:4px 10px; border-radius:10px; font-size:11px; font-weight:600; }
-.type-card-badge.good { background:#e8f5e9; color:#00a870; }
-.type-card-badge.warn { background:#ffebee; color:#d54941; }
+.device-code { font-size:12px; font-weight:500; }
+.device-state { font-size:10px; color:#999; }
+.device-arrow { color:#ccc; font-size:12px; }
+
+/* 问题详情弹窗 */
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:center;justify-content:center; }
+.modal-overlay.active { display:flex; }
+.modal { background:#fff; border-radius:16px; padding:24px; width:310px; max-height:80vh; overflow-y:auto; }
+.modal h3 { font-size:16px; font-weight:700; margin-bottom:4px; }
+.modal .modal-desc { font-size:12px; color:#999; margin-bottom:12px; }
+.modal-detail-row { font-size:13px; color:#333; padding:6px 0; border-bottom:1px solid #f5f5f5; display:flex; justify-content:space-between; }
+.modal-detail-row:last-child { border-bottom:none; }
+.modal-detail-label { color:#999; }
+.modal-btn { width:100%; padding:12px; border-radius:10px; border:none; font-size:14px; font-weight:600; cursor:pointer; margin-top:8px; transition:opacity .15s; }
+.modal-btn:active { opacity:.8; }
+.modal-btn.primary { background:#0052d9; color:#fff; }
+.modal-btn.secondary { background:#f5f5f5; color:#666; }
+.modal-btn.success { background:#e8f5e9; color:#00a870; }
+
 .bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
 .nav-item.active { color:#0052d9; }
 .nav-item .nav-icon { font-size:20px; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
 </style>
+<script src="../../js/sdk.js"></script>
 </head>
 <body>
 <div class="nav-top"><a href="../../../index.html">返回导航</a></div>
 <div class="phone">
-  <div class="header">
-    <span class="header-title">设备监控</span>
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">设备监控</span>
     <div class="view-toggle">
-      <button class="toggle-btn active" onclick="switchView('room',this)">按包间</button>
-      <button class="toggle-btn" onclick="switchView('type',this)">按类型</button>
+      <button class="toggle-btn active" onclick="switchView('alert',this)">告警</button>
+      <button class="toggle-btn" onclick="switchView('device',this)">全部</button>
     </div>
   </div>
-  <div class="page">
-    <div class="alert-bar" onclick="location.href='../device-control/index.html?deviceId=DEV008&type=Lock&roomId=RM002&roomName=%E4%B8%AD%E8%8C%B6%E5%AE%A4A'">
-      <span class="alert-bar-text">🔴 1台设备离线 · 1台故障</span>
-      <span class="alert-bar-arrow">查看 ›</span>
-    </div>
-    <div id="roomView"></div>
-    <div id="typeView" class="type-sections"></div>
+  <div class="page" id="pageContent">
+    <!-- 告警列表 (默认) -->
+    <div id="alertView"></div>
+    <!-- 全部设备视图 (初始隐藏) -->
+    <div id="deviceView" style="display:none;"></div>
   </div>
   <div class="bottom-nav">
     <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
-    <div class="nav-item" onclick="location.href='../room-status/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">房态</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
     <div class="nav-item active"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
-    <div class="nav-item" onclick="location.href='../scene-control/index.html'"><div class="nav-icon">🎬</div><div class="nav-label">场景</div></div>
     <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+
+<!-- 问题详情弹窗 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal" id="detailContent"></div>
+</div>
+
 <script>
+var showToast = StaffSDK.UI.toast;
+var currentView = 'alert';
+
 const rooms = [
   { roomId:"RM001", name:"大会议室" }, { roomId:"RM002", name:"中茶室A" }, { roomId:"RM003", name:"中茶室B" },
   { roomId:"RM004", name:"大茶室C" }, { roomId:"RM005", name:"展厅" }, { roomId:"RM006", name:"工作间" },
@@ -132,8 +159,108 @@ const devices = [
   { deviceId:"DEV034", deviceCode:"YL-LIGHT-06", roomId:"RM006", type:"Light", status:"Online", info:"亮度 50% · 4000K", typeIcon:"💡", typeLabel:"灯光" },
 ];
 
-function renderRoomView() {
-  // Sort rooms: faulty/offline rooms first
+const typeLabels = { Lock:'门锁', AC:'空调', Light:'灯光', Curtain:'窗帘', Speaker:'音响' };
+const typeIcons = { Lock:'🔒', AC:'❄️', Light:'💡', Curtain:'🪟', Speaker:'🔊' };
+const levelIcons = { error:'🔴', warning:'🟠', info:'🔵' };
+
+// ── 告警列表 ──
+function renderAlertView() {
+  // Collect problems: SDK alerts + offline/fault devices
+  var problems = [];
+  var sdkAlerts = StaffSDK.MOCK ? (StaffSDK.MOCK.alerts || []) : [];
+  sdkAlerts.forEach(function(a) {
+    if (a.status === 'Active') {
+      problems.push({ id: a.alertId, type: 'sdk', level: a.level, title: a.message, time: a.time, roomName: '', deviceInfo: '' });
+    }
+  });
+  devices.forEach(function(d) {
+    if (d.status !== 'Online') {
+      problems.push({
+        id: d.deviceId, type: 'device', level: d.status === 'Offline' ? 'error' : 'warning',
+        title: d.typeLabel + ' ' + d.deviceCode,
+        time: '', roomName: rooms.find(function(r) { return r.roomId === d.roomId; }),
+        deviceInfo: d.info + ' · ' + (d.status === 'Offline' ? '离线' : '故障')
+      });
+    }
+  });
+
+  var container = document.getElementById('alertView');
+  if (!problems.length) {
+    container.innerHTML = '<div class="alert-none">🟢 所有设备运行正常，暂无告警</div>';
+    return;
+  }
+
+  container.innerHTML =
+    '<div class="section-label">🔔 问题列表<span class="count-badge">' + problems.length + '</span></div>' +
+    problems.map(function(p) {
+      var roomName = p.roomName ? (p.roomName.name || p.roomName) : '';
+      return '<div class="alert-item ' + p.level + '" onclick="showAlertDetail(\'' + p.id + '\')">' +
+        '<span class="alert-icon">' + (levelIcons[p.level] || '🔵') + '</span>' +
+        '<div class="alert-content">' +
+        '<div class="alert-title">' + p.title + '</div>' +
+        '<div class="alert-desc">' + (roomName ? '<span>' + roomName + '</span>' : '') +
+        (p.time ? '<span>' + p.time + '</span>' : '') +
+        (p.deviceInfo ? '<span>' + p.deviceInfo + '</span>' : '') + '</div></div>' +
+        '<span class="alert-arrow">›</span></div>';
+    }).join('');
+}
+
+function showAlertDetail(id) {
+  var modal = document.getElementById('detailContent');
+  // Try SDK alerts first
+  var sdkAlerts = StaffSDK.MOCK ? (StaffSDK.MOCK.alerts || []) : [];
+  var sdkItem = null;
+  sdkAlerts.forEach(function(a) { if (a.alertId === id) sdkItem = a; });
+
+  if (sdkItem) {
+    modal.innerHTML = '<h3>' + (sdkItem.level === 'error' ? '🔴' : sdkItem.level === 'warning' ? '🟠' : '🔵') + ' 告警详情</h3>' +
+      '<div class="modal-desc">' + sdkItem.message + '</div>' +
+      '<div class="modal-detail-row"><span class="modal-detail-label">告警ID</span><span>' + sdkItem.alertId + '</span></div>' +
+      '<div class="modal-detail-row"><span class="modal-detail-label">级别</span><span>' + ({error:'错误',warning:'警告',info:'提示'}[sdkItem.level] || sdkItem.level) + '</span></div>' +
+      '<div class="modal-detail-row"><span class="modal-detail-label">时间</span><span>' + sdkItem.time + '</span></div>' +
+      '<div class="modal-detail-row"><span class="modal-detail-label">状态</span><span style="color:#e37318;">' + sdkItem.status + '</span></div>' +
+      '<button class="modal-btn success" onclick="resolveAlert(\'' + sdkItem.alertId + '\')">✓ 标记已处理</button>' +
+      '<button class="modal-btn secondary" onclick="closeDetail()">关闭</button>';
+  } else {
+    // Device fault
+    var dev = null;
+    devices.forEach(function(d) { if (d.deviceId === id) dev = d; });
+    if (!dev) { modal.innerHTML = '<h3>未找到详情</h3><button class="modal-btn secondary" onclick="closeDetail()">关闭</button>'; }
+    else {
+      var room = null;
+      rooms.forEach(function(r) { if (r.roomId === dev.roomId) room = r; });
+      modal.innerHTML = '<h3>' + dev.typeIcon + ' ' + dev.typeLabel + ' - ' + (room ? room.name : '') + '</h3>' +
+        '<div class="modal-desc">' + dev.info + '</div>' +
+        '<div class="modal-detail-row"><span class="modal-detail-label">设备编码</span><span>' + dev.deviceCode + '</span></div>' +
+        '<div class="modal-detail-row"><span class="modal-detail-label">状态</span><span style="color:' + (dev.status === 'Online' ? '#00a870' : '#d54941') + ';">' + ({Online:'在线',Offline:'离线',Fault:'故障'}[dev.status] || dev.status) + '</span></div>' +
+        '<div class="modal-detail-row"><span class="modal-detail-label">房间</span><span>' + (room ? room.name : '') + '</span></div>' +
+        '<button class="modal-btn primary" onclick="goDeviceControl(\'' + dev.deviceId + '\',\'' + dev.type + '\',\'' + dev.roomId + '\')">设备控制</button>' +
+        '<button class="modal-btn secondary" onclick="closeDetail()">关闭</button>';
+    }
+  }
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function resolveAlert(alertId) {
+  StaffSDK.API.resolveAlert(alertId).then(function() {
+    showToast('告警已标记已处理');
+    closeDetail();
+    renderAlertView();
+  });
+}
+
+function goDeviceControl(deviceId, type, roomId) {
+  var roomName = '';
+  rooms.forEach(function(r) { if (r.roomId === roomId) roomName = r.name; });
+  location.href = '../device-control/index.html?deviceId=' + deviceId + '&type=' + type + '&roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName);
+}
+
+function closeDetail() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+// ── 全部设备视图 ──
+function renderDeviceView() {
   var sortedRooms = rooms.slice().sort(function(a, b) {
     var aBad = devices.filter(function(d) { return d.roomId === a.roomId && d.status !== 'Online'; }).length;
     var bBad = devices.filter(function(d) { return d.roomId === b.roomId && d.status !== 'Online'; }).length;
@@ -142,126 +269,56 @@ function renderRoomView() {
   var hasIssues = devices.some(function(d) { return d.status !== 'Online'; });
   var statusLabel = { Online:'在线', Offline:'离线', Fault:'故障' };
 
-  var html = hasIssues ? '<div class="sort-info">⚠ 有异常的包间已置顶显示，点击展开查看详情</div>' : '<div class="sort-info">🟢 所有设备运行正常</div>';
+  var html = '<div class="alert-none" style="padding:12px;text-align:left;font-size:11px;">' +
+    (hasIssues ? '⚠ 有异常的包间已置顶' : '🟢 所有设备运行正常') + '</div>';
 
   html += sortedRooms.map(function(room) {
     var roomDevices = devices.filter(function(d) { return d.roomId === room.roomId; });
     var offlineCount = roomDevices.filter(function(d) { return d.status !== 'Online'; }).length;
     var allGood = offlineCount === 0;
-
     return '<div class="room-group">' +
       '<div class="room-group-header" onclick="toggleRoom(this)">' +
-        '<span class="collapse-icon' + (allGood ? '' : ' open') + '">▶</span> ' +
-        '<span class="room-group-name">' + room.name + '</span>' +
-        '<span class="room-group-summary ' + (allGood ? 'allgood' : 'warn') + '">' + (allGood ? '🟢 全部在线' : '⚠ ' + offlineCount + '台异常') + ' · ' + roomDevices.length + '台</span>' +
-      '</div>' +
+      '<span class="collapse-icon' + (allGood ? '' : ' open') + '">▶</span> ' +
+      '<span class="room-group-name">' + room.name + '</span>' +
+      '<span class="room-group-summary ' + (allGood ? 'allgood' : 'warn') + '">' + (allGood ? '🟢 全部在线' : '⚠ ' + offlineCount + '台异常') + ' · ' + roomDevices.length + '台</span></div>' +
       '<div class="room-devices' + (allGood ? ' collapsed' : ' expanded') + '">' +
-        roomDevices.map(function(d) {
-          return '<div class="device-row" onclick="location.href=\'../device-control/index.html?deviceId=' + d.deviceId + '&type=' + d.type + '&roomId=' + room.roomId + '&roomName=' + encodeURIComponent(room.name) + '\'">' +
-            '<div class="device-dot ' + d.status.toLowerCase() + '"></div>' +
-            '<span class="device-type-icon">' + d.typeIcon + '</span>' +
-            '<div class="device-info">' +
-              '<div class="device-code">' + d.typeLabel + '</div>' +
-              '<div class="device-state">' + d.deviceCode + ' · ' + d.info + ' · ' + statusLabel[d.status] + '</div>' +
-            '</div>' +
-            '<span class="device-arrow">›</span>' +
-          '</div>';
-        }).join('') +
-      '</div>' +
-    '</div>';
+      roomDevices.map(function(d) {
+        return '<div class="device-row" onclick="goDeviceControl(\'' + d.deviceId + '\',\'' + d.type + '\',\'' + room.roomId + '\')">' +
+          '<div class="device-dot ' + d.status.toLowerCase() + '"></div>' +
+          '<span class="device-type-icon">' + d.typeIcon + '</span>' +
+          '<div class="device-info"><div class="device-code">' + d.typeLabel + '</div>' +
+          '<div class="device-state">' + d.deviceCode + ' · ' + d.info + ' · ' + statusLabel[d.status] + '</div></div>' +
+          '<span class="device-arrow">›</span></div>';
+      }).join('') + '</div></div>';
   }).join('');
-
-  document.getElementById('roomView').innerHTML = html;
+  document.getElementById('deviceView').innerHTML = html;
 }
 
 function toggleRoom(el) {
   var icon = el.querySelector('.collapse-icon');
   var devicesDiv = el.parentElement.querySelector('.room-devices');
   if (devicesDiv.classList.contains('collapsed')) {
-    devicesDiv.classList.remove('collapsed');
-    devicesDiv.classList.add('expanded');
-    icon.classList.add('open');
+    devicesDiv.classList.remove('collapsed'); devicesDiv.classList.add('expanded'); icon.classList.add('open');
   } else {
-    devicesDiv.classList.remove('expanded');
-    devicesDiv.classList.add('collapsed');
-    icon.classList.remove('open');
+    devicesDiv.classList.remove('expanded'); devicesDiv.classList.add('collapsed'); icon.classList.remove('open');
   }
 }
 
-function renderTypeView() {
-  const types = ['Lock','AC','Light','Curtain','Speaker'];
-  const typeLabels = { Lock:'门锁', AC:'空调', Light:'灯光', Curtain:'窗帘', Speaker:'音响' };
-  const typeIcons = { Lock:'🔒', AC:'❄️', Light:'💡', Curtain:'🪟', Speaker:'🔊' };
-
-  document.getElementById('typeView').innerHTML = types.map(type => {
-    const typeDevices = devices.filter(d => d.type === type);
-    const online = typeDevices.filter(d => d.status === 'Online').length;
-    const offline = typeDevices.filter(d => d.status !== 'Online').length;
-    return `<div class="type-card" onclick="filterByType('${type}')">
-      <div class="type-card-left">
-        <span class="type-card-icon">${typeIcons[type]}</span>
-        <div class="type-card-info">
-          <span class="type-card-name">${typeLabels[type]}</span>
-          <span class="type-card-stats">共${typeDevices.length}台 · 在线${online}台 · 异常${offline}台</span>
-        </div>
-      </div>
-      <span class="type-card-badge ${offline===0?'good':'warn'}">${offline===0?'✓ 全部正常':'⚠ '+offline+'台异常'}</span>
-    </div>`;
-  }).join('');
-}
-
-function filterByType(type) {
-  var sortedRooms = rooms.slice().sort(function(a, b) {
-    var aBad = devices.filter(function(d) { return d.roomId === a.roomId && d.type === type && d.status !== 'Online'; }).length;
-    var bBad = devices.filter(function(d) { return d.roomId === b.roomId && d.type === type && d.status !== 'Online'; }).length;
-    return bBad - aBad;
-  });
-  var statusLabel = { Online:'在线', Offline:'离线', Fault:'故障' };
-
-  document.getElementById('roomView').innerHTML = sortedRooms.map(room => {
-    const roomDevices = devices.filter(d => d.roomId === room.roomId && d.type === type);
-    if (!roomDevices.length) return '';
-    const offlineCount = roomDevices.filter(d => d.status !== 'Online').length;
-    const allGood = offlineCount === 0;
-
-    return '<div class="room-group">' +
-      '<div class="room-group-header" onclick="toggleRoom(this)">' +
-        '<span class="collapse-icon' + (allGood ? '' : ' open') + '">▶</span> ' +
-        '<span class="room-group-name">' + room.name + '</span>' +
-        '<span class="room-group-summary ' + (offlineCount ? 'warn' : 'allgood') + '">' + (offlineCount ? '⚠ ' + offlineCount + '台异常' : '🟢 正常') + ' · ' + roomDevices.length + '台</span>' +
-      '</div>' +
-      '<div class="room-devices' + (allGood ? ' collapsed' : ' expanded') + '">' +
-        roomDevices.map(d => `
-        <div class="device-row" onclick="location.href='../device-control/index.html?deviceId=${d.deviceId}&type=${d.type}&roomId=${room.roomId}&roomName=${encodeURIComponent(room.name)}'">
-          <div class="device-dot ${d.status.toLowerCase()}"></div><span class="device-type-icon">${d.typeIcon}</span>
-          <div class="device-info"><div class="device-code">${d.typeLabel}</div><div class="device-state">${d.deviceCode} · ${d.info} · ${statusLabel[d.status]}</div></div><span class="device-arrow">›</span>
-        </div>`).join('') +
-      '</div>' +
-    '</div>';
-  }).join('');
-  document.getElementById('roomView').style.display = 'block';
-  document.getElementById('typeView').className = 'type-sections';
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.toggle-btn:first-child').classList.add('active');
-}
-
-let currentView = 'room';
 function switchView(view, el) {
   currentView = view;
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.toggle-btn').forEach(function(b) { b.classList.remove('active'); });
   el.classList.add('active');
-  document.getElementById('roomView').style.display = view === 'room' ? 'block' : 'none';
-  document.getElementById('typeView').className = 'type-sections' + (view === 'type' ? ' active' : '');
-  if (view === 'room') renderRoomView();
+  document.getElementById('alertView').style.display = view === 'alert' ? 'block' : 'none';
+  document.getElementById('deviceView').style.display = view === 'device' ? 'block' : 'none';
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2000);
-}
+// 点击背景关闭弹窗
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDetail();
+});
 
-renderRoomView();
-renderTypeView();
+renderAlertView();
+renderDeviceView();
 </script>
 </body>
 </html>

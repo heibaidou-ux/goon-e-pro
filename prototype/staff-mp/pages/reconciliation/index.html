@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对账工单 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:0 8px 0 0; }
+.nav-title { flex:1; font-size:16px; font-weight:600; }
+.page { flex:1; overflow-y:auto; padding:16px; padding-bottom:60px; }
+.summary-card { background:linear-gradient(135deg,#0052d9,#366ef4); border-radius:14px; padding:16px; color:#fff; margin-bottom:16px; }
+.summary-row { display:flex; justify-content:space-between; margin-top:8px; }
+.summary-num { font-size:24px; font-weight:800; }
+.summary-label { font-size:12px; opacity:.8; }
+.rec-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; border-left:4px solid #e37318; }
+.rec-card.resolved { border-left-color:#00a870; opacity:.8; }
+.rec-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.rec-id { font-size:12px; color:#999; }
+.rec-status { font-size:11px; font-weight:600; padding:2px 10px; border-radius:10px; }
+.rec-pending { background:#fff3e0; color:#e37318; }
+.rec-resolved { background:#e8f5e9; color:#00a870; }
+.rec-room { font-size:15px; font-weight:600; margin-bottom:4px; }
+.rec-platform { font-size:12px; color:#666; margin-bottom:4px; }
+.rec-amounts { display:flex; gap:16px; font-size:13px; margin-bottom:6px; }
+.rec-amounts .system { color:#333; font-weight:600; }
+.rec-amounts .platform { color:#999; }
+.rec-amounts .diff { color:#d54941; font-weight:600; }
+.rec-reason { font-size:11px; color:#999; background:#f9fafb; border-radius:8px; padding:6px 10px; margin-bottom:8px; }
+.rec-actions { display:flex; gap:6px; }
+.rec-btn { padding:6px 14px; border-radius:6px; font-size:12px; cursor:pointer; border:none; font-weight:500; }
+.rec-btn.primary { background:#e3f2fd; color:#0052d9; }
+.rec-btn.success { background:#e8f5e9; color:#00a870; }
+.rec-btn.ghost { background:#f5f5f5; color:#666; }
+.empty-state { text-align:center; padding:60px 20px; color:#999; }
+.empty-state .icon { font-size:48px; margin-bottom:10px; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:310px; }
+.modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
+.modal p { font-size:13px;color:#666;margin-bottom:12px; }
+.modal textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:13px; height:80px; resize:vertical; }
+.modal-buttons { display:flex;gap:8px;margin-top:12px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#0052d9;color:#fff; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.page::-webkit-scrollbar { display:none; }
+</style>
+<script src="../../js/sdk.js"></script>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">对账工单</span>
+  </div>
+  <div class="page">
+    <div class="summary-card">
+      <div style="display:flex;justify-content:space-between;">
+        <div><div class="summary-label">待处理对账</div><div class="summary-num" id="pendingCount">0</div></div>
+        <div><div class="summary-label">总差异金额</div><div class="summary-num" id="totalDiff">¥0</div></div>
+        <div><div class="summary-label">已处理</div><div class="summary-num" id="resolvedCount">0</div></div>
+      </div>
+    </div>
+    <div id="recList"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+<div class="modal-overlay" id="resolveModal">
+  <div class="modal">
+    <h3>处理对账差异</h3>
+    <p id="resolveInfo"></p>
+    <textarea id="resolveNote" placeholder="说明处理方式... (选填)"></textarea>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="hideResolve()">关闭</button>
+      <button class="modal-btn confirm" onclick="doResolve()">确认处理</button>
+    </div>
+  </div>
+</div>
+<script>
+var showToast = StaffSDK.UI.toast;
+var pendingResolveId = null;
+var recData = [];
+
+function renderRecs() {
+  StaffSDK.API.getReconciliationOrders().then(function(orders) {
+    recData = orders;
+    var pending = orders.filter(function(o) { return o.status === 'Pending'; });
+    var resolved = orders.filter(function(o) { return o.status !== 'Pending'; });
+    var totalDiff = 0;
+    pending.forEach(function(o) { totalDiff += o.diff || 0; });
+
+    document.getElementById('pendingCount').textContent = pending.length;
+    document.getElementById('totalDiff').textContent = '¥' + totalDiff;
+    document.getElementById('resolvedCount').textContent = resolved.length;
+
+    var container = document.getElementById('recList');
+    if (!orders.length) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">💰</div><p>暂无对账工单</p></div>';
+      return;
+    }
+
+    container.innerHTML = orders.map(function(o) {
+      var isPending = o.status === 'Pending';
+      return '<div class="rec-card ' + (isPending ? '' : 'resolved') + '">' +
+        '<div class="rec-header">' +
+        '<span class="rec-id">' + o.recId + ' · ' + o.orderRef + '</span>' +
+        '<span class="rec-status ' + (isPending ? 'rec-pending' : 'rec-resolved') + '">' + (isPending ? '待处理' : '已处理') + '</span></div>' +
+        '<div class="rec-room">' + o.roomName + '</div>' +
+        '<div class="rec-platform">平台: ' + (o.platform || '—') + ' · ' + (o.date || '') + ' · ' + (o.customerPhone || '') + '</div>' +
+        '<div class="rec-amounts">' +
+        '<span class="system">系统: ¥' + (o.systemAmount || 0) + '</span>' +
+        '<span class="platform">平台: ¥' + (o.platformAmount || 0) + '</span>' +
+        '<span class="diff">差异: ¥' + (o.diff || 0) + '</span></div>' +
+        '<div class="rec-reason">📌 ' + (o.reason || '') + '</div>' +
+        (isPending ? '<div class="rec-actions"><button class="rec-btn primary" onclick="openResolve(\'' + o.recId + '\')">处理差异</button><button class="rec-btn ghost" onclick="showToast(\'已标记为无需处理\')">忽略</button></div>' : '') +
+        '</div>';
+    }).join('');
+  });
+}
+
+function openResolve(recId) {
+  pendingResolveId = recId;
+  var rec = null;
+  recData.forEach(function(o) { if (o.recId === recId) rec = o; });
+  if (!rec) return;
+  document.getElementById('resolveInfo').innerHTML =
+    '<strong>' + rec.roomName + '</strong> 系统 ¥' + rec.systemAmount + ' vs 平台 ¥' + rec.platformAmount +
+    '<br><span style="color:#d54941;">差异: ¥' + rec.diff + '</span>';
+  document.getElementById('resolveNote').value = '';
+  document.getElementById('resolveModal').style.display = 'flex';
+}
+
+function doResolve() {
+  if (!pendingResolveId) return;
+  var note = document.getElementById('resolveNote').value.trim() || '差异已确认处理';
+  StaffSDK.API.resolveReconciliation(pendingResolveId, { note: note }).then(function() {
+    showToast('对账工单已处理');
+    hideResolve();
+    renderRecs();
+  });
+}
+
+function hideResolve() { document.getElementById('resolveModal').style.display = 'none'; pendingResolveId = null; }
+
+renderRecs();
+</script>
+</body>
+</html>

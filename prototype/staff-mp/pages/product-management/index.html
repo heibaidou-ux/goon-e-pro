@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品管理 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:0 8px 0 0; }
+.nav-title { flex:1; font-size:16px; font-weight:600; }
+.page { flex:1; overflow-y:auto; padding:16px; padding-bottom:60px; }
+.page::-webkit-scrollbar { display:none; }
+.tab-row { display:flex; background:#f0f0f0; border-radius:10px; padding:2px; margin-bottom:14px; }
+.tab-item { flex:1; text-align:center; padding:10px; border-radius:8px; font-size:13px; cursor:pointer; color:#999; font-weight:500; }
+.tab-item.active { background:#fff; color:#333; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+.summary-card { background:linear-gradient(135deg,#0052d9,#366ef4); border-radius:14px; padding:16px; color:#fff; margin-bottom:16px; display:flex; justify-content:space-around; }
+.summary-item { text-align:center; }
+.summary-num { font-size:24px; font-weight:800; }
+.summary-label { font-size:11px; opacity:.8; margin-top:2px; }
+.cat-tabs { display:flex; gap:6px; margin-bottom:12px; overflow-x:auto; }
+.cat-tab { padding:6px 14px; border-radius:16px; font-size:12px; cursor:pointer; border:1.5px solid #e0e0e0; background:#fff; color:#666; font-weight:500; white-space:nowrap; }
+.cat-tab.active { background:#0052d9; color:#fff; border-color:#0052d9; }
+.prod-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; display:flex; gap:14px; align-items:center; }
+.prod-img { width:56px; height:56px; border-radius:10px; background:#f5f5f5; display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
+.prod-info { flex:1; min-width:0; }
+.prod-name { font-size:14px; font-weight:600; color:#333; }
+.prod-spec { font-size:11px; color:#999; margin-top:2px; }
+.prod-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+.prod-price { font-size:16px; font-weight:700; color:#d54941; }
+.prod-stock { font-size:11px; padding:2px 8px; border-radius:6px; }
+.stock-ok { background:#e8f5e9; color:#00a870; }
+.stock-low { background:#fff3e0; color:#e37318; }
+.stock-out { background:#ffebee; color:#d54941; }
+.prod-action-btn { padding:6px 12px; border-radius:6px; font-size:11px; cursor:pointer; border:none; font-weight:500; }
+.prod-action-btn.primary { background:#e3f2fd; color:#0052d9; }
+.prod-action-btn.danger { background:#ffebee; color:#d54941; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:310px;max-height:85vh;overflow-y:auto; }
+.modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
+.modal p { font-size:13px;color:#666;margin-bottom:4px; }
+.modal input,.modal textarea { width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:8px; }
+.modal-buttons { display:flex;gap:8px;margin-top:12px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#0052d9;color:#fff; }
+.modal-btn.danger { background:#d54941;color:#fff; }
+</style>
+<script src="../../js/sdk.js"></script>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">商品管理</span>
+  </div>
+  <div class="page">
+    <div class="tab-row">
+      <div class="tab-item active" onclick="switchTab('all',this)">全部商品</div>
+      <div class="tab-item" onclick="switchTab('low',this)">库存不足</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-item"><div class="summary-num" id="prodTotal">0</div><div class="summary-label">全部商品</div></div>
+      <div class="summary-item"><div class="summary-num" id="prodOnSale">0</div><div class="summary-label">在售</div></div>
+      <div class="summary-item"><div class="summary-num" id="prodLowStock">0</div><div class="summary-label">库存不足</div></div>
+    </div>
+    <div class="cat-tabs" id="catTabs"></div>
+    <div id="prodList"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+
+<script>
+var showToast = StaffSDK.UI.toast;
+var currentTab = 'all';
+var currentCat = '全部';
+
+// Mock product data
+var products = [
+  { id:'P001', name:'安溪铁观音', category:'茶叶', spec:'250g/罐', price:128, stock:45, unit:'罐', icon:'🍵', onSale:true },
+  { id:'P002', name:'金骏眉红茶', category:'茶叶', spec:'100g/罐', price:198, stock:22, unit:'罐', icon:'🍵', onSale:true },
+  { id:'P003', name:'武夷大红袍', category:'茶叶', spec:'200g/盒', price:298, stock:8, unit:'盒', icon:'🍵', onSale:true },
+  { id:'P004', name:'龙井绿茶', category:'茶叶', spec:'150g/罐', price:168, stock:3, unit:'罐', icon:'🍵', onSale:true },
+  { id:'P005', name:'茶点拼盘A', category:'茶点', spec:'4味混拼', price:48, stock:20, unit:'份', icon:'🥮', onSale:true },
+  { id:'P006', name:'茶点拼盘B', category:'茶点', spec:'6味混拼', price:68, stock:15, unit:'份', icon:'🥮', onSale:true },
+  { id:'P007', name:'手工曲奇', category:'茶点', spec:'200g/盒', price:38, stock:6, unit:'盒', icon:'🍪', onSale:true },
+  { id:'P008', name:'茶具套装·青花', category:'茶具', spec:'1壶4杯', price:388, stock:10, unit:'套', icon:'🏺', onSale:true },
+  { id:'P009', name:'茶具套装·白瓷', category:'茶具', spec:'1壶4杯', price:268, stock:0, unit:'套', icon:'🏺', onSale:true },
+  { id:'P010', name:'随手泡·电动', category:'器具', spec:'1.2L', price:158, stock:12, unit:'个', icon:'⚡', onSale:true },
+  { id:'P011', name:'茶巾·麻', category:'器具', spec:'30×30cm', price:18, stock:50, unit:'条', icon:'🧣', onSale:true },
+  { id:'P012', name:'武夷水仙', category:'茶叶', spec:'150g/袋', price:88, stock:0, unit:'袋', icon:'🍵', onSale:false },
+  { id:'P013', name:'茶点·绿豆糕', category:'茶点', spec:'6枚装', price:28, stock:30, unit:'盒', icon:'🟢', onSale:true },
+  { id:'P014', name:'普洱熟茶', category:'茶叶', spec:'357g/饼', price:258, stock:5, unit:'饼', icon:'🍵', onSale:true },
+  { id:'P015', name:'蜂蜜柚子茶', category:'茶饮', spec:'500g/罐', price:45, stock:18, unit:'罐', icon:'🍯', onSale:true },
+  { id:'P016', name:'玫瑰花茶', category:'茶饮', spec:'80g/罐', price:35, stock:25, unit:'罐', icon:'🌹', onSale:true },
+];
+
+function getCategories() { var cats = ['全部']; products.forEach(function(p) { if (cats.indexOf(p.category) === -1) cats.push(p.category); }); return cats; }
+
+function render() {
+  // Stats
+  document.getElementById('prodTotal').textContent = products.length;
+  document.getElementById('prodOnSale').textContent = products.filter(function(p) { return p.onSale; }).length;
+  document.getElementById('prodLowStock').textContent = products.filter(function(p) { return p.stock > 0 && p.stock <= 10; }).length;
+
+  // Category tabs
+  var cats = getCategories();
+  document.getElementById('catTabs').innerHTML = cats.map(function(c) {
+    return '<span class="cat-tab ' + (c === currentCat ? 'active' : '') + '" onclick="selectCat(\'' + c + '\')">' + c + '</span>';
+  }).join('');
+
+  // Product list
+  var filtered = products.filter(function(p) {
+    if (currentCat !== '全部' && p.category !== currentCat) return false;
+    if (currentTab === 'low') return p.stock <= 10;
+    return true;
+  });
+
+  var container = document.getElementById('prodList');
+  if (!filtered.length) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">暂无匹配商品</div>';
+    return;
+  }
+  container.innerHTML = filtered.map(function(p) {
+    var stockClass = p.stock === 0 ? 'stock-out' : (p.stock <= 10 ? 'stock-low' : 'stock-ok');
+    var stockLabel = p.stock === 0 ? '缺货' : (p.stock <= 5 ? '库存紧张' : (p.stock <= 10 ? '偏低' : '充足'));
+    return '<div class="prod-card">' +
+      '<div class="prod-img">' + p.icon + '</div>' +
+      '<div class="prod-info">' +
+        '<div class="prod-name">' + p.name + (!p.onSale ? ' <span style="font-size:10px;color:#999;">(已下架)</span>' : '') + '</div>' +
+        '<div class="prod-spec">' + p.category + ' · ' + p.spec + '</div>' +
+        '<div class="prod-bottom"><span class="prod-price">¥' + p.price + '</span>' +
+        '<span class="prod-stock ' + stockClass + '">' + p.stock + p.unit + ' · ' + stockLabel + '</span></div>' +
+        '<div style="margin-top:6px;"><button class="prod-action-btn primary" onclick="showEditStock(\'' + p.id + '\')">调整库存</button>' +
+        '<button class="prod-action-btn ' + (p.onSale ? 'danger' : 'primary') + '" onclick="toggleOnSale(\'' + p.id + '\')" style="margin-left:6px;">' + (p.onSale ? '下架' : '上架') + '</button></div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function selectCat(c) { currentCat = c; render(); }
+
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-row .tab-item').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  render();
+}
+
+function toggleOnSale(id) {
+  products.forEach(function(p) { if (p.id === id) p.onSale = !p.onSale; });
+  showToast('商品状态已更新');
+  render();
+}
+
+function showEditStock(id) {
+  var p = null;
+  products.forEach(function(x) { if (x.id === id) p = x; });
+  if (!p) return;
+  var modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.style.display = 'flex';
+  modal.innerHTML = '<div class="modal">' +
+    '<h3>调整库存 - ' + p.name + '</h3>' +
+    '<p>当前库存: ' + p.stock + ' ' + p.unit + '</p>' +
+    '<input type="number" id="newStock" value="' + p.stock + '" min="0" style="font-size:16px;">' +
+    '<div class="modal-buttons">' +
+    '<button class="modal-btn cancel" onclick="this.parentElement.parentElement.parentElement.remove()">取消</button>' +
+    '<button class="modal-btn confirm" onclick="doEditStock(\'' + id + '\')">确认</button></div></div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+}
+
+function doEditStock(id) {
+  var input = document.getElementById('newStock');
+  if (!input) return;
+  var val = parseInt(input.value);
+  if (isNaN(val) || val < 0) { showToast('请输入有效数量'); return; }
+  products.forEach(function(p) { if (p.id === id) p.stock = val; });
+  showToast('库存已更新');
+  document.querySelectorAll('.modal-overlay').forEach(function(m) { m.remove(); });
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

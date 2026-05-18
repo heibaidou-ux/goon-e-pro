@@ -59,6 +59,21 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .tab-row { display:flex; background:#f0f0f0; border-radius:10px; padding:2px; margin-bottom:14px; }
 .tab-item { flex:1; text-align:center; padding:10px; border-radius:8px; font-size:13px; cursor:pointer; color:#999; font-weight:500; }
 .tab-item.active { background:#fff; color:#333; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+/* Assigned tasks */
+.task-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; border-left:4px solid #366ef4; }
+.task-card.done { border-left-color:#00a870; opacity:.8; }
+.task-card .task-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.task-card .task-assignee { font-size:14px; font-weight:600; }
+.task-card .task-badge { font-size:11px; padding:2px 8px; border-radius:8px; }
+.task-pending { background:#fff3e0; color:#e37318; }
+.task-done { background:#e8f5e9; color:#00a870; }
+.task-card .task-meta { font-size:12px; color:#999; margin-bottom:6px; }
+.task-card .task-actions { display:flex; gap:6px; margin-top:4px; }
+.assign-form { background:#fff; border-radius:14px; padding:16px; margin-bottom:14px; }
+.assign-form select,
+.assign-form input,
+.assign-form textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:13px; margin-bottom:10px; font-family:inherit; }
+.assign-form textarea { height:60px; resize:vertical; }
 .bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
 .nav-item.active { color:#0052d9; }
@@ -74,7 +89,9 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .modal-btn.cancel { background:#f5f5f5;color:#666; }
 .modal-btn.confirm { background:#0052d9;color:#fff; }
 .modal-btn.danger { background:#d54941;color:#fff; }
+.page::-webkit-scrollbar { display:none; }
 </style>
+<script src="../../js/sdk.js"></script>
 </head>
 <body>
 <div class="nav-top"><a href="../../../index.html">返回导航</a></div>
@@ -86,19 +103,18 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
   <div class="page">
     <div class="tab-row">
       <div class="tab-item active" onclick="switchTab('current',this)">今日巡检</div>
+      <div class="tab-item" onclick="switchTab('assign',this)">安排巡检</div>
       <div class="tab-item" onclick="switchTab('history',this)">历史记录</div>
     </div>
     <div id="mainContent"></div>
   </div>
   <div class="bottom-nav">
     <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
-    <div class="nav-item" onclick="location.href='../room-status/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">房态</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
     <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
-    <div class="nav-item" onclick="location.href='../scene-control/index.html'"><div class="nav-icon">🎬</div><div class="nav-label">场景</div></div>
-    <div class="nav-item active"><div class="nav-icon">🔍</div><div class="nav-label">巡检</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
 <div class="modal-overlay" id="submitModal">
   <div class="modal">
     <h3>提交巡检报告？</h3>
@@ -142,7 +158,7 @@ const checklist = [
 
 // State: track each item's result
 let results = {};
-let photos = {}; // simulated photo uploads
+let photos = {};
 
 function initResults() {
   checklist.forEach(cat => {
@@ -176,6 +192,7 @@ function switchTab(tab, el) {
 function render() {
   const container = document.getElementById('mainContent');
   if (currentTab === 'history') { renderHistory(container); return; }
+  if (currentTab === 'assign') { renderAssign(container); return; }
 
   const p = getProgress();
   let html = `
@@ -212,7 +229,7 @@ function render() {
           <div class="check-label">${item.label}</div>
           <div class="check-standard">检查标准: ${item.standard}</div>
           <div class="check-abnormal ${isAbnormal?'show':''}" id="ab-${item.id}">
-            <input class="abnormal-input" placeholder="描述异常情况及位置..." id="desc-${item.id}" value="${getAbnormalDesc(item.id)}" onchange="saveDesc('${item.id}',this.value)">
+            <input class="abnormal-input" placeholder="描述异常情况及位置..." id="desc-${item.id}" value="${getAbnormalDesc(item.id)||''}" onchange="saveDesc('${item.id}',this.value)">
             <button class="photo-btn" onclick="simPhoto('${item.id}')">📷 拍照记录</button>
             <div class="photo-preview" id="photos-${item.id}">${(photos[item.id]||[]).map(() => '<div class="photo-thumb">📸</div>').join('')}</div>
           </div>
@@ -260,7 +277,6 @@ function submitReport() {
 }
 
 function doSubmit() {
-  // Save to localStorage as completed inspection
   const p = getProgress();
   const report = {
     date: new Date().toLocaleDateString('zh-CN'),
@@ -279,7 +295,6 @@ function doSubmit() {
 
   showToast('巡检报告已提交！');
   hideModal();
-  // Re-init for next inspection
   results = {}; abnormalDescs = {}; photos = {};
   initResults();
   render();
@@ -305,13 +320,104 @@ function renderHistory(container) {
   `).join('');
 }
 
+// ── 安排巡检 (店长功能) ──
+function renderAssign(container) {
+  var staffOpts = [
+    { id:'S001', name:'小林', role:'店长' },
+    { id:'S002', name:'小张', role:'店员' },
+    { id:'S003', name:'小李', role:'店员' },
+    { id:'S004', name:'小王', role:'店员' },
+  ];
+  var optsHtml = staffOpts.map(function(s) {
+    return '<option value="' + s.id + '">' + s.name + ' (' + s.role + ')</option>';
+  }).join('');
+
+  var html = '<div class="assign-form">' +
+    '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px;">📋 安排巡检任务</div>' +
+    '<select id="assignStaff">' + optsHtml + '</select>' +
+    '<input type="date" id="assignDate" value="' + StaffSDK.Utils.todayStr() + '">' +
+    '<textarea id="assignNote" placeholder="巡检说明（如：重点检查消防设备）"></textarea>' +
+    '<button class="submit-btn" onclick="doAssign()">✓ 下达巡检任务</button>' +
+    '</div>';
+
+  // Show existing assigned tasks
+  var tasks = StaffSDK.Utils.lsGet('inspection_tasks', []);
+  if (tasks.length) {
+    html += '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px;">已安排的巡检任务</div>';
+    tasks.sort(function(a,b) { return b.createdAt - a.createdAt; });
+    html += tasks.map(function(t, idx) {
+      var isDone = t.status === 'done';
+      var staffName = '';
+      staffOpts.forEach(function(s) { if (s.id === t.staffId) staffName = s.name; });
+      return '<div class="task-card ' + (isDone ? 'done' : '') + '">' +
+        '<div class="task-header">' +
+        '<span class="task-assignee">👤 ' + staffName + '</span>' +
+        '<span class="task-badge ' + (isDone ? 'task-done' : 'task-pending') + '">' + (isDone ? '✓ 已完成' : '⏳ 待处理') + '</span></div>' +
+        '<div class="task-meta">📅 ' + t.date + (t.note ? ' · 📌 ' + t.note : '') + '</div>' +
+        (isDone ? '<div class="task-meta">✅ 完成时间: ' + (t.doneAt || '') + '</div>' : '') +
+        (!isDone ? '<div class="task-actions"><button class="radio-btn normal active" onclick="markTaskDone(' + idx + ')">标记完成</button>' +
+        '<button class="radio-btn abnormal" onclick="deleteTask(' + idx + ')">删除</button></div>' : '') +
+        '</div>';
+    }).join('');
+  } else {
+    html += '<div style="text-align:center;padding:30px;color:#999;">暂无安排的巡检任务</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function doAssign() {
+  var staffId = document.getElementById('assignStaff').value;
+  var date = document.getElementById('assignDate').value;
+  var note = document.getElementById('assignNote').value.trim();
+  var staffName = '';
+  var staffOpts = [
+    { id:'S001', name:'小林', role:'店长' },
+    { id:'S002', name:'小张', role:'店员' },
+    { id:'S003', name:'小李', role:'店员' },
+    { id:'S004', name:'小王', role:'店员' },
+  ];
+  staffOpts.forEach(function(s) { if (s.id === staffId) staffName = s.name; });
+
+  var tasks = StaffSDK.Utils.lsGet('inspection_tasks', []);
+  tasks.unshift({
+    id: 'TASK_' + Date.now(),
+    staffId: staffId,
+    staffName: staffName,
+    date: date,
+    note: note,
+    status: 'pending',
+    createdAt: Date.now(),
+    assignedBy: '店长 小林'
+  });
+  StaffSDK.Utils.lsSet('inspection_tasks', tasks);
+  showToast('✅ 已向 ' + staffName + ' 下达巡检任务');
+  document.getElementById('assignNote').value = '';
+  render();
+}
+
+function markTaskDone(idx) {
+  var tasks = StaffSDK.Utils.lsGet('inspection_tasks', []);
+  if (tasks[idx]) {
+    tasks[idx].status = 'done';
+    tasks[idx].doneAt = new Date().toLocaleString('zh-CN');
+    StaffSDK.Utils.lsSet('inspection_tasks', tasks);
+    showToast('任务已标记完成');
+    render();
+  }
+}
+
+function deleteTask(idx) {
+  var tasks = StaffSDK.Utils.lsGet('inspection_tasks', []);
+  tasks.splice(idx, 1);
+  StaffSDK.Utils.lsSet('inspection_tasks', tasks);
+  showToast('任务已删除');
+  render();
+}
+
 function hideModal() { document.getElementById('submitModal').style.display = 'none'; }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2000);
-}
+var showToast = StaffSDK.UI.toast;
 
 render();
 </script>

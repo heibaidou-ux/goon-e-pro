@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>排班管理 - 店长</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:0 8px 0 0; }
+.nav-title { flex:1; font-size:16px; font-weight:600; }
+.page { flex:1; overflow-y:auto; padding:16px; padding-bottom:60px; }
+.page::-webkit-scrollbar { display:none; }
+.week-nav { display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:14px; padding:12px; margin-bottom:16px; }
+.week-nav-btn { background:none; border:none; font-size:18px; cursor:pointer; color:#0052d9; padding:4px 8px; }
+.week-nav-title { font-size:14px; font-weight:600; color:#333; }
+.staff-summary { display:flex; gap:10px; margin-bottom:16px; }
+.staff-card { flex:1; background:#fff; border-radius:12px; padding:14px; text-align:center; }
+.staff-card .sc-avatar { font-size:28px; }
+.staff-card .sc-name { font-size:13px; font-weight:600; color:#333; margin-top:4px; }
+.staff-card .sc-shift { font-size:11px; color:#999; margin-top:2px; }
+.staff-card .sc-badge { font-size:10px; padding:2px 8px; border-radius:6px; margin-top:6px; display:inline-block; }
+.scb-morning { background:#e3f2fd; color:#0052d9; }
+.scb-afternoon { background:#fff3e0; color:#e37318; }
+.scb-full { background:#e8f5e9; color:#00a870; }
+.scb-off { background:#f5f5f5; color:#ccc; }
+.shift-grid { background:#fff; border-radius:14px; overflow:hidden; margin-bottom:16px; }
+.shift-header { display:flex; border-bottom:1px solid #f0f0f0; }
+.shift-header-item { flex:1; text-align:center; padding:10px 4px; font-size:11px; font-weight:600; color:#666; }
+.shift-header-item:first-child { flex:0 0 56px; }
+.shift-row { display:flex; border-bottom:1px solid #f5f5f5; }
+.shift-row:last-child { border-bottom:none; }
+.shift-label { flex:0 0 56px; padding:10px 4px; font-size:12px; font-weight:500; color:#333; display:flex; align-items:center; justify-content:center; }
+.shift-cell { flex:1; padding:6px 2px; text-align:center; cursor:pointer; border-radius:4px; margin:2px; transition:all .15s; }
+.shift-cell:active { background:#f0f5ff; }
+.shift-cell .cell-content { font-size:10px; padding:4px 2px; border-radius:6px; }
+.shift-cell .cell-content.morning { background:#e3f2fd; color:#0052d9; }
+.shift-cell .cell-content.afternoon { background:#fff3e0; color:#e37318; }
+.shift-cell .cell-content.full { background:#e8f5e9; color:#00a870; }
+.shift-cell .cell-content.off { background:#f5f5f5; color:#ccc; }
+.section-title { font-size:14px; font-weight:600; color:#333; margin-bottom:10px; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:300px; }
+.modal h3 { font-size:15px;margin-bottom:8px;color:#333; }
+.modal p { font-size:13px;color:#666;margin-bottom:12px; }
+.modal select { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:13px; margin-bottom:8px; }
+.modal-buttons { display:flex;gap:8px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#0052d9;color:#fff; }
+.modal-btn.primary { background:#0052d9;color:#fff; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+</style>
+<script src="../../js/sdk.js"></script>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">排班管理</span>
+    <span style="font-size:11px;color:#999;padding:3px 8px;background:#f0f0f0;border-radius:4px;">店长</span>
+  </div>
+  <div class="page">
+    <div class="week-nav">
+      <button class="week-nav-btn" onclick="prevWeek()">‹</button>
+      <span class="week-nav-title" id="weekTitle">本周</span>
+      <button class="week-nav-btn" onclick="nextWeek()">›</button>
+    </div>
+    <div class="staff-summary" id="staffSummary"></div>
+    <div class="section-title">排班表</div>
+    <div class="shift-grid" id="shiftGrid"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="modal-btn primary" onclick="addSchedule()" style="margin-top:0;">+ 添加排班</button>
+      <button class="modal-btn cancel" onclick="showToast('排班已保存')" style="margin-top:0;">💾 保存</button>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+
+<script>
+var showToast = StaffSDK.UI.toast;
+
+var staffList = [
+  { id:'S001', name:'小林', role:'店长', avatar:'👩‍💼' },
+  { id:'S002', name:'小张', role:'店员', avatar:'👨‍🍳' },
+  { id:'S003', name:'小李', role:'店员', avatar:'👩‍🍳' },
+  { id:'S004', name:'小王', role:'店员', avatar:'👨‍💼' },
+  { id:'S005', name:'小赵', role:'保洁', avatar:'🧹' },
+];
+
+var shiftTypes = { morning:'早班', afternoon:'晚班', full:'全天', off:'休息' };
+var shiftColors = { morning:'morning', afternoon:'afternoon', full:'full', off:'off' };
+
+var currentWeekOffset = 0;
+
+function getWeekDates(offset) {
+  var now = new Date();
+  var day = now.getDay();
+  var diff = now.getDate() - day + (day === 0 ? -6 : 1) + offset * 7;
+  var mon = new Date(now.setDate(diff));
+  var dates = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(mon);
+    d.setDate(mon.getDate() + i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function getSchedules() {
+  return StaffSDK.Utils.lsGet('schedules', {});
+}
+
+function saveSchedules(s) {
+  StaffSDK.Utils.lsSet('schedules', s);
+}
+
+function getWeekKey(dates) {
+  var d = dates[0];
+  return d.getFullYear() + '-' + ((d.getMonth()+1) < 10 ? '0' : '') + (d.getMonth()+1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate();
+}
+
+function render() {
+  var dates = getWeekDates(currentWeekOffset);
+  var weekKey = getWeekKey(dates);
+  var schedules = getSchedules();
+  var weekData = schedules[weekKey] || {};
+  var dayNames = ['一','二','三','四','五','六','日'];
+
+  // Week title
+  var monday = dates[0], sunday = dates[6];
+  var title = (monday.getMonth()+1) + '/' + monday.getDate() + ' - ' + (sunday.getMonth()+1) + '/' + sunday.getDate();
+  document.getElementById('weekTitle').textContent = title;
+
+  // Staff summary - show today's shifts
+  var today = new Date();
+  var todayIdx = (today.getDay() + 6) % 7; // Monday=0
+  var todayStr = StaffSDK.Utils.todayStr();
+  // Find current week's today date string
+  var todayDateStr = (today.getFullYear()) + '-' + ((today.getMonth()+1) < 10 ? '0' : '') + (today.getMonth()+1) + '-' + (today.getDate() < 10 ? '0' : '') + today.getDate();
+  // Actually, let me find the date string for today within the week
+  var targetDate = dates[todayIdx];
+  if (!targetDate || targetDate.toDateString() !== new Date().toDateString()) {
+    // Today isn't in this week view, just show the first day
+    targetDate = dates[0];
+  }
+  var targetKey = targetDate.getFullYear() + '-' + ((targetDate.getMonth()+1) < 10 ? '0' : '') + (targetDate.getMonth()+1) + '-' + (targetDate.getDate() < 10 ? '0' : '') + targetDate.getDate();
+
+  // Show which staff are working on which day
+  var summaryHtml = '';
+  staffList.forEach(function(s) {
+    var shift = weekData[s.id] || {};
+    // Find shift for target date
+    var dateKey = targetKey;
+    var todayShift = shift[dateKey] || '';
+    var shiftLabel = todayShift ? (shiftTypes[todayShift] || '') : '未排班';
+    var badgeClass = todayShift ? 'scb-' + todayShift : 'scb-off';
+    summaryHtml += '<div class="staff-card">' +
+      '<div class="sc-avatar">' + s.avatar + '</div>' +
+      '<div class="sc-name">' + s.name + '</div>' +
+      '<div class="sc-shift">' + (todayShift ? shiftLabel : '—') + '</div>' +
+      '<span class="sc-badge ' + badgeClass + '">' + todayShift + '</span></div>';
+  });
+  document.getElementById('staffSummary').innerHTML = summaryHtml;
+
+  // Shift grid
+  var headerHtml = '<div class="shift-header"><div class="shift-header-item"></div>';
+  for (var i = 0; i < 7; i++) {
+    var d = dates[i];
+    var isToday = d.toDateString() === new Date().toDateString();
+    headerHtml += '<div class="shift-header-item" style="' + (isToday ? 'color:#0052d9;' : '') + '">' + dayNames[i] + '<br><span style="font-weight:400;">' + d.getDate() + '</span></div>';
+  }
+  headerHtml += '</div>';
+
+  var bodyHtml = '';
+  staffList.forEach(function(s) {
+    bodyHtml += '<div class="shift-row">';
+    bodyHtml += '<div class="shift-label">' + s.name + '</div>';
+    for (var i = 0; i < 7; i++) {
+      var dateKey = dates[i].getFullYear() + '-' + ((dates[i].getMonth()+1) < 10 ? '0' : '') + (dates[i].getMonth()+1) + '-' + (dates[i].getDate() < 10 ? '0' : '') + dates[i].getDate();
+      var shift = weekData[s.id] ? (weekData[s.id][dateKey] || '') : '';
+      var contentClass = shift ? shiftColors[shift] : '';
+      var label = shift ? (shiftTypes[shift] || '') : '';
+      bodyHtml += '<div class="shift-cell" onclick="editShift(\'' + s.id + '\',\'' + dateKey + '\',\'' + weekKey + '\')">' +
+        '<div class="cell-content ' + contentClass + '">' + label + '</div></div>';
+    }
+    bodyHtml += '</div>';
+  });
+
+  document.getElementById('shiftGrid').innerHTML = headerHtml + bodyHtml;
+}
+
+function prevWeek() { currentWeekOffset--; render(); }
+function nextWeek() { currentWeekOffset++; render(); }
+
+function editShift(staffId, dateKey, weekKey) {
+  var schedules = getSchedules();
+  var weekData = schedules[weekKey] || {};
+  var staff = weekData[staffId] || {};
+  var currentShift = staff[dateKey] || '';
+
+  var html = '<h3>排班调整</h3><p>' + getStaffName(staffId) + ' · ' + dateKey + '</p>' +
+    '<select id="shiftSelect">' +
+    '<option value="">— 休息 —</option>' +
+    '<option value="morning" ' + (currentShift === 'morning' ? 'selected' : '') + '>早班 09:00-14:00</option>' +
+    '<option value="afternoon" ' + (currentShift === 'afternoon' ? 'selected' : '') + '>晚班 14:00-22:00</option>' +
+    '<option value="full" ' + (currentShift === 'full' ? 'selected' : '') + '>全天 09:00-22:00</option>' +
+    '</select>' +
+    '<div class="modal-buttons">' +
+    '<button class="modal-btn cancel" onclick="closeModal(this)">取消</button>' +
+    '<button class="modal-btn confirm" onclick="confirmShift(\'' + staffId + '\',\'' + dateKey + '\',\'' + weekKey + '\')">确认</button></div>';
+
+  showModal(html);
+}
+
+function getStaffName(id) {
+  for (var i = 0; i < staffList.length; i++) { if (staffList[i].id === id) return staffList[i].name; }
+  return id;
+}
+
+function confirmShift(staffId, dateKey, weekKey) {
+  var sel = document.getElementById('shiftSelect');
+  if (!sel) return;
+  var value = sel.value;
+  var schedules = getSchedules();
+  if (!schedules[weekKey]) schedules[weekKey] = {};
+  if (!schedules[weekKey][staffId]) schedules[weekKey][staffId] = {};
+  schedules[weekKey][staffId][dateKey] = value;
+  if (!value) delete schedules[weekKey][staffId][dateKey];
+  saveSchedules(schedules);
+  closeAllModals();
+  showToast('排班已更新');
+  render();
+}
+
+function addSchedule() {
+  var scheds = getSchedules();
+  var dates = getWeekDates(currentWeekOffset);
+  var weekKey = getWeekKey(dates);
+
+  var staffOpts = staffList.map(function(s) {
+    return '<option value="' + s.id + '">' + s.name + ' (' + s.role + ')</option>';
+  }).join('');
+
+  var dateOpts = dates.map(function(d) {
+    var v = d.getFullYear() + '-' + ((d.getMonth()+1) < 10 ? '0' : '') + (d.getMonth()+1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate();
+    return '<option value="' + v + '">' + (d.getMonth()+1) + '/' + d.getDate() + ' (' + ['日','一','二','三','四','五','六'][d.getDay()] + ')</option>';
+  }).join('');
+
+  var html = '<h3>快速添加排班</h3>' +
+    '<select id="asStaff">' + staffOpts + '</select>' +
+    '<select id="asDate">' + dateOpts + '</select>' +
+    '<select id="asShift">' +
+    '<option value="morning">早班 09:00-14:00</option>' +
+    '<option value="afternoon">晚班 14:00-22:00</option>' +
+    '<option value="full">全天 09:00-22:00</option>' +
+    '</select>' +
+    '<div class="modal-buttons">' +
+    '<button class="modal-btn cancel" onclick="closeModal(this)">取消</button>' +
+    '<button class="modal-btn confirm" onclick="confirmAddSchedule(\'' + weekKey + '\')">添加</button></div>';
+
+  showModal(html);
+}
+
+function confirmAddSchedule(weekKey) {
+  var staffId = document.getElementById('asStaff').value;
+  var dateKey = document.getElementById('asDate').value;
+  var shift = document.getElementById('asShift').value;
+  if (!staffId || !dateKey || !shift) { showToast('请完整选择'); return; }
+  var schedules = getSchedules();
+  if (!schedules[weekKey]) schedules[weekKey] = {};
+  if (!schedules[weekKey][staffId]) schedules[weekKey][staffId] = {};
+  schedules[weekKey][staffId][dateKey] = shift;
+  saveSchedules(schedules);
+  closeAllModals();
+  showToast('排班已添加');
+  render();
+}
+
+function showModal(html) {
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.innerHTML = '<div class="modal">' + html + '</div>';
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function closeModal(el) { el.closest('.modal-overlay').remove(); }
+function closeAllModals() { document.querySelectorAll('.modal-overlay').forEach(function(m) { m.remove(); }); }
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考勤打卡 - 店员端</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:0 8px 0 0; }
+.nav-title { flex:1; font-size:16px; font-weight:600; }
+.page { flex:1; overflow-y:auto; padding:16px; padding-bottom:60px; }
+.page::-webkit-scrollbar { display:none; }
+.clock-card { background:linear-gradient(135deg,#0052d9,#366ef4); border-radius:16px; padding:24px; text-align:center; color:#fff; margin-bottom:16px; }
+.clock-time { font-size:42px; font-weight:800; letter-spacing:2px; }
+.clock-date { font-size:13px; opacity:.8; margin-top:4px; }
+.clock-btns { display:flex; gap:12px; margin-top:20px; }
+.clock-btn { flex:1; padding:16px; border-radius:12px; border:none; font-size:15px; font-weight:600; cursor:pointer; transition:transform .15s; font-family:inherit; }
+.clock-btn:active { transform:scale(.96); }
+.clock-btn.checkin { background:#fff; color:#0052d9; }
+.clock-btn.checkout { background:rgba(255,255,255,.2); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
+.clock-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+.clock-status { margin-top:14px; padding:10px; border-radius:8px; background:rgba(255,255,255,.1); font-size:13px; }
+.today-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:12px; }
+.today-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f5f5f5; }
+.today-row:last-child { border-bottom:none; }
+.today-label { font-size:13px; color:#666; }
+.today-value { font-size:14px; font-weight:600; color:#333; }
+.today-value.green { color:#00a870; }
+.today-value.red { color:#d54941; }
+.section-title { font-size:14px; font-weight:600; color:#333; margin-bottom:10px; }
+.history-list { background:#fff; border-radius:14px; overflow:hidden; }
+.history-item { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid #f5f5f5; }
+.history-item:last-child { border-bottom:none; }
+.history-date { font-size:13px; color:#333; font-weight:500; }
+.history-time { font-size:12px; color:#999; }
+.history-status { font-size:11px; padding:2px 8px; border-radius:6px; }
+.his-normal { background:#e8f5e9; color:#00a870; }
+.his-late { background:#fff3e0; color:#e37318; }
+.his-miss { background:#ffebee; color:#d54941; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
+.nav-item .nav-icon { font-size:20px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:300px;text-align:center; }
+.modal h3 { font-size:15px;margin-bottom:8px;color:#333; }
+.modal p { font-size:13px;color:#666;margin-bottom:12px; }
+.modal-buttons { display:flex;gap:8px; }
+.modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#0052d9;color:#fff; }
+</style>
+<script src="../../js/sdk.js"></script>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">考勤打卡</span>
+  </div>
+  <div class="page">
+    <div class="clock-card">
+      <div class="clock-time" id="clockTime">--:--:--</div>
+      <div class="clock-date" id="clockDate"></div>
+      <div class="clock-btns">
+        <button class="clock-btn checkin" id="checkinBtn" onclick="doCheckin()">📌 上班打卡</button>
+        <button class="clock-btn checkout" id="checkoutBtn" onclick="doCheckout()">🚶 下班打卡</button>
+      </div>
+      <div class="clock-status" id="clockStatus">今日尚未打卡</div>
+    </div>
+
+    <div class="today-card" id="todayCard">
+      <div class="today-row"><span class="today-label">上班时间</span><span class="today-value" id="todayCheckin">--:--</span></div>
+      <div class="today-row"><span class="today-label">下班时间</span><span class="today-value" id="todayCheckout">--:--</span></div>
+      <div class="today-row"><span class="today-label">工作时长</span><span class="today-value" id="todayDuration">--</span></div>
+      <div class="today-row"><span class="today-label">打卡状态</span><span class="today-value" id="todayStatus">未打卡</span></div>
+    </div>
+
+    <div class="section-title">本月打卡记录</div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../dashboard/index.html'"><div class="nav-icon">📊</div><div class="nav-label">工作台</div></div>
+    <div class="nav-item" onclick="location.href='../order-management/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../device-monitor/index.html'"><div class="nav-icon">📱</div><div class="nav-label">设备</div></div>
+    <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
+  </div>
+</div>
+
+<script>
+var showToast = StaffSDK.UI.toast;
+var clockTimer = null;
+
+function updateClock() {
+  var now = new Date();
+  document.getElementById('clockTime').textContent =
+    (now.getHours() < 10 ? '0' : '') + now.getHours() + ':' +
+    (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ':' +
+    (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();
+}
+function updateDate() {
+  document.getElementById('clockDate').textContent = new Date().toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+}
+
+function getTodayRecords() {
+  var recs = StaffSDK.Utils.lsGet('attendance_records', []);
+  var today = StaffSDK.Utils.todayStr();
+  var r = null;
+  recs.forEach(function(rec) { if (rec.date === today) r = rec; });
+  return r;
+}
+
+function loadState() {
+  updateClock();
+  updateDate();
+  if (clockTimer) clearInterval(clockTimer);
+  clockTimer = setInterval(updateClock, 1000);
+
+  var today = getTodayRecords();
+  var checkinBtn = document.getElementById('checkinBtn');
+  var checkoutBtn = document.getElementById('checkoutBtn');
+  var statusEl = document.getElementById('clockStatus');
+
+  if (!today) {
+    checkinBtn.disabled = false;
+    checkoutBtn.disabled = true;
+    statusEl.textContent = '📌 今日尚未打卡，点击上班打卡';
+    document.getElementById('todayCheckin').textContent = '--:--';
+    document.getElementById('todayCheckout').textContent = '--:--';
+    document.getElementById('todayDuration').textContent = '--';
+    document.getElementById('todayStatus').textContent = '未打卡';
+    document.getElementById('todayStatus').className = 'today-value red';
+    return;
+  }
+
+  checkinBtn.disabled = true;
+  document.getElementById('todayCheckin').textContent = today.checkin;
+
+  if (today.checkout) {
+    checkoutBtn.disabled = true;
+    statusEl.textContent = '✅ 今日已打卡完成 (' + today.checkin + ' → ' + today.checkout + ')';
+    document.getElementById('todayCheckout').textContent = today.checkout;
+    document.getElementById('todayDuration').textContent = today.duration || calcDuration(today.checkin, today.checkout);
+    document.getElementById('todayStatus').textContent = '已完成';
+    document.getElementById('todayStatus').className = 'today-value green';
+    // 检查是否迟到 (9:30之后上班算迟到)
+    var ci = today.checkin.split(':').map(Number);
+    if (ci[0] > 9 || (ci[0] === 9 && ci[1] > 30)) {
+      statusEl.textContent = '⚠ 今日已打卡，但上班时间 ' + today.checkin + ' 较晚，请注意准时';
+    }
+  } else {
+    checkoutBtn.disabled = false;
+    statusEl.textContent = '⏰ 已上班 (' + today.checkin + ')，下班记得打卡';
+    document.getElementById('todayCheckout').textContent = '--:--';
+    document.getElementById('todayDuration').textContent = '进行中';
+    document.getElementById('todayStatus').textContent = '在岗中';
+    document.getElementById('todayStatus').className = 'today-value green';
+  }
+}
+
+function calcDuration(cin, cout) {
+  var ci = cin.split(':').map(Number);
+  var co = cout.split(':').map(Number);
+  var diff = (co[0] * 60 + co[1]) - (ci[0] * 60 + ci[1]);
+  if (diff < 0) diff += 1440;
+  var h = Math.floor(diff / 60), m = diff % 60;
+  return h + '时' + m + '分';
+}
+
+function doCheckin() {
+  if (getTodayRecords()) { showToast('今日已打卡'); return; }
+  var now = new Date();
+  var timeStr = (now.getHours() < 10 ? '0' : '') + now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+  var recs = StaffSDK.Utils.lsGet('attendance_records', []);
+  recs.unshift({ date: StaffSDK.Utils.todayStr(), checkin: timeStr, checkout: null, duration: null });
+  StaffSDK.Utils.lsSet('attendance_records', recs);
+  showToast('✅ 上班打卡成功 ' + timeStr);
+  loadState();
+}
+
+function doCheckout() {
+  var today = getTodayRecords();
+  if (!today) { showToast('请先上班打卡'); return; }
+  if (today.checkout) { showToast('今日已下班打卡'); return; }
+  var now = new Date();
+  var timeStr = (now.getHours() < 10 ? '0' : '') + now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+  today.checkout = timeStr;
+  today.duration = calcDuration(today.checkin, today.checkout);
+  var recs = StaffSDK.Utils.lsGet('attendance_records', []);
+  for (var i = 0; i < recs.length; i++) {
+    if (recs[i].date === today.date) { recs[i] = today; break; }
+  }
+  StaffSDK.Utils.lsSet('attendance_records', recs);
+  showToast('✅ 下班打卡成功 ' + timeStr + '，今日工作时长 ' + today.duration);
+  loadState();
+}
+
+function renderHistory() {
+  var recs = StaffSDK.Utils.lsGet('attendance_records', []);
+  var container = document.getElementById('historyList');
+  if (!recs.length) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:#999;">暂无打卡记录</div>';
+    return;
+  }
+  // Show last 30 days
+  var monthAgo = new Date();
+  monthAgo.setDate(monthAgo.getDate() - 30);
+  var recent = recs.filter(function(r) { return r.date >= StaffSDK.Utils.todayStr(monthAgo); });
+  if (!recent.length) recent = recs.slice(0, 10);
+  container.innerHTML = recent.map(function(r) {
+    var status = r.checkout ? '正常' : '未下班';
+    var sClass = 'his-normal';
+    if (!r.checkout) { sClass = 'his-miss'; status = '未完成'; }
+    else {
+      var ci = r.checkin.split(':').map(Number);
+      if (ci[0] > 9 || (ci[0] === 9 && ci[1] > 30)) { sClass = 'his-late'; status = '迟到'; }
+    }
+    return '<div class="history-item">' +
+      '<div><div class="history-date">' + r.date + '</div><div class="history-time">' + (r.checkin || '--') + (r.checkout ? ' → ' + r.checkout : '') + '</div></div>' +
+      '<span class="history-status ' + sClass + '">' + status + '</span></div>';
+  }).join('');
+}
+
+loadState();
+renderHistory();
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>我的优惠券</title>
+<script src="../../js/sdk.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:100vh; background:#f5f7fa; display:flex; flex-direction:column; position:relative; }
+.nav-top { position:absolute; top:10px; right:10px; z-index:200; }
+.nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; background:#fff; }
+.back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
+.nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; padding:12px 16px 60px; }
+.page::-webkit-scrollbar { display:none; }
+
+.coupon-card { background:linear-gradient(135deg,#fff3e0,#ffe0b2); border-radius:12px; padding:16px; margin-bottom:12px; display:flex; align-items:center; gap:14px; position:relative; overflow:hidden; }
+.coupon-card::before { content:''; position:absolute; left:-8px; top:50%; transform:translateY(-50%); width:16px; height:16px; background:#f5f7fa; border-radius:50%; }
+.coupon-card::after { content:''; position:absolute; right:-8px; top:50%; transform:translateY(-50%); width:16px; height:16px; background:#f5f7fa; border-radius:50%; }
+.coupon-left { text-align:center; min-width:80px; flex-shrink:0; }
+.coupon-value { font-size:28px; font-weight:800; color:#e37318; }
+.coupon-value .unit { font-size:14px; }
+.coupon-right { flex:1; }
+.coupon-source { font-size:12px; font-weight:600; color:#e37318; }
+.coupon-title { font-size:14px; font-weight:600; color:#333; margin-top:2px; }
+.coupon-expiry { font-size:11px; color:#999; margin-top:4px; }
+.coupon-status { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:600; margin-top:6px; }
+.status-unused { background:#e8f5e9; color:#07c160; }
+.status-used { background:#f5f5f5; color:#999; }
+.status-expired { background:#fff3e0; color:#e37318; }
+
+.empty-state { text-align:center; padding:60px 20px; color:#999; }
+.empty-state .empty-icon { font-size:48px; margin-bottom:12px; }
+.empty-state p { font-size:14px; }
+
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
+.nav-item .nav-icon { font-size:20px; display:block; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
+</style>
+</head>
+<body>
+<div class="nav-top"><a href="../../../index.html">返回导航</a></div>
+<div class="phone">
+  <div class="nav-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <span class="nav-title">我的优惠券</span>
+  </div>
+  <div class="page" id="couponList"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='../home/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
+    <div class="nav-item" onclick="location.href='../room-list/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
+    <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item active"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ── SDK init ──
+var SDK = window.ERP.SDK;
+var API = SDK.API;
+var UI = SDK.UI;
+var Utils = SDK.Utils;
+
+function renderCoupons() {
+  var coupons = Utils.lsGet('coupons', []);
+  var el = document.getElementById('couponList');
+  if (coupons.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎫</div><p>暂无优惠券</p><p style="font-size:12px;margin-top:8px;">首次充值可获赠优惠券包</p></div>';
+    return;
+  }
+  // Update statuses
+  var now = new Date();
+  coupons.forEach(function(c) {
+    if (c.status === 'unused' && new Date(c.expiry) < now) c.status = 'expired';
+  });
+  Utils.lsSet('coupons', coupons);
+
+  var unused = coupons.filter(function(c) { return c.status === 'unused'; });
+  var used = coupons.filter(function(c) { return c.status === 'used'; });
+  var expired = coupons.filter(function(c) { return c.status === 'expired'; });
+
+  var html = '';
+  if (unused.length > 0) {
+    html += '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:10px;">可用优惠券 (' + unused.length + ')</div>';
+    html += unused.map(function(c) { return renderCard(c); }).join('');
+  }
+  if (used.length > 0) {
+    html += '<div style="font-size:13px;font-weight:600;color:#999;margin:16px 0 10px;">已使用 (' + used.length + ')</div>';
+    html += used.map(function(c) { return renderCard(c); }).join('');
+  }
+  if (expired.length > 0) {
+    html += '<div style="font-size:13px;font-weight:600;color:#999;margin:16px 0 10px;">已过期 (' + expired.length + ')</div>';
+    html += expired.map(function(c) { return renderCard(c); }).join('');
+  }
+  el.innerHTML = html;
+}
+
+function renderCard(c) {
+  var statusLabels = { unused:'可用', used:'已使用', expired:'已过期' };
+  var statusClass = 'coupon-status status-' + c.status;
+  var expiryDate = new Date(c.expiry);
+  var expiryStr = expiryDate.getFullYear() + '-' + String(expiryDate.getMonth()+1).padStart(2,'0') + '-' + String(expiryDate.getDate()).padStart(2,'0');
+  return '<div class="coupon-card">' +
+    '<div class="coupon-left"><div class="coupon-value">¥<span class="unit">' + c.value + '</span></div></div>' +
+    '<div class="coupon-right">' +
+      '<div class="coupon-source">' + c.source + '</div>' +
+      '<div class="coupon-title">满' + c.value + '元可用 · 全场通用</div>' +
+      '<div class="coupon-expiry">有效期至 ' + expiryStr + '</div>' +
+      '<div class="' + statusClass + '">' + statusLabels[c.status] + '</div>' +
+    '</div></div>';
+}
+
+// Using SDK.UI.toast
+
+renderCoupons();
+</script>
+</body>
+</html>
