@@ -24,7 +24,8 @@
           房间管理
         </t-menu-item>
 
-        <t-menu-group title="供应链" v-show="!isCollapsed" v-if="hasPermission('MENU_PRODUCTS') || hasPermission('MENU_PURCHASES') || hasPermission('MENU_INVENTORY') || hasPermission('MENU_SUPPLIERS')">
+        <t-menu-group title="供应链" v-show="!isCollapsed" v-if="hasPermission('MENU_ORDERS') || hasPermission('MENU_PRODUCTS') || hasPermission('MENU_PURCHASES') || hasPermission('MENU_INVENTORY') || hasPermission('MENU_SUPPLIERS')">
+          <t-menu-item value="/orders" v-if="hasPermission('MENU_ORDERS')"><template #icon><t-icon name="order" /></template>订单管理</t-menu-item>
           <t-menu-item value="/products" v-if="hasPermission('MENU_PRODUCTS')"><template #icon><t-icon name="gift" /></template>商品目录</t-menu-item>
           <t-menu-item value="/purchases" v-if="hasPermission('MENU_PURCHASES')"><template #icon><t-icon name="shopping-cart" /></template>采购配货</t-menu-item>
           <t-menu-item value="/inventory" v-if="hasPermission('MENU_INVENTORY')"><template #icon><t-icon name="archive" /></template>库存管理</t-menu-item>
@@ -164,8 +165,14 @@ function onMenuChange(value: string) {
 }
 
 function handleLogout() {
-  // Clear ALL app-localStorage keys
-  ;['erp_logged_in','erp_user','erp_room_bills','mp_orders','mp_cart'].forEach(k => localStorage.removeItem(k))
+  // Clear ALL app-localStorage keys (customer-mp, staff-mp, admin-web)
+  ;[
+    'erp_logged_in','erp_user','erp_room_bills','erp_audit_logs','erp_qr_context',
+    'mp_orders','mp_cart','mp_shop_orders','mp_bookings','mp_user','mp_balance_visible','mp_staff_notifications','mp_coupons','mp_inspection_history',
+    'shop_orders','tea_cart','bookings','user','logged_in','users','coupons','room_bills','balance',
+    'staff_logged_in','staff_user','staff_profile','staff_password',
+    'bookings','devices','room_maintenance','audit_logs','inspection_tasks','schedules','attendance_records','coupon_logs'
+  ].forEach(k => localStorage.removeItem(k))
   router.push('/login')
 }
 

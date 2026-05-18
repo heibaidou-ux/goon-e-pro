@@ -233,7 +233,25 @@ var Utils = SDK.Utils;
 
 // ── data ──
 // Sync with supply-chain.json: all 12 products with story/brewingTips
-var products = {
+// First try products synced from admin-web, fallback to hardcoded defaults
+var products = (function() {
+  try {
+    var synced = localStorage.getItem('admin_sync_products');
+    if (synced) {
+      var parsed = JSON.parse(synced);
+      var result = {};
+      for (var i = 0; i < parsed.length; i++) {
+        var cat = parsed[i];
+        result[cat.category] = cat.items || [];
+      }
+      if (result.tea && result.snack && result.ware) return result;
+    }
+  } catch(e) {}
+  return getDefaultProducts();
+})();
+
+function getDefaultProducts() {
+  return {
   snack: [
     { id:'S01', name:'坚果拼盘', desc:'精选四种坚果 · 轻盐烘焙', price:38, spec:'200g/份', icon:'🌰', bg:'#fff3e0', image:'', story:'精选美国杏仁、新疆核桃、云南松子、东北榛子，轻盐烘焙原香酥脆。', origin:'混合产地' },
     { id:'S02', name:'绿豆糕（经典款）', desc:'传统苏式 · 细腻绵密', price:25, spec:'150g/盒', icon:'🥮', bg:'#fff8e1', image:'', story:'去皮绿豆蒸制，口感细腻绵密入口即化，甜而不腻。保质期较短建议即买即食。', origin:'江苏苏州' },
@@ -254,7 +272,8 @@ var products = {
     { id:'W03', name:'双人下午茶套餐', desc:'双人茶聚 · 经典之选', price:168, spec:'1份', icon:'🧁', bg:'#fce4ec', image:'', story:'任选2壶茶饮+双色绿豆糕+坚果拼盘+时令水果，适合与友人共度下午茶。', origin:'高岸茶室' },
     { id:'W04', name:'商务洽谈套餐', desc:'商务会谈 · 尊享体验', price:228, spec:'1份', icon:'💼', bg:'#e3f2fd', image:'', story:'精选岩茶或金骏眉+茶点四色拼盘+商务简餐，私密包间从容会面。', origin:'高岸茶室' },
   ],
-};
+  };
+}
 
 // Room context
 var orderRoomId = null;

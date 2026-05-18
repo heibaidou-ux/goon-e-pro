@@ -37,9 +37,11 @@ export function getMpOrders(): any[] {
 }
 
 // Read customer-mp shop orders
+// NOTE: customer-mp writes to 'shop_orders' (not 'mp_shop_orders')
+// Try both keys for backwards compatibility
 export function getMpShopOrders(): any[] {
   try {
-    const raw = localStorage.getItem('mp_shop_orders')
+    const raw = localStorage.getItem('shop_orders') || localStorage.getItem('mp_shop_orders')
     if (raw) return JSON.parse(raw)
   } catch (e) { /* ignore */ }
   return []

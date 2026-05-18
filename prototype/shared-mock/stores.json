@@ -5,14 +5,32 @@
       "storeCode": "YL",
       "name": "盈隆店",
       "address": "广州市天河区盈隆广场3楼",
+      "fullAddress": "广州市天河区珠江新城华夏路28号盈隆大厦16层",
       "phone": "020-88888888",
+      "detailedPhone": "020-8888-8888",
       "rating": 4.8,
       "distance": 2.3,
       "coverImage": "/images/store-cover.png",
       "description": "高空茶室，180°落地窗，俯瞰城市天际线",
       "openingHours": "08:00-24:00",
+      "displayHours": "09:00-23:00",
       "status": "Active",
-      "rooms": ["RM001", "RM002", "RM003", "RM004", "RM005", "RM006"]
+      "rooms": ["RM001", "RM002", "RM003", "RM004", "RM005", "RM006"],
+      "location": {
+        "lat": 23.119,
+        "lng": 113.325,
+        "amapUrl": "https://uri.amap.com/marker?position=113.325,23.119&name=高岸茶室·盈隆店"
+      },
+      "parkingInfo": {
+        "location": "盈隆大厦地下停车场 B2-B3层",
+        "fees": [
+          { "label": "日间 (08:00-19:00)", "fee": "¥16/小时", "free": false },
+          { "label": "夜间 (19:00-08:00)", "fee": "¥8/小时", "free": false },
+          { "label": "茶室消费客人", "fee": "免费停车3小时", "free": true }
+        ],
+        "spots": "车位充足，B3层配有新能源充电桩（快充/慢充）",
+        "tips": "建议绿色出行：地铁APM线妇儿中心站A口步行300米即达"
+      }
     }
   ]
 }

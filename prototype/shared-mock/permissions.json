@@ -2,6 +2,7 @@
   "resources": [
     { "resourceId": "MENU_DASHBOARD", "type": "menu", "label": "门店总览", "route": "/dashboard" },
     { "resourceId": "MENU_ROOMS", "type": "menu", "label": "房间管理", "route": "/rooms" },
+    { "resourceId": "MENU_ORDERS", "type": "menu", "label": "订单管理", "route": "/orders" },
     { "resourceId": "MENU_PRODUCTS", "type": "menu", "label": "商品目录", "route": "/products" },
     { "resourceId": "MENU_PURCHASES", "type": "menu", "label": "采购配货", "route": "/purchases" },
     { "resourceId": "MENU_INVENTORY", "type": "menu", "label": "库存管理", "route": "/inventory" },
@@ -56,7 +57,7 @@
   "rolePermissions": [
     { "roleId": "admin", "permissions": ["*"] },
     { "roleId": "store_manager", "permissions": [
-      "MENU_DASHBOARD", "MENU_ROOMS", "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
+      "MENU_DASHBOARD", "MENU_ROOMS", "MENU_ORDERS", "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
       "MENU_REVENUE", "MENU_EXPENSE", "MENU_SETTLEMENT", "MENU_RECONCILIATION", "MENU_DIVIDENDS", "MENU_REPORTS",
       "MENU_EMPLOYEES", "MENU_SCHEDULING", "MENU_ATTENDANCE", "MENU_PAYROLL", "MENU_PERFORMANCE", "MENU_CLEANER",
       "MENU_DEVICES", "MENU_SCENES", "MENU_ALERTS",
@@ -81,7 +82,7 @@
       "BTN_APPROVE", "BTN_REJECT", "BTN_PAY", "BTN_EXPORT"
     ] },
     { "roleId": "head_office", "permissions": [
-      "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
+      "MENU_ORDERS", "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
       "MENU_DASHBOARD", "MENU_REPORTS", "MENU_SETTLEMENT",
       "MENU_CAMPAIGNS", "MENU_COUPONS", "MENU_PLATFORM_ACTIVITIES", "MENU_ANALYSIS",
       "MENU_EMPLOYEES", "MENU_PAYROLL", "MENU_PERFORMANCE",
@@ -93,7 +94,7 @@
     ] },
     { "roleId": "head_gm", "permissions": [
       "MENU_DASHBOARD", "MENU_ROOMS",
-      "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
+      "MENU_ORDERS", "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
       "MENU_REVENUE", "MENU_EXPENSE", "MENU_SETTLEMENT", "MENU_RECONCILIATION", "MENU_DIVIDENDS", "MENU_REPORTS", "MENU_ASSETS",
       "MENU_EMPLOYEES", "MENU_EXTERNAL_PERSONNEL", "MENU_SCHEDULING", "MENU_ATTENDANCE", "MENU_PAYROLL", "MENU_PERFORMANCE", "MENU_CLEANER",
       "MENU_CAMPAIGNS", "MENU_COUPONS", "MENU_PLATFORM_ACTIVITIES", "MENU_ANALYSIS",
@@ -103,7 +104,7 @@
     ] },
     { "roleId": "head_dgm", "permissions": [
       "MENU_DASHBOARD", "MENU_ROOMS",
-      "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
+      "MENU_ORDERS", "MENU_PRODUCTS", "MENU_PURCHASES", "MENU_INVENTORY", "MENU_SUPPLIERS",
       "MENU_REVENUE", "MENU_EXPENSE", "MENU_SETTLEMENT", "MENU_RECONCILIATION", "MENU_DIVIDENDS", "MENU_REPORTS", "MENU_ASSETS",
       "MENU_EMPLOYEES", "MENU_EXTERNAL_PERSONNEL", "MENU_SCHEDULING", "MENU_ATTENDANCE", "MENU_PAYROLL", "MENU_PERFORMANCE", "MENU_CLEANER",
       "MENU_CAMPAIGNS", "MENU_COUPONS", "MENU_PLATFORM_ACTIVITIES", "MENU_ANALYSIS",

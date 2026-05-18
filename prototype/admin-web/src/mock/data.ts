@@ -49,12 +49,24 @@ function mergeOrders() {
 
 const orders = mergeOrders()
 
+// ── Shop orders (tea / merchandise) from customer-mp localStorage ──
+function mergeShopOrders() {
+  try {
+    const shopOrders = localStorage.getItem('shop_orders') || localStorage.getItem('mp_shop_orders')
+    if (shopOrders) return JSON.parse(shopOrders)
+  } catch (e) { /* ignore */ }
+  return []
+}
+
+const shopOrders = mergeShopOrders()
+
 export {
   stores,
   rooms,
   devices,
   scenes,
   orders,
+  shopOrders,
   customers,
   employees,
   alerts,

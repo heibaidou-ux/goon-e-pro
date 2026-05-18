@@ -163,7 +163,7 @@
 <script setup lang="ts">
 import { computed, ref, onErrorCaptured } from 'vue'
 import { useRouter } from 'vue-router'
-import { rooms, orders, devices, alerts, employees, getRoomStatusColor, getRoomStatusLabel } from '@/mock/data'
+import { rooms, orders, shopOrders, devices, alerts, employees, getRoomStatusColor, getRoomStatusLabel } from '@/mock/data'
 
 const router = useRouter()
 
@@ -189,12 +189,23 @@ const unresolvedAlerts = computed(() => alertArr.filter(a => a.status === 'Unres
 const todayStr = new Date().toISOString().slice(0, 10)
 const todayStats = computed(() => {
   const todayOrders = orderArr.filter(o => o.date === todayStr)
+  const todayShop = shopOrders.filter((o: any) => {
+    const d = (o.createdAt || '').slice(0, 10)
+    return d === todayStr
+  })
   const inUse = todayOrders.filter(o => o.status === 'InUse').length
   const booked = todayOrders.filter(o => o.status === 'Booked').length
   const completed = todayOrders.filter(o => o.status === 'Completed').length
-  const revenue = todayOrders.filter(o => o.status !== 'Booked').reduce((sum, o) => sum + o.totalAmount, 0)
-  const expectedRevenue = todayOrders.reduce((sum, o) => sum + o.totalAmount, 0)
-  return { totalOrders: todayOrders.length, inUse, booked, completed, revenue, expectedRevenue }
+  const roomRevenue = todayOrders.filter(o => o.status !== 'Booked').reduce((sum, o) => sum + o.totalAmount, 0)
+  const shopRevenue = todayShop.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0)
+  const expectedRoomRev = todayOrders.reduce((sum, o) => sum + o.totalAmount, 0)
+  const expectedShopRev = todayShop.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0)
+  return {
+    totalOrders: todayOrders.length + todayShop.length,
+    inUse, booked, completed,
+    revenue: roomRevenue + shopRevenue,
+    expectedRevenue: expectedRoomRev + expectedShopRev,
+  }
 })
 
 const revenueCards = computed(() => [

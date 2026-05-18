@@ -71,10 +71,67 @@ import finance from '@mock/finance.json'
 const dateRange = ref(['2026-04-25', '2026-05-04'])
 const selectedStore = ref('')
 
-const revenueData = finance.dailyRevenue
+// ── Read real shop orders from localStorage ──
+function getLocalShopOrders(): any[] {
+  try {
+    const raw = localStorage.getItem('shop_orders') || localStorage.getItem('mp_shop_orders')
+    if (raw) return JSON.parse(raw)
+  } catch (e) { /* ignore */ }
+  return []
+}
+
+// ── Build daily revenue entries from shop orders ──
+function buildShopRevenueDays(): Record<string, { totalAmount: number; orderCount: number }> {
+  const orders = getLocalShopOrders()
+  const byDate: Record<string, { totalAmount: number; orderCount: number }> = {}
+  orders.forEach((o: any) => {
+    const d = (o.createdAt || '').slice(0, 10)
+    if (!d) return
+    if (!byDate[d]) byDate[d] = { totalAmount: 0, orderCount: 0 }
+    byDate[d].totalAmount += o.totalAmount || 0
+    byDate[d].orderCount++
+  })
+  return byDate
+}
+
+// ── Compute total retail revenue from shop orders ──
+const shopRevenueTotal = computed(() => {
+  const byDate = buildShopRevenueDays()
+  let total = 0
+  for (const d in byDate) total += byDate[d].totalAmount
+  return total
+})
+
+const shopOrderCount = computed(() => {
+  const byDate = buildShopRevenueDays()
+  let count = 0
+  for (const d in byDate) count += byDate[d].orderCount
+  return count
+})
+
+// ── Merge shop order days into static revenue data ──
+const revenueData = computed(() => {
+  const shopDays = buildShopRevenueDays()
+  return finance.dailyRevenue.map(r => {
+    const dateKey = r.date
+    const shop = shopDays[dateKey]
+    if (shop) {
+      return {
+        ...r,
+        totalAmount: r.totalAmount + shop.totalAmount,
+        orderCount: r.orderCount + shop.orderCount,
+        platformBreakdown: {
+          ...r.platformBreakdown,
+          '小程序': (r.platformBreakdown['小程序'] || 0) + shop.totalAmount,
+        }
+      }
+    }
+    return r
+  })
+})
 
 const filteredRevenue = computed(() => {
-  let list = revenueData
+  let list = revenueData.value
   if (selectedStore.value) list = list.filter(r => r.storeName === selectedStore.value)
   return list
 })
@@ -92,9 +149,10 @@ const platformSubsidy = 1850
 const memberRecharge = 3200
 
 const accountSummary = computed(() => {
+  const roomRevenue = totalRevenue.value - shopRevenueTotal.value
   const items = [
-    { name: '空间租用', amount: Math.round(totalRevenue.value * 0.72), color: '#0052D9' },
-    { name: '商品零售', amount: Math.round(totalRevenue.value * 0.18), color: '#00A870' },
+    { name: '空间租用', amount: Math.max(roomRevenue, 0), color: '#0052D9' },
+    { name: '商品零售', amount: shopRevenueTotal.value, color: '#00A870' },
     { name: '平台补贴', amount: platformSubsidy, color: '#E37318' },
     { name: '其他收入', amount: Math.round(totalRevenue.value * 0.1), color: '#9C27B0' },
   ]

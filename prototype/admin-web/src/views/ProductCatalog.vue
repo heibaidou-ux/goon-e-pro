@@ -489,9 +489,78 @@ function saveProduct() {
     })
   }
 
+  // Sync products to localStorage for customer-mp tea-shop
+  syncProductsToMp()
+
   showProductForm.value = false
   editingProduct.value = null
 }
+
+// Sync admin products to customer-mp format in localStorage
+function syncProductsToMp() {
+  const tea: any[] = []
+  const snack: any[] = []
+  const ware: any[] = []
+  const mpProducts: any[] = []
+
+  products.value.forEach((p: any) => {
+    const price = p.retailPrice || 0
+    if (p.category === '茶叶') {
+      tea.push({
+        id: 'T' + String(tea.length + 1).padStart(2, '0'),
+        name: p.name,
+        desc: (p.origin || '') + ' · ' + (p.subCategory || ''),
+        price: price,
+        spec: p.spec,
+        icon: '🍃',
+        bg: '#e8f5e9',
+        image: p.image || '',
+        story: p.story || '',
+        origin: p.origin || '',
+        brewingTips: p.brewingTips ? (p.brewingTips.waterTemp + ' · ' + p.brewingTips.steepTime + ' · ' + p.brewingTips.vessel) : '',
+      })
+    } else if (p.category === '茶点') {
+      snack.push({
+        id: 'S' + String(snack.length + 1).padStart(2, '0'),
+        name: p.name,
+        desc: (p.subCategory || '') + ' · ' + (p.spec || ''),
+        price: price,
+        spec: p.spec,
+        icon: '🥮',
+        bg: '#fff8e1',
+        image: p.image || '',
+        story: p.story || '',
+        origin: p.origin || '',
+      })
+    } else {
+      ware.push({
+        id: 'W' + String(ware.length + 1).padStart(2, '0'),
+        name: p.name,
+        desc: (p.subCategory || '') + ' · ' + (p.spec || ''),
+        price: price,
+        spec: p.spec,
+        icon: '🏺',
+        bg: '#efebe9',
+        image: p.image || '',
+        story: p.story || '',
+        origin: p.origin || '',
+        brewingTips: p.brewingTips ? (p.brewingTips.waterTemp + ' · ' + p.brewingTips.steepTime + ' · ' + p.brewingTips.vessel) : '',
+      })
+    }
+  })
+
+  mpProducts.push({ category: 'tea', label: '茶叶', items: tea })
+  mpProducts.push({ category: 'snack', label: '茶点', items: snack })
+  mpProducts.push({ category: 'ware', label: '茶具', items: ware })
+
+  try {
+    localStorage.setItem('admin_sync_products', JSON.stringify(mpProducts))
+    localStorage.setItem('admin_sync_products_time', new Date().toISOString())
+  } catch (e) { /* ignore storage full */ }
+}
+
+// Initial sync to mp on mount
+setTimeout(() => syncProductsToMp(), 500)
 </script>
 
 <style scoped>
