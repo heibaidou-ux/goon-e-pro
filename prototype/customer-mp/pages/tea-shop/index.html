@@ -2,13 +2,15 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>茶品商城</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>茶品雅集</title>
+<script src="../../js/sdk.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-.phone { width:375px; height:812px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
-.page { flex:1; overflow-y:auto; padding-bottom:60px; position:relative; }
+body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; position:relative; }
+.page::-webkit-scrollbar { display:none; }
 .header { padding:16px; background:#fff; border-bottom:1px solid #f0f0f0; position:sticky; top:0; z-index:10; }
 .header-title { font-size:18px; font-weight:700; color:#1a1a1a; text-align:center; }
 .cart-badge { position:absolute; right:16px; top:16px; cursor:pointer; font-size:20px; }
@@ -55,14 +57,13 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .cart-total .total-price { color:#e37318; }
 .checkout-btn { margin:0 16px 20px; padding:14px; background:#07c160; color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; width:calc(100% - 32px); cursor:pointer; }
 
-.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
-.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; transition:color .15s; text-decoration:none; }
-.nav-item .nav-icon { font-size:20px; }
-.nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
-.nav-item:not(.active) { color:#999; }
 
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
+.nav-item .nav-icon { font-size:20px; display:block; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
 
 /* Payment Modal */
 .pay-modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center; }
@@ -97,7 +98,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
   <!-- Product List View -->
   <div class="page" id="productView">
     <div class="header">
-      <div class="header-title">茶品商城</div>
+      <div class="header-title">茶品雅集</div>
       <div class="cart-badge" onclick="showCart()">
         🛒<span class="badge" id="cartBadge" style="display:none">0</span>
       </div>
@@ -132,7 +133,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 
   <div class="bottom-nav">
     <div class="nav-item" onclick="location.href='../home/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
-    <div class="nav-item" onclick="location.href='../room-detail/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../room-list/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
     <div class="nav-item active"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
     <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
     <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
@@ -177,6 +178,18 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 </div>
 
 <!-- Payment Modal -->
+<!-- Insufficient Balance Alert -->
+<div class="pay-modal-overlay" id="insufficientModal" onclick="if(event.target===this)hideInsufficientModal()">
+  <div class="pay-modal">
+    <h3>⚠️ 余额不足</h3>
+    <p style="font-size:14px;color:#666;margin:16px 0;line-height:1.6;" id="insufficientMsg"></p>
+    <div class="pay-modal-btns">
+      <button class="pay-btn-cancel" onclick="hideInsufficientModal()">取消支付</button>
+      <button class="pay-btn-confirm" onclick="switchPayMethod()">选择其他方式</button>
+    </div>
+  </div>
+</div>
+
 <div class="pay-modal-overlay" id="payModal">
   <div class="pay-modal">
     <h3>确认支付</h3>
@@ -212,6 +225,12 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 </div>
 
 <script>
+// ── SDK init ──
+var SDK = window.ERP.SDK;
+var API = SDK.API;
+var UI = SDK.UI;
+var Utils = SDK.Utils;
+
 // ── data ──
 // Sync with supply-chain.json: all 12 products with story/brewingTips
 var products = {
@@ -266,7 +285,7 @@ function closeRoomBanner() {
 }
 
 var currentCat = 'tea';
-var cart = JSON.parse(localStorage.getItem('mp_tea_cart') || '[]');
+var cart = Utils.lsGet('tea_cart', []);
 var detailProduct = null;
 var detailQty = 1;
 var payMethod = 'balance';
@@ -337,7 +356,7 @@ function removeFromCart(product) {
 }
 
 function saveCart() {
-  localStorage.setItem('mp_tea_cart', JSON.stringify(cart));
+  Utils.lsSet('tea_cart', JSON.stringify(cart));
 }
 
 function renderCartBadge() {
@@ -444,11 +463,11 @@ function clearCart() {
   renderCart();
   renderCartBadge();
   showProducts();
-  showToast('购物车已清空');
+  UI.toast('购物车已清空');
 }
 
 function checkout() {
-  if (cart.length === 0) { showToast('购物车为空'); return; }
+  if (cart.length === 0) { UI.toast('购物车为空'); return; }
   showPayModal();
 }
 
@@ -489,20 +508,21 @@ function confirmPay() {
 
   // Check balance if paying with balance
   if (payMethod === 'balance') {
-    var user = JSON.parse(localStorage.getItem('mp_user') || 'null');
+    var user = Utils.lsGet('user' || 'null');
     var balance = user ? (user.balance || 0) : 0;
     if (balance < total) {
-      showToast('余额不足（余额¥' + balance + '），请选择其他支付方式');
+      document.getElementById('insufficientMsg').textContent = '当前余额 ¥' + balance + '，需支付 ¥' + total + '。请选择其他支付方式或取消支付。';
+      document.getElementById('insufficientModal').style.display = 'flex';
       return;
     }
     user.balance -= total;
-    localStorage.setItem('mp_user', JSON.stringify(user));
+    Utils.lsSet('user', user);
   }
 
   // Handle room charge
   if (payMethod === 'room') {
     // Save to room bills
-    var roomBills = JSON.parse(localStorage.getItem('erp_room_bills') || '{}');
+    var roomBills = Utils.lsGet('room_bills', {});
     if (!roomBills[orderRoomId]) {
       roomBills[orderRoomId] = { roomId:orderRoomId, roomName:orderRoomName, items:[], totalAmount:0, roomFee:0, createdAt:new Date().toISOString(), settledAt:null };
     }
@@ -510,10 +530,10 @@ function confirmPay() {
       return { productName:item.name, qty:item.qty, price:item.price, amount:item.price * item.qty, orderedAt:new Date().toISOString() };
     }));
     roomBills[orderRoomId].totalAmount += total;
-    localStorage.setItem('erp_room_bills', JSON.stringify(roomBills));
+    Utils.lsSet('room_bills', JSON.stringify(roomBills));
 
     // Create order record
-    var shopOrders = JSON.parse(localStorage.getItem('mp_shop_orders') || '[]');
+    var shopOrders = Utils.lsGet('shop_orders', []);
     var orderId = 'SH' + Date.now();
     var now = new Date();
     shopOrders.unshift({
@@ -530,7 +550,7 @@ function confirmPay() {
       tableId: orderTableId,
       type: 'room-charge'
     });
-    localStorage.setItem('mp_shop_orders', JSON.stringify(shopOrders));
+    Utils.lsSet('shop_orders', shopOrders);
 
     cart = [];
     saveCart();
@@ -538,7 +558,7 @@ function confirmPay() {
     showProducts();
     renderCart();
     document.getElementById('payModal').style.display = 'none';
-    showToast('✅ 已挂账至' + orderRoomName + '，请在离店时统一结算');
+    UI.toast('✅ 已挂账至' + orderRoomName + '，请在离店时统一结算');
     return;
   }
 
@@ -550,7 +570,7 @@ function confirmPay() {
   }
   var orderStatus = needsShipping ? 'Shipping' : 'Completed';
 
-  var shopOrders = JSON.parse(localStorage.getItem('mp_shop_orders') || '[]');
+  var shopOrders = Utils.lsGet('shop_orders', []);
   var orderId = 'SH' + Date.now();
   var now = new Date();
   var dateStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
@@ -566,7 +586,7 @@ function confirmPay() {
     payment: payMethod === 'wechat' ? '微信支付' : payMethod === 'alipay' ? '支付宝' : '余额支付',
     type: 'shop'
   });
-  localStorage.setItem('mp_shop_orders', JSON.stringify(shopOrders));
+  Utils.lsSet('shop_orders', shopOrders);
 
   cart = [];
   saveCart();
@@ -575,11 +595,20 @@ function confirmPay() {
   renderCart();
   document.getElementById('payModal').style.display = 'none';
   var statusMsg = needsShipping ? '待发货' : '已完成';
-  showToast('支付成功！订单' + statusMsg + '，单号：' + orderId);
+  UI.toast('支付成功！订单' + statusMsg + '，单号：' + orderId);
 }
 
 function cancelPay() {
   document.getElementById('payModal').style.display = 'none';
+}
+
+function hideInsufficientModal() {
+  document.getElementById('insufficientModal').style.display = 'none';
+  document.getElementById('payModal').style.display = 'none';
+}
+
+function switchPayMethod() {
+  document.getElementById('insufficientModal').style.display = 'none';
 }
 
 // ── Product Detail ──
@@ -658,10 +687,10 @@ function detailAddToCart() {
   renderProducts();
   renderCartBadge();
   hideDetail();
-  showToast(detailProduct.name + ' ×' + detailQty + ' 已加入购物车');
+  UI.toast(detailProduct.name + ' ×' + detailQty + ' 已加入购物车');
 }
 
-function showToast(msg) {
+UI.toast = function(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.style.display = 'block';

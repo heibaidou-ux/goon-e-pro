@@ -2,25 +2,33 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>包间预订</title>
+<script src="../../js/sdk.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-.phone { width:375px; height:812px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
 .nav-top { position:fixed; top:10px; right:20px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
-.page { flex:1; overflow-y:auto; padding-bottom:60px; }
 .nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; background:#fff; }
 .back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
 .nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
-.hero { height:120px; display:flex; align-items:center; justify-content:center; font-size:48px; flex-shrink:0; }
-.room-info { padding:10px 16px 6px; }
-.room-name { font-size:17px; font-weight:700; }
-.room-meta { font-size:12px; color:#666; margin-top:2px; }
-.facility-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
-.facility-tag { background:#f0fdf4; color:#07c160; padding:2px 8px; border-radius:10px; font-size:11px; }
-.divider { height:6px; background:#f5f5f5; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; }
+.page::-webkit-scrollbar { display:none; }
+
+/* Unified room header card */
+.room-header-card { margin:0; padding:16px; color:#fff; }
+.room-header-card.gradient-tea { background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%); }
+.room-header-card.gradient-meeting { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); }
+.room-header-card.gradient-exhibition { background:linear-gradient(135deg,#f5af19 0%,#f12711 100%); }
+.room-header-card.gradient-workshop { background:linear-gradient(135deg,#8e9eab 0%,#eef2f3 100%); }
+.room-header-top { display:flex; align-items:center; gap:12px; }
+.room-header-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; background:rgba(255,255,255,.25); flex-shrink:0; }
+.room-header-name { font-size:17px; font-weight:700; }
+.room-header-meta { font-size:12px; opacity:.85; margin-top:2px; }
+.room-header-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+.room-header-tags .facility-tag { background:rgba(255,255,255,.2); color:#fff; padding:2px 10px; border-radius:10px; font-size:11px; }
 
 /* Date bar */
 .date-bar { display:flex; align-items:center; padding:10px 12px; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
@@ -32,48 +40,43 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .date-chip.today { border-color:#07c160; }
 .date-chip.selected { background:#07c160; color:#fff; border-color:#07c160; }
 .date-chip.selected .d-week, .date-chip.selected .d-month { color:rgba(255,255,255,.7); }
-.date-more { flex-shrink:0; padding:10px 8px; border-radius:10px; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; font-size:12px; color:#666; text-align:center; min-width:42px; line-height:1.4; }
+.date-more { flex-shrink:0; padding:10px 8px; border-radius:10px; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; font-size:12px; color:#666; text-align:center; min-width:42px; }
 
-/* Person bar */
-.person-bar { padding:8px 12px; }
-.person-bar-label { font-size:11px; color:#999; margin-bottom:4px; }
-.person-scroll { display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:2px; }
-.person-scroll::-webkit-scrollbar { display:none; }
-.person-chip { padding:8px 12px; border-radius:10px; text-align:center; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; transition:all .15s; flex-shrink:0; min-width:80px; }
-.person-chip.selected { background:#07c160; color:#fff; border-color:#07c160; }
-.person-chip .p-count { font-size:14px; font-weight:600; }
-.person-chip .p-price { font-size:11px; color:#e37318; margin-top:1px; }
-.person-chip.selected .p-price { color:#fff; }
+/* Duration selector */
+.section-label { font-size:12px; font-weight:600; color:#333; margin-bottom:8px; }
+.duration-section { padding:12px 12px 4px; }
+.duration-grid { display:flex; gap:8px; }
+.duration-chip { flex:1; padding:12px 4px; border-radius:10px; text-align:center; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; font-size:13px; font-weight:600; transition:all .15s; }
+.duration-chip:active { opacity:.7; }
+.duration-chip.selected { border-color:#07c160; background:#f0fdf4; color:#07c160; }
 
-/* Time grid */
-.time-section { padding:4px 12px; }
-.time-section-label { font-size:11px; color:#999; margin-bottom:4px; }
-.time-grid { display:flex; flex-wrap:wrap; gap:4px; overflow-y:auto; max-height:220px; border:1.5px solid #e5e5e5; border-radius:10px; padding:8px; }
-.time-cell { padding:7px 2px; border-radius:6px; text-align:center; cursor:pointer; border:1px solid #eee; background:#fff; font-size:11px; transition:all .12s; width:calc(25% - 3px); flex-shrink:0; }
-.time-cell:hover { border-color:#07c160; }
-.time-cell.selected { background:#07c160; color:#fff; border-color:#07c160; }
-.time-cell.in-range { background:#e8f5e9; border-color:#a5d6a7; }
-.time-cell .t-label { font-weight:500; }
-.time-cell .t-price { font-size:9px; display:block; color:#999; }
-.time-cell.selected .t-price { color:rgba(255,255,255,.7); }
-.time-cell.disabled { cursor:not-allowed; }
-.time-cell.disabled.booked { opacity:.35; background:#f5f5f5; border-color:#e0e0e0; }
-.time-cell.disabled.cleaning { opacity:.7; background:#fff8e1; border-color:#ffe082; }
+/* Form rows */
+.form-row { padding:6px 12px; display:flex; align-items:center; gap:8px; }
+.form-label { font-size:12px; font-weight:600; color:#333; min-width:48px; flex-shrink:0; }
+.form-row .now-btn { padding:8px 16px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.form-row .now-btn:active { opacity:.8; }
+.form-row .time-or { font-size:11px; color:#ccc; }
+.form-row select { flex:1; padding:8px 10px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; font-size:13px; color:#333; appearance:auto; }
+.duration-select-wrap { display:inline-block; position:relative; }
+.cd-select { padding:8px 12px; border-radius:8px; border:1.5px solid #07c160; background:#f0fdf4; font-size:13px; font-weight:600; color:#07c160; }
 
-/* Special */
-.special-section { padding:6px 12px 4px; }
-.special-row { display:flex; gap:8px; }
-.special-chip { flex:1; padding:10px; border-radius:10px; text-align:center; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; transition:all .15s; }
-.special-chip.selected { border-color:#07c160; background:#f0fdf4; }
-.special-chip .sp-name { font-size:13px; font-weight:600; }
-.special-chip .sp-price { font-size:11px; color:#e37318; margin-top:2px; }
-.special-chip .sp-desc { font-size:10px; color:#999; margin-top:2px; }
+/* Conflict alert */
+.conflict-alert { margin:4px 12px; padding:10px 14px; border-radius:8px; background:#fff3e0; border:1px solid #ffe082; font-size:12px; color:#e65100; display:none; }
+.conflict-alert .suggest-time { color:#07c160; font-weight:600; cursor:pointer; text-decoration:underline; }
 
-.night-picker { padding:4px 12px 8px; display:none; }
-.night-picker-label { font-size:11px; color:#999; margin-bottom:4px; }
-.night-grid { display:flex; flex-wrap:wrap; gap:4px; }
-.night-cell { padding:6px 10px; border-radius:8px; text-align:center; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; font-size:12px; transition:all .15s; }
-.night-cell.selected { background:#07c160; color:#fff; border-color:#07c160; }
+/* Inline info */
+.info-bar { padding:2px 12px 6px; display:flex; gap:16px; font-size:10px; color:#999; }
+
+/* In-page bottom (subtotal + confirm) */
+.inpage-bottom { padding:16px 12px; border-top:1px solid #f0f0f0; margin-top:8px; }
+.inpage-total { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.inpage-total .total-label { font-size:13px; color:#999; flex-shrink:0; }
+.inpage-total .total-price { font-size:20px; font-weight:700; color:#e37318; flex-shrink:0; }
+.inpage-total .total-detail { font-size:12px; color:#999; flex:1; text-align:right; }
+.inpage-total .total-detail.active { font-size:17px; font-weight:700; color:#e37318; }
+.inpage-book-btn { width:100%; padding:14px; border-radius:10px; background:#07c160; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; }
+.inpage-book-btn:active { opacity:.8; }
+.inpage-book-btn:disabled { background:#ccc; cursor:not-allowed; }
 
 /* Calendar modal */
 .cal-modal { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
@@ -91,24 +94,13 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .cal-day.past { color:#ddd;cursor:default; }
 .cal-close { margin-top:10px;padding:10px;border-radius:8px;border:none;background:#07c160;color:#fff;font-size:14px;cursor:pointer;width:100%; }
 
-/* Bottom bar */
-.bottom-bar { background:#fff; border-top:1px solid #f0f0f0; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
-.total-info { display:flex; flex-direction:column; }
-.total-label { font-size:11px; color:#999; }
-.total-price { font-size:22px; font-weight:700; color:#e37318; }
-.total-detail { font-size:10px; color:#999; margin-top:1px; }
-.book-btn { padding:14px 28px; border-radius:10px; background:#07c160; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; transition:opacity .15s; }
-.book-btn:active { opacity:.8; }
-.book-btn:disabled { background:#ccc; cursor:not-allowed; }
-
-.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
-.nav-item { flex:1; text-align:center; padding:8px 0 4px; cursor:pointer; color:#999; font-size:10px; }
-.nav-item.active { color:#07c160; }
-.nav-item .nav-icon { font-size:18px; display:block; }
-.nav-item .nav-label { font-size:9px; margin-top:1px; }
-
 .no-booking { text-align:center; padding:40px 20px; color:#999; }
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
+.nav-item .nav-icon { font-size:20px; display:block; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
 </style>
 </head>
 <body>
@@ -119,20 +111,12 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
     <span class="nav-title" id="roomTitle">加载中...</span>
   </div>
   <div class="page" id="pageContent"></div>
-  <div class="bottom-bar" id="bottomBar" style="display:none;">
-    <div class="total-info">
-      <span class="total-label">小计</span>
-      <span class="total-price" id="totalPrice">¥0</span>
-      <span class="total-detail" id="totalDetail"></span>
-    </div>
-    <button class="book-btn" id="bookBtn" disabled onclick="goPay()">确认预约</button>
-  </div>
   <div class="bottom-nav">
-    <div class="nav-item" onclick="location.href='../home/index.html'"><span class="nav-icon">🏠</span><span class="nav-label">主页</span></div>
-    <div class="nav-item active"><span class="nav-icon">📅</span><span class="nav-label">预订</span></div>
-    <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><span class="nav-icon">🍵</span><span class="nav-label">茶品</span></div>
-    <div class="nav-item" onclick="location.href='../my-orders/index.html'"><span class="nav-icon">📋</span><span class="nav-label">订单</span></div>
-    <div class="nav-item" onclick="location.href='../member-center/index.html'"><span class="nav-icon">👤</span><span class="nav-label">我的</span></div>
+    <div class="nav-item" onclick="location.href='../home/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
+    <div class="nav-item active"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
+    <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
+    <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
   </div>
 </div>
 <div class="cal-modal" id="calModal" onclick="if(event.target===this)hideCalModal()">
@@ -149,402 +133,406 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 </div>
 <div class="toast" id="toast"></div>
 <script>
+// Room data — flat hourly rate (space/time pricing, not per-person)
 const rooms = [
-  { roomId:"RM004", name:"大茶室C", type:"茶室", capacity:6, area:25, facilities:["茶台","K歌","投影","落地窗"], bookable:true },
-  { roomId:"RM001", name:"大会议室", type:"会议室", capacity:10, area:30, facilities:["投影","会议桌","K歌设备","落地窗"], bookable:true },
-  { roomId:"RM002", name:"中茶室A", type:"茶室", capacity:4, area:18, facilities:["茶台","落地窗","茶具套装"], bookable:true },
-  { roomId:"RM003", name:"中茶室B", type:"茶室", capacity:4, area:18, facilities:["茶台","落地窗","茶具套装"], bookable:true },
+  { roomId:"RM004", name:"大茶室C", type:"茶室", capacity:6, area:25, facilities:["茶台","K歌","投影","落地窗"], pricePerHour:120 },
+  { roomId:"RM001", name:"大会议室", type:"会议室", capacity:10, area:30, facilities:["投影","会议桌","K歌设备","落地窗"], pricePerHour:200 },
+  { roomId:"RM002", name:"中茶室A", type:"茶室", capacity:4, area:18, facilities:["茶台","落地窗","茶具套装"], pricePerHour:80 },
+  { roomId:"RM003", name:"中茶室B", type:"茶室", capacity:4, area:18, facilities:["茶台","落地窗","茶具套装"], pricePerHour:80 },
   { roomId:"RM005", name:"展厅", type:"展厅", capacity:20, area:40, facilities:["前台","收银","茶具展示","休闲区"], bookable:false },
   { roomId:"RM006", name:"工作间", type:"工作间", capacity:2, area:12, facilities:["储物","机柜"], bookable:false },
 ];
 
-const roomPricing = {
-  RM004: { perPerson:{2:98,3:118,4:138,5:158,6:178}, night:278, overnight:418 },
-  RM001: { perPerson:{4:158,6:188,8:218,10:258}, night:278, overnight:418 },
-  RM002: { perPerson:{2:88,3:118,4:128}, night:278, overnight:418 },
-  RM003: { perPerson:{2:88,3:118,4:128}, night:278, overnight:418 },
-};
-
 const heroes = { '茶室':'🍵', '会议室':'💼', '展厅':'🏛️', '工作间':'🔧' };
-const heroBg = { '茶室':'linear-gradient(135deg,#43e97b 0%,#38f9d7 100%)', '会议室':'linear-gradient(135deg,#667eea 0%,#764ba2 100%)', '展厅':'linear-gradient(135deg,#f5af19 0%,#f12711 100%)', '工作间':'linear-gradient(135deg,#8e9eab 0%,#eef2f3 100%)' };
+const gradClassMap = { '茶室':'gradient-tea', '会议室':'gradient-meeting', '展厅':'gradient-exhibition', '工作间':'gradient-workshop' };
 
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get('id') || 'RM004';
 const room = rooms.find(r => r.roomId === roomId) || rooms[0];
-const pricing = roomPricing[roomId] || { perPerson:{}, night:278, overnight:418 };
+const hourRate = room.pricePerHour || 120;
 
 document.getElementById('roomTitle').textContent = room.name;
-document.getElementById('calWeekdays').innerHTML = ['日','一','二','三','四','五','六'].map(d => `<span>${d}</span>`).join('');
+document.getElementById('calWeekdays').innerHTML = ['日','一','二','三','四','五','六'].map(d => '<span>'+d+'</span>').join('');
 const page = document.getElementById('pageContent');
 
-if (!room.bookable) {
-  page.innerHTML = `
-    <div class="hero" style="background:${heroBg[room.type]||'#f0f0f0'};">${heroes[room.type]||'🏠'}</div>
-    <div class="room-info"><div class="room-name">${room.name}</div><div class="room-meta">容纳: ${room.capacity}人 · ${room.area}㎡</div><div class="facility-tags">${room.facilities.map(f => `<span class="facility-tag">${f}</span>`).join('')}</div></div>
-    <div class="divider"></div>
-    <div class="no-booking"><div style="font-size:48px;margin-bottom:12px;">${roomId==='RM005'?'🏛️':'🔧'}</div><p style="font-size:16px;font-weight:600;color:#333;">${roomId==='RM005'?'自由参观，无需预约':'员工专用空间'}</p><p style="font-size:13px;margin-top:8px;">${roomId==='RM005'?'展厅为开放区域，自由使用。如需使用包间，请选择茶室或会议室预约。':'工作间为员工储物和设备机柜空间，不对外开放。'}</p><button style="margin-top:16px;padding:10px 24px;border-radius:8px;background:#07c160;color:#fff;border:none;font-size:14px;cursor:pointer;" onclick="location.href='../home/index.html'">查看可预约包间</button></div>`;
-} else {
-  document.getElementById('bottomBar').style.display = 'flex';
-  const personOptions = Object.entries(pricing.perPerson).map(([p,rate]) => ({ count:parseInt(p), rate }));
-  personOptions.sort((a,b) => a.count-b.count);
+// ── State ──
+const today = new Date(); today.setHours(0,0,0,0);
+const now = new Date();
+let selectedDate = new Date(today);
+let selectedStart = null;   // "HH:MM"
+let selectedEnd = null;     // "HH:MM"
+let selectedDuration = null; // 120/180/240, or null for custom
+let isCustomMode = false;
+let customStep = 'start';   // 'start' or 'end' in custom mode
+let calYear = today.getFullYear(), calMonth = today.getMonth();
 
-  const today = new Date(); today.setHours(0,0,0,0);
-  const now = new Date();
-
-  let selectedDate = new Date(today);
-  let selectedPerson = personOptions[0].count;
-  let selectedStart = null;
-  let selectedEnd = null;
-  let sessionType = 'standard';
-  let nightStartTime = null;
-  let calYear = today.getFullYear(), calMonth = today.getMonth();
-
-  page.innerHTML = `
-    <div class="hero" style="background:${heroBg[room.type]||'#f0f0f0'};">${heroes[room.type]||'🏠'}</div>
-    <div class="room-info"><div class="room-name">${room.name}</div><div class="room-meta">容纳: ${room.capacity}人 · ${room.area}㎡</div><div class="facility-tags">${room.facilities.map(f => `<span class="facility-tag">${f}</span>`).join('')}</div></div>
-    <div class="divider"></div>
-    <div class="date-bar" id="dateBar"></div>
-    <div class="person-bar"><div class="person-bar-label">选择人数（左右滑动）</div><div class="person-scroll" id="personScroll"></div></div>
-    <div class="time-section"><div class="time-section-label" id="timeSectionLabel">选择时段 — 点击起点，再点击终点</div><div class="time-grid" id="timeGrid"></div><div style="font-size:10px;color:#999;margin-top:6px;display:flex;gap:12px"><span style="display:inline-flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fff8e1;border:1px solid #ffe082"></span> 保洁准备中(15min)</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f5f5f5"></span> 已预约</span></div></div>
-    <div class="special-section" id="specialSection"></div>
-    <div class="night-picker" id="nightPicker"><div class="night-picker-label">夜间开始时间（23:59-05:00，3小时）</div><div class="night-grid" id="nightGrid"></div></div>`;
-
-  // ── Date bar ──
-  function renderDateBar() {
-    const weekNames = ['日','一','二','三','四','五','六'];
-    let html = '';
-    for (let i = 0; i < 5; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      const isToday = d.toDateString() === today.toDateString();
-      const isSelected = d.toDateString() === selectedDate.toDateString();
-      let cls = 'date-chip';
-      if (isToday) cls += ' today';
-      if (isSelected) cls += ' selected';
-      html += `<div class="${cls}" onclick="pickDateBar(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))"><div class="d-week">周${weekNames[d.getDay()]}</div><div class="d-day">${d.getDate()}</div><div class="d-month">${d.getMonth()+1}月</div></div>`;
-    }
-    html += '<div class="date-more" onclick="showCalModal()">更多<br>▾</div>';
-    document.getElementById('dateBar').innerHTML = html;
+// ── Render main content ──
+function renderPage() {
+  if (!room.bookable && (roomId==='RM005'||roomId==='RM006')) {
+    var gc = gradClassMap[room.type] || 'gradient-workshop';
+    page.innerHTML =
+      '<div class="room-header-card ' + gc + '"><div class="room-header-top"><div class="room-header-icon">' + (heroes[room.type]||'🏠') + '</div><div><div class="room-header-name">' + room.name + '</div><div class="room-header-meta">容纳 ' + room.capacity + '人 · ' + room.area + '㎡ · 非预约空间</div></div></div><div class="room-header-tags">' + room.facilities.map(function(f) { return '<span class="facility-tag">' + f + '</span>'; }).join('') + '</div></div>' +
+      '<div class="no-booking"><div style="font-size:48px;margin-bottom:12px;">' + (roomId==='RM005'?'🏛️':'🔧') + '</div><p style="font-size:16px;font-weight:600;color:#333;">' + (roomId==='RM005'?'自由参观，无需预约':'员工专用空间') + '</p><p style="font-size:13px;margin-top:8px;">' + (roomId==='RM005'?'展厅为开放区域，自由使用。如需使用包间，请选择茶室或会议室预约。':'工作间为员工储物和设备机柜空间，不对外开放。') + '</p><button style="margin-top:16px;padding:10px 24px;border-radius:8px;background:#07c160;color:#fff;border:none;font-size:14px;cursor:pointer;" onclick="location.href=\'../home/index.html\'">查看可预约包间</button></div>';
+    return;
   }
 
-  window.pickDateBar = function(d) {
-    selectedDate = d; selectedStart = null; selectedEnd = null;
-    renderDateBar(); renderTimeGrid(); renderSpecial(); updateTotal();
-  };
+  var gc = gradClassMap[room.type] || 'gradient-tea';
+  var facTags = room.facilities.map(function(f) { return '<span class="facility-tag">' + f + '</span>'; }).join('');
+  page.innerHTML =
+    '<div class="room-header-card ' + gc + '"><div class="room-header-top"><div class="room-header-icon">' + (heroes[room.type]||'🏠') + '</div><div><div class="room-header-name">' + room.name + '</div><div class="room-header-meta">容纳 ' + room.capacity + '人 · ' + room.area + '㎡ · ¥' + hourRate + '/小时</div></div></div><div class="room-header-tags">' + facTags + '</div></div>' +
+    '<div class="date-bar" id="dateBar"></div>' +
+    '<div class="duration-section"><div class="section-label">选择时长</div><div class="duration-grid" id="durationGrid"></div><div id="customDurationWrap" style="display:none;margin-top:6px"><select class="cd-select" id="customDurationSelect" onchange="pickCustomDuration(this.value)"><option value="">选择时长...</option></select></div></div>' +
+    '<div id="timeRow" class="form-row" style="display:none"><div class="form-label">开始时间</div><button class="now-btn" id="nowBtn" onclick="pickNow()">⚡ 现在开始</button><span class="time-or">或</span><select id="timeSelect" onchange="pickTimeFromSelect(this.value)"><option value="">选择时间...</option></select></div>' +
+    '<div class="info-bar"><span>🧹 保洁准备(15min)</span><span>📅 约满时段不显示</span></div>' +
+    '<div class="conflict-alert" id="conflictAlert"></div>' +
+    '<div class="inpage-bottom"><div class="inpage-total"><span class="total-label">小计</span><span class="total-price" id="totalPrice">¥0</span><span class="total-detail" id="totalDetail">请选择时长和时间</span></div><button class="inpage-book-btn" id="bookBtn" disabled onclick="goPay()">确认预约</button></div>';
 
-  // ── Calendar modal ──
-  window.showCalModal = function() { document.getElementById('calModal').style.display = 'flex'; renderCalendar(); };
-  window.hideCalModal = function() { document.getElementById('calModal').style.display = 'none'; };
-  window.calChangeMonth = function(dir) {
-    calMonth += dir;
-    if (calMonth < 0) { calMonth = 11; calYear--; }
-    if (calMonth > 11) { calMonth = 0; calYear++; }
-    renderCalendar();
-  };
-
-  function renderCalendar() {
-    document.getElementById('calMonth').textContent = calYear + '年 ' + (calMonth+1) + '月';
-    const firstDay = new Date(calYear, calMonth, 1).getDay();
-    const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-    const daysInPrev = new Date(calYear, calMonth, 0).getDate();
-    const maxDate = new Date(today); maxDate.setDate(today.getDate()+90);
-    let cells = '';
-    for (let i = firstDay-1; i >= 0; i--) cells += '<div class="cal-day other">' + (daysInPrev-i) + '</div>';
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dt = new Date(calYear, calMonth, d);
-      const isToday = dt.toDateString() === today.toDateString();
-      const isPast = dt < today;
-      const isTooFar = dt > maxDate;
-      const isSelected = dt.toDateString() === selectedDate.toDateString();
-      let cls = 'cal-day';
-      if (isToday) cls += ' today';
-      if (isSelected) cls += ' selected';
-      if (isPast || isTooFar) cls += ' past';
-      const click = (isPast||isTooFar) ? '' : 'onclick="calPick('+calYear+','+calMonth+','+d+')"';
-      cells += '<div class="'+cls+'" '+click+'>'+d+'</div>';
-    }
-    const remaining = 42 - firstDay - daysInMonth;
-    for (let d = 1; d <= remaining; d++) cells += '<div class="cal-day other">'+d+'</div>';
-    document.getElementById('calGrid').innerHTML = cells;
-  }
-
-  window.calPick = function(y, m, d) {
-    selectedDate = new Date(y, m, d); selectedStart = null; selectedEnd = null;
-    renderDateBar(); renderTimeGrid(); renderSpecial(); updateTotal(); hideCalModal();
-  };
-
-  // ── Person bar ──
-  function renderPersonBar() {
-    document.getElementById('personScroll').innerHTML = personOptions.map(({count,rate}) =>
-      '<div class="person-chip' + (selectedPerson===count?' selected':'') + '" onclick="pickPerson('+count+')"><div class="p-count">'+count+'人</div><div class="p-price">¥'+rate+'/时</div></div>'
-    ).join('');
-  }
-
-  window.pickPerson = function(count) {
-    selectedPerson = count;
-    renderPersonBar(); renderTimeGrid(); updateTotal();
-  };
-
-  // ── Booking buffer: 15 min cleaning buffer between bookings ──
-  const existingBookings = {
-    RD004: [{ date:'2026-05-10', start:'08:00', end:'10:00' }, { date:'2026-05-10', start:'14:00', end:'16:00' }],
-    RM001: [{ date:'2026-05-10', start:'09:00', end:'12:00' }],
-    RM002: [{ date:'2026-05-10', start:'10:00', end:'12:30' }],
-    RM003: [],
-    RM005: [], RM006: [],
-  };
-
-  function getBookedBlocks(roomId, dateStr) {
-    const blocks = existingBookings[roomId] || [];
-    return blocks.filter(b => b.date === dateStr).map(b => {
-      const sp = b.start.split(':'), ep = b.end.split(':');
-      const sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
-      let eMin = parseInt(ep[0])*60 + parseInt(ep[1]);
-      if (eMin <= sMin) eMin += 24*60;
-      return { startMin: sMin, endMin: eMin };
-    });
-  }
-
-  function isTimeBlocked(checkStart, checkEnd, roomId, dateStr) {
-    const blocks = getBookedBlocks(roomId, dateStr);
-    const nextDate = new Date(dateStr);
-    nextDate.setDate(nextDate.getDate() + 1);
-    const nextDateStr = nextDate.getFullYear() + '-' + String(nextDate.getMonth()+1).padStart(2,'0') + '-' + String(nextDate.getDate()).padStart(2,'0');
-    const nextBlocks = getBookedBlocks(roomId, nextDateStr);
-    const allBlocks = blocks.concat(nextBlocks);
-    for (const b of allBlocks) {
-      const cleaningEnd = b.endMin + 15;
-      if (checkStart < cleaningEnd && checkEnd > b.startMin) return true;
-    }
-    return false;
-  }
-
-  // Check if cell is specifically in cleaning buffer (not the booking itself)
-  function getCellStatus(cMin, cEnd, roomId, dateStr) {
-    const blocks = getBookedBlocks(roomId, dateStr);
-    const nextDate = new Date(dateStr);
-    nextDate.setDate(nextDate.getDate() + 1);
-    const nextDateStr = nextDate.getFullYear() + '-' + String(nextDate.getMonth()+1).padStart(2,'0') + '-' + String(nextDate.getDate()).padStart(2,'0');
-    const allBlocks = blocks.concat(getBookedBlocks(roomId, nextDateStr));
-    for (const b of allBlocks) {
-      if (cMin < b.endMin && cEnd > b.startMin) return 'booked';   // actual booking
-      if (cMin < b.endMin + 15 && cEnd > b.endMin) return 'cleaning'; // buffer zone
-    }
-    return 'free';
-  }
-
-  // ── Time grid ──
-  function renderTimeGrid() {
-    const isToday = selectedDate.toDateString() === today.toDateString();
-    let startMin = 0;
-    if (isToday) {
-      const curMin = now.getHours() * 60 + now.getMinutes();
-      startMin = Math.ceil((curMin + 1) / 30) * 30;
-    }
-    const cells = [];
-    for (let m = startMin; m < 24*60 + 24*60; m += 30) {
-      const dayOffset = Math.floor(m / (24*60));
-      const minInDay = m % (24*60);
-      const h = Math.floor(minInDay / 60);
-      const min = minInDay % 60;
-      const timeStr = String(h).padStart(2,'0') + ':' + String(min).padStart(2,'0');
-      cells.push({ time: timeStr, minutes: m, dayOffset: dayOffset });
-    }
-
-    const rate = pricing.perPerson[selectedPerson] || Object.values(pricing.perPerson)[0];
-    const halfPrice = Math.round(rate / 2);
-    let sMin = -1, eMin = -1;
-    if (selectedStart) { const sp = selectedStart.split(':'); sMin = parseInt(sp[0])*60 + parseInt(sp[1]); }
-    if (selectedEnd) { const ep = selectedEnd.split(':'); eMin = parseInt(ep[0])*60 + parseInt(ep[1]); if (eMin <= sMin) eMin += 24*60; }
-
-    const dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
-
-    document.getElementById('timeGrid').innerHTML = cells.map(c => {
-      const cMin = c.minutes;
-      let cls = 'time-cell';
-      const displayTime = c.dayOffset === 0 ? c.time : '次日'+c.time;
-      if (selectedStart && c.time === selectedStart && c.dayOffset === 0) cls += ' selected';
-      if (selectedEnd && c.time === selectedEnd && (eMin > 24*60 ? c.dayOffset === 1 : c.dayOffset === 0)) cls += ' selected';
-      if (selectedStart && selectedEnd && cMin > sMin && cMin < eMin) cls += ' in-range';
-
-      // Check cell status: free / booked(预约) / cleaning(准备中)
-      const cellEnd = cMin + 30;
-      const cellStatus = getCellStatus(cMin, cellEnd, roomId, dateStr);
-      let label = displayTime;
-      let priceLabel = '¥'+halfPrice;
-      if (cellStatus === 'booked') {
-        cls += ' disabled booked';
-        label = '已预约';
-        priceLabel = '';
-      } else if (cellStatus === 'cleaning') {
-        cls += ' disabled cleaning';
-        label = '🧹 准备中';
-        priceLabel = '保洁';
-      }
-
-      return '<div class="'+cls+'" onclick="pickTimeCell(\''+c.time+'\','+c.dayOffset+')"><span class="t-label">'+label+'</span><span class="t-price">' + priceLabel + '</span></div>';
-    }).join('');
-  }
-
-  window.pickTimeCell = function(time, dayOffset) {
-    const dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
-    if (sessionType !== 'standard') { sessionType = 'standard'; nightStartTime = null; renderSpecial(); }
-    if (!selectedStart || (selectedStart && selectedEnd)) {
-      // Check if the clicked start time is within a blocked (booked+cleaning) period
-      const sp = time.split(':');
-      const sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
-      const cellEnd = sMin + 30;
-      if (isTimeBlocked(sMin, cellEnd, roomId, dateStr)) {
-        showToast('该时段已被占用（含15分钟保洁缓冲），请选择其他时段');
-        return;
-      }
-      selectedStart = time; selectedEnd = null;
-    } else {
-      const sp = selectedStart.split(':');
-      const ep = time.split(':');
-      let sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
-      let eMin = parseInt(ep[0])*60 + parseInt(ep[1]) + dayOffset * 24*60;
-      if (eMin <= sMin) { showToast('结束时间必须晚于开始时间'); return; }
-
-      // Check if the selected range conflicts with any booking+cleaning buffer
-      if (isTimeBlocked(sMin, eMin, roomId, dateStr)) {
-        showToast('该时段与已有预约冲突（含前后15分钟保洁缓冲），请调整时间');
-        return;
-      }
-      selectedEnd = time;
-    }
-    renderTimeGrid(); updateTotal();
-  };
-
-  // ── Special ──
-  function renderSpecial() {
-    document.getElementById('specialSection').innerHTML =
-      '<div class="special-row">' +
-      '<div class="special-chip' + (sessionType==='night'?' selected':'') + '" onclick="pickSpecial(\'night\')"><div class="sp-name">🌙 夜间套餐</div><div class="sp-price">¥'+pricing.night+'/3小时</div><div class="sp-desc">23:59-08:00</div></div>' +
-      '<div class="special-chip' + (sessionType==='overnight'?' selected':'') + '" onclick="pickSpecial(\'overnight\')"><div class="sp-name">🌃 通宵套餐</div><div class="sp-price">¥'+pricing.overnight+'</div><div class="sp-desc">23:59-08:00</div></div>' +
-      '</div>';
-
-    const nightPicker = document.getElementById('nightPicker');
-    if (sessionType === 'night') {
-      nightPicker.style.display = '';
-      // Determine valid start range: from max(now rounded up to 30min, 00:00) to 05:00
-      var nowMin = now.getHours() * 60 + now.getMinutes();
-      var minStart = 0; // 00:00 default
-      if (selectedDate.toDateString() === today.toDateString()) {
-        // Same day: don't allow past times, round up to next 30-min slot
-        minStart = Math.ceil((nowMin + 1) / 30) * 30; // round up to next 30-min slot
-      }
-      var nightSlots = [];
-      // 23:59 available if not past on the selected date
-      var isToday2 = selectedDate.toDateString() === today.toDateString();
-      if (!isToday2 || nowMin < 23*60+59) nightSlots.push('23:59');
-      // 00:00-05:00 slots, filtered by current time on today
-      if (minStart <= 300) {
-        for (var m = minStart; m <= 300; m += 30) {
-          nightSlots.push(String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0'));
-        }
-      }
-      // Update label to show valid range info
-      document.getElementById('nightPicker').querySelector('.night-picker-label').textContent =
-        '夜间开始时间（' + nightSlots[0] + '-05:00 · 3小时 · 最晚08:00结束）';
-      document.getElementById('nightGrid').innerHTML = nightSlots.map(function(t) {
-        return '<div class="night-cell' + (nightStartTime===t?' selected':'') + '" onclick="pickNightStart(\''+t+'\')">'+t+'</div>';
-      }).join('');
-    } else {
-      nightPicker.style.display = 'none';
-    }
-  }
-
-  window.pickSpecial = function(type) {
-    if (type === 'night') {
-      // Validate: if user has a standard start time, check it falls within night range
-      if (selectedStart) {
-        var parts = selectedStart.split(':');
-        var startMin = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-        // Night valid start: 00:00-05:00 (3h ends by 08:00), or the 23:59 slot
-        if (selectedStart === '23:59' || (startMin >= 0 && startMin <= 300)) {
-          sessionType = 'night';
-          nightStartTime = selectedStart;
-          selectedEnd = null;
-          renderTimeGrid(); renderSpecial(); updateTotal();
-          return;
-        } else {
-          showToast('夜间套餐起始时间须在00:00-05:00范围内，当前所选时间不符合条件');
-          return;
-        }
-      }
-    }
-    sessionType = type;
-    if (type !== 'night') nightStartTime = null;
-    selectedStart = null; selectedEnd = null;
-    renderTimeGrid(); renderSpecial(); updateTotal();
-  };
-
-  window.pickNightStart = function(t) { nightStartTime = t; renderSpecial(); updateTotal(); };
-
-  function formatNightEnd(startTime) {
-    const parts = startTime.split(':');
-    let adj = parseInt(parts[0])*60 + parseInt(parts[1]);
-    if (adj < 6*60) adj += 24*60;
-    adj += 180;
-    return String(Math.floor(adj/60)%24).padStart(2,'0') + ':' + String(adj%60).padStart(2,'0');
-  }
-
-  // ── Total ──
-  function updateTotal() {
-    const tp = document.getElementById('totalPrice');
-    const td = document.getElementById('totalDetail');
-    const btn = document.getElementById('bookBtn');
-    let price = 0, detail = '';
-
-    if (sessionType === 'night') {
-      if (!nightStartTime) { tp.textContent = '¥0'; td.textContent = '请选择夜间开始时间'; btn.disabled = true; return; }
-      price = pricing.night;
-      detail = '夜间套餐 · ' + nightStartTime + '-' + formatNightEnd(nightStartTime) + ' · ' + selectedPerson + '人';
-    } else if (sessionType === 'overnight') {
-      price = pricing.overnight;
-      detail = '通宵套餐 · ' + selectedPerson + '人 · 23:59-08:00';
-    } else if (selectedStart && selectedEnd) {
-      const sp = selectedStart.split(':'), ep = selectedEnd.split(':');
-      let sMin = parseInt(sp[0])*60 + parseInt(sp[1]), eMin = parseInt(ep[0])*60 + parseInt(ep[1]);
-      if (eMin <= sMin) eMin += 24*60;
-      const dur = eMin - sMin;
-      const rate = pricing.perPerson[selectedPerson] || Object.values(pricing.perPerson)[0];
-      price = Math.round(rate * dur / 60);
-      detail = selectedStart + '-' + selectedEnd + ' · ' + selectedPerson + '人 · ' + Math.floor(dur/60) + 'h' + (dur%60>0?dur%60+'m':'');
-    } else {
-      tp.textContent = '¥0'; td.textContent = selectedStart ? '请选择结束时间' : '请选择开始时间'; btn.disabled = true; return;
-    }
-    tp.textContent = '¥' + price; td.textContent = detail; btn.disabled = false;
-  }
-
-  // ── Go pay ──
-  window.goPay = function() {
-    let price, detail, durationMin;
-    const pc = selectedPerson;
-    if (sessionType === 'night') {
-      price = pricing.night; detail = '夜间套餐 ' + nightStartTime + '-' + formatNightEnd(nightStartTime) + ' ' + pc + '人'; durationMin = 180;
-    } else if (sessionType === 'overnight') {
-      price = pricing.overnight; detail = '通宵套餐 ' + pc + '人'; durationMin = 480;
-    } else {
-      const sp = selectedStart.split(':'), ep = selectedEnd.split(':');
-      let sMin = parseInt(sp[0])*60 + parseInt(sp[1]), eMin = parseInt(ep[0])*60 + parseInt(ep[1]);
-      if (eMin <= sMin) eMin += 24*60;
-      durationMin = eMin - sMin;
-      const rate = pricing.perPerson[pc] || Object.values(pricing.perPerson)[0];
-      price = Math.round(rate * durationMin / 60);
-      detail = selectedStart + '-' + selectedEnd + ' · ' + pc + '人';
-    }
-    const dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
-    const prm = 'roomName=' + encodeURIComponent(room.name) + '&date=' + dateStr + '&slot=' + encodeURIComponent(detail) + '&price=' + price + '&duration=' + durationMin + '&roomId=' + room.roomId + '&personCount=' + pc + '&sessionType=' + sessionType;
-    location.href = '../booking-confirm/index.html?' + prm;
-  };
-
-  renderDateBar(); renderPersonBar(); renderTimeGrid(); renderSpecial();
+  renderDateBar();
+  renderDurationGrid();
+  updateBilling();
 }
 
+// ── Date bar ──
+function renderDateBar() {
+  const weekNames = ['日','一','二','三','四','五','六'];
+  let html = '';
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const isToday = d.toDateString() === today.toDateString();
+    const isSelected = d.toDateString() === selectedDate.toDateString();
+    let cls = 'date-chip';
+    if (isToday) cls += ' today';
+    if (isSelected) cls += ' selected';
+    html += '<div class="' + cls + '" onclick="pickDateBar(new Date(' + d.getFullYear() + ',' + d.getMonth() + ',' + d.getDate() + '))"><div class="d-week">周' + weekNames[d.getDay()] + '</div><div class="d-day">' + d.getDate() + '</div><div class="d-month">' + (d.getMonth()+1) + '月</div></div>';
+  }
+  html += '<div class="date-more" onclick="showCalModal()">更多<br>▾</div>';
+  document.getElementById('dateBar').innerHTML = html;
+}
+
+window.pickDateBar = function(d) {
+  selectedDate = d; resetSelection();
+  renderDateBar(); renderDurationGrid(); updateBilling();
+  document.getElementById('timeRow').style.display = 'none';
+  document.getElementById('customDurationWrap').style.display = 'none';
+  document.getElementById('conflictAlert').style.display = 'none';
+};
+
+function resetSelection() {
+  selectedStart = null; selectedEnd = null; selectedDuration = null;
+  isCustomMode = false; customStep = 'start'; nowMode = false;
+}
+
+// ── Calendar ──
+window.showCalModal = function() { document.getElementById('calModal').style.display = 'flex'; renderCalendar(); };
+window.hideCalModal = function() { document.getElementById('calModal').style.display = 'none'; };
+window.calChangeMonth = function(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+};
+
+function renderCalendar() {
+  document.getElementById('calMonth').textContent = calYear + '年 ' + (calMonth+1) + '月';
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+  const maxDate = new Date(today); maxDate.setDate(today.getDate()+90);
+  let cells = '';
+  for (let i = firstDay-1; i >= 0; i--) cells += '<div class="cal-day other">' + (daysInPrev-i) + '</div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt = new Date(calYear, calMonth, d);
+    const isToday = dt.toDateString() === today.toDateString();
+    const isPast = dt < today;
+    const isTooFar = dt > maxDate;
+    const isSelected = dt.toDateString() === selectedDate.toDateString();
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    if (isSelected) cls += ' selected';
+    if (isPast || isTooFar) cls += ' past';
+    const click = (isPast||isTooFar) ? '' : 'onclick="calPick(' + calYear + ',' + calMonth + ',' + d + ')"';
+    cells += '<div class="' + cls + '" ' + click + '>' + d + '</div>';
+  }
+  const remaining = 42 - firstDay - daysInMonth;
+  for (let d = 1; d <= remaining; d++) cells += '<div class="cal-day other">' + d + '</div>';
+  document.getElementById('calGrid').innerHTML = cells;
+}
+
+window.calPick = function(y, m, d) {
+  selectedDate = new Date(y, m, d); resetSelection();
+  renderDateBar(); renderDurationGrid(); updateBilling(); hideCalModal();
+  document.getElementById('timeRow').style.display = 'none';
+  document.getElementById('customDurationWrap').style.display = 'none';
+  document.getElementById('conflictAlert').style.display = 'none';
+};
+
+// ── Booking conflict helpers ──
+const existingBookings = {
+  RM004: [{ date:'2026-05-10', start:'08:00', end:'10:00' }, { date:'2026-05-10', start:'14:00', end:'16:00' }],
+  RM001: [{ date:'2026-05-10', start:'09:00', end:'12:00' }],
+  RM002: [{ date:'2026-05-10', start:'10:00', end:'12:30' }],
+  RM003: [],
+  RM005: [], RM006: [],
+};
+
+function getBookedBlocks(roomId, dateStr) {
+  const blocks = existingBookings[roomId] || [];
+  return blocks.filter(function(b) { return b.date === dateStr; }).map(function(b) {
+    var sp = b.start.split(':'), ep = b.end.split(':');
+    var sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
+    var eMin = parseInt(ep[0])*60 + parseInt(ep[1]);
+    if (eMin <= sMin) eMin += 24*60;
+    return { startMin: sMin, endMin: eMin };
+  });
+}
+
+function isTimeBlocked(checkStart, checkEnd, roomId, dateStr) {
+  var blocks = getBookedBlocks(roomId, dateStr);
+  var nextDate = new Date(dateStr);
+  nextDate.setDate(nextDate.getDate() + 1);
+  var nextDateStr = nextDate.getFullYear() + '-' + String(nextDate.getMonth()+1).padStart(2,'0') + '-' + String(nextDate.getDate()).padStart(2,'0');
+  var allBlocks = blocks.concat(getBookedBlocks(roomId, nextDateStr));
+  for (var bi = 0; bi < allBlocks.length; bi++) {
+    var b = allBlocks[bi];
+    var cleaningEnd = b.endMin + 15;
+    if (checkStart < cleaningEnd && checkEnd > b.startMin) return true;
+  }
+  return false;
+}
+
+// ── Duration selector ──
+function renderDurationGrid() {
+  var durations = [
+    { val: 120, label: '2小时' },
+    { val: 180, label: '3小时' },
+    { val: 240, label: '4小时' },
+    { val: 'custom', label: '指定时长' },
+  ];
+  var html = '';
+  for (var i = 0; i < durations.length; i++) {
+    var d = durations[i];
+    var isSel = (d.val === 'custom' && isCustomMode) || (d.val !== 'custom' && selectedDuration === d.val);
+    html += '<div class="duration-chip' + (isSel ? ' selected' : '') + '" onclick="pickDuration(' + (d.val === 'custom' ? "'custom'" : d.val) + ')">' + d.label + '</div>';
+  }
+  document.getElementById('durationGrid').innerHTML = html;
+}
+
+window.pickDuration = function(val) {
+  document.getElementById('conflictAlert').style.display = 'none';
+  if (val === 'custom') {
+    isCustomMode = true;
+    selectedDuration = null;
+    selectedStart = null;
+    selectedEnd = null;
+    renderDurationGrid();
+    var wrap = document.getElementById('customDurationWrap');
+    wrap.style.display = 'block';
+    var sel = document.getElementById('customDurationSelect');
+    var opts = '<option value="">选择时长...</option>';
+    for (var h = 5; h <= 24; h++) {
+      opts += '<option value="' + (h*60) + '">' + h + '小时</option>';
+    }
+    sel.innerHTML = opts;
+    sel.value = '';
+    document.getElementById('timeRow').style.display = 'none';
+    updateBilling();
+  } else {
+    isCustomMode = false;
+    selectedDuration = val;
+    selectedStart = null;
+    selectedEnd = null;
+    document.getElementById('customDurationWrap').style.display = 'none';
+    renderDurationGrid();
+    showTimeSelection();
+    updateBilling();
+  }
+};
+
+window.pickCustomDuration = function(durStr) {
+  if (!durStr) return;
+  selectedDuration = parseInt(durStr);
+  isCustomMode = true;
+  selectedStart = null;
+  selectedEnd = null;
+  showTimeSelection();
+  updateBilling();
+};
+
+function showTimeSelection() {
+  document.getElementById('timeRow').style.display = 'flex';
+  populateTimeSelect();
+}
+
+function populateTimeSelect() {
+  var sel = document.getElementById('timeSelect');
+  var isToday = selectedDate.toDateString() === today.toDateString();
+  var curMin = isToday ? now.getHours() * 60 + now.getMinutes() : 0;
+  var startMin = Math.ceil(curMin / 30) * 30;
+
+  var dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
+
+  var html = '<option value="">选择时间...</option>';
+  var maxMin = 24*60 + 6*60;
+  for (var m = startMin; m < maxMin; m += 30) {
+    var dayOffset = Math.floor(m / (24*60));
+    var minInDay = m % (24*60);
+    var timeStr = String(Math.floor(minInDay/60)).padStart(2,'0') + ':' + String(minInDay%60).padStart(2,'0');
+    var display = dayOffset === 0 ? timeStr : '次日' + timeStr;
+    var eMin = selectedDuration ? m + selectedDuration : m + 30;
+    if (!isTimeBlocked(m, eMin, roomId, dateStr)) {
+      html += '<option value="' + timeStr + '">' + display + '</option>';
+    }
+  }
+  sel.innerHTML = html;
+  sel.value = '';
+}
+
+// -- Now button --
+window.pickNow = function() {
+  if (!selectedDuration) {
+    showToast('请先选择时长');
+    return;
+  }
+  document.getElementById('conflictAlert').style.display = 'none';
+
+  var curMin = now.getHours() * 60 + now.getMinutes();
+  var startTime = String(Math.floor(curMin/60)).padStart(2,'0') + ':' + String(curMin%60).padStart(2,'0');
+  var eMin = curMin + selectedDuration;
+  var endH = Math.floor(eMin/60) % 24;
+  var endM = eMin % 60;
+  var endTime = String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0');
+
+  var dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
+
+  if (isTimeBlocked(curMin, eMin, roomId, dateStr)) {
+    showConflictSuggestion(curMin, selectedDuration, dateStr);
+    return;
+  }
+
+  selectedStart = startTime;
+  selectedEnd = endTime;
+  document.getElementById('timeSelect').value = '';
+  updateBilling();
+};
+
+// -- Time select --
+window.pickTimeFromSelect = function(timeStr) {
+  if (!timeStr || !selectedDuration) return;
+  document.getElementById('conflictAlert').style.display = 'none';
+
+  var sp = timeStr.split(':');
+  var sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
+  var eMin = sMin + selectedDuration;
+
+  var dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
+
+  if (isTimeBlocked(sMin, eMin, roomId, dateStr)) {
+    showConflictSuggestion(sMin, selectedDuration, dateStr);
+    document.getElementById('timeSelect').value = '';
+    return;
+  }
+
+  var endH = Math.floor(eMin/60) % 24;
+  var endM = eMin % 60;
+
+  selectedStart = timeStr;
+  selectedEnd = String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0');
+  updateBilling();
+};
+
+function showConflictSuggestion(checkMin, duration, dateStr) {
+  var maxSearch = 24*60;
+  var found = -1;
+  for (var m = checkMin + 30; m < maxSearch; m += 30) {
+    if (!isTimeBlocked(m, m + duration, roomId, dateStr)) {
+      found = m;
+      break;
+    }
+  }
+
+  var alertEl = document.getElementById('conflictAlert');
+  if (found >= 0) {
+    var h = Math.floor(found/60) % 24;
+    var mins = found % 60;
+    var suggestTime = String(h).padStart(2,'0') + ':' + String(mins).padStart(2,'0');
+    alertEl.innerHTML = '⚠️ 该时段已被预约。<span class="suggest-time">建议从 ' + suggestTime + ' 开始 ›</span>';
+    alertEl.querySelector('.suggest-time').onclick = function() { applySuggestedTime(suggestTime); };
+  } else {
+    alertEl.innerHTML = '⚠️ 该时段已被预约，请选择其他日期。';
+  }
+  alertEl.style.display = 'block';
+}
+
+window.applySuggestedTime = function(timeStr) {
+  document.getElementById('conflictAlert').style.display = 'none';
+  var sel = document.getElementById('timeSelect');
+  sel.value = timeStr;
+  pickTimeFromSelect(timeStr);
+};
+
+// -- Update billing --
+function updateBilling() {
+  var tp = document.getElementById('totalPrice');
+  var td = document.getElementById('totalDetail');
+  var btn = document.getElementById('bookBtn');
+  if (!tp) return;
+  var price = 0, detail = '', canBook = false;
+
+  if (selectedDuration && selectedStart && selectedEnd) {
+    td.className = 'total-detail active';
+    if (isCustomMode) {
+      var sp = selectedStart.split(':'), ep = selectedEnd.split(':');
+      var sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
+      var eMin = parseInt(ep[0])*60 + parseInt(ep[1]);
+      if (eMin <= sMin) eMin += 24*60;
+      var dur = eMin - sMin;
+      price = Math.round(hourRate * dur / 60);
+      detail = selectedStart + '-' + selectedEnd + ' · ' + Math.floor(dur/60) + 'h' + (dur%60>0?dur%60+'m':'');
+    } else {
+      price = Math.round(hourRate * selectedDuration / 60);
+      detail = selectedStart + '-' + selectedEnd + ' · ' + (selectedDuration/60) + '小时';
+    }
+    canBook = true;
+  } else if (selectedDuration) {
+    td.className = 'total-detail';
+    detail = '请选择开始时间';
+  } else {
+    td.className = 'total-detail';
+    detail = '请选择时长';
+  }
+
+  tp.textContent = '¥' + price;
+  td.textContent = detail;
+  btn.disabled = !canBook;
+}
+
+// -- Go pay --// ── Go pay ──
+window.goPay = function() {
+  var price, detail, durationMin;
+  if (isCustomMode) {
+    var sp = selectedStart.split(':'), ep = selectedEnd.split(':');
+    var sMin = parseInt(sp[0])*60 + parseInt(sp[1]);
+    var eMin = parseInt(ep[0])*60 + parseInt(ep[1]);
+    if (eMin <= sMin) eMin += 24*60;
+    durationMin = eMin - sMin;
+    price = Math.round(hourRate * durationMin / 60);
+    detail = selectedStart + '-' + selectedEnd;
+  } else {
+    durationMin = selectedDuration;
+    price = Math.round(hourRate * durationMin / 60);
+    detail = selectedStart + '-' + selectedEnd;
+  }
+  var dateStr = selectedDate.getFullYear() + '-' + String(selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(selectedDate.getDate()).padStart(2,'0');
+  var prm = 'roomName=' + encodeURIComponent(room.name) + '&date=' + dateStr + '&slot=' + encodeURIComponent(detail) + '&price=' + price + '&duration=' + durationMin + '&roomId=' + room.roomId + '&sessionType=standard';
+  location.href = '../booking-confirm/index.html?' + prm;
+};
+
+// ── Init ──
+renderPage();
+
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg; t.style.display = 'block';
   setTimeout(function() { t.style.display = 'none'; }, 2000);
 }

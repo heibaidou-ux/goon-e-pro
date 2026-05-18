@@ -2,15 +2,17 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的订单 - 高岸茶室</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>我的订单</title>
+<script src="../../js/sdk.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-.phone { width:375px; height:812px; background:#f5f7fa; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; position:relative; }
+body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:100vh; background:#f5f7fa; display:flex; flex-direction:column; position:relative; }
 .nav-top { position:absolute; top:10px; right:10px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
-.page { flex:1; height:0; overflow-y:auto; padding-bottom:80px; }
+.page { flex:1; height:0; overflow-y:auto; scrollbar-width:none; }
+.page::-webkit-scrollbar { display:none; }
 
 /* Tabs */
 .tab-bar { display:flex; background:#fff; border-bottom:1px solid #eee; position:sticky; top:0; z-index:10; }
@@ -18,7 +20,8 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .tab.active { color:#07c160; font-weight:600; }
 .tab.active::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:24px; height:3px; background:#07c160; border-radius:2px; }
 
-.order-card { background:#fff; border-radius:14px; padding:16px; margin:0 16px 12px; }
+/* Order card */
+.order-card { background:#fff; padding:16px; margin:0 0 10px; }
 .order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .order-room { font-size:16px; font-weight:600; }
 .order-status { font-size:12px; font-weight:600; padding:4px 10px; border-radius:12px; }
@@ -27,29 +30,33 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .status-completed { background:#f5f5f5; color:#999; }
 .order-time { font-size:13px; color:#666; margin-bottom:4px; }
 .order-price { font-size:14px; font-weight:600; color:#e37318; margin-bottom:8px; }
-.door-section { background:#fffbf0; border-radius:10px; padding:12px; margin:10px 0; display:flex; align-items:center; justify-content:space-between; }
+
+/* Big action buttons */
+.big-actions { display:flex; gap:10px; margin-top:10px; }
+.big-action-btn { flex:1; padding:14px; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; border:none; text-align:center; transition:opacity .15s; }
+.big-action-btn:active { opacity:.8; }
+.big-action-btn.primary { background:#07c160; color:#fff; }
+.big-action-btn.outline { background:#fff; color:#07c160; border:1.5px solid #07c160; }
+.big-action-btn.ghost { background:#f5f5f5; color:#666; }
+
+.door-section { background:#fffbf0; padding:12px; display:flex; align-items:center; justify-content:space-between; margin:10px 0; }
 .door-label { font-size:12px; color:#999; }
 .door-code { font-size:20px; font-weight:800; font-family:"Courier New",monospace; color:#333; letter-spacing:6px; }
 .door-hint { font-size:12px; color:#e37318; }
-.order-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; align-items:center; }
-.order-btn { padding:8px 16px; border-radius:8px; font-size:13px; cursor:pointer; border:none; font-weight:500; transition:opacity .15s; }
-.order-btn:active { opacity:.8; }
-.order-btn.primary { background:#07c160; color:#fff; }
-.order-btn.outline { background:#fff; color:#07c160; border:1.5px solid #07c160; }
-.order-btn.danger { background:#fff; color:#d54941; border:1.5px solid #d54941; }
-.order-btn.ghost { background:#f5f5f5; color:#666; }
 .empty { text-align:center; padding:60px 20px; color:#999; }
 .empty-icon { font-size:48px; margin-bottom:12px; }
 .cancel-note { font-size:11px; color:#999; margin-left:8px; }
-
-/* Bottom nav */
-.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
-.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
-.nav-item.active { color:#07c160; }
-.nav-item .nav-icon { font-size:20px; }
-.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.order-btn { padding:8px 16px; border-radius:8px; font-size:13px; cursor:pointer; border:none; font-weight:500; }
+.order-btn.danger { background:#fff; color:#d54941; border:1.5px solid #d54941; }
+.order-btn.outline { background:#fff; color:#07c160; border:1.5px solid #07c160; }
+.order-btn.ghost { background:#f5f5f5; color:#666; }
 
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
+.nav-item .nav-icon { font-size:20px; display:block; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
 .modal { background:#fff;border-radius:14px;padding:20px;width:300px;text-align:center; }
 .modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
@@ -59,8 +66,6 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .modal-btn.cancel { background:#f5f5f5;color:#666; }
 .modal-btn.confirm { background:#07c160;color:#fff; }
 .modal-btn.danger { background:#d54941;color:#fff; }
-
-/* Extend time picker */
 .time-picker { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
 .time-option { padding:10px 8px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; cursor:pointer; font-size:12px; text-align:center; transition:all .15s; }
 .time-option:hover { border-color:#07c160; }
@@ -78,10 +83,9 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
     <div class="tab" onclick="switchOrderTab('completed',this)">已完成</div>
   </div>
   <div class="page" id="orderList"></div>
-
   <div class="bottom-nav">
     <div class="nav-item" onclick="location.href='../home/index.html'"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
-    <div class="nav-item" onclick="location.href='../room-detail/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../room-list/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
     <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
     <div class="nav-item active"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
     <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
@@ -107,14 +111,18 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
   <div class="modal" id="detailContent"></div>
 </div>
 <script>
+// ── SDK init ──
+var SDK = window.ERP.SDK;
+var API = SDK.API;
+var UI = SDK.UI;
+var Utils = SDK.Utils;
+
 let currentOrderTab = 'active';
 let cancelTarget = null;
 let extendTarget = null;
 let selectedExtendIdx = null;
 
-// Load bookings from localStorage, merge with demo orders
-var savedBookings = [];
-try { savedBookings = JSON.parse(localStorage.getItem('mp_bookings') || '[]'); } catch(e) {}
+var savedBookings = Utils.lsGet('bookings', []);
 var orders = savedBookings.concat([
   { id:"ORD001", roomId:"RM004", roomName:"大茶室C", date:"2026-05-08", time:"10:00-11:30", price:180, status:"InUse", doorCode:"8264", doorValid:true, remaining:45, endTime:"11:30", duration:"90" },
   { id:"ORD003", roomId:"RM004", roomName:"大茶室C", date:"2026-05-08", time:"16:00-18:00", price:240, status:"Booked", doorCode:null, doorValid:false, endTime:"18:00" },
@@ -126,34 +134,24 @@ var orders = savedBookings.concat([
 
 function switchOrderTab(tab, el) {
   currentOrderTab = tab;
-  const parent = el.parentElement;
-  parent.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); t.style.color='#999'; t.style.fontWeight='normal'; });
-  el.classList.add('active'); el.style.color='#07c160'; el.style.fontWeight='600';
+  el.parentElement.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
   renderOrders();
 }
 
 function renderOrders() {
-  const container = document.getElementById('orderList');
-  const shopOrders = JSON.parse(localStorage.getItem('mp_shop_orders') || '[]');
-  const mappedShopOrders = shopOrders.map(function(s) {
+  var container = document.getElementById('orderList');
+  var shopOrders = Utils.lsGet('shop_orders', []);
+  var mappedShopOrders = shopOrders.map(function(s) {
     return {
-      id: s.orderId,
-      orderId: s.orderId,
-      roomName: '茶品商城',
-      date: s.date || '',
-      time: s.time || '',
-      price: s.totalAmount,
-      status: s.status,
-      isShop: true,
-      items: s.items,
-      payment: s.payment || '微信支付',
-      createdAt: s.createdAt
+      id: s.orderId, roomName: '茶品雅集', date: s.date || '', time: s.time || '',
+      price: s.totalAmount, status: s.status, isShop: true, items: s.items,
+      payment: s.payment || '微信支付', createdAt: s.createdAt
     };
   });
-  const allOrders = orders.concat(mappedShopOrders);
-
+  var allOrders = orders.concat(mappedShopOrders);
   var filtered;
-  if (currentOrderTab === 'active') filtered = allOrders.filter(function(o) { return o.status === 'InUse' || o.status === 'Shipping'; });
+  if (currentOrderTab === 'active') filtered = allOrders.filter(function(o) { return o.status === 'InUse' || o.status === 'Shipping' || o.status === 'RoomCharge'; });
   else if (currentOrderTab === 'upcoming') filtered = allOrders.filter(function(o) { return o.status === 'Booked'; });
   else filtered = allOrders.filter(function(o) { return o.status === 'Completed' || o.status === 'ShopCompleted'; });
 
@@ -162,77 +160,91 @@ function renderOrders() {
     return;
   }
 
-  container.innerHTML = '<div style="padding:16px;">' + filtered.map(function(o) {
+  container.innerHTML = '<div style="padding:16px 0;">' + filtered.map(function(o) {
     var encName = encodeURIComponent(o.roomName || '');
     var durationVal = o.duration || '90';
-    var statusHtml = '', contentHtml = '';
+    var html = '';
 
     if (o.status === 'InUse') {
-      statusHtml = '<span class="order-status status-inuse">使用中</span>';
-      contentHtml = '<div class="door-section">' +
-        '<div><div class="door-label">门禁密码</div><div class="door-code">' + o.doorCode + '</div></div>' +
-        '<button class="order-btn ghost" onclick="copyCode(\'' + o.doorCode + '\')">📋</button>' +
+      html = '<div class="order-card">' +
+        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-inuse">使用中</span></div>' +
+        '<div class="order-time">' + o.date + ' ' + o.time + '</div>' +
+        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div class="door-section">' +
+          '<div><div class="door-label">门禁密码</div><div class="door-code">' + o.doorCode + '</div></div>' +
+          '<button class="order-btn ghost" onclick="copyCode(\'' + o.doorCode + '\')">📋 复制</button>' +
         '</div>' +
-        '<div class="order-actions">' +
-        '<button class="order-btn primary" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'">房内智控</button>' +
-        '<button class="order-btn outline" onclick="showExtendOrder(\'' + o.id + '\')">续订</button>' +
-        '<button class="order-btn danger" onclick="quickCheckout(\'' + o.id + '\')">退房</button>' +
-        '</div>';
+        '<div class="big-actions">' +
+          '<button class="big-action-btn primary" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'">🚪 开门</button>' +
+          '<button class="big-action-btn outline" onclick="showExtendOrder(\'' + o.id + '\')">⏱ 续订</button>' +
+        '</div></div>';
     } else if (o.status === 'Booked') {
-      statusHtml = '<span class="order-status status-booked">已预定</span>';
       var isClose = o.date === '2026-05-08';
-      contentHtml = '<div class="door-section"><div class="door-label">门禁密码</div><div class="door-hint">预约前30分钟显示</div></div>' +
-        '<div class="order-actions">' +
-        '<button class="order-btn danger" onclick="showCancel(\'' + o.id + '\',' + (!isClose) + ')">取消预约</button>' +
-        '<span class="cancel-note">' + (isClose ? '距开始不足2小时，取消收取定金50%' : '距开始超过2小时，可免费取消') + '</span>' +
-        '</div>';
+      html = '<div class="order-card">' +
+        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-booked">已预定</span></div>' +
+        '<div class="order-time">' + o.date + ' ' + o.time + '</div>' +
+        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div class="door-section"><div class="door-label">门禁密码</div><div class="door-hint">预约前30分钟显示</div></div>' +
+        '<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+          '<button class="order-btn outline" onclick="useNow(\'' + o.id + '\')">立即使用</button>' +
+          '<button class="order-btn danger" onclick="showCancel(\'' + o.id + '\',' + (!isClose) + ')">取消预约</button>' +
+          '<span class="cancel-note">' + (isClose ? '距开始不足2小时，取消收取定金50%' : '距开始超过2小时，可免费取消') + '</span>' +
+        '</div></div>';
     } else if (o.isShop && o.status === 'Shipping') {
-      statusHtml = '<span class="order-status status-booked" style="background:#fff3e0;color:#e37318;">待发货</span>';
       var shipItemsHtml = '';
       if (o.items && o.items.length) {
         for (var si = 0; si < o.items.length; si++) {
-          var shipItem = o.items[si];
           if (si > 0) shipItemsHtml += ' · ';
-          shipItemsHtml += shipItem.name + ' ×' + shipItem.qty + ' ¥' + (shipItem.price * shipItem.qty);
+          shipItemsHtml += o.items[si].name + ' ×' + o.items[si].qty;
         }
       }
-      contentHtml = '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + shipItemsHtml + '</div>' +
-        '<div style="font-size:12px;color:#999;margin-bottom:8px;">预计3-5个工作日发货 · ' + (o.payment || '微信支付') + '</div>' +
-        '<div class="order-actions">' +
-        '<button class="order-btn outline" onclick="showShopDetail(\'' + o.id + '\')">查看详情</button>' +
-        '</div>';
+      html = '<div class="order-card">' +
+        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-booked" style="background:#fff3e0;color:#e37318;">待发货</span></div>' +
+        '<div class="order-time">' + (o.date||'') + '</div>' +
+        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + shipItemsHtml + '</div>' +
+        '<div style="font-size:12px;color:#999;margin-bottom:8px;">预计3-5个工作日发货</div>' +
+        '<button class="order-btn outline" onclick="showShopDetail(\'' + (o.orderId||o.id) + '\')">查看详情</button></div>';
+    } else if (o.isShop && o.status === 'RoomCharge') {
+      var rcItemsHtml = '';
+      if (o.items && o.items.length) {
+        for (var ri = 0; ri < o.items.length; ri++) {
+          if (ri > 0) rcItemsHtml += ' · ';
+          rcItemsHtml += o.items[ri].name + ' ×' + o.items[ri].qty;
+        }
+      }
+      html = '<div class="order-card">' +
+        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-inuse" style="background:#fff3e0;color:#e65100;">挂账中</span></div>' +
+        '<div class="order-time">' + (o.date||'') + '</div>' +
+        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + rcItemsHtml + '</div>' +
+        '<div style="font-size:12px;color:#999;margin-bottom:8px;">离店时统一结算</div>' +
+        '<button class="order-btn outline" onclick="showShopDetail(\'' + (o.orderId||o.id) + '\')">查看详情</button></div>';
     } else if (o.isShop) {
-      statusHtml = '<span class="order-status status-inuse" style="background:#e3f2fd;color:#0052d9;">商品消费</span>';
       var shopItemsHtml = '';
-      if (typeof o.items === 'string') {
-        shopItemsHtml = o.items;
-      } else if (o.items && o.items.length) {
+      if (typeof o.items === 'string') shopItemsHtml = o.items;
+      else if (o.items && o.items.length) {
         for (var si2 = 0; si2 < o.items.length; si2++) {
-          var sitem = o.items[si2];
           if (si2 > 0) shopItemsHtml += ' · ';
-          shopItemsHtml += sitem.name + ' ×' + sitem.qty + ' ¥' + (sitem.price * sitem.qty);
+          shopItemsHtml += o.items[si2].name + ' ×' + o.items[si2].qty;
         }
       }
-      contentHtml = '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + shopItemsHtml + '</div>' +
-        '<div style="font-size:12px;color:#999;margin-bottom:8px;">支付方式: ' + (o.payment || '微信支付') + '</div>' +
-        '<div class="order-actions">' +
-        '<button class="order-btn outline" onclick="showShopDetail(\'' + o.id + '\')">查看详情</button>' +
-        '</div>';
+      html = '<div class="order-card">' +
+        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-inuse" style="background:#e3f2fd;color:#0052d9;">已完成</span></div>' +
+        '<div class="order-time">' + (o.date||'') + '</div>' +
+        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + shopItemsHtml + '</div>' +
+        '<button class="order-btn outline" onclick="showShopDetail(\'' + (o.orderId||o.id) + '\')">查看详情</button></div>';
     } else {
-      statusHtml = '<span class="order-status status-completed">已完成</span>';
-      contentHtml = '<div style="font-size:13px;color:#666;margin-bottom:8px;">支付方式: ' + o.payment + '</div>' +
-        '<div class="order-actions">' +
+      html = '<div class="order-card">' +
+        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-completed">已完成</span></div>' +
+        '<div class="order-time">' + o.date + ' ' + o.time + '</div>' +
+        '<div class="order-price">¥' + o.price + '</div>' +
+        '<div style="font-size:13px;color:#666;margin-bottom:8px;">支付方式: ' + o.payment + '</div>' +
         '<button class="order-btn outline" onclick="location.href=\'../room-detail/index.html?id=' + o.roomId + '\'">再次预约</button>' +
-        '<button class="order-btn ghost" onclick="showDetail(\'' + o.id + '\')">查看详情</button>' +
-        '</div>';
+        '<button class="order-btn ghost" style="margin-left:8px;" onclick="showDetail(\'' + o.id + '\')">查看详情</button></div>';
     }
-
-    return '<div class="order-card">' +
-      '<div class="order-header"><span class="order-room">' + o.roomName + '</span>' + statusHtml + '</div>' +
-      '<div class="order-time">' + o.date + ' ' + o.time + '</div>' +
-      '<div class="order-price">¥' + o.price + '</div>' +
-      contentHtml +
-      '</div>';
+    return html;
   }).join('') + '</div>';
 }
 
@@ -247,18 +259,23 @@ function confirmCancel() {
     for (var i = 0; i < orders.length; i++) {
       if (orders[i].id === cancelTarget) { orders[i].status = 'Cancelled'; break; }
     }
-    showToast('订单已取消，退款将退回原支付方式');
+    UI.toast('订单已取消，退款将退回原支付方式');
   }
   hideModal(); cancelTarget = null; renderOrders();
 }
-function quickCheckout(id) {
+
+// Extend
+function useNow(id) {
   for (var i = 0; i < orders.length; i++) {
-    if (orders[i].id === id) { orders[i].status = 'Completed'; break; }
+    if (orders[i].id === id) {
+      orders[i].status = 'InUse';
+      var encName = encodeURIComponent(orders[i].roomName || '包间');
+      location.href = '../room-control/index.html?roomId=' + orders[i].roomId + '&roomName=' + encName + '&duration=90';
+      break;
+    }
   }
-  showToast('退房成功！'); renderOrders();
 }
 
-// Extend from orders page
 function showExtendOrder(id) {
   extendTarget = id;
   var o = null;
@@ -271,7 +288,6 @@ function showExtendOrder(id) {
   document.getElementById('extendInfo').innerHTML =
     '<div>订单日期: <b>' + o.date + '</b> · 原时段: <b>' + o.time + '</b></div>' +
     '<div style="margin-top:4px;">当前将于 <b>' + et + '</b> 结束。请选择续订至何时：</div>';
-
   var optsHtml = '';
   for (var i = 1; i <= 8; i++) {
     var totalMin = baseMin + i * 30;
@@ -301,25 +317,25 @@ function doExtendOrder() {
   if (!o) return;
   var extMin = selectedExtendIdx * 30;
   var price = Math.round(120 * extMin / 60);
-
-  var balance = parseInt(localStorage.getItem('mp_balance') || '280');
-  balance -= price;
-  localStorage.setItem('mp_balance', String(balance));
-
+  API.getBalance().then(function(balance) {
+    var newBalance = balance - price;
+    var user = Utils.lsGet('user', {});
+    user.balance = newBalance;
+    Utils.lsSet('user', user);
+  });
   o.price += price;
   var et = o.endTime || (o.time ? o.time.split('-')[1] : '12:00');
   var parts = et.split(':');
-  var endH = parseInt(parts[0]), endM = parseInt(parts[1]) || 0;
-  var newMin = Math.ceil((endH * 60 + endM) / 30) * 30 + extMin;
+  var newMin = (parseInt(parts[0])*60 + (parseInt(parts[1])||0)) + extMin;
   o.endTime = String(Math.floor(newMin/60)%24).padStart(2,'0') + ':' + String(newMin%60).padStart(2,'0');
   o.time = o.time.split('-')[0] + '-' + o.endTime;
   hideExtendModal();
-  showToast('续订成功！已续订至 ' + o.endTime + '，¥' + price + ' 已从余额扣除，订单总价 ¥' + o.price + '，余额 ¥' + balance);
+  UI.toast('续订成功！已续订至 ' + o.endTime + '，¥' + price + ' 已从余额扣除');
   renderOrders();
 }
 function hideExtendModal() { document.getElementById('extendModal').style.display = 'none'; extendTarget = null; }
 
-// Detail for room orders
+// Detail
 function showDetail(id) {
   var o = null;
   for (var i = 0; i < orders.length; i++) { if (orders[i].id === id) { o = orders[i]; break; } }
@@ -337,58 +353,42 @@ function showDetail(id) {
   document.getElementById('detailModal').style.display = 'flex';
 }
 
-// Detail for shop orders
 function showShopDetail(id) {
-  var shopOrders = JSON.parse(localStorage.getItem('mp_shop_orders') || '[]');
+  var shopOrders = Utils.lsGet('shop_orders', []);
   var o = null;
   for (var i = 0; i < shopOrders.length; i++) {
     if (shopOrders[i].orderId === id || shopOrders[i].id === id) { o = shopOrders[i]; break; }
   }
-  if (!o) { showToast('订单信息未找到'); return; }
-
-  var statusLabel = o.status === 'Shipping' ? '待发货' : o.status === 'Completed' ? '已完成' : '商品消费';
+  if (!o) { UI.toast('订单信息未找到'); return; }
+  var statusLabel = o.status === 'Shipping' ? '待发货' : '已完成';
   var itemsHtml = '';
-  if (typeof o.items === 'string') {
-    itemsHtml = o.items;
-  } else if (o.items && o.items.length) {
+  if (typeof o.items === 'string') itemsHtml = o.items;
+  else if (o.items && o.items.length) {
     for (var k = 0; k < o.items.length; k++) {
       var item = o.items[k];
       itemsHtml += '<div style="display:flex;justify-content:space-between;padding:4px 0;">' +
-        '<span>' + item.name + ' ×' + item.qty + '</span>' +
-        '<span>¥' + (item.price * item.qty) + '</span></div>';
+        '<span>' + item.name + ' ×' + item.qty + '</span><span>¥' + (item.price * item.qty) + '</span></div>';
     }
   }
-  var extraInfo = '';
-  if (o.status === 'Shipping') {
-    extraInfo = '<div style="display:flex;justify-content:space-between;padding:6px 0;color:#e37318;"><span>发货状态</span><span>待发货 · 预计3-5个工作日</span></div>';
-  }
-
   document.getElementById('detailContent').innerHTML =
     '<h3>商品订单详情</h3>' +
     '<div style="text-align:left;font-size:13px;color:#666;">' +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>订单号</span><span>' + (o.orderId || o.id) + '</span></div>' +
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>日期</span><span>' + (o.date || '') + ' ' + (o.time || '') + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>日期</span><span>' + (o.date||'') + '</span></div>' +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>状态</span><span style="font-weight:600;">' + statusLabel + '</span></div>' +
     '<div style="margin-top:8px;border-top:1px solid #eee;padding-top:8px;">' + itemsHtml + '</div>' +
-    extraInfo +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #eee;margin-top:8px;"><span>合计</span><span style="font-weight:700;color:#e37318;">¥' + (o.totalAmount || o.price) + '</span></div>' +
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>支付方式</span><span>' + (o.payment || '—') + '</span></div>' +
     '</div>' +
     '<button class="modal-btn cancel" style="margin-top:12px;width:100%;" onclick="document.getElementById(\'detailModal\').style.display=\'none\'">关闭</button>';
   document.getElementById('detailModal').style.display = 'flex';
 }
 
 function copyCode(code) {
-  navigator.clipboard && navigator.clipboard.writeText(code).then(function() { showToast('密码已复制: '+code); }).catch(function() { showToast('密码: '+code); });
+  navigator.clipboard && navigator.clipboard.writeText(code).then(function() { UI.toast('密码已复制'); }).catch(function() { UI.toast('密码: '+code); });
 }
 
 function hideModal() { document.getElementById('cancelModal').style.display = 'none'; }
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  setTimeout(function() { t.style.display = 'none'; }, 2000);
-}
-
+// Using SDK.UI.toast
 renderOrders();
 </script>
 </body>

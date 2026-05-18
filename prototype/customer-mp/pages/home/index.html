@@ -2,51 +2,77 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>高岸茶室 - 首页</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>高岸茶室</title>
+<script src="../../js/sdk.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
-.phone { width:375px; height:812px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; position:relative; }
-.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; padding-bottom:60px; }
+.page::-webkit-scrollbar { display:none; }
 .nav-top { position:fixed; top:10px; right:20px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
 .store-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#fff; }
 .store-name { font-size:18px; font-weight:700; color:#1a1a1a; }
 .store-select { font-size:13px; color:#0052d9; display:flex; align-items:center; gap:4px; cursor:pointer; padding:4px 8px; border-radius:6px; background:#f0f5ff; }
+.user-badge { font-size:11px; color:#07c160; margin-left:6px; font-weight:400; }
 
-/* Carousel */
-.carousel { position:relative; height:200px; overflow:hidden; }
-.carousel-track { display:flex; height:100%; transition:transform .4s ease; }
-.carousel-slide { min-width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:16px; color:#fff; position:relative; }
-.carousel-slide::after { content:''; position:absolute; bottom:0; left:0; right:0; height:60%; background:linear-gradient(transparent,rgba(0,0,0,.5)); pointer-events:none; }
+/* Active order banner */
+.active-order-banner { display:none; margin:0; padding:14px 16px; background:linear-gradient(135deg,#07c160,#00a854); color:#fff; }
+.active-order-banner.show { display:block; }
+.active-order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.active-order-title { font-size:13px; font-weight:600; opacity:.9; }
+.active-order-room { font-size:16px; font-weight:700; }
+.active-order-time { font-size:12px; opacity:.8; margin-top:2px; }
+.active-order-btns { display:flex; gap:10px; margin-top:10px; }
+.active-order-btn { flex:1; padding:12px; border-radius:10px; border:none; font-size:14px; font-weight:600; cursor:pointer; text-align:center; }
+.active-order-btn.primary { background:#fff; color:#07c160; }
+.active-order-btn.outline { background:rgba(255,255,255,.2); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
+
+/* Carousel — transform-based with auto-rotation + partial next slide */
+.carousel-wrap { position:relative; overflow:hidden; }
+.carousel-track { display:flex; transition:transform .4s ease; }
+.carousel-slide { width:100%; flex-shrink:0; height:200px; display:flex; flex-direction:column; justify-content:flex-end; padding:16px 20px; color:#fff; position:relative; border-radius:12px; overflow:hidden; background-size:cover; background-position:center; background-repeat:no-repeat; cursor:pointer; }
 .carousel-slide .slide-title { font-size:20px; font-weight:700; position:relative; z-index:1; text-shadow:0 1px 4px rgba(0,0,0,.5); }
-.carousel-slide .slide-desc { font-size:14px; margin-top:4px; opacity:.9; position:relative; z-index:1; text-shadow:0 1px 4px rgba(0,0,0,.5); }
-.carousel-slide .slide-tags { display:flex; gap:8px; margin-top:8px; position:relative; z-index:1; }
-.carousel-slide .slide-tag { background:rgba(255,255,255,.2); padding:2px 8px; border-radius:10px; font-size:11px; }
+.carousel-slide .slide-desc { font-size:13px; margin-top:4px; position:relative; z-index:1; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 .carousel-dots { position:absolute; bottom:8px; right:16px; display:flex; gap:6px; z-index:2; }
 .carousel-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.4); transition:all .2s; cursor:pointer; }
 .carousel-dot.active { background:#fff; width:18px; border-radius:10px; }
-.quick-actions { display:flex; gap:12px; padding:16px; }
-.quick-btn { flex:1; padding:16px; border-radius:12px; text-align:center; cursor:pointer; border:none; font-size:14px; font-weight:600; transition:transform .15s; }
-.quick-btn:active { transform:scale(.97); }
-.quick-btn.primary { background:#07c160; color:#fff; }
-.quick-btn.outline { background:#f0fdf4; color:#07c160; border:1.5px solid #07c160; }
-.section { padding:0 16px; margin-bottom:20px; }
+
+/* Four quick shortcuts */
+.quick-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; padding:16px; }
+.quick-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; border:none; background:none; padding:10px 4px; transition:transform .15s; }
+.quick-item:active { transform:scale(.95); }
+.quick-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff; background:#07c160; }
+.quick-icon.brand { background:linear-gradient(135deg,#07c160,#00a854); }
+.quick-icon.balance { background:linear-gradient(135deg,#0052d9,#366ef4); }
+.quick-icon.coupon { background:linear-gradient(135deg,#e37318,#f5a623); }
+.quick-icon.profile { background:linear-gradient(135deg,#9c27b0,#ce93d8); }
+.quick-label { font-size:11px; color:#333; font-weight:500; }
+.quick-balance { font-size:13px; font-weight:700; color:#0052d9; margin-top:1px; }
+
+/* Section */
+.section { padding:0 16px; margin-bottom:16px; }
 .section-title { font-size:15px; font-weight:600; margin-bottom:12px; color:#1a1a1a; }
-.room-card { display:flex; padding:14px; border-radius:12px; background:#f9fafb; margin-bottom:10px; cursor:pointer; transition:box-shadow .15s; }
-.room-card:hover { box-shadow:0 2px 12px rgba(0,0,0,.08); }
-.room-card-avatar { width:72px; height:72px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:28px; }
-.room-card-body { margin-left:12px; flex:1; }
+
+/* Room list */
+.room-card { display:flex; padding:14px; background:#f9fafb; margin-bottom:10px; cursor:pointer; transition:box-shadow .15s; border-radius:12px; }
+.room-card:active { background:#f0f0f0; }
+.room-card-img { width:80px; height:80px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:28px; overflow:hidden; }
+.room-card-img img { width:100%; height:100%; object-fit:cover; }
+.room-card-body { margin-left:12px; flex:1; display:flex; flex-direction:column; justify-content:space-between; }
 .room-card-name { font-size:15px; font-weight:600; }
-.room-card-meta { font-size:12px; color:#999; margin-top:4px; }
-.room-card-price { font-size:16px; font-weight:700; color:#e37318; margin-top:4px; }
-.room-card-arrow { color:#ccc; font-size:14px; align-self:center; }
+.room-card-meta { font-size:12px; color:#999; margin-top:2px; }
+.room-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+.room-card-price { font-size:16px; font-weight:700; color:#e37318; }
+.room-card-book-btn { padding:6px 14px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; }
+.room-card-book-btn:active { opacity:.8; }
 
 /* Tea products */
 .tea-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.tea-card { background:#fff; border-radius:12px; overflow:hidden; border:1px solid #f0f0f0; cursor:pointer; transition:box-shadow .15s; }
-.tea-card:hover { box-shadow:0 2px 12px rgba(0,0,0,.08); }
+.tea-card { background:#fff; border:1px solid #f0f0f0; cursor:pointer; transition:box-shadow .15s; border-radius:12px; overflow:hidden; }
+.tea-card:active { background:#fafafa; }
 .tea-card-img { height:100px; display:flex; align-items:center; justify-content:center; font-size:40px; }
 .tea-card-body { padding:10px; }
 .tea-card-name { font-size:13px; font-weight:600; }
@@ -55,13 +81,6 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
 .tea-card-price { font-size:15px; font-weight:700; color:#e37318; }
 .tea-card-btn { padding:4px 12px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:11px; cursor:pointer; }
 .tea-card-btn:active { opacity:.8; }
-
-.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
-.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; transition:color .15s; text-decoration:none; }
-.nav-item .nav-icon { font-size:20px; }
-.nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
-.nav-item:not(.active) { color:#999; }
 
 /* Modal */
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
@@ -89,12 +108,15 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
 .store-option.active { color:#07c160; font-weight:600; }
 .store-option.coming { color:#999; cursor:default; }
 .store-coming-tag { font-size:10px; padding:2px 6px; border-radius:8px; background:#fff3e0; color:#e37318; }
-
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
-
 .qr-context-btn:active { opacity:.8; }
 
-.user-badge { font-size:12px; color:#07c160; margin-left:8px; }
+/* Bottom nav */
+.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; flex-shrink:0; z-index:10; }
+.nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
+.nav-item .nav-icon { font-size:20px; display:block; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.nav-item.active { color:#07c160; }
 </style>
 </head>
 <body>
@@ -102,11 +124,12 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
 <div class="phone">
   <div class="page">
     <div class="store-header">
-      <span class="store-name">高岸茶室<span class="user-badge" id="userBadge" style="display:none">已登录</span></span>
+      <span class="store-name">高岸茶室</span>
       <span class="store-select" onclick="showStoreSelector()">盈隆店 ▾</span>
     </div>
-    <!-- QR Context Card (shown when QR scan detected) -->
-    <div class="qr-context-card" id="qrContextCard" style="display:none;margin:12px 16px;background:#f0fdf4;border-radius:12px;padding:14px;border:1.5px solid #dcedc8;">
+
+    <!-- QR Context Card -->
+    <div class="qr-context-card" id="qrContextCard" style="display:none;margin:12px 16px;background:#f0fdf4;padding:14px;border:1.5px solid #dcedc8;">
       <div style="display:flex;align-items:center;gap:10px;">
         <span style="font-size:24px;">📍</span>
         <div style="flex:1;">
@@ -122,27 +145,24 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
       </div>
     </div>
 
-    <div class="carousel" id="carousel">
+    <!-- Carousel — brand-first, auto-rotate with partial next slide -->
+    <div class="carousel-wrap">
       <div class="carousel-track" id="carouselTrack">
-        <div class="carousel-slide" style="background:url('../../images/茶荟头图-空间-诗梳风大茶室.jpg') center/cover no-repeat;">
-          <div class="slide-title">高空茶室</div>
-          <div class="slide-desc">超宽落地窗，俯瞰城市天际线</div>
-          <div class="slide-tags"><span class="slide-tag">★ 4.8分</span><span class="slide-tag">距2.3km</span><span class="slide-tag">24小时营业</span></div>
-        </div>
-        <div class="carousel-slide" style="background:url('../../images/头图四-店面招牌.jpg') center/cover no-repeat;">
-          <div class="slide-title">精选好茶</div>
-          <div class="slide-desc">古树普洱 · 明前龙井 · 武夷岩茶</div>
-          <div class="slide-tags"><span class="slide-tag">新品到店</span><span class="slide-tag">限时特惠</span></div>
-        </div>
         <div class="carousel-slide" style="background:url('../../images/中英文标题LOGO-蓝天白云-16比9-A.jpg') center/cover no-repeat;">
-          <div class="slide-title">商务会议</div>
-          <div class="slide-desc">投影 · K歌 · 茶台 · 高端私密空间</div>
-          <div class="slide-tags"><span class="slide-tag">大会议室</span><span class="slide-tag">可容纳10人</span></div>
+          <div class="slide-title">高岸茶室</div>
+          <div class="slide-desc">城市中的静谧茶空间 · 商务社交新选择</div>
         </div>
-        <div class="carousel-slide" style="background:url('../../images/金德大诗梳风004.jpg') center/cover no-repeat;">
-          <div class="slide-title">雅致茶空间</div>
-          <div class="slide-desc">传统茶道 · 香道体验 · 高端社交</div>
-          <div class="slide-tags"><span class="slide-tag">特色体验</span><span class="slide-tag">VIP专属</span></div>
+        <div class="carousel-slide" onclick="location.href='../member-center/index.html?action=topup'" style="background:url('../../images/头图四-店面招牌.jpg') center/cover no-repeat;">
+          <div class="slide-title">会员首充特惠</div>
+          <div class="slide-desc">首充享7折 + 赠送优惠券包，锁定超值体验</div>
+        </div>
+        <div class="carousel-slide" onclick="location.href='../home/index.html'" style="background:url('../../images/茶荟头图-空间-诗梳风大茶室.jpg') center/cover no-repeat;">
+          <div class="slide-title">精选包间</div>
+          <div class="slide-desc">大茶室 · 会议室 · 中茶室 · 满足不同需求</div>
+        </div>
+        <div class="carousel-slide" onclick="location.href='../coupon-verify/index.html'" style="background:url('../../images/金德大诗梳风004.jpg') center/cover no-repeat;">
+          <div class="slide-title">优惠券大放送</div>
+          <div class="slide-desc">领取专属优惠券，到店享更多折扣</div>
         </div>
       </div>
       <div class="carousel-dots" id="carouselDots">
@@ -152,14 +172,47 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
         <span class="carousel-dot" onclick="goSlide(3)"></span>
       </div>
     </div>
-    <div class="quick-actions">
-      <button class="quick-btn primary" onclick="handleBooking()">立即预约</button>
-      <button class="quick-btn outline" onclick="goMember()">会员中心</button>
+
+    <!-- Active order action buttons -->
+    <div class="active-order-banner" id="activeOrderBanner">
+      <div class="active-order-header">
+        <span class="active-order-title">⏱ 当前消费</span>
+        <span class="active-order-room" id="activeOrderRoom">—</span>
+      </div>
+      <div class="active-order-time" id="activeOrderTime">—</div>
+      <div class="active-order-btns">
+        <button class="active-order-btn primary" id="activeOrderDoorBtn">🚪 开门</button>
+        <button class="active-order-btn outline" id="activeOrderServiceBtn">📞 客服</button>
+      </div>
     </div>
+
+    <!-- Four quick shortcuts -->
+    <div class="quick-grid">
+      <button class="quick-item" onclick="location.href='../coupon-verify/index.html'">
+        <div class="quick-icon brand">🎫</div>
+        <span class="quick-label">验券</span>
+      </button>
+      <button class="quick-item" onclick="handleBalanceClick()" style="position:relative;">
+        <div class="quick-icon balance" id="quickBalanceIcon">💰</div>
+        <span class="quick-label">会员余额</span>
+        <span class="quick-balance" id="quickBalance">¥280</span>
+        <span class="eye-icon" id="homeBalanceEye" onclick="event.stopPropagation();toggleHomeBalance()" style="position:absolute;top:4px;right:4px;font-size:10px;cursor:pointer;opacity:.5;">👁</span>
+      </button>
+      <button class="quick-item" onclick="handleCouponClick()">
+        <div class="quick-icon coupon">🏷️</div>
+        <span class="quick-label">优惠券</span>
+      </button>
+      <button class="quick-item" onclick="goProfile()">
+        <div class="quick-icon profile">👤</div>
+        <span class="quick-label">我的</span>
+      </button>
+    </div>
+
     <div class="section">
       <div class="section-title">可预约包间</div>
       <div id="roomList"></div>
     </div>
+
     <div class="section">
       <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
         <span>🍵 精选茶品</span>
@@ -172,7 +225,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
   </div>
   <div class="bottom-nav">
     <div class="nav-item active"><div class="nav-icon">🏠</div><div class="nav-label">主页</div></div>
-    <div class="nav-item" onclick="location.href='../room-detail/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
+    <div class="nav-item" onclick="location.href='../room-list/index.html'"><div class="nav-icon">📅</div><div class="nav-label">预订</div></div>
     <div class="nav-item" onclick="location.href='../tea-shop/index.html'"><div class="nav-icon">🍵</div><div class="nav-label">茶品</div></div>
     <div class="nav-item" onclick="location.href='../my-orders/index.html'"><div class="nav-icon">📋</div><div class="nav-label">订单</div></div>
     <div class="nav-item" onclick="location.href='../member-center/index.html'"><div class="nav-icon">👤</div><div class="nav-label">我的</div></div>
@@ -214,7 +267,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
   </div>
 </div>
 
-<!-- QR Warning Modal (independent of login modal) -->
+<!-- QR Warning Modal -->
 <div class="modal-overlay" id="qrWarningModal" style="display:none;">
   <div class="modal">
     <h3 style="color:#D54941;">⚠️ 房间未启用</h3>
@@ -224,7 +277,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
 </div>
 
 <!-- QR Debug Panel -->
-<div class="qr-debug" id="qrDebug" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;border-radius:12px;padding:14px;width:340px;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.3);">
+<div class="qr-debug" id="qrDebug" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;border-radius:12px;padding:14px;width:340px;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.3);">
   <div style="font-size:13px;font-weight:600;margin-bottom:8px;">🔧 QR扫码调试</div>
   <div style="display:flex;gap:6px;margin-bottom:6px;">
     <input id="debugRoomId" value="RM004" style="flex:1;padding:6px 10px;border-radius:6px;border:none;font-size:12px;" placeholder="房间ID" />
@@ -237,7 +290,12 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
 
 <script>
 // ── state ──
-let isLoggedIn = localStorage.getItem('mp_logged_in') === 'true';
+var SDK = window.ERP.SDK;
+var API = SDK.API;
+var UI = SDK.UI;
+var Utils = SDK.Utils;
+
+let isLoggedIn = API.isLoggedIn();
 let currentUser = null;
 let loginMode = 'login';
 let pendingAction = null;
@@ -246,20 +304,97 @@ let pendingAction = null;
 let qrRoomId = null;
 let qrTableId = null;
 
-const stores = [
-  { id:'YL', name:'盈隆店', active:true },
-  { id:'ZJ', name:'珠江新城店', active:false },
-  { id:'PZ', name:'琶洲店', active:false },
-];
+const colors = { 'MeetingRoom':'#e3f2fd', 'TeaRoom':'#e8f5e9', 'Exhibition':'#fff3e0', 'Workspace':'#f5f5f5' };
+const icons = { 'MeetingRoom':'💼', 'TeaRoom':'🍵', 'Exhibition':'🏛️', 'Workspace':'🔧' };
 
-const rooms = [
-  { roomId:"RM004", name:"大茶室C", type:"茶室", capacity:6, area:25, facilities:"茶台·K歌·投影·落地窗", pricePerHour:120 },
-  { roomId:"RM001", name:"大会议室", type:"会议室", capacity:10, area:30, facilities:"投影·会议桌·K歌设备·落地窗", pricePerHour:200 },
-  { roomId:"RM002", name:"中茶室A", type:"茶室", capacity:4, area:18, facilities:"茶台·落地窗·茶具套装", pricePerHour:80 },
-  { roomId:"RM003", name:"中茶室B", type:"茶室", capacity:4, area:18, facilities:"茶台·落地窗·茶具套装", pricePerHour:80 },
-];
-const colors = { '茶室':'#e8f5e9', '会议室':'#e3f2fd' };
-const icons = { '茶室':'🍵', '会议室':'💼' };
+// ── Carousel auto-rotation ──
+var currentSlide = 0;
+var totalSlides = 4;
+function goSlide(idx) {
+  currentSlide = idx;
+  var slides = document.querySelectorAll('.carousel-slide');
+  if (slides.length > 0) {
+    var slideWidth = slides[0].offsetWidth;
+    document.getElementById('carouselTrack').style.transform = 'translateX(-' + (idx * slideWidth) + 'px)';
+  }
+  document.querySelectorAll('.carousel-dot').forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+}
+setInterval(function() { goSlide((currentSlide + 1) % totalSlides); }, 3500);
+
+// ── Active order detection ──
+(function() {
+  var bookings = Utils.lsGet('bookings', []);
+  var active = null;
+  var now2 = new Date();
+  var dateStr = now2.getFullYear() + '-' + String(now2.getMonth()+1).padStart(2,'0') + '-' + String(now2.getDate()).padStart(2,'0');
+  var curMin = now2.getHours() * 60 + now2.getMinutes();
+
+  // Check localStorage bookings first
+  for (var i = 0; i < bookings.length; i++) {
+    var b = bookings[i];
+    if (b.status === 'InUse' || b.status === 'in_use') {
+      active = b; break;
+    }
+    if (b.status === 'Booked' && b.date === dateStr && b.time) {
+      var parts = b.time.split('-');
+      if (parts.length >= 2) {
+        var start = parseInt(parts[0].split(':')[0])*60 + parseInt(parts[0].split(':')[1]);
+        var end = parseInt(parts[1].split(':')[0])*60 + parseInt(parts[1].split(':')[1]);
+        if (curMin >= start && curMin < end) { active = b; break; }
+      }
+    }
+  }
+
+  // Fallback: demo active order for prototype
+  if (!active) {
+    var savedOrders = JSON.parse(localStorage.getItem('mp_bookings') || '[]');
+    for (var si = 0; si < savedOrders.length; si++) {
+      var sb = savedOrders[si];
+      if (sb.status === 'InUse' || sb.status === 'in_use') { active = sb; break; }
+      if (sb.status === 'Booked' && sb.date === dateStr && sb.time) {
+        var p2 = sb.time.split('-');
+        if (p2.length >= 2) {
+          var st = parseInt(p2[0].split(':')[0])*60 + parseInt(p2[0].split(':')[1]);
+          var en = parseInt(p2[1].split(':')[0])*60 + parseInt(p2[1].split(':')[1]);
+          if (curMin >= st && curMin < en) { active = sb; break; }
+        }
+      }
+    }
+  }
+
+  // Demo fallback so banner is always visible for prototyping
+  if (!active) {
+    active = {
+      roomId: 'RM004',
+      roomName: '大茶室C',
+      date: dateStr,
+      time: String(now2.getHours()).padStart(2,'0') + ':00-' + String(now2.getHours()+1).padStart(2,'0') + ':00'
+    };
+  }
+    var banner = document.getElementById('activeOrderBanner');
+    banner.classList.add('show');
+    document.getElementById('activeOrderRoom').textContent = active.roomName || '—';
+    document.getElementById('activeOrderTime').textContent = (active.date || '') + ' ' + (active.time || '');
+    document.getElementById('activeOrderDoorBtn').onclick = function() {
+      UI.toast('🚪 门已开，请进入');
+    };
+    document.getElementById('activeOrderServiceBtn').onclick = function() {
+      var now2 = new Date();
+      var ts = now2.getFullYear() + '-' + String(now2.getMonth()+1).padStart(2,'0') + '-' + String(now2.getDate()).padStart(2,'0') + ' ' + String(now2.getHours()).padStart(2,'0') + ':' + String(now2.getMinutes()).padStart(2,'0');
+      var notification = {
+        id: 'SRV' + Date.now(),
+        type: 'customer_call',
+        roomId: active.roomId || '',
+        roomName: active.roomName || '—',
+        time: ts,
+        message: '客人呼叫服务'
+      };
+      var notifications = JSON.parse(localStorage.getItem('mp_staff_notifications') || '[]');
+      notifications.unshift(notification);
+      localStorage.setItem('mp_staff_notifications', JSON.stringify(notifications));
+      UI.toast('📞 已通知店员，请稍候');
+    };
+})();
 
 // ── QR scan detection ──
 (function() {
@@ -268,26 +403,22 @@ const icons = { '茶室':'🍵', '会议室':'💼' };
   qrTableId = params.get('table_id');
 
   if (qrRoomId) {
-    // Anti-mis-scan: verify room has active order
     var orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
     var activeOrder = null;
     for (var i = 0; i < orders.length; i++) {
       if (orders[i].roomId === qrRoomId && (orders[i].status === 'InUse' || orders[i].status === 'in_use')) {
-        activeOrder = orders[i];
-        break;
+        activeOrder = orders[i]; break;
       }
     }
-
     if (!activeOrder) {
-      setTimeout(function() {
-        showQrWarning('该房间暂未开启使用，请联系店员开启房间');
-      }, 500);
+      setTimeout(function() { showQrWarning('该房间暂未开启使用，请联系店员开启房间'); }, 500);
     } else {
-      var roomName = qrRoomId;
-      for (var j = 0; j < rooms.length; j++) {
-        if (rooms[j].roomId === qrRoomId) { roomName = rooms[j].name; break; }
-      }
-      showQrContextCard(roomName, qrRoomId, qrTableId);
+      // Look up room name from SDK data
+      API.getRoomById(qrRoomId).then(function(room) {
+        showQrContextCard(room.name, qrRoomId, qrTableId);
+      }).catch(function() {
+        showQrContextCard(qrRoomId, qrRoomId, qrTableId);
+      });
     }
   }
 })();
@@ -299,8 +430,7 @@ function showQrWarning(msg) {
 
 function hideQrWarning() {
   document.getElementById('qrWarningModal').style.display = 'none';
-  qrRoomId = null;
-  qrTableId = null;
+  qrRoomId = null; qrTableId = null;
 }
 
 function showQrContextCard(roomName, roomId, tableId) {
@@ -319,15 +449,13 @@ function closeQrContext() {
 function goCartWithRoom() {
   var ctx = JSON.parse(localStorage.getItem('erp_qr_context') || 'null');
   var url = '../tea-shop/index.html';
-  if (ctx) {
-    url += '?room_id=' + ctx.roomId + '&room_name=' + encodeURIComponent(ctx.roomName) + '&table_id=' + ctx.tableId;
-  }
+  if (ctx) url += '?room_id=' + ctx.roomId + '&room_name=' + encodeURIComponent(ctx.roomName) + '&table_id=' + ctx.tableId;
   location.href = url;
 }
 
 function showRoomBill() {
   var ctx = JSON.parse(localStorage.getItem('erp_qr_context') || 'null');
-  if (!ctx) { showToast('未检测到房间信息'); return; }
+  if (!ctx) { UI.toast('未检测到房间信息'); return; }
   var roomBills = JSON.parse(localStorage.getItem('erp_room_bills') || '{}');
   var bill = roomBills[ctx.roomId];
   if (!bill || !bill.items || bill.items.length === 0) {
@@ -350,13 +478,8 @@ function showRoomBill() {
   document.getElementById('roomBillModal').style.display = 'flex';
 }
 
-function hideRoomBill() {
-  document.getElementById('roomBillModal').style.display = 'none';
-}
-
-function showProducts() {
-  location.href = '../my-orders/index.html';
-}
+function hideRoomBill() { document.getElementById('roomBillModal').style.display = 'none'; }
+function showProducts() { location.href = '../my-orders/index.html'; }
 
 // ── Debug panel ──
 if (window.location.search.indexOf('debug=1') >= 0 || localStorage.getItem('erp_debug_mode') === 'true') {
@@ -376,147 +499,208 @@ function debugQrScan() {
   location.href = '?room_id=' + roomId + '&table_id=' + tableId + '&debug=1';
 }
 
-// ── init login and data ──
-if (isLoggedIn) {
-  currentUser = JSON.parse(localStorage.getItem('mp_user') || 'null');
-  if (currentUser) {
-    document.getElementById('userBadge').style.display = 'inline';
-    document.getElementById('userBadge').textContent = currentUser.name || '已登录';
-  }
+// ── Balance visibility ──
+var homeBalVisible = localStorage.getItem('mp_balance_visible') !== 'false';
+
+function applyHomeBalanceVisibility() {
+  var el = document.getElementById('quickBalance');
+  var eye = document.getElementById('homeBalanceEye');
+  if (!el) return;
+  API.getBalance().then(function(bal) {
+    if (homeBalVisible) {
+      el.textContent = Utils.formatMoney(bal);
+      if (eye) eye.textContent = '👁';
+    } else {
+      el.textContent = '****';
+      if (eye) eye.textContent = '👁‍🗨';
+    }
+  });
 }
 
-document.getElementById('roomList').innerHTML = rooms.map(function(r) {
-  return '<div class="room-card" onclick="goRoom(\'' + r.roomId + '\')">' +
-    '<div class="room-card-avatar" style="background:' + (colors[r.type]||'#f0f0f0') + '">' + (icons[r.type]||'🏠') + '</div>' +
-    '<div class="room-card-body">' +
-      '<div class="room-card-name">' + r.name + '</div>' +
-      '<div class="room-card-meta">' + r.capacity + '人 · ' + r.area + '㎡ · ' + r.facilities + '</div>' +
-      '<div class="room-card-price">¥' + r.pricePerHour + '/时</div>' +
-    '</div>' +
-    '<div class="room-card-arrow">›</div>' +
-  '</div>';
-}).join('');
+function toggleHomeBalance() {
+  homeBalVisible = !homeBalVisible;
+  localStorage.setItem('mp_balance_visible', homeBalVisible);
+  applyHomeBalanceVisibility();
+}
 
-// Tea products (synced with supply-chain.json)
-const teaProducts = [
-  { id:'T01', name:'明前龙井', type:'绿茶', desc:'西湖核心产区 · 清香甘醇', price:168, spec:'250g/罐', icon:'🍃', bg:'#e8f5e9', image:'' },
-  { id:'T02', name:'金骏眉', type:'红茶', desc:'武夷山桐木关 · 蜜香甘醇', price:258, spec:'200g/罐', icon:'🪵', bg:'#fce4ec', image:'' },
-  { id:'T03', name:'铁观音', type:'乌龙', desc:'安溪高山 · 七泡有余香', price:138, spec:'250g/罐', icon:'🏔️', bg:'#fff3e0', image:'' },
-  { id:'T04', name:'云南普洱（生普）', type:'普洱', desc:'勐海古树 · 茶气霸烈', price:198, spec:'357g/饼', icon:'🌿', bg:'#efebe9', image:'' },
-  { id:'T05', name:'云南普洱（熟普）', type:'普洱', desc:'勐海发酵 · 陈香醇厚', price:208, spec:'357g/饼', icon:'🏵️', bg:'#f1f8e9', image:'' },
-  { id:'T06', name:'武夷岩茶', type:'乌龙', desc:'大红袍 · 岩骨花香', price:358, spec:'100g/罐', icon:'🏔️', bg:'#efebe9', image:'' },
-];
+// ── Init data (async) ──
+function initHomePage() {
+  // Render room cards from embedded data immediately
+  var embeddedRooms = [
+    { roomId:'RM001', name:'大会议室', type:'MeetingRoom', capacity:10, area:30, facilities:['投影','会议桌','K歌设备','落地窗'], pricePerHour:200 },
+    { roomId:'RM002', name:'中茶室A', type:'TeaRoom', capacity:4, area:18, facilities:['茶台','落地窗','茶具套装'], pricePerHour:80 },
+    { roomId:'RM003', name:'中茶室B', type:'TeaRoom', capacity:4, area:18, facilities:['茶台','落地窗','茶具套装'], pricePerHour:80 },
+    { roomId:'RM004', name:'大茶室C', type:'TeaRoom', capacity:6, area:25, facilities:['茶台','K歌','投影','落地窗'], pricePerHour:120 },
+  ];
+  var roomListEl = document.getElementById('roomList');
+  roomListEl.innerHTML = embeddedRooms.map(function(r) {
+    var bgColor = colors[r.type] || '#f0f0f0';
+    var icon = icons[r.type] || '🏠';
+    var facilities = (r.facilities || []).join(' · ');
+    var price = r.pricePerHour || 120;
+    return '<div class="room-card" onclick="goRoom(\'' + r.roomId + '\')">' +
+      '<div class="room-card-img" style="background:' + bgColor + '">' + icon + '</div>' +
+      '<div class="room-card-body">' +
+        '<div class="room-card-name">' + r.name + '</div>' +
+        '<div class="room-card-meta">' + (r.capacity || '—') + '人 · ' + (r.area || '—') + '㎡ · ' + facilities + '</div>' +
+        '<div class="room-card-footer">' +
+          '<span class="room-card-price">¥' + price + '/时</span>' +
+          '<button class="room-card-book-btn" onclick="event.stopPropagation();goRoom(\'' + r.roomId + '\')">立即预约</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 
-// Cart management
-let teaCart = JSON.parse(localStorage.getItem('mp_tea_cart') || '[]');
+  Promise.all([
+    API.getRooms(true),
+    API.getProducts(),
+    API.getCurrentUser(),
+    API.getBalance()
+  ]).then(function(results) {
+    var roomsData = results[0];
+    var productsData = results[1];
+    var user = results[2];
+    var balance = results[3];
+
+    if (user) {
+      currentUser = user;
+      updateQuickIcons(user);
+    }
+
+    // Render room list
+    var roomListEl = document.getElementById('roomList');
+    roomListEl.innerHTML = roomsData.map(function(r) {
+      var typeLabel = Utils.getRoomTypeLabel(r.type);
+      var bgColor = colors[r.type] || '#f0f0f0';
+      var icon = icons[r.type] || '🏠';
+      var facilities = (r.facilities || []).join(' · ');
+      var price = r.pricePerHour || r.pricePerHalfHour * 2 || 120;
+      return '<div class="room-card" onclick="goRoom(\'' + r.roomId + '\')">' +
+        '<div class="room-card-img" style="background:' + bgColor + '">' + icon + '</div>' +
+        '<div class="room-card-body">' +
+          '<div class="room-card-name">' + r.name + '</div>' +
+          '<div class="room-card-meta">' + (r.capacity || '—') + '人 · ' + (r.area || '—') + '㎡ · ' + facilities + '</div>' +
+          '<div class="room-card-footer">' +
+            '<span class="room-card-price">¥' + price + '/时</span>' +
+            '<button class="room-card-book-btn" onclick="event.stopPropagation();goRoom(\'' + r.roomId + '\')">立即预约</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    // Render tea products grid
+    renderTeaGrid(productsData);
+
+    // Apply balance visibility
+    applyHomeBalanceVisibility();
+
+    // User level icon
+    if (user) updateQuickIcons(user);
+  }).catch(function(err) {
+    UI.toast('加载失败: ' + err.message);
+  });
+}
+
+function updateQuickIcons(user) {
+  if (!user) return;
+  var level = user.memberLevel || 'Gold';
+  var levelIcons = {
+    'Gold':    { icon:'💎' },
+    'Silver':  { icon:'💰' },
+    'Bronze':  { icon:'👛' },
+    'Diamond': { icon:'💳' }
+  };
+  var info = levelIcons[level] || levelIcons['Gold'];
+  var iconEl = document.getElementById('quickBalanceIcon');
+  if (iconEl) iconEl.textContent = info.icon;
+}
+
+var _teaProductsData = [];
+var _teaCart = [];
 
 function addToCart(product) {
-  var existing = null;
-  for (var i = 0; i < teaCart.length; i++) {
-    if (teaCart[i].id === product.id) { existing = teaCart[i]; break; }
-  }
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    teaCart.push({ id:product.id, name:product.name, price:product.price, qty:1, icon:product.icon, spec:product.spec || '' });
-  }
-  localStorage.setItem('mp_tea_cart', JSON.stringify(teaCart));
-  var totalItems = 0;
-  var totalPrice = 0;
-  for (var i = 0; i < teaCart.length; i++) {
-    totalItems += teaCart[i].qty;
-    totalPrice += teaCart[i].price * teaCart[i].qty;
-  }
-  renderCartBadge();
-  showToast('已加入购物车: ' + product.name + '（共' + totalItems + '件 ¥' + totalPrice + '）');
+  API.addToCart(product).then(function(cart) {
+    _teaCart = cart;
+    renderCartBadge();
+    UI.toast('已加入购物车: ' + product.name);
+  });
 }
 
 function renderCartBadge() {
-  var totalItems = 0;
-  for (var i = 0; i < teaCart.length; i++) { totalItems += teaCart[i].qty; }
-  var badge = document.getElementById('cartBadge');
-  if (badge) {
-    badge.textContent = totalItems;
-    badge.style.display = totalItems > 0 ? '' : 'none';
-  }
+  API.getCart().then(function(cart) {
+    _teaCart = cart;
+    var totalItems = 0;
+    for (var i = 0; i < cart.length; i++) { totalItems += cart[i].qty || 1; }
+    var badge = document.getElementById('cartBadge');
+    if (badge) { badge.textContent = totalItems; badge.style.display = totalItems > 0 ? '' : 'none'; }
+  });
 }
 
 function goCart() {
-  if (teaCart.length === 0) { showToast('购物车为空'); return; }
-  location.href = '../tea-shop/index.html?tab=cart';
+  API.getCart().then(function(cart) {
+    if (cart.length === 0) { UI.toast('购物车为空'); return; }
+    location.href = '../tea-shop/index.html?tab=cart';
+  });
 }
 
-function renderTeaGrid() {
-  document.getElementById('teaGrid').innerHTML = teaProducts.map(function(t) {
+function renderTeaGrid(products) {
+  _teaProductsData = products;
+  // Assign visual properties for SDK products
+  var visualMap = {
+    'T001': { icon:'🍃', bg:'#e8f5e9' }, 'T002': { icon:'🪵', bg:'#fce4ec' },
+    'T003': { icon:'🏔️', bg:'#fff3e0' }, 'T004': { icon:'🌿', bg:'#efebe9' },
+    'T005': { icon:'🏵️', bg:'#f1f8e9' }, 'T006': { icon:'🏔️', bg:'#efebe9' },
+    'T007': { icon:'🏺', bg:'#f3e5f5' }, 'T008': { icon:'🥃', bg:'#e0f7fa' }
+  };
+  document.getElementById('teaGrid').innerHTML = products.map(function(t) {
+    var vis = visualMap[t.productId] || { icon:'🍵', bg:'#f0f0f0' };
     return '<div class="tea-card" onclick="location.href=\'../tea-shop/index.html\'" style="cursor:pointer;">' +
-      '<div class="tea-card-img" style="background:' + t.bg + ';position:relative;overflow:hidden;">' +
-        (t.image ? '<img src="' + t.image + '" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;" onerror="this.style.display=\'none\'" />' : '') +
-        '<span style="position:relative;z-index:1;">' + t.icon + '</span>' +
+      '<div class="tea-card-img" style="background:' + vis.bg + ';position:relative;overflow:hidden;">' +
+        '<span style="position:relative;z-index:1;font-size:40px;">' + vis.icon + '</span>' +
       '</div>' +
       '<div class="tea-card-body">' +
         '<div class="tea-card-name">' + t.name + '</div>' +
-        '<div class="tea-card-desc">' + t.desc + '</div>' +
+        '<div class="tea-card-desc">' + (t.desc || '') + '</div>' +
         '<div class="tea-card-footer">' +
-          '<span class="tea-card-price">¥' + t.price + '</span>' +
-          '<button class="tea-card-btn" onclick="event.stopPropagation();addToCart(teaProducts[' + teaProducts.indexOf(t) + '])">+ 加购</button>' +
+          '<span class="tea-card-price">' + Utils.formatMoney(t.price) + '</span>' +
+          '<button class="tea-card-btn" onclick="event.stopPropagation();addToCart({productId:\'' + t.productId + '\',name:\'' + t.name + '\',price:' + t.price + '})">+ 加购</button>' +
         '</div>' +
       '</div>' +
     '</div>';
   }).join('');
 }
 
-renderTeaGrid();
-renderCartBadge();
-
-// Carousel
-let currentSlide = 0;
-const totalSlides = 4;
-
-function goSlide(idx) {
-  currentSlide = idx;
-  document.getElementById('carouselTrack').style.transform = 'translateX(-' + (idx * 100) + '%)';
-  document.querySelectorAll('.carousel-dot').forEach(function(d,i) { d.classList.toggle('active', i===idx); });
-}
-
-function nextSlide() {
-  goSlide((currentSlide + 1) % totalSlides);
-}
-
-setInterval(nextSlide, 3500);
-
-// Touch swipe for carousel
-let touchStartX = 0;
-document.getElementById('carousel').addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; });
-document.getElementById('carousel').addEventListener('touchend', function(e) {
-  var diff = touchStartX - e.changedTouches[0].clientX;
-  if (diff > 40) goSlide((currentSlide + 1) % totalSlides);
-  else if (diff < -40) goSlide((currentSlide - 1 + totalSlides) % totalSlides);
-});
-
-// ── booking flow ──
-function handleBooking() {
-  if (isLoggedIn) {
-    document.querySelector('.section').scrollIntoView({ behavior:'smooth' });
-  } else {
-    pendingAction = 'booking';
-    showLogin();
+// ── Quick actions ──
+function handleBalanceClick() {
+  if (!isLoggedIn) {
+    pendingAction = 'profile'; showLogin(); return;
   }
+  location.href = '../member-center/index.html';
+}
+
+function handleCouponClick() {
+  if (!isLoggedIn) {
+    pendingAction = 'coupon'; showLogin(); return;
+  }
+  location.href = '../my-coupons/index.html';
+}
+
+function goProfile() {
+  if (!isLoggedIn) {
+    pendingAction = 'profile'; showLogin(); return;
+  }
+  location.href = '../member-center/index.html';
 }
 
 function goRoom(roomId) {
   if (!isLoggedIn) {
-    pendingAction = 'room-' + roomId;
-    showLogin();
-    return;
+    pendingAction = 'room-' + roomId; showLogin(); return;
   }
   location.href = '../room-detail/index.html?id=' + roomId;
 }
 
 // ── login ──
-function showLogin() {
-  document.getElementById('loginModal').style.display = 'flex';
-  renderLoginForm();
-}
+function showLogin() { document.getElementById('loginModal').style.display = 'flex'; renderLoginForm(); }
 
 function switchLoginTab(mode) {
   loginMode = mode;
@@ -529,22 +713,19 @@ function switchLoginTab(mode) {
 function renderLoginForm() {
   var container = document.getElementById('loginContent');
   var regContainer = document.getElementById('registerContent');
-
   if (loginMode === 'login') {
-    container.style.display = 'block';
-    regContainer.style.display = 'none';
+    container.style.display = 'block'; regContainer.style.display = 'none';
     container.innerHTML =
       '<div class="form-item"><label class="form-label">手机号</label><input class="form-input" id="loginPhone" type="tel" placeholder="请输入手机号" value="138****8888"></div>' +
-      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="loginCode" placeholder="验证码" value="8888"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #07c160;background:#fff;color:#07c160;font-size:12px;cursor:pointer;" onclick="showToast(\'验证码已发送: 8888\')">获取验证码</button></div></div>' +
+      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="loginCode" placeholder="验证码" value="8888"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #07c160;background:#fff;color:#07c160;font-size:12px;cursor:pointer;" onclick="UI.toast(\'验证码已发送: 8888\')">获取验证码</button></div></div>' +
       '<button class="form-btn" onclick="doLogin()">登 录</button>' +
       '<div class="form-switch" onclick="switchLoginTab(\'register\')">没有账号？立即注册 →</div>';
   } else {
-    container.style.display = 'none';
-    regContainer.style.display = 'block';
+    container.style.display = 'none'; regContainer.style.display = 'block';
     regContainer.innerHTML =
       '<div class="form-item"><label class="form-label">手机号</label><input class="form-input" id="regPhone" type="tel" placeholder="请输入手机号"></div>' +
       '<div class="form-item"><label class="form-label">昵称</label><input class="form-input" id="regName" placeholder="请输入昵称"></div>' +
-      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="regCode" placeholder="验证码"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #07c160;background:#fff;color:#07c160;font-size:12px;cursor:pointer;" onclick="showToast(\'验证码已发送\')">获取验证码</button></div></div>' +
+      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="regCode" placeholder="验证码"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #07c160;background:#fff;color:#07c160;font-size:12px;cursor:pointer;" onclick="UI.toast(\'验证码已发送\')">获取验证码</button></div></div>' +
       '<button class="form-btn" onclick="doRegister()">注 册</button>' +
       '<div class="form-switch" onclick="switchLoginTab(\'login\')">已有账号？立即登录 →</div>';
   }
@@ -552,32 +733,49 @@ function renderLoginForm() {
 
 function doLogin() {
   var phone = document.getElementById('loginPhone') ? document.getElementById('loginPhone').value : '138****8888';
-  currentUser = { phone:phone, name:'张先生', memberLevel:'金牌会员', balance:280, totalSpent:3680, bookingCount:12 };
-  completeLogin();
+  var code = document.getElementById('loginCode') ? document.getElementById('loginCode').value : '8888';
+  UI.showLoading('登录中...');
+  API.login(phone, code).then(function(user) {
+    currentUser = user;
+    isLoggedIn = true;
+    document.getElementById('loginModal').style.display = 'none';
+    updateQuickIcons(user);
+    applyHomeBalanceVisibility();
+    UI.hideLoading();
+    UI.toast('登录成功');
+    handlePendingAction();
+  }).catch(function(err) {
+    UI.hideLoading();
+    UI.toast(err.message || '登录失败');
+  });
 }
 
 function doRegister() {
   var name = document.getElementById('regName') ? document.getElementById('regName').value : '新用户';
   var phone = document.getElementById('regPhone') ? document.getElementById('regPhone').value : '130****0000';
-  currentUser = { phone:phone, name:name, memberLevel:'普通会员', balance:0, totalSpent:0, bookingCount:0 };
-  completeLogin();
+  UI.showLoading('注册中...');
+  API.login(phone, '8888').then(function(user) {
+    currentUser = user;
+    isLoggedIn = true;
+    document.getElementById('loginModal').style.display = 'none';
+    updateQuickIcons(user);
+    applyHomeBalanceVisibility();
+    UI.hideLoading();
+    UI.toast('注册成功');
+    handlePendingAction();
+  }).catch(function(err) {
+    UI.hideLoading();
+    UI.toast(err.message || '注册失败');
+  });
 }
 
-function completeLogin() {
-  isLoggedIn = true;
-  localStorage.setItem('mp_logged_in', 'true');
-  localStorage.setItem('mp_user', JSON.stringify(currentUser));
-  document.getElementById('loginModal').style.display = 'none';
-  document.getElementById('userBadge').style.display = 'inline';
-  document.getElementById('userBadge').textContent = currentUser.name;
-  showToast('登录成功');
-
+function handlePendingAction() {
   if (pendingAction) {
-    if (pendingAction === 'booking') {
-      setTimeout(function() { document.querySelector('.section').scrollIntoView({ behavior:'smooth' }); }, 300);
-    } else if (pendingAction.indexOf('room-') === 0) {
+    if (pendingAction.indexOf('room-') === 0) {
       var roomId = pendingAction.replace('room-', '');
       setTimeout(function() { location.href = '../room-detail/index.html?id=' + roomId; }, 300);
+    } else if (pendingAction === 'profile') {
+      setTimeout(function() { location.href = '../member-center/index.html'; }, 300);
     }
     pendingAction = null;
   }
@@ -586,33 +784,10 @@ function completeLogin() {
 // ── store selector ──
 function showStoreSelector() { document.getElementById('storeModal').style.display = 'flex'; }
 function hideStoreSelector() { document.getElementById('storeModal').style.display = 'none'; }
-function selectStore(name) { hideStoreSelector(); showToast('当前门店: ' + name); }
+function selectStore(name) { hideStoreSelector(); UI.toast('当前门店: ' + name); }
 
-// ── member ──
-function goMember() {
-  if (!isLoggedIn) {
-    pendingAction = 'member';
-    showLogin();
-    return;
-  }
-  location.href = '../member-center/index.html';
-}
-
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.className = 'toast';
-    t.id = 'toast';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg; t.style.display = 'block';
-  setTimeout(function() { t.style.display = 'none'; }, 2000);
-}
-
-// init login form
-renderLoginForm();
+// ── Init ──
+initHomePage();
 </script>
-<div class="toast" id="toast"></div>
 </body>
 </html>
