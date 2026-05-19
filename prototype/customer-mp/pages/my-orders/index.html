@@ -418,16 +418,24 @@ function renderOrders() {
         '</div></div>';
     } else if (o.status === 'Booked') {
       var isClose = o.date === '2026-05-08';
+      var isExpired = o.date && o.date < Utils.todayStr();
+      if (isExpired) {
+        html = '<div class="order-card" style="opacity:.5;">' +
+          '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status" style="background:#f5f5f5;color:#999;">已过期</span></div>' +
+          '<div class="order-time">' + (o.date||'') + ' ' + (o.time||'') + '</div>' +
+          '<div class="order-price">¥' + (o.price||0) + '</div></div>';
+      } else {
       html = '<div class="order-card">' +
         '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-booked">已预定</span></div>' +
         '<div class="order-time">' + (o.date||'') + ' ' + (o.time||'') + '</div>' +
         '<div class="order-price">¥' + (o.price||0) + '</div>' +
         '<div class="door-section"><div class="door-label">门禁密码</div><div class="door-hint">预约前30分钟显示</div></div>' +
         '<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-          '<button class="order-btn outline" onclick="useNow(\'' + o.id + '\')">立即使用</button>' +
-          '<button class="order-btn danger" onclick="showCancel(\'' + o.id + '\',' + (!isClose) + ')">取消预约</button>' +
+          '<button class="order-btn outline" onclick="useNow(\'' + (o.orderId || o.id) + '\')">立即使用</button>' +
+          '<button class="order-btn danger" onclick="showCancel(\'' + (o.orderId || o.id) + '\',' + (!isClose) + ')">取消预约</button>' +
           '<span class="cancel-note">' + (isClose ? '距开始不足2小时，取消收取定金50%' : '距开始超过2小时，可免费取消') + '</span>' +
         '</div></div>';
+      }
     } else if (o.isShop && o.status === 'Shipping') {
       var shipItemsHtml = '';
       if (o.items && o.items.length) {
@@ -504,23 +512,135 @@ function showCancel(id, free) {
 function confirmCancel() {
   if (cancelTarget) {
     for (var i = 0; i < orders.length; i++) {
-      if (orders[i].id === cancelTarget) { orders[i].status = 'Cancelled'; break; }
+      if (orders[i].id === cancelTarget || orders[i].orderId === cancelTarget) { orders[i].status = 'Cancelled'; break; }
     }
     UI.toast('订单已取消，退款将退回原支付方式');
   }
   hideModal(); cancelTarget = null; renderOrders();
 }
 
-// Extend
+// Extend / Early check-in
 function useNow(id) {
+  // Find order from the combined orders array
+  var order = null;
   for (var i = 0; i < orders.length; i++) {
-    if (orders[i].id === id) {
-      orders[i].status = 'InUse';
-      var encName = encodeURIComponent(orders[i].roomName || '包间');
-      location.href = '../room-control/index.html?roomId=' + orders[i].roomId + '&roomName=' + encName + '&duration=90';
+    if (orders[i].id === id || orders[i].orderId === id) { order = orders[i]; break; }
+  }
+  if (!order) { UI.toast('订单不存在'); return; }
+
+  // Reject expired orders
+  if (order.date && order.date < Utils.todayStr()) {
+    UI.toast('预约已过期，无法使用');
+    return;
+  }
+
+  var roomId = order.roomId;
+  var orderId = order.orderId || order.id;
+
+  // Check if room is currently occupied by another booking
+  var allBookings = Utils.lsGet('bookings', []);
+  var isOccupied = false;
+  for (var i = 0; i < allBookings.length; i++) {
+    var b = allBookings[i];
+    if (b.roomId === roomId && b.status === 'InUse' && b.orderId !== orderId && b.id !== id) {
+      isOccupied = true;
       break;
     }
   }
+
+  if (isOccupied) {
+    UI.toast('该房间目前正在使用中，暂无法提前开始');
+    return;
+  }
+
+  // Calculate actual duration from booking (original预订时长)
+  var durationMin = parseInt(order.duration) || 90;
+  if ((!order.duration || isNaN(parseInt(order.duration))) && order.time) {
+    var timeParts = order.time.split('-');
+    if (timeParts.length >= 2) {
+      var sh = parseInt(timeParts[0].split(':')[0]) || 0, sm = parseInt(timeParts[0].split(':')[1]) || 0;
+      var eh = parseInt(timeParts[1].split(':')[0]) || 0, em = parseInt(timeParts[1].split(':')[1]) || 0;
+      durationMin = Math.max(30, (eh * 60 + em) - (sh * 60 + sm));
+    }
+  }
+
+  // Determine end time: check if later booking exists on same room+date
+  var now = new Date();
+  var newEndDate;
+  var originalEndStr = order.time ? order.time.split('-')[1] : '';
+  if (originalEndStr && order.date) {
+    // Parse original end time
+    var origEndH = parseInt(originalEndStr.split(':')[0]) || 0;
+    var origEndM = parseInt(originalEndStr.split(':')[1]) || 0;
+    var origEndTotalMin = origEndH * 60 + origEndM;
+
+    // Check for later Booked bookings on same room+date
+    var hasLater = false;
+    for (var li = 0; li < allBookings.length; li++) {
+      var lb = allBookings[li];
+      if (lb.roomId === roomId && lb.date === order.date && lb.status === 'Booked') {
+        var lbStart = lb.time ? lb.time.split('-')[0] : '';
+        if (lbStart) {
+          var lbMin = parseInt(lbStart.split(':')[0]) * 60 + (parseInt(lbStart.split(':')[1]) || 0);
+          if (lbMin >= origEndTotalMin - 15) { hasLater = true; break; }
+        }
+      }
+    }
+    // Also check demo orders array for later bookings
+    if (!hasLater) {
+      for (var li2 = 0; li2 < orders.length; li2++) {
+        var lo = orders[li2];
+        if (lo.roomId === roomId && lo.date === order.date && lo.status === 'Booked' && lo.time) {
+          var loStart = lo.time.split('-')[0];
+          if (loStart) {
+            var loMin = parseInt(loStart.split(':')[0]) * 60 + (parseInt(loStart.split(':')[1]) || 0);
+            if (loMin >= origEndTotalMin - 15) { hasLater = true; break; }
+          }
+        }
+      }
+    }
+
+    if (hasLater) {
+      // Later booking exists — must end at original end time
+      newEndDate = new Date(order.date);
+      newEndDate.setHours(origEndH, origEndM, 0, 0);
+    } else {
+      // No later booking — can use full duration from now
+      newEndDate = new Date(now.getTime() + durationMin * 60000);
+    }
+  } else {
+    // Fallback: just use now + duration
+    newEndDate = new Date(now.getTime() + durationMin * 60000);
+  }
+  var newEndH = newEndDate.getHours(), newEndM = newEndDate.getMinutes();
+  var newEndTime = (newEndH < 10 ? '0' : '') + newEndH + ':' + (newEndM < 10 ? '0' : '') + newEndM;
+
+  // Update booking in localStorage: status + recalculated endTime + actualStartTime
+  var updatedInLS = false;
+  for (var i = 0; i < allBookings.length; i++) {
+    if (allBookings[i].orderId === orderId || allBookings[i].id === id) {
+      allBookings[i].status = 'InUse';
+      allBookings[i].actualStartTime = now.toISOString();
+      allBookings[i].endTime = newEndTime;
+      updatedInLS = true;
+      break;
+    }
+  }
+  if (updatedInLS) {
+    Utils.lsSet('bookings', allBookings);
+  }
+
+  // Update in-memory order too
+  order.status = 'InUse';
+
+  // Navigate to room-control with the actual duration from now
+  var encName = encodeURIComponent(order.roomName || '包间');
+  var encSlot = encodeURIComponent(order.time || '');
+  location.href = '../room-control/index.html?roomId=' + roomId +
+    '&roomName=' + encName +
+    '&duration=' + durationMin +
+    '&date=' + (order.date || '') +
+    '&slot=' + encSlot;
 }
 
 function showExtendOrder(id) {

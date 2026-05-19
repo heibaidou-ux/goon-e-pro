@@ -229,9 +229,34 @@ var ctrlDateStr = ctrlParams.get('date') || '';
 var ctrlSlot = ctrlParams.get('slot') || '';
 document.getElementById('roomCtrlTitle').textContent = ctrlRoomName;
 
-// Parse end time from slot for date-aware display
+// Look up the actual InUse booking for this room from localStorage
+// This ensures remaining time is based on real endTime, not just URL params
+var ctrlBooking = null;
+var allBk = Utils.lsGet('bookings', []);
+for (var bi = 0; bi < allBk.length; bi++) {
+  if (allBk[bi].roomId === ctrlRoomId && allBk[bi].status === 'InUse') {
+    ctrlBooking = allBk[bi];
+    break;
+  }
+}
+
+// Parse end time from booking data or slot for date-aware display
 var ctrlEndDate = null;
-if (ctrlSlot && ctrlDateStr) {
+if (ctrlBooking && ctrlBooking.endTime) {
+  // Use the booking's stored endTime directly (already recalculated for early check-in)
+  var etParts = ctrlBooking.endTime.split(':').map(Number);
+  var endH = etParts[0] || 0, endM = etParts[1] || 0;
+  var ctDateStr = ctrlBooking.date || ctrlDateStr;
+  ctrlEndDate = new Date(ctDateStr);
+  ctrlEndDate.setHours(endH, endM, 0, 0);
+  // If end time has passed, assume next day
+  if (ctrlEndDate <= new Date()) {
+    ctrlEndDate.setDate(ctrlEndDate.getDate() + 1);
+  }
+  // Calculate actual remaining time from now until end
+  var now = new Date();
+  ctrlDuration = Math.max(1, Math.round((ctrlEndDate - now) / 60000));
+} else if (ctrlSlot && ctrlDateStr) {
   var slotParts = ctrlSlot.split('-');
   if (slotParts.length >= 2) {
     var endTimeStr = slotParts[1].trim();
@@ -425,6 +450,19 @@ function confirmExtendPay() {
     if (ctrlEndDate) {
       ctrlEndDate = new Date(ctrlEndDate.getTime() + extMin * 60000);
       updateEndDisplay(ctrlEndDate);
+    }
+    // Persist the new endTime to localStorage
+    if (ctrlBooking) {
+      var rawBk = Utils.lsGet('bookings', []);
+      for (var ei = 0; ei < rawBk.length; ei++) {
+        if (rawBk[ei].roomId === ctrlRoomId && rawBk[ei].status === 'InUse') {
+          var nh = ctrlEndDate ? ctrlEndDate.getHours() : 0;
+          var nm = ctrlEndDate ? ctrlEndDate.getMinutes() : 0;
+          rawBk[ei].endTime = (nh < 10 ? '0' : '') + nh + ':' + (nm < 10 ? '0' : '') + nm;
+          break;
+        }
+      }
+      Utils.lsSet('bookings', rawBk);
     }
     document.getElementById('extendPayModal').style.display = 'none';
     hideModal('extend');

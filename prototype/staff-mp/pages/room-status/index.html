@@ -528,7 +528,71 @@ function quickAction(roomId, action) {
     var found = null;
     bkList.forEach(function(b) { if (b.roomId === roomId && b.status === 'Booked') found = b; });
     if (found) {
+      // Check if room is occupied by another InUse booking
+      var isOccupied = false;
+      bkList.forEach(function(b) {
+        if (b.roomId === roomId && b.status === 'InUse' && b.orderId !== found.orderId) {
+          isOccupied = true;
+        }
+      });
+      if (isOccupied) {
+        showToast('该房间目前正在使用中，暂无法确认到店');
+        renderRooms();
+        return;
+      }
+
       StaffSDK.API.checkIn(found.orderId).then(function() {
+        // Recalculate endTime based on actual check-in time and later bookings
+        var updated = StaffSDK.Utils.lsGet('bookings', []);
+        for (var i = 0; i < updated.length; i++) {
+          if (updated[i].orderId === found.orderId) {
+            var b = updated[i];
+            var dur = parseInt(b.duration) || 90;
+            if ((!b.duration || isNaN(parseInt(b.duration))) && b.time) {
+              var tp = b.time.split('-');
+              if (tp.length >= 2) {
+                var sh = parseInt(tp[0].split(':')[0]) || 0, sm = parseInt(tp[0].split(':')[1]) || 0;
+                var eh = parseInt(tp[1].split(':')[0]) || 0, em = parseInt(tp[1].split(':')[1]) || 0;
+                dur = Math.max(30, (eh*60+em) - (sh*60+sm));
+              }
+            }
+            var now = new Date();
+
+            // Check for later bookings on same room+date
+            var originalEndStr = b.time ? b.time.split('-')[1] : '';
+            var hasLater = false;
+            if (originalEndStr && b.date) {
+              var origEndH = parseInt(originalEndStr.split(':')[0]) || 0;
+              var origEndM = parseInt(originalEndStr.split(':')[1]) || 0;
+              var origEndTotal = origEndH * 60 + origEndM;
+              for (var li = 0; li < updated.length; li++) {
+                var lb = updated[li];
+                if (lb.roomId === b.roomId && lb.date === b.date && lb.status === 'Booked' && lb.orderId !== found.orderId) {
+                  var ls = lb.time ? lb.time.split('-')[0] : '';
+                  if (ls) {
+                    var lm = parseInt(ls.split(':')[0]) * 60 + (parseInt(ls.split(':')[1]) || 0);
+                    if (lm >= origEndTotal - 15) { hasLater = true; break; }
+                  }
+                }
+              }
+            }
+
+            if (hasLater) {
+              // Later booking exists — end at original end time
+              var oeParts = originalEndStr.split(':');
+              var ne = new Date(b.date);
+              ne.setHours(parseInt(oeParts[0]) || 0, parseInt(oeParts[1]) || 0, 0, 0);
+              b.endTime = String(ne.getHours()).padStart(2,'0') + ':' + String(ne.getMinutes()).padStart(2,'0');
+            } else {
+              // No later booking — full duration from now
+              var ne = new Date(now.getTime() + dur * 60000);
+              b.endTime = String(ne.getHours()).padStart(2,'0') + ':' + String(ne.getMinutes()).padStart(2,'0');
+            }
+            b.actualStartTime = now.toISOString();
+            break;
+          }
+        }
+        StaffSDK.Utils.lsSet('bookings', updated);
         showToast(found.roomName + ' 已确认到店，触发欢迎场景');
         renderRooms();
       }).catch(function() { showToast('操作失败'); renderRooms(); });

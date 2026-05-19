@@ -43,12 +43,17 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 
 .coupon-input { background:#fff; padding:14px; margin-bottom:16px; border:2px solid #e5e5e5; display:none; }
 .coupon-input.active { display:block; border-color:#07c160; }
-.coupon-row { display:flex; gap:8px; }
-.coupon-field { flex:1; padding:10px; border:1.5px solid #e5e5e5; font-size:14px; }
-.coupon-verify-btn { padding:10px 16px; background:#07c160; color:#fff; border:none; font-size:13px; cursor:pointer; }
-.coupon-result { font-size:12px; margin-top:8px; }
-.coupon-result.success { color:#07c160; }
-.coupon-result.error { color:#d54941; }
+.coupon-platform-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+.coupon-platform-row:last-of-type { margin-bottom:0; }
+.cp-label { font-size:12px; font-weight:600; color:#333; min-width:70px; flex-shrink:0; }
+.coupon-field { flex:1; min-width:100px; padding:8px; border:1.5px solid #e5e5e5; font-size:13px; border-radius:6px; }
+.coupon-field:focus { outline:none; border-color:#07c160; }
+.coupon-verify-btn { padding:8px 12px; background:#07c160; color:#fff; border:none; font-size:12px; cursor:pointer; border-radius:6px; font-weight:600; white-space:nowrap; }
+.coupon-verify-btn:active { opacity:.8; }
+.cp-status { font-size:11px; min-width:60px; text-align:right; }
+.cp-status.success { color:#07c160; }
+.cp-status.error { color:#d54941; }
+.coupon-total { font-size:12px; color:#07c160; font-weight:600; margin-top:8px; padding-top:8px; border-top:1px dashed #e5e5e5; text-align:center; }
 
 .total-section { background:#fff; padding:16px; margin-bottom:16px; border:2px solid #07c160; }
 .total-row { display:flex; justify-content:space-between; align-items:center; }
@@ -129,30 +134,34 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
             <div class="pay-method-info"><div class="pay-method-name">会员余额</div><div class="pay-method-desc" id="balanceDesc">当前余额 ¥280</div></div>
             <span class="pay-method-check">✓</span>
           </div>
-          <div class="pay-method" onclick="selectPay('meituan',this)" id="payMeituan">
-            <span class="pay-method-icon">🟡</span>
-            <div class="pay-method-info"><div class="pay-method-name">美团</div><div class="pay-method-desc">美团支付/月付</div></div>
-            <span class="pay-method-check">✓</span>
-          </div>
-          <div class="pay-method" onclick="selectPay('dianping',this)" id="payDianping">
-            <span class="pay-method-icon">⭐</span>
-            <div class="pay-method-info"><div class="pay-method-name">大众点评</div><div class="pay-method-desc">点评团购/买单</div></div>
-            <span class="pay-method-check">✓</span>
-          </div>
-          <div class="pay-method" onclick="selectPay('douyin',this)" id="payDouyin">
-            <span class="pay-method-icon">🎵</span>
-            <div class="pay-method-info"><div class="pay-method-name">抖音验券</div><div class="pay-method-desc">输入抖音团购券码</div></div>
+          <div class="pay-method" onclick="selectPay('coupon',this)" id="payCoupon">
+            <span class="pay-method-icon">🎫</span>
+            <div class="pay-method-info"><div class="pay-method-name">验券</div><div class="pay-method-desc">美团/大众点评/抖音团购券</div></div>
             <span class="pay-method-check">✓</span>
           </div>
         </div>
       </div>
 
       <div class="coupon-input" id="couponBox">
-        <div class="coupon-row">
-          <input class="coupon-field" id="couponCode" placeholder="输入券码">
-          <button class="coupon-verify-btn" onclick="verifyCoupon()">验券</button>
+        <div class="coupon-platform-row">
+          <span class="cp-label">🟡 美团</span>
+          <input class="coupon-field" id="couponMt" placeholder="输入美团券码">
+          <button class="coupon-verify-btn" onclick="verifyPlatformCoupon('meituan')">验券</button>
+          <span class="cp-status" id="cpStatusMt"></span>
         </div>
-        <div class="coupon-result" id="couponResult"></div>
+        <div class="coupon-platform-row">
+          <span class="cp-label">⭐ 大众点评</span>
+          <input class="coupon-field" id="couponDp" placeholder="输入点评券码">
+          <button class="coupon-verify-btn" onclick="verifyPlatformCoupon('dianping')">验券</button>
+          <span class="cp-status" id="cpStatusDp"></span>
+        </div>
+        <div class="coupon-platform-row">
+          <span class="cp-label">🎵 抖音</span>
+          <input class="coupon-field" id="couponDy" placeholder="输入抖音券码">
+          <button class="coupon-verify-btn" onclick="verifyPlatformCoupon('douyin')">验券</button>
+          <span class="cp-status" id="cpStatusDy"></span>
+        </div>
+        <div class="coupon-total" id="couponTotal">已核验 0 张券，共抵扣 ¥0</div>
       </div>
 
       <div class="balance-warning" id="balanceWarning" style="display:none;">
@@ -261,7 +270,6 @@ API.getBalance().then(function(bal) {
   document.getElementById('balanceDesc').textContent = '当前余额 ¥' + userBalance;
 });
 var selectedPay = 'wechat';
-var couponVerified = false;
 var couponDiscount = 0;
 var isCombinedPay = false;
 var combinedBalancePart = 0;
@@ -286,7 +294,7 @@ function selectPay(method, el) {
   combinedBalancePart = 0;
   document.querySelectorAll('.pay-method').forEach(function(m) { m.classList.remove('selected'); });
   el.classList.add('selected');
-  document.getElementById('couponBox').classList.toggle('active', method === 'douyin');
+  document.getElementById('couponBox').classList.toggle('active', method === 'coupon');
   var warn = document.getElementById('balanceWarning');
   var combinedBtn = document.getElementById('combinedPayBtn');
   var combinedInfo = document.getElementById('combinedPayInfo');
@@ -306,10 +314,10 @@ function selectPay(method, el) {
     document.getElementById('discountInfo').style.display = 'none';
   } else {
     warn.style.display = 'none'; combinedBtn.style.display = 'none'; combinedInfo.style.display = 'none';
-    document.getElementById('finalPrice').textContent = '¥' + (price - couponDiscount);
+    document.getElementById('finalPrice').textContent = '¥' + Math.max(0, price - couponDiscount);
     if (couponDiscount > 0) {
       document.getElementById('discountInfo').style.display = 'block';
-      document.getElementById('discountInfo').textContent = '券抵扣 ¥' + couponDiscount + ' · 实付 ¥' + (price - couponDiscount);
+      document.getElementById('discountInfo').textContent = '券抵扣 ¥' + couponDiscount + ' · 实付 ¥' + Math.max(0, price - couponDiscount);
     } else {
       document.getElementById('discountInfo').style.display = 'none';
     }
@@ -325,19 +333,57 @@ function selectCombinedPay() {
   document.getElementById('finalPrice').textContent = '¥' + price;
 }
 
-function verifyCoupon() {
-  var code = document.getElementById('couponCode').value.trim();
-  var result = document.getElementById('couponResult');
-  if (code.length < 4) {
-    result.className = 'coupon-result error';
-    result.textContent = '请输入有效券码';
-    couponVerified = false; couponDiscount = 0;
+var verifiedCoupons = {};
+
+function verifyPlatformCoupon(platform) {
+  var inputIds = { meituan:'couponMt', dianping:'couponDp', douyin:'couponDy' };
+  var statusIds = { meituan:'cpStatusMt', dianping:'cpStatusDp', douyin:'cpStatusDy' };
+  var platformNames = { meituan:'美团', dianping:'大众点评', douyin:'抖音' };
+  var platformKeys = { meituan:'Meituan', dianping:'Dianping', douyin:'Douyin' };
+  var code = document.getElementById(inputIds[platform]).value.trim();
+  var statusEl = document.getElementById(statusIds[platform]);
+
+  if (!code) {
+    statusEl.className = 'cp-status error';
+    statusEl.textContent = '请输入券码';
+    return;
+  }
+
+  API.verifyCoupon(code).then(function(result) {
+    if (result.platform !== platformKeys[platform]) {
+      statusEl.className = 'cp-status error';
+      statusEl.textContent = '该券不属于' + platformNames[platform];
+      delete verifiedCoupons[platform];
+      updateCouponTotal();
+      return;
+    }
+    verifiedCoupons[platform] = { code: code, value: result.value, desc: result.desc };
+    statusEl.className = 'cp-status success';
+    statusEl.textContent = '✓ ¥' + result.value;
+    updateCouponTotal();
+  }).catch(function(err) {
+    statusEl.className = 'cp-status error';
+    statusEl.textContent = err.message || '验券失败';
+    delete verifiedCoupons[platform];
+    updateCouponTotal();
+  });
+}
+
+function updateCouponTotal() {
+  var totalDiscount = 0;
+  var count = 0;
+  for (var p in verifiedCoupons) { totalDiscount += verifiedCoupons[p].value; count++; }
+  couponDiscount = totalDiscount;
+
+  document.getElementById('couponTotal').textContent = '已核验 ' + count + ' 张券，共抵扣 ¥' + totalDiscount;
+
+  var finalPrice = Math.max(0, price - couponDiscount);
+  document.getElementById('finalPrice').textContent = '¥' + finalPrice;
+  if (couponDiscount > 0) {
+    document.getElementById('discountInfo').style.display = 'block';
+    document.getElementById('discountInfo').textContent = '券抵扣 ¥' + couponDiscount + ' · 实付 ¥' + finalPrice;
   } else {
-    couponVerified = true;
-    couponDiscount = Math.round(price * 0.2);
-    result.className = 'coupon-result success';
-    result.textContent = '✓ 券码验证通过，可抵扣 ¥' + couponDiscount;
-    selectPay('douyin', document.getElementById('payDouyin'));
+    document.getElementById('discountInfo').style.display = 'none';
   }
 }
 
@@ -372,7 +418,17 @@ function confirmPay() {
     else userBalance = 0;
   }
 
-  var payMethodLabels = { wechat:'微信支付', alipay:'支付宝', balance:'会员余额', meituan:'美团', dianping:'大众点评', douyin:'抖音验券' };
+  var payMethodLabels = { wechat:'微信支付', alipay:'支付宝', balance:'会员余额', coupon:'验券' };
+  // Build coupon payment detail string
+  var couponDetail = '';
+  if (selectedPay === 'coupon' || couponDiscount > 0) {
+    var parts = [];
+    for (var p in verifiedCoupons) {
+      var pnames = { meituan:'美团', dianping:'大众点评', douyin:'抖音' };
+      parts.push(pnames[p] + '-' + verifiedCoupons[p].code);
+    }
+    if (parts.length) couponDetail = '验券(' + parts.join(', ') + ')';
+  }
 
   document.getElementById('confirmView').style.display = 'none';
   document.getElementById('successView').style.display = 'block';
@@ -390,6 +446,9 @@ function confirmPay() {
       document.getElementById('succPayMethod').textContent = '余额 + 微信支付';
       document.getElementById('successSub').textContent = '余额抵扣 ¥' + combinedBalancePart + ' + 微信支付 ¥' + (price - combinedBalancePart);
     }
+  } else if (selectedPay === 'coupon') {
+    document.getElementById('succPayMethod').textContent = couponDetail || '验券';
+    document.getElementById('successSub').textContent = '券已核销，共抵扣 ¥' + couponDiscount;
   } else {
     document.getElementById('succPayMethod').textContent = payMethodLabels[selectedPay] || selectedPay;
   }
@@ -401,7 +460,7 @@ function confirmPay() {
     roomId: roomId, roomName: roomName, date: dateStr,
     time: slot, price: price, duration: duration, personCount: personCount,
     sessionType: sessionType, endTime: endTime,
-    payment: isCombinedPay ? '余额+微信' : payMethodLabels[selectedPay],
+    payment: isCombinedPay ? '余额+微信' : (selectedPay === 'coupon' ? couponDetail || '验券' : payMethodLabels[selectedPay]),
     doorCode: savedDoorCode
   };
 
@@ -414,11 +473,12 @@ function confirmPay() {
     // createBooking already saved to ls, but ensure legacy format too
     try {
       var legacy = JSON.parse(localStorage.getItem('mp_bookings') || '[]');
+      var legacyPay = isCombinedPay ? '余额+微信' : (selectedPay === 'coupon' ? couponDetail || '验券' : payMethodLabels[selectedPay]);
       legacy.unshift({
         id: result.orderId, roomId: roomId, roomName: roomName, date: dateStr,
         time: slot, price: price, duration: duration, personCount: personCount,
         doorCode: savedDoorCode, status: 'Booked', sessionType: sessionType,
-        endTime: endTime, payment: isCombinedPay ? '余额+微信' : payMethodLabels[selectedPay]
+        endTime: endTime, payment: legacyPay
       });
       localStorage.setItem('mp_bookings', JSON.stringify(legacy));
     } catch(e) {}
@@ -427,7 +487,61 @@ function confirmPay() {
 }
 
 function openDoor() {
-  location.href = '../room-control/index.html?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) + '&duration=' + duration + '&date=' + encodeURIComponent(dateStr) + '&slot=' + encodeURIComponent(slot);
+  var now = new Date();
+  var durationMin = parseInt(duration) || 90;
+
+  // Determine end time: check if later booking exists on same room+date
+  var newEndDate;
+  var slotParts = slot ? slot.split('-') : [];
+  var originalEndStr = slotParts.length >= 2 ? slotParts[1].trim() : '';
+  if (originalEndStr && dateStr) {
+    var origEndH = parseInt(originalEndStr.split(':')[0]) || 0;
+    var origEndM = parseInt(originalEndStr.split(':')[1]) || 0;
+    var origEndTotalMin = origEndH * 60 + origEndM;
+
+    // Check for later Booked bookings on same room+date from localStorage
+    var bkList = Utils.lsGet('bookings', []);
+    var hasLater = false;
+    for (var bi = 0; bi < bkList.length; bi++) {
+      var lb = bkList[bi];
+      if (lb.roomId === roomId && lb.date === dateStr && lb.status === 'Booked') {
+        var lbStart = lb.time ? lb.time.split('-')[0] : '';
+        if (lbStart) {
+          var lbMin = parseInt(lbStart.split(':')[0]) * 60 + (parseInt(lbStart.split(':')[1]) || 0);
+          if (lbMin >= origEndTotalMin - 15) { hasLater = true; break; }
+        }
+      }
+    }
+
+    if (hasLater) {
+      // Later booking exists — must end at original end time
+      newEndDate = new Date(dateStr);
+      newEndDate.setHours(origEndH, origEndM, 0, 0);
+      // Recalculate effective duration from now
+      durationMin = Math.max(1, Math.round((newEndDate - now) / 60000));
+    } else {
+      // No later booking — can use full duration from now
+      newEndDate = new Date(now.getTime() + durationMin * 60000);
+    }
+  } else {
+    newEndDate = new Date(now.getTime() + durationMin * 60000);
+  }
+
+  var newEndH = newEndDate.getHours(), newEndM = newEndDate.getMinutes();
+  var newEndTime = (newEndH < 10 ? '0' : '') + newEndH + ':' + (newEndM < 10 ? '0' : '') + newEndM;
+
+  // Update booking in localStorage: status → InUse, recalculate endTime
+  for (var bi2 = 0; bi2 < bkList.length; bi2++) {
+    if (bkList[bi2].roomId === roomId && bkList[bi2].status === 'Booked') {
+      bkList[bi2].status = 'InUse';
+      bkList[bi2].actualStartTime = now.toISOString();
+      bkList[bi2].endTime = newEndTime;
+      break;
+    }
+  }
+  Utils.lsSet('bookings', bkList);
+
+  location.href = '../room-control/index.html?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) + '&duration=' + durationMin + '&date=' + encodeURIComponent(dateStr) + '&slot=' + encodeURIComponent(slot);
 }
 
 function copyCode() {
