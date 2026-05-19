@@ -1,0 +1,310 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-05-16T16:00:00.000Z" agent="Python" version="24.2.5">
+  <diagram id="topology" name="网络与485总线拓扑">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="101" parent="1" style="text;strokeColor=none;fillColor=none;align=center;fontSize=18;fontStyle=4;html=1;" vertex="1" value="&lt;b&gt;盈隆店分布式网络IP音频与485总线系统拓扑图（V1.2 · 纯星型拓扑）&lt;/b&gt;">
+          <mxGeometry x="30" y="10" width="1340" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="102" parent="1" style="rounded=1;strokeColor=#566573;fillColor=#f5f5f5;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=4;spacingLeft=8;html=1;" vertex="1" value="&lt;b&gt;工作间 · 19寸标准机柜（10U）&lt;/b&gt;">
+          <mxGeometry x="20" y="55" width="1560" height="165" as="geometry" />
+        </mxCell>
+        <mxCell id="103" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#d4e6f1;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;🔗 24口千兆网管交换机（1U）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;VLAN 10: 智能内网&lt;br&gt;VLAN 20: 客人外网&lt;/font&gt;">
+          <mxGeometry x="40" y="85" width="210" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="104" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d5d8dc;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;💾 HA主机（私有服务器，2U）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;双网口聚合&lt;br&gt;音频推流 + 485控制&lt;/font&gt;">
+          <mxGeometry x="290" y="85" width="210" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="105" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d4e6f1;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;🎤 无线话筒接收机（1U）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;一拖八 · 8天线 · 紧凑型&lt;br&gt;MIX OUT → 会议室T-6715&lt;/font&gt;">
+          <mxGeometry x="540" y="85" width="210" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="106" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fdebd0;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;🔌 侧挂：485串口服务器&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;RJ45 → RS485&lt;br&gt;Modbus RTU over TCP&lt;/font&gt;">
+          <mxGeometry x="790" y="85" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="107" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#d5d8dc;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;📡 侧挂：8路隔离集线器&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;星型拓扑 | CH1-CH6&lt;br&gt;信号再生 | 端口内置120Ω&lt;/font&gt;">
+          <mxGeometry x="1030" y="85" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="108" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fdebd0;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;🔌 侧挂：明纬24V电源&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;AC 220V → DC 24V/10A&lt;br&gt;为全店485设备供电&lt;/font&gt;">
+          <mxGeometry x="1270" y="85" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="109" parent="1" style="strokeWidth=1;strokeColor=#1a5276;" edge="1">
+          <mxGeometry x="500" y="112" width="-250" height="0" as="geometry" />
+        </mxCell>
+        <mxCell id="110" parent="1" style="text;strokeColor=none;fillColor=none;fontSize=8;align=center" vertex="1" value="双网口聚合">
+          <mxGeometry x="300" y="62" width="180" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="111" parent="1" style="text;strokeColor=none;fillColor=none;align=left;fontSize=9;html=1;" vertex="1" value="&lt;i&gt;▼ 交换机VLAN：端口1-8 = VLAN 10（智能内网：T-6715×5 + NAS×1 + 串口服务器×1） | 端口9-20 = VLAN 20（客人外网：AP×5 + 有线网口×5 + 上联）&lt;/i&gt;">
+          <mxGeometry x="40" y="150" width="1500" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="112" parent="1" style="text;strokeColor=#566573;fillColor=#f8f9fa;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;rounded=1;html=1;" vertex="1" value="&lt;b&gt;📐 机柜排布（上→下）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;① 24口网管交换机（1U）&lt;br&gt;② 通风盲板（1U）&lt;br&gt;③ HA主机（2U）&lt;br&gt;④ 无线话筒接收机（1U）&lt;br&gt;⑤ 空U/理线（5U余量）&lt;br&gt;&lt;br&gt;&lt;i&gt;侧挂：&lt;/i&gt;&lt;br&gt;485串口服务器 | 485集线器&lt;br&gt;24V电源&lt;/font&gt;">
+          <mxGeometry x="40" y="180" width="180" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="113" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#eaf2f8;fontSize=11;fontStyle=1;html=1;verticalAlign=top;spacingTop=4" vertex="1" value="&lt;b&gt;RM001 · 大会议室&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;Slave ID=01 | 吊顶电箱（加大号）&lt;/font&gt;">
+          <mxGeometry x="80" y="330" width="230" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="114" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#d5f5e3;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🎵 itc T-6715 网络广播终端&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;VLAN 10固定IP | LINE IN←蓝牙面板&lt;br&gt;SPK OUT→4只（L+R各并2只100V）&lt;/font&gt;">
+          <mxGeometry x="90" y="385" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="115" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;聚英8路继电器&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;DO×8&lt;/font&gt;">
+          <mxGeometry x="90" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="116" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;📶 3网线/房间&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:6px&quot;&gt;① 设备网→T-6715&lt;br&gt;② AP面板&lt;br&gt;③ 有线网口&lt;/font&gt;">
+          <mxGeometry x="200" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="117" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d4e6f1;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;🔵 86蓝牙面板 → LINE IN（短距屏蔽线≤3米）&lt;/b&gt;">
+          <mxGeometry x="90" y="470" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="118" parent="1" style="rounded=1;strokeColor=#c0392b;fillColor=#fdedec;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;⚡ 负载：&lt;/b&gt;照明×2 + 空调 + 窗帘">
+          <mxGeometry x="90" y="492" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="119" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;VLAN 10:&lt;/b&gt; IP音频推流 + HTTP API  |  &lt;b&gt;VLAN 20:&lt;/b&gt; AP/有线网">
+          <mxGeometry x="90" y="542" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="120" parent="1" style="strokeWidth=1;strokeColor=#1a5276;" edge="1">
+          <mxGeometry x="160" y="240" width="0" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="121" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#eaf2f8;fontSize=11;fontStyle=1;html=1;verticalAlign=top;spacingTop=4" vertex="1" value="&lt;b&gt;RM002 · 中茶室A&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;Slave ID=02 | 吊顶电箱（加大号）&lt;/font&gt;">
+          <mxGeometry x="310" y="330" width="230" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="122" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#d5f5e3;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🎵 itc T-6715 网络广播终端&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;VLAN 10固定IP | LINE IN←蓝牙面板&lt;br&gt;SPK OUT→1只（双音圈）&lt;/font&gt;">
+          <mxGeometry x="320" y="385" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="123" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;聚英8路继电器&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;DO×8&lt;/font&gt;">
+          <mxGeometry x="320" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="124" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;📶 3网线/房间&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:6px&quot;&gt;① 设备网→T-6715&lt;br&gt;② AP面板&lt;br&gt;③ 有线网口&lt;/font&gt;">
+          <mxGeometry x="430" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="125" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d4e6f1;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;🔵 86蓝牙面板 → LINE IN（短距屏蔽线≤3米）&lt;/b&gt;">
+          <mxGeometry x="320" y="470" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="126" parent="1" style="rounded=1;strokeColor=#c0392b;fillColor=#fdedec;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;⚡ 负载：&lt;/b&gt;照明×2 + 空调 + 窗帘 + 排风">
+          <mxGeometry x="320" y="492" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="127" parent="1" style="rounded=1;strokeColor=#bf360c;fillColor=#fbe9e7;fontSize=7;html=1;" vertex="1" value="🔥 电茶炉1500W（经25A接触器）">
+          <mxGeometry x="320" y="517" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="128" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;VLAN 10:&lt;/b&gt; IP音频推流 + HTTP API  |  &lt;b&gt;VLAN 20:&lt;/b&gt; AP/有线网">
+          <mxGeometry x="320" y="542" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="129" parent="1" style="strokeWidth=1;strokeColor=#1a5276;" edge="1">
+          <mxGeometry x="390" y="240" width="0" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="130" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#eaf2f8;fontSize=11;fontStyle=1;html=1;verticalAlign=top;spacingTop=4" vertex="1" value="&lt;b&gt;RM003 · 中茶室B&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;Slave ID=03 | 吊顶电箱（加大号）&lt;/font&gt;">
+          <mxGeometry x="540" y="330" width="230" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="131" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#d5f5e3;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🎵 itc T-6715 网络广播终端&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;VLAN 10固定IP | LINE IN←蓝牙面板&lt;br&gt;SPK OUT→1只（双音圈）&lt;/font&gt;">
+          <mxGeometry x="550" y="385" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="132" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;聚英8路继电器&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;DO×8&lt;/font&gt;">
+          <mxGeometry x="550" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="133" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;📶 3网线/房间&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:6px&quot;&gt;① 设备网→T-6715&lt;br&gt;② AP面板&lt;br&gt;③ 有线网口&lt;/font&gt;">
+          <mxGeometry x="660" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="134" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d4e6f1;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;🔵 86蓝牙面板 → LINE IN（短距屏蔽线≤3米）&lt;/b&gt;">
+          <mxGeometry x="550" y="470" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="135" parent="1" style="rounded=1;strokeColor=#c0392b;fillColor=#fdedec;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;⚡ 负载：&lt;/b&gt;照明×2 + 空调 + 窗帘 + 排风">
+          <mxGeometry x="550" y="492" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="136" parent="1" style="rounded=1;strokeColor=#bf360c;fillColor=#fbe9e7;fontSize=7;html=1;" vertex="1" value="🔥 电茶炉1500W（经25A接触器）">
+          <mxGeometry x="550" y="517" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="137" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;VLAN 10:&lt;/b&gt; IP音频推流 + HTTP API  |  &lt;b&gt;VLAN 20:&lt;/b&gt; AP/有线网">
+          <mxGeometry x="550" y="542" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="138" parent="1" style="strokeWidth=1;strokeColor=#1a5276;" edge="1">
+          <mxGeometry x="620" y="240" width="0" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="139" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#eaf2f8;fontSize=11;fontStyle=1;html=1;verticalAlign=top;spacingTop=4" vertex="1" value="&lt;b&gt;RM004 · 大茶室C&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;Slave ID=04 | 吊顶电箱（加大号）&lt;/font&gt;">
+          <mxGeometry x="770" y="330" width="230" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="140" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#d5f5e3;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🎵 itc T-6715 网络广播终端&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;VLAN 10固定IP | LINE IN←蓝牙面板&lt;br&gt;SPK OUT→1只（双音圈）&lt;/font&gt;">
+          <mxGeometry x="780" y="385" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="141" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;聚英8路继电器&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;DO×8&lt;/font&gt;">
+          <mxGeometry x="780" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="142" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;📶 3网线/房间&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:6px&quot;&gt;① 设备网→T-6715&lt;br&gt;② AP面板&lt;br&gt;③ 有线网口&lt;/font&gt;">
+          <mxGeometry x="890" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="143" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d4e6f1;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;🔵 86蓝牙面板 → LINE IN（短距屏蔽线≤3米）&lt;/b&gt;">
+          <mxGeometry x="780" y="470" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="144" parent="1" style="rounded=1;strokeColor=#c0392b;fillColor=#fdedec;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;⚡ 负载：&lt;/b&gt;照明×2 + 空调 + 窗帘 + 排风">
+          <mxGeometry x="780" y="492" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="145" parent="1" style="rounded=1;strokeColor=#bf360c;fillColor=#fbe9e7;fontSize=7;html=1;" vertex="1" value="🔥 电茶炉1500W（经25A接触器）">
+          <mxGeometry x="780" y="517" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="146" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;VLAN 10:&lt;/b&gt; IP音频推流 + HTTP API  |  &lt;b&gt;VLAN 20:&lt;/b&gt; AP/有线网">
+          <mxGeometry x="780" y="542" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="147" parent="1" style="strokeWidth=1;strokeColor=#1a5276;" edge="1">
+          <mxGeometry x="850" y="240" width="0" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="148" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#eaf2f8;fontSize=11;fontStyle=1;html=1;verticalAlign=top;spacingTop=4" vertex="1" value="&lt;b&gt;RM005 · 走廊&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;Slave ID=05 | 吊顶电箱（加大号）&lt;/font&gt;">
+          <mxGeometry x="1000" y="330" width="230" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="149" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#d5f5e3;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🎵 itc T-6715 网络广播终端&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;VLAN 10固定IP | LINE IN←蓝牙面板&lt;br&gt;SPK OUT→1只&lt;/font&gt;">
+          <mxGeometry x="1010" y="385" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="150" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;聚英8路继电器&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;DO×8&lt;/font&gt;">
+          <mxGeometry x="1010" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="151" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;📶 3网线/房间&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:6px&quot;&gt;① 设备网→T-6715&lt;br&gt;② AP面板&lt;br&gt;③ 有线网口&lt;/font&gt;">
+          <mxGeometry x="1120" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="152" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d4e6f1;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;🔵 86蓝牙面板 → LINE IN（短距屏蔽线≤3米）&lt;/b&gt;">
+          <mxGeometry x="1010" y="470" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="153" parent="1" style="rounded=1;strokeColor=#c0392b;fillColor=#fdedec;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;⚡ 负载：&lt;/b&gt;照明×3">
+          <mxGeometry x="1010" y="492" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="154" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;VLAN 10:&lt;/b&gt; IP音频推流 + HTTP API  |  &lt;b&gt;VLAN 20:&lt;/b&gt; AP/有线网">
+          <mxGeometry x="1010" y="542" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="155" parent="1" style="strokeWidth=1;strokeColor=#1a5276;" edge="1">
+          <mxGeometry x="1080" y="240" width="0" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="156" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#eaf2f8;fontSize=11;fontStyle=1;html=1;verticalAlign=top;spacingTop=4" vertex="1" value="&lt;b&gt;RM006 · 展厅/前台&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;Slave ID=06 | 吊顶电箱（加大号）&lt;/font&gt;">
+          <mxGeometry x="1230" y="330" width="230" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="157" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#d5f5e3;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🎵 itc T-6715 网络广播终端&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;VLAN 10固定IP | LINE IN←蓝牙面板&lt;br&gt;SPK OUT→1只&lt;/font&gt;">
+          <mxGeometry x="1240" y="385" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="158" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;聚英8路继电器&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;DO×8&lt;/font&gt;">
+          <mxGeometry x="1240" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="159" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;📶 3网线/房间&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:6px&quot;&gt;① 设备网→T-6715&lt;br&gt;② AP面板&lt;br&gt;③ 有线网口&lt;/font&gt;">
+          <mxGeometry x="1350" y="425" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="160" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d4e6f1;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;🔵 86蓝牙面板 → LINE IN（短距屏蔽线≤3米）&lt;/b&gt;">
+          <mxGeometry x="1240" y="470" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="161" parent="1" style="rounded=1;strokeColor=#c0392b;fillColor=#fdedec;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;⚡ 负载：&lt;/b&gt;照明×2">
+          <mxGeometry x="1240" y="492" width="210" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="162" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=7;html=1;" vertex="1" value="&lt;b&gt;VLAN 10:&lt;/b&gt; IP音频推流 + HTTP API  |  &lt;b&gt;VLAN 20:&lt;/b&gt; AP/有线网">
+          <mxGeometry x="1240" y="542" width="210" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="163" parent="1" style="strokeWidth=1;strokeColor=#1a5276;" edge="1">
+          <mxGeometry x="1310" y="240" width="0" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="164" parent="1" style="text;strokeColor=#1a5276;fillColor=#fbfcfc;fontSize=10;align=left;verticalAlign=middle;rounded=1;strokeWidth=2;spacingLeft=12;html=1;" vertex="1" value="&lt;b&gt;每房间线缆汇总（5根 = 3网线 + 1 485 + 1音箱线）：&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;📶 网线①（设备网）：交换机VLAN 10 → 吊顶电箱T-6715 LAN IN（标准以太网T568B，纯数据不拆分）&lt;br&gt;📶 网线②（无线AP）：交换机VLAN 20 → 墙面86 AP面板（PoE可选）&lt;br&gt;📶 网线③（有线网）：交换机VLAN 20 → 桌边86网络墙插&lt;br&gt;🔌 485网线（24V+485）：485集线器CHn → 吊顶电箱继电器模块（色谱：橙/橙白=V+ 绿/绿白=V- 蓝=485A 蓝白=485B）&lt;br&gt;🔊 音箱线（2×1.5mm²）：T-6715 SPK OUT → Bose吸顶音箱&lt;/font&gt;">
+          <mxGeometry x="20" y="600" width="1560" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="165" parent="1" style="text;strokeColor=none;fillColor=none;align=center;fontSize=9;" vertex="1" value="图例：绿色=VLAN 10智能内网  |  橙色=VLAN 20客人外网  |  蓝色=485总线  |  红色=220V强电  |  紫色=音频信号">
+          <mxGeometry x="20" y="685" width="1560" height="25" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="room_detail" name="单房间接线详图">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1050" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2001" parent="1" style="text;strokeColor=none;fillColor=none;align=center;fontSize=16;fontStyle=4" vertex="1" value="&lt;b&gt;单个房间接线详图（V1.2 · 分布式网络IP音频架构 · 以包间为例）&lt;/b&gt;">
+          <mxGeometry x="20" y="10" width="1160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2002" parent="1" style="rounded=1;strokeColor=#566573;fillColor=#f5f5f5;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=4;spacingLeft=8;html=1;" vertex="1" value="&lt;b&gt;来自总弱电柜（工作间机柜 · 4根线/房间）&lt;/b&gt;">
+          <mxGeometry x="20" y="50" width="1160" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="2003" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;网线①（设备网）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;六类SFTP · VLAN 10&lt;br&gt;交换机→T-6715 LAN IN&lt;/font&gt;">
+          <mxGeometry x="40" y="80" width="220" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2004" parent="1" style="rounded=1;strokeColor=#f39c12;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;网线②（无线AP）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;六类SFTP · VLAN 20&lt;br&gt;交换机→86 AP面板&lt;/font&gt;">
+          <mxGeometry x="290" y="80" width="220" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2005" parent="1" style="rounded=1;strokeColor=#f39c12;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;网线③（有线网）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;六类SFTP · VLAN 20&lt;br&gt;交换机→桌边网口&lt;/font&gt;">
+          <mxGeometry x="540" y="80" width="220" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2006" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;485网线（24V+信号）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;屏蔽网线 · 485 HUB CHn&lt;br&gt;24V+485A/B&lt;/font&gt;">
+          <mxGeometry x="790" y="80" width="220" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2007" parent="1" style="rounded=1;strokeColor=#95a5a6;fillColor=#f4f6f6;fontSize=8;html=1;" vertex="1" value="&lt;b&gt;📌 音箱线&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;房间内本地布线&lt;br&gt;T-6715→吸顶音箱&lt;/font&gt;">
+          <mxGeometry x="1040" y="80" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2008" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#eaf2f8;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=4;spacingLeft=8;html=1;" vertex="1" value="&lt;b&gt;房间吊顶电箱（加大号 ≥400×300mm）&lt;/b&gt;">
+          <mxGeometry x="20" y="160" width="1160" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="2009" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#d5f5e3;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;&lt;font style=&quot;font-size:12px&quot;&gt;🎵 itc T-6715 网络广播功放终端&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;┌─────────────────────────────────────┐&lt;br&gt;│ [LAN IN] ← 网线①（VLAN 10固定IP）  │ ← HA音频推流 + HTTP API&lt;br&gt;│ [LINE IN] ← 86蓝牙面板（屏蔽音频线）│ ← 客人手机蓝牙音乐&lt;br&gt;│ [MIC IN]  ← 无线话筒MIX OUT（会议室）│ ← 话筒广播&lt;br&gt;│ [SPK OUT] L+L- R+R- 凤凰端子        │ → Bose吸顶音箱（每路最多并2只）&lt;br&gt;│ [DC 24V]                           │ ← 吊顶电箱取电&lt;br&gt;└─────────────────────────────────────┘&lt;/font&gt;">
+          <mxGeometry x="30" y="195" width="340" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="2010" parent="1" style="rounded=1;strokeColor=#d35400;fillColor=#fef9e7;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;&lt;font style=&quot;font-size:11px&quot;&gt;聚英8路联动版继电器模块&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;┌─────────────────────────────────────┐&lt;br&gt;│ [V+] [V-] [485A] [485B] ← 485网线  │&lt;br&gt;│ [DI1-DI8] [GND] ← 预留传感器       │&lt;br&gt;│ COM1→NO1  COM2→NO2  ...  COM8→NO8 │&lt;br&gt;│ COM端子之间2.5mm²硬线跳线           │&lt;br&gt;└─────────────────────────────────────┘&lt;/font&gt;">
+          <mxGeometry x="400" y="195" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="2011" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#fbfcfc;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;接线端子排&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;┌────────────────────┐&lt;br&gt;│ 零线排 (N Bus)     │&lt;br&gt;├────────────────────┤&lt;br&gt;│ 地线排 (PE Bus)    │&lt;br&gt;└────────────────────┘&lt;/font&gt;">
+          <mxGeometry x="690" y="195" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="2012" parent="1" style="rounded=1;strokeColor=#c0392b;fillColor=#fdedec;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;⚡ 220V进线&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;从房间配电箱&lt;br&gt;&lt;br&gt;&lt;b&gt;火线(L)&lt;/b&gt; 2.5mm² → COM&lt;br&gt;&lt;b&gt;零线(N)&lt;/b&gt; → 零线排&lt;br&gt;&lt;b&gt;地线(PE)&lt;/b&gt; → 地线排&lt;/font&gt;">
+          <mxGeometry x="880" y="195" width="130" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="2013" parent="1" style="rounded=1;strokeColor=#566573;fillColor=#f5f5f5;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;spacingLeft=8;html=1;" vertex="1" value="&lt;b&gt;📶 墙面设备（86型面板）&lt;/b&gt;">
+          <mxGeometry x="20" y="440" width="1160" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="2014" parent="1" style="rounded=1;strokeColor=#2c3e50;fillColor=#d4e6f1;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🔵 86蓝牙音频墙插面板&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;3.5mm/RCA → 金属屏蔽音频线（≤3米）&lt;br&gt;→ 吊顶电箱T-6715 LINE IN&lt;/font&gt;">
+          <mxGeometry x="30" y="470" width="230" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2015" parent="1" style="rounded=1;strokeColor=#f39c12;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;📶 86无线AP面板（Wi-Fi 6）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;网线②（VLAN 20）&lt;br&gt;客人无线网络&lt;/font&gt;">
+          <mxGeometry x="290" y="470" width="230" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2016" parent="1" style="rounded=1;strokeColor=#f39c12;fillColor=#fef9e7;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🔌 86有线网络墙插&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;网线③（VLAN 20）&lt;br&gt;客人笔记本有线接入&lt;/font&gt;">
+          <mxGeometry x="550" y="470" width="230" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2017" parent="1" style="rounded=1;strokeColor=#7f8c8d;fillColor=#d5d8dc;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;🔘 485智能场景面板（三键六开）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:7px&quot;&gt;Modbus RTU | Slave ID 11-16&lt;br&gt;吊顶电箱24V+485取电&lt;/font&gt;">
+          <mxGeometry x="810" y="470" width="230" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2018" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;spacingLeft=8;html=1;" vertex="1" value="🎵 音频信号流（分布式IP架构）">
+          <mxGeometry x="20" y="540" width="1160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2019" parent="1" style="text;strokeColor=none;fillColor=none;fontSize=8;align=left;verticalAlign=middle;" vertex="1" value="【IP推流】HA主机 → UDP/TCP → 24口交换机VLAN 10 → T-6715（固定IP）→ 内部解码 → SPK OUT → Bose吸顶音箱  |  【本地蓝牙】客人手机 → 86蓝牙面板 → 屏蔽音频线（≤3米）→ T-6715 LINE IN → 内部混合 → SPK OUT → Bose吸顶音箱  |  【话筒（会议室）】无线话筒接收机 MIX OUT → 6.35mm跳线 → T-6715 MIC IN">
+          <mxGeometry x="30" y="565" width="1140" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="2020" parent="1" style="text;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=1;html=1;" vertex="1" value="&lt;b&gt;▼ 485总线接线（吊顶电箱内）&lt;/b&gt;">
+          <mxGeometry x="20" y="610" width="1160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="2021" parent="1" style="rounded=1;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=9;html=1;" vertex="1" value="&lt;b&gt;485网线接入端子排：&lt;/b&gt;橙+橙白=V+ → 继电器模块V+ 、485面板V+  |  绿+绿白=V- → 模块V- 、面板V-  |  蓝=485A → 模块485A 、面板485A  |  蓝白=485B → 模块485B 、面板485B  |  &lt;b&gt;屏蔽层：&lt;/b&gt;总柜单端接地，吊顶端悬空">
+          <mxGeometry x="30" y="640" width="1140" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="2022" parent="1" style="text;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=1;html=1;" vertex="1" value="&lt;b&gt;▼ 负载输出分配（DO继电器）&lt;/b&gt;">
+          <mxGeometry x="20" y="685" width="1160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="2023" parent="1" style="rounded=1;strokeColor=#f39c12;fillColor=#fdedec;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;CH1 · 照明&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;灯具火线&lt;br&gt;线径: 1.5mm²&lt;/font&gt;">
+          <mxGeometry x="30" y="720" width="175" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2024" parent="1" style="rounded=1;strokeColor=#e74c3c;fillColor=#fdedec;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;CH2 · 空调面板&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;220V供电&lt;br&gt;线径: 1.5mm²&lt;/font&gt;">
+          <mxGeometry x="220" y="720" width="175" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2025" parent="1" style="rounded=1;strokeColor=#9b59b6;fillColor=#fdedec;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;CH3 · 电动窗帘&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;电机电源&lt;br&gt;线径: 1.5mm²&lt;/font&gt;">
+          <mxGeometry x="410" y="720" width="175" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2026" parent="1" style="rounded=1;strokeColor=#e74c3c;fillColor=#fdedec;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;CH4 · 电茶炉&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;→ 接触器线圈&lt;br&gt;线径: 2.5mm²&lt;/font&gt;">
+          <mxGeometry x="600" y="720" width="175" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2027" parent="1" style="rounded=1;strokeColor=#2ecc71;fillColor=#fdedec;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;CH5 · 辅助插座&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;吧台/香薰&lt;br&gt;线径: 1.5mm²&lt;/font&gt;">
+          <mxGeometry x="790" y="720" width="175" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2028" parent="1" style="rounded=1;strokeColor=#95a5a6;fillColor=#fdedec;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;CH6 · 备用通道&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;预留&lt;br&gt;线径: —&lt;/font&gt;">
+          <mxGeometry x="980" y="720" width="175" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2029" parent="1" style="rounded=1;strokeColor=#bf360c;fillColor=#fbe9e7;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;🔥 电茶炉交流接触器接线（强烈建议）&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;CH4(NO4) → 25A接触器线圈  |  接触器主触点(2.5mm²) → 电茶炉专用插座  |  避免1500W负载直接经过继电器模块端子&lt;/font&gt;">
+          <mxGeometry x="30" y="785" width="540" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2030" parent="1" style="rounded=1;strokeColor=#1e8449;fillColor=#e8f8f5;fontSize=10;html=1;" vertex="1" value="&lt;b&gt;🎵 Bose吸顶音箱档位&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:8px&quot;&gt;安装前统一拨至100V端 8W 或 16W（所有音箱保持一致）&lt;br&gt;&lt;b&gt;4只（会议室）：&lt;/b&gt;L+/L-并联2只，R+/R-并联2只  |  &lt;b&gt;2只（立体声）：&lt;/b&gt;L+/L-左，R+/R-右  |  &lt;b&gt;单音箱：&lt;/b&gt;双音圈或MONO&lt;/font&gt;">
+          <mxGeometry x="590" y="785" width="570" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2031" parent="1" style="text;strokeColor=#c0392b;fillColor=#fdedec;fontSize=10;align=left;verticalAlign=middle;rounded=1;strokeWidth=2" vertex="1" value="&lt;b&gt;⚠️ 施工特别提醒&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#c0392b;&quot;&gt;① 强弱电严禁共管：弱电线必须单独走PVC弱电管，不能与220V强电线穿同一根管  |  ② T-6715需设VLAN 10固定IP，交换机端口绑定MAC  |  ③ 485网线24V正负极切勿接反，开机前万用表测量确认  |  ④ 吊顶电箱内强弱电分区：左侧T-6715+继电器+485，右侧220V进线+零地线排，间距≥10cm  |  ⑤ 单音箱房间严禁物理短接L+和R+，T-6715后台设MONO模式或使用双音圈音箱  |  ⑥ 4只音箱房间（会议室）：L+L-并联2只，R+R-并联2只，各通道功率不超出T-6715额定值&lt;/font&gt;">
+          <mxGeometry x="20" y="850" width="1160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="2032" parent="1" style="text;strokeColor=#1a5276;fillColor=#ebf5fb;fontSize=9;align=left;verticalAlign=middle;rounded=1;html=1;" vertex="1" value="&lt;b&gt;VLAN：&lt;/b&gt;VLAN 10=智能内网（T-6715×5 + NAS + 串口服务器） · VLAN 20=客人外网（AP×5 + 有线网口×5）  |  &lt;b&gt;485参数：&lt;/b&gt;Modbus RTU · 9600 bps · 隔离集线器端口内置120Ω  |  &lt;b&gt;Slave ID：&lt;/b&gt;继电器01-06 · 面板11-16  |  &lt;b&gt;音频架构：&lt;/b&gt;分布式IP · 5× itc T-6715 · HA UDP/TCP推流 · 蓝牙面板本地LINE IN">
+          <mxGeometry x="20" y="915" width="1160" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
