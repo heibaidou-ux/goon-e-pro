@@ -14,7 +14,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .header { padding:16px; background:#fff; border-bottom:1px solid #f0f0f0; position:sticky; top:0; z-index:10; }
 .header-title { font-size:18px; font-weight:700; color:#1a1a1a; text-align:center; }
 .cart-badge { position:absolute; right:16px; top:16px; cursor:pointer; font-size:20px; }
-.cart-badge .badge { position:absolute; top:-6px; right:-6px; background:#e37318; color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; min-width:18px; text-align:center; }
+.cart-badge .badge { position:absolute; top:-6px; right:-6px; background:#B8860B; color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; min-width:18px; text-align:center; }
 
 /* Room context banner */
 .room-banner { background:#f0fdf4; padding:10px 16px; border-bottom:1px solid #dcedc8; display:flex; align-items:center; gap:8px; font-size:13px; color:#333; }
@@ -25,7 +25,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 /* Category Tabs */
 .cat-tabs { display:flex; padding:12px 16px; gap:8px; background:#fff; border-bottom:1px solid #f5f5f5; position:sticky; top:57px; z-index:10; }
 .cat-tab { flex:1; padding:8px; text-align:center; border-radius:20px; font-size:13px; cursor:pointer; background:#f5f5f5; color:#666; border:none; transition:all .15s; }
-.cat-tab.active { background:#07c160; color:#fff; }
+.cat-tab.active { background:#5D8A6B; color:#fff; }
 
 /* Products */
 .product-list { padding:12px 16px; }
@@ -37,7 +37,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .product-spec { font-size:11px; color:#bbb; margin-top:1px; }
 .product-desc { font-size:11px; color:#999; margin-top:2px; }
 .product-footer { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
-.product-price { font-size:16px; font-weight:700; color:#e37318; }
+.product-price { font-size:16px; font-weight:700; color:#B8860B; }
 .product-price .unit { font-size:11px; font-weight:400; color:#999; }
 .qty-ctrl { display:flex; align-items:center; gap:8px; }
 .qty-btn { width:26px; height:26px; border-radius:50%; border:1px solid #ddd; background:#fff; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#333; }
@@ -51,11 +51,11 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .cart-empty { text-align:center; padding:60px 20px; color:#ccc; font-size:14px; }
 .cart-item { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f5f5f5; }
 .cart-item-name { flex:1; font-size:14px; }
-.cart-item-price { color:#e37318; font-weight:600; margin-right:12px; font-size:13px; }
+.cart-item-price { color:#B8860B; font-weight:600; margin-right:12px; font-size:13px; }
 .cart-total { padding:16px; text-align:right; font-size:18px; font-weight:700; border-top:1px solid #f0f0f0; }
 .cart-total .total-label { font-size:13px; color:#999; }
-.cart-total .total-price { color:#e37318; }
-.checkout-btn { margin:0 16px 20px; padding:14px; background:#07c160; color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; width:calc(100% - 32px); cursor:pointer; }
+.cart-total .total-price { color:#B8860B; }
+.checkout-btn { margin:0 16px 20px; padding:14px; background:#5D8A6B; color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; width:calc(100% - 32px); cursor:pointer; }
 
 
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
@@ -63,25 +63,26 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
+.nav-item.active { color:#5D8A6B; }
 
 /* Payment Modal */
 .pay-modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center; }
-.pay-modal { background:#fff;border-radius:14px;padding:24px;width:320px;max-height:90vh;overflow-y:auto;text-align:center; }
+.pay-modal { background:#fff;border-radius:14px;padding:24px;width:320px;max-height:90vh;overflow-y:auto;scrollbar-width:none;text-align:center; }
+.pay-modal::-webkit-scrollbar { display:none; }
 .pay-modal h3 { font-size:16px;margin-bottom:12px;color:#333; }
-.pay-total { font-size:32px;font-weight:800;color:#e37318;margin:12px 0; }
+.pay-total { font-size:32px;font-weight:800;color:#B8860B;margin:12px 0; }
 .pay-items { text-align:left;background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:12px; }
 .pay-item-row { display:flex;justify-content:space-between;padding:4px 0;font-size:13px;color:#666; }
 .pay-methods { margin:12px 0;text-align:left; }
 .pay-method { display:flex;align-items:center;padding:10px 12px;border:1.5px solid #e5e5e5;border-radius:8px;margin-bottom:8px;cursor:pointer;font-size:14px;transition:all .15s; }
-.pay-method.selected { border-color:#07c160;background:#f0fdf4; }
+.pay-method.selected { border-color:#5D8A6B;background:#f0fdf4; }
 .pay-method .pay-method-icon { font-size:20px;margin-right:10px; }
 .pay-method .pay-method-name { flex:1; }
-.pay-method .pay-method-check { color:#07c160;font-size:16px; }
+.pay-method .pay-method-check { color:#5D8A6B;font-size:16px; }
 .pay-modal-btns { display:flex;gap:10px;margin-top:16px; }
 .pay-modal-btns button { flex:1;padding:12px;border-radius:8px;border:none;font-size:15px;font-weight:600;cursor:pointer; }
 .pay-btn-cancel { background:#f5f5f5;color:#666; }
-.pay-btn-confirm { background:#07c160;color:#fff; }
+.pay-btn-confirm { background:#5D8A6B;color:#fff; }
 .pay-btn-confirm:disabled { background:#ccc;cursor:not-allowed; }
 
 /* Story section in detail modal */
@@ -121,9 +122,9 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
     <div class="cart-header">
       <button style="background:none;border:none;font-size:20px;cursor:pointer;color:#666;" onclick="showProducts()">← 返回</button>
       <h3>购物车</h3>
-      <button style="background:none;border:none;font-size:13px;cursor:pointer;color:#e37318;" onclick="clearCart()">清空</button>
+      <button style="background:none;border:none;font-size:13px;cursor:pointer;color:#B8860B;" onclick="clearCart()">清空</button>
     </div>
-    <div id="cartItems" style="flex:1;overflow-y:auto;"></div>
+    <div id="cartItems" style="flex:1;overflow-y:auto;scrollbar-width:none;"></div>
     <div class="cart-total">
       <span class="total-label">合计：</span>
       <span class="total-price" id="cartTotalPrice">¥0</span>
@@ -160,7 +161,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;">
       <span style="font-size:13px;color:#666;">单价</span>
-      <span style="font-size:22px;font-weight:800;color:#e37318;" id="detailPrice"></span>
+      <span style="font-size:22px;font-weight:800;color:#B8860B;" id="detailPrice"></span>
     </div>
     <div style="text-align:center;margin-bottom:12px;">
       <span style="font-size:12px;color:#999;">数量</span>
@@ -407,7 +408,7 @@ function renderProducts() {
           '<span class="product-price">¥' + p.price + '<span class="unit">/件</span></span>' +
           (qty > 0
             ? '<div class="qty-ctrl"><button class="qty-btn" onclick="event.stopPropagation();removeFromCart(' + catVar + '[' + i + '])">−</button><span class="qty-num">' + qty + '</span><button class="qty-btn" onclick="event.stopPropagation();addToCart(' + catVar + '[' + i + '])">+</button></div>'
-            : '<button style="padding:4px 14px;border-radius:16px;background:#07c160;color:#fff;border:none;font-size:12px;cursor:pointer;" onclick="event.stopPropagation();addToCart(' + catVar + '[' + i + '])">+ 加购</button>') +
+            : '<button style="padding:4px 14px;border-radius:16px;background:#5D8A6B;color:#fff;border:none;font-size:12px;cursor:pointer;" onclick="event.stopPropagation();addToCart(' + catVar + '[' + i + '])">+ 加购</button>') +
         '</div>' +
       '</div>' +
     '</div>';

@@ -13,7 +13,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
 .back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
 .nav-title { font-size:16px; font-weight:600; flex:1; }
-.page { flex:1; overflow-y:auto; padding:12px 16px; padding-bottom:60px; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; padding:12px 16px; padding-bottom:60px; }
 .page::-webkit-scrollbar { display:none; }
 .room-card { background:#fff; border-radius:14px; padding:16px; margin-bottom:10px; border-left:4px solid #ccc; }
 .room-card.inuse { border-left-color:#00a870; }
@@ -46,7 +46,8 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .nav-item .nav-icon { font-size:20px; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
-.modal { background:#fff;border-radius:14px;padding:20px;width:310px;max-height:85vh;overflow-y:auto; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:310px;max-height:85vh;overflow-y:auto;scrollbar-width:none; }
+.modal::-webkit-scrollbar { display:none; }
 .modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
 .modal p { font-size:13px;color:#666;margin-bottom:4px; }
 .modal input,.modal textarea { width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:8px; }
@@ -264,30 +265,41 @@ function openAction(roomId, action) {
       '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:4px;">客人信息</div>' +
       '<input placeholder="客人姓名 *" id="bkCustName">' +
       '<input placeholder="联系电话 *" id="bkCustPhone" type="tel">' +
+      '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">客源渠道</div>' +
+      '<select id="bkCustomerSource" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:8px;">' +
+      '<option value="">请选择客源</option><option value="美团">美团</option><option value="抖音">抖音</option><option value="携程">携程</option><option value="大众点评">大众点评</option><option value="小红书">小红书</option><option value="微信">微信</option><option value="到店">到店</option><option value="电话">电话</option><option value="其他">其他</option></select>' +
       '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">开始时间</div>' +
       '<select class="time-select" id="bkStartTime" style="width:100%;" onchange="updateBookingAmount()">' + th + '</select>' +
       '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">使用时长</div>' +
       '<p style="font-size:11px;color:#999;margin-bottom:6px;">请选择使用时长</p>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;" id="durationGroup">' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;" id="durationGroup">' +
       '<button class="duration-btn" data-dur="1" onclick="selectDuration(this,1);updateBookingAmount()">1小时<br><small>¥' + (price*1) + '</small></button>' +
       '<button class="duration-btn" data-dur="2" onclick="selectDuration(this,2);updateBookingAmount()">2小时<br><small>¥' + (price*2) + '</small></button>' +
       '<button class="duration-btn" data-dur="3" onclick="selectDuration(this,3);updateBookingAmount()">3小时<br><small>¥' + (price*3) + '</small></button>' +
       '<button class="duration-btn" data-dur="4" onclick="selectDuration(this,4);updateBookingAmount()">4小时<br><small>¥' + (price*4) + '</small></button>' +
+      '<button class="duration-btn" data-dur="custom" onclick="selectCustomDuration(this);updateBookingAmount()">自定义<br><small>自定义</small></button>' +
+      '</div>' +
+      '<div id="customHoursRow" style="display:none;margin-top:8px;">' +
+      '<label style="font-size:12px;color:#666;">自定义小时数</label>' +
+      '<input type="number" id="bkCustomHours" min="0.5" max="24" step="0.5" value="2" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-top:4px;" oninput="updateBookingAmount()">' +
       '</div>' +
       '<div id="amountDisplay" style="margin:10px 0;padding:12px;background:#f0f5ff;border-radius:10px;text-align:center;">' +
       '<span style="font-size:14px;color:#666;">预估金额: </span>' +
-      '<span style="font-size:22px;font-weight:800;color:#0052d9;" id="orderAmount">¥0</span></div>' +
+      '<span style="font-size:22px;font-weight:800;color:#5D8A6B;" id="orderAmount">¥0</span></div>' +
       '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">支付状态</div>' +
       '<div style="display:flex;gap:6px;" id="paymentGroup">' +
       '<label class="payment-radio selected" data-pay="unpaid" onclick="selectPayment(this)">未支付</label>' +
       '<label class="payment-radio" data-pay="paid" onclick="selectPayment(this)">已支付</label></div>' +
       '<div id="payMethodGroup" style="display:none;margin-top:8px;">' +
       '<div style="font-size:12px;color:#666;margin-bottom:4px;">支付方式</div>' +
-      '<div style="display:flex;gap:6px;">' +
-      '<label class="pay-method-btn" data-method="微信" onclick="selectPayMethod(this)">微信</label>' +
-      '<label class="pay-method-btn" data-method="支付宝" onclick="selectPayMethod(this)">支付宝</label>' +
-      '<label class="pay-method-btn" data-method="现金" onclick="selectPayMethod(this)">现金</label>' +
-      '<label class="pay-method-btn" data-method="其他" onclick="selectPayMethod(this)">其他</label></div></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+      '<label class="pay-method-btn" data-method="团购券" onclick="selectPayMethod(this)">团购券</label>' +
+      '<label class="pay-method-btn" data-method="微信收款" onclick="selectPayMethod(this)">微信收款</label>' +
+      '<label class="pay-method-btn" data-method="美团收银码" onclick="selectPayMethod(this)">美团收银码</label>' +
+      '<label class="pay-method-btn" data-method="会员预充值" onclick="selectPayMethod(this)">会员预充值</label>' +
+      '<label class="pay-method-btn" data-method="对公转账" onclick="selectPayMethod(this)">对公转账</label>' +
+      '<label class="pay-method-btn" data-method="现金收款" onclick="selectPayMethod(this)">现金收款</label>' +
+      '<label class="pay-method-btn" data-method="其他收款" onclick="selectPayMethod(this)">其他收款</label></div></div>' +
       '<div style="font-size:13px;font-weight:600;color:#333;margin:8px 0 4px;">备注</div>' +
       '<textarea placeholder="备注信息（选填）" id="bkNotes" style="resize:vertical;"></textarea>' +
       '<div class="modal-buttons"><button class="modal-btn cancel" onclick="hideModal()">取消</button><button class="modal-btn confirm" onclick="doProxyBooking()">确认代预订</button></div>';
@@ -488,14 +500,27 @@ function updateBookingAmount() {
   var halfHourPrice = Math.round(price / 2);
   var durEl = document.querySelector('#durationGroup .duration-btn.selected');
   if (!durEl) { document.getElementById('orderAmount').textContent = '¥0'; return; }
-  var dur = parseInt(durEl.getAttribute('data-dur'));
-  var total = dur * 2 * halfHourPrice;
+  var dur;
+  if (durEl.getAttribute('data-dur') === 'custom') {
+    var customInput = document.getElementById('bkCustomHours');
+    dur = customInput ? parseFloat(customInput.value) || 2 : 2;
+  } else {
+    dur = parseInt(durEl.getAttribute('data-dur'));
+  }
+  var total = Math.round(dur * 2 * halfHourPrice);
   document.getElementById('orderAmount').textContent = '¥' + total;
 }
 
 function selectDuration(btn, value) {
   document.querySelectorAll('#durationGroup .duration-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
+  document.getElementById('customHoursRow').style.display = 'none';
+}
+
+function selectCustomDuration(btn) {
+  document.querySelectorAll('#durationGroup .duration-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  document.getElementById('customHoursRow').style.display = 'block';
 }
 
 function selectPayment(el) {
@@ -646,11 +671,20 @@ function doProxyBooking() {
   if (!phone) { showToast('请输入联系电话'); return; }
   if (!/^1\d{10}$/.test(phone)) { showToast('请输入正确的11位手机号'); return; }
 
+  var source = document.getElementById('bkCustomerSource').value;
+  if (!source) { showToast('请选择客源渠道'); return; }
+
   var price = priceMap[currentAction.roomId] || 60;
   var halfHourPrice = Math.round(price / 2);
   var selectedDur = document.querySelector('#durationGroup .duration-btn.selected');
   if (!selectedDur) { showToast('请选择使用时长'); return; }
-  var duration = parseInt(selectedDur.getAttribute('data-dur'));
+  var duration;
+  if (selectedDur.getAttribute('data-dur') === 'custom') {
+    var customInput = document.getElementById('bkCustomHours');
+    duration = customInput ? parseFloat(customInput.value) || 2 : 2;
+  } else {
+    duration = parseInt(selectedDur.getAttribute('data-dur'));
+  }
 
   var startTime = document.getElementById('bkStartTime').value;
   var startNow = false;
@@ -691,6 +725,7 @@ function doProxyBooking() {
     customerName: name,
     name: name,
     phone: phone,
+    customerSource: source,
     date: StaffSDK.Utils.todayStr(),
     startTime: startTime,
     endTime: endTime,

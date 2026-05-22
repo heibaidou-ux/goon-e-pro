@@ -15,11 +15,11 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
 .store-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#fff; }
 .store-name { font-size:18px; font-weight:700; color:#1a1a1a; }
-.store-select { font-size:13px; color:#0052d9; display:flex; align-items:center; gap:4px; cursor:pointer; padding:4px 8px; border-radius:6px; background:#f0f5ff; }
-.user-badge { font-size:11px; color:#07c160; margin-left:6px; font-weight:400; }
+.store-select { font-size:13px; color:#5D8A6B; display:flex; align-items:center; gap:4px; cursor:pointer; padding:4px 8px; border-radius:6px; background:#f0f5ff; }
+.user-badge { font-size:11px; color:#5D8A6B; margin-left:6px; font-weight:400; }
 
 /* Active order banner */
-.active-order-banner { display:none; margin:0; padding:14px 16px; background:linear-gradient(135deg,#07c160,#00a854); color:#fff; }
+.active-order-banner { display:none; margin:0; padding:14px 16px; background:linear-gradient(135deg,#5D8A6B,#00a854); color:#fff; }
 .active-order-banner.show { display:block; }
 .active-order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .active-order-title { font-size:13px; font-weight:600; opacity:.9; }
@@ -27,7 +27,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .active-order-time { font-size:12px; opacity:.8; margin-top:2px; }
 .active-order-btns { display:flex; gap:10px; margin-top:10px; }
 .active-order-btn { flex:1; padding:12px; border-radius:10px; border:none; font-size:14px; font-weight:600; cursor:pointer; text-align:center; }
-.active-order-btn.primary { background:#fff; color:#07c160; }
+.active-order-btn.primary { background:#fff; color:#5D8A6B; }
 .active-order-btn.outline { background:rgba(255,255,255,.2); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
 
 /* Carousel — transform-based with auto-rotation + partial next slide */
@@ -44,13 +44,13 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .quick-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; padding:16px; }
 .quick-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; border:none; background:none; padding:10px 4px; transition:transform .15s; }
 .quick-item:active { transform:scale(.95); }
-.quick-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff; background:#07c160; }
-.quick-icon.brand { background:linear-gradient(135deg,#07c160,#00a854); }
-.quick-icon.balance { background:linear-gradient(135deg,#0052d9,#366ef4); }
-.quick-icon.coupon { background:linear-gradient(135deg,#e37318,#f5a623); }
-.quick-icon.profile { background:linear-gradient(135deg,#9c27b0,#ce93d8); }
+.quick-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff; background:#5D8A6B; }
+.quick-icon.brand { background:linear-gradient(135deg,#5D8A6B,#7BA88E); }
+.quick-icon.balance { background:linear-gradient(135deg,#7A8B8B,#A3B5B5); }
+.quick-icon.coupon { background:linear-gradient(135deg,#B8860B,#D4A84B); }
+.quick-icon.profile { background:linear-gradient(135deg,#8B7D6B,#B5A896); }
 .quick-label { font-size:11px; color:#333; font-weight:500; }
-.quick-balance { font-size:13px; font-weight:700; color:#0052d9; margin-top:1px; }
+.quick-balance { font-size:13px; font-weight:700; color:#7A8B8B; margin-top:1px; }
 
 /* Section */
 .section { padding:0 16px; margin-bottom:16px; }
@@ -65,8 +65,8 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .room-card-name { font-size:15px; font-weight:600; }
 .room-card-meta { font-size:12px; color:#999; margin-top:2px; }
 .room-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
-.room-card-price { font-size:16px; font-weight:700; color:#e37318; }
-.room-card-book-btn { padding:6px 14px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; }
+.room-card-price { font-size:16px; font-weight:700; color:#B8860B; }
+.room-card-book-btn { padding:6px 14px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; }
 .room-card-book-btn:active { opacity:.8; }
 
 /* Tea products */
@@ -78,36 +78,37 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .tea-card-name { font-size:13px; font-weight:600; }
 .tea-card-desc { font-size:11px; color:#999; margin-top:2px; }
 .tea-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
-.tea-card-price { font-size:15px; font-weight:700; color:#e37318; }
-.tea-card-btn { padding:4px 12px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:11px; cursor:pointer; }
+.tea-card-price { font-size:15px; font-weight:700; color:#B8860B; }
+.tea-card-btn { padding:4px 12px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:11px; cursor:pointer; }
 .tea-card-btn:active { opacity:.8; }
 
 /* Modal */
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
-.modal { background:#fff;border-radius:14px;padding:24px;width:320px;text-align:center;max-height:90vh;overflow-y:auto; }
+.modal { background:#fff;border-radius:14px;padding:24px;width:320px;text-align:center;max-height:90vh;overflow-y:auto;scrollbar-width:none; }
+.modal::-webkit-scrollbar { display:none; }
 .modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
 .modal p { font-size:14px;color:#666;margin-bottom:8px; }
-.modal .amount { font-size:32px;font-weight:800;color:#e37318; }
-.modal-close { margin-top:16px;padding:10px 24px;border-radius:8px;border:none;background:#07c160;color:#fff;font-size:14px;cursor:pointer;width:100%; }
+.modal .amount { font-size:32px;font-weight:800;color:#B8860B; }
+.modal-close { margin-top:16px;padding:10px 24px;border-radius:8px;border:none;background:#5D8A6B;color:#fff;font-size:14px;cursor:pointer;width:100%; }
 
 /* Login */
 .login-tabs { display:flex; margin-bottom:16px; border-radius:8px; overflow:hidden; border:1px solid #e5e5e5; }
 .login-tab { flex:1; padding:10px; cursor:pointer; font-size:13px; background:#f5f5f5; color:#999; border:none; transition:all .15s; }
-.login-tab.active { background:#07c160; color:#fff; }
+.login-tab.active { background:#5D8A6B; color:#fff; }
 .form-item { margin-bottom:12px; text-align:left; }
 .form-label { font-size:12px; color:#999; margin-bottom:4px; display:block; }
 .form-input { width:100%; padding:10px 12px; border:1.5px solid #e5e5e5; border-radius:8px; font-size:14px; outline:none; transition:border-color .15s; }
-.form-input:focus { border-color:#07c160; }
-.form-btn { width:100%; padding:12px; border-radius:8px; border:none; background:#07c160; color:#fff; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
+.form-input:focus { border-color:#5D8A6B; }
+.form-btn { width:100%; padding:12px; border-radius:8px; border:none; background:#5D8A6B; color:#fff; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
 .form-btn:active { opacity:.8; }
-.form-switch { font-size:12px; color:#0052d9; margin-top:12px; cursor:pointer; }
+.form-switch { font-size:12px; color:#5D8A6B; margin-top:12px; cursor:pointer; }
 
 /* Store selector */
 .store-option { display:flex; align-items:center; justify-content:space-between; padding:14px; border-bottom:1px solid #f0f0f0; cursor:pointer; font-size:14px; }
 .store-option:last-child { border-bottom:none; }
-.store-option.active { color:#07c160; font-weight:600; }
+.store-option.active { color:#5D8A6B; font-weight:600; }
 .store-option.coming { color:#999; cursor:default; }
-.store-coming-tag { font-size:10px; padding:2px 6px; border-radius:8px; background:#fff3e0; color:#e37318; }
+.store-coming-tag { font-size:10px; padding:2px 6px; border-radius:8px; background:#fff3e0; color:#B8860B; }
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
 .qr-context-btn:active { opacity:.8; }
 
@@ -119,15 +120,15 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .parking-section .ps-text { font-size:13px; color:#666; line-height:1.6; }
 .parking-section .ps-tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:6px; margin:2px 4px 2px 0; }
 .ps-tag.free { background:#e8f5e9; color:#00a870; }
-.ps-tag.paid { background:#fff3e0; color:#e37318; }
-.ps-tag.info { background:#e3f2fd; color:#0052d9; }
+.ps-tag.paid { background:#fff3e0; color:#B8860B; }
+.ps-tag.info { background:#e3f2fd; color:#5D8A6B; }
 
 /* Bottom nav */
 .bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
+.nav-item.active { color:#5D8A6B; }
 </style>
 </head>
 <body>
@@ -147,7 +148,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
           <div style="font-size:14px;font-weight:600;color:#333;" id="qrContextTitle">您正在 <b>大茶室C</b></div>
           <div style="font-size:12px;color:#666;margin-top:2px;" id="qrContextDesc">桌号: 2号桌 · 已自动识别位置</div>
         </div>
-        <button class="qr-context-btn" onclick="goCartWithRoom()" style="padding:8px 16px;border-radius:16px;background:#07c160;color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">点茶品 →</button>
+        <button class="qr-context-btn" onclick="goCartWithRoom()" style="padding:8px 16px;border-radius:16px;background:#5D8A6B;color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">点茶品 →</button>
       </div>
       <div style="display:flex;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid #dcedc8;">
         <button style="flex:1;padding:6px;border-radius:8px;background:#fff;border:1px solid #dcedc8;font-size:12px;color:#666;cursor:pointer;" onclick="showRoomBill()">🧾 查看挂账</button>
@@ -237,8 +238,8 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
     <div class="section">
       <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
         <span>🍵 精选茶品</span>
-        <span style="font-size:12px;font-weight:400;color:#07c160;cursor:pointer;display:flex;align-items:center;gap:4px;" onclick="goCart()">
-          🛒 购物车<span id="cartBadge" style="background:#e37318;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;display:none;">0</span>
+        <span style="font-size:12px;font-weight:400;color:#5D8A6B;cursor:pointer;display:flex;align-items:center;gap:4px;" onclick="goCart()">
+          🛒 购物车<span id="cartBadge" style="background:#B8860B;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;display:none;">0</span>
         </span>
       </div>
       <div class="tea-grid" id="teaGrid"></div>
@@ -257,7 +258,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 <div class="modal-overlay" id="storeModal" onclick="if(event.target===this)hideStoreSelector()">
   <div class="modal">
     <h3>选择门店</h3>
-    <div class="store-option active" onclick="selectStore('盈隆店','YL')">📍 盈隆店 <span style="color:#07c160;">✓ 当前</span></div>
+    <div class="store-option active" onclick="selectStore('盈隆店','YL')">📍 盈隆店 <span style="color:#5D8A6B;">✓ 当前</span></div>
     <div class="store-option coming" onclick="showToast('珠江新城店正在筹备中，将由高岸ERP全面接管，敬请期待')">📍 珠江新城店 <span class="store-coming-tag">即将上线</span></div>
     <div class="store-option coming" onclick="showToast('琶洲店正在筹备中，将由高岸ERP全面接管，敬请期待')">📍 琶洲店 <span class="store-coming-tag">即将上线</span></div>
     <button class="modal-close" onclick="hideStoreSelector()">关闭</button>
@@ -314,8 +315,8 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 <div class="modal-overlay" id="roomBillModal" onclick="if(event.target===this)hideRoomBill()">
   <div class="modal" style="text-align:left;">
     <h3 style="text-align:center;">🧾 房间挂账单</h3>
-    <div id="roomBillContent" style="max-height:300px;overflow-y:auto;"></div>
-    <div id="roomBillTotal" style="text-align:right;font-size:18px;font-weight:700;color:#e37318;padding:10px 0;border-top:1px solid #f0f0f0;margin-top:8px;"></div>
+    <div id="roomBillContent" style="max-height:300px;overflow-y:auto;scrollbar-width:none;"></div>
+    <div id="roomBillTotal" style="text-align:right;font-size:18px;font-weight:700;color:#B8860B;padding:10px 0;border-top:1px solid #f0f0f0;margin-top:8px;"></div>
     <button class="modal-close" onclick="hideRoomBill()">关闭</button>
   </div>
 </div>
@@ -335,7 +336,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
   <div style="display:flex;gap:6px;margin-bottom:6px;">
     <input id="debugRoomId" value="RM004" style="flex:1;padding:6px 10px;border-radius:6px;border:none;font-size:12px;" placeholder="房间ID" />
     <input id="debugTableId" value="1" style="width:60px;padding:6px 10px;border-radius:6px;border:none;font-size:12px;" placeholder="桌号" />
-    <button onclick="debugQrScan()" style="padding:6px 12px;border-radius:6px;background:#07c160;color:#fff;border:none;font-size:12px;cursor:pointer;">模拟扫码</button>
+    <button onclick="debugQrScan()" style="padding:6px 12px;border-radius:6px;background:#5D8A6B;color:#fff;border:none;font-size:12px;cursor:pointer;">模拟扫码</button>
     <button onclick="document.getElementById('qrDebug').style.display='none'" style="padding:6px 8px;border-radius:6px;background:#666;color:#fff;border:none;font-size:12px;cursor:pointer;">✕</button>
   </div>
   <div style="font-size:11px;color:#999;">按 Ctrl+D 隐藏调试面板</div>
@@ -522,7 +523,7 @@ function showRoomBill() {
       total += item.amount || (item.price * item.qty);
       html += '<div class="pay-item-row" style="padding:6px 0;border-bottom:1px solid #f5f5f5;">' +
         '<span>' + (item.productName || item.name) + ' ×' + (item.qty || 1) + '</span>' +
-        '<span style="color:#e37318;">¥' + (item.amount || item.price * item.qty) + '</span></div>';
+        '<span style="color:#B8860B;">¥' + (item.amount || item.price * item.qty) + '</span></div>';
     }
     document.getElementById('roomBillContent').innerHTML =
       '<div style="font-size:12px;color:#999;margin-bottom:6px;">' + ctx.roomName + ' · 挂账明细</div>' + html;
@@ -804,7 +805,7 @@ function renderLoginForm() {
     container.style.display = 'block'; regContainer.style.display = 'none';
     container.innerHTML =
       '<div class="form-item"><label class="form-label">手机号</label><input class="form-input" id="loginPhone" type="tel" placeholder="请输入手机号" value="138****8888"></div>' +
-      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="loginCode" placeholder="验证码" value="8888"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #07c160;background:#fff;color:#07c160;font-size:12px;cursor:pointer;" onclick="UI.toast(\'验证码已发送: 8888\')">获取验证码</button></div></div>' +
+      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="loginCode" placeholder="验证码" value="8888"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #5D8A6B;background:#fff;color:#5D8A6B;font-size:12px;cursor:pointer;" onclick="UI.toast(\'验证码已发送: 8888\')">获取验证码</button></div></div>' +
       '<button class="form-btn" onclick="doLogin()">登 录</button>' +
       '<div class="form-switch" onclick="switchLoginTab(\'register\')">没有账号？立即注册 →</div>';
   } else {
@@ -812,7 +813,7 @@ function renderLoginForm() {
     regContainer.innerHTML =
       '<div class="form-item"><label class="form-label">手机号</label><input class="form-input" id="regPhone" type="tel" placeholder="请输入手机号"></div>' +
       '<div class="form-item"><label class="form-label">昵称</label><input class="form-input" id="regName" placeholder="请输入昵称"></div>' +
-      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="regCode" placeholder="验证码"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #07c160;background:#fff;color:#07c160;font-size:12px;cursor:pointer;" onclick="UI.toast(\'验证码已发送\')">获取验证码</button></div></div>' +
+      '<div class="form-item"><label class="form-label">验证码</label><div style="display:flex;gap:8px;"><input class="form-input" id="regCode" placeholder="验证码"><button style="white-space:nowrap;padding:10px 12px;border-radius:8px;border:1px solid #5D8A6B;background:#fff;color:#5D8A6B;font-size:12px;cursor:pointer;" onclick="UI.toast(\'验证码已发送\')">获取验证码</button></div></div>' +
       '<button class="form-btn" onclick="doRegister()">注 册</button>' +
       '<div class="form-switch" onclick="switchLoginTab(\'login\')">已有账号？立即登录 →</div>';
   }

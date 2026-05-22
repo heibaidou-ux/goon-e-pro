@@ -17,8 +17,8 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 /* Tabs */
 .tab-bar { display:flex; background:#fff; border-bottom:1px solid #eee; position:sticky; top:0; z-index:10; }
 .tab { flex:1; text-align:center; padding:14px 0; cursor:pointer; font-size:14px; color:#999; position:relative; transition:color .15s; }
-.tab.active { color:#07c160; font-weight:600; }
-.tab.active::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:24px; height:3px; background:#07c160; border-radius:2px; }
+.tab.active { color:#5D8A6B; font-weight:600; }
+.tab.active::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:24px; height:3px; background:#5D8A6B; border-radius:2px; }
 
 /* Order card */
 .order-card { background:#fff; padding:16px; margin:0 0 10px; }
@@ -29,26 +29,26 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .status-booked { background:#f3e5f5; color:#9c27b0; }
 .status-completed { background:#f5f5f5; color:#999; }
 .order-time { font-size:13px; color:#666; margin-bottom:4px; }
-.order-price { font-size:14px; font-weight:600; color:#e37318; margin-bottom:8px; }
+.order-price { font-size:14px; font-weight:600; color:#B8860B; margin-bottom:8px; }
 
 /* Big action buttons */
 .big-actions { display:flex; gap:10px; margin-top:10px; }
 .big-action-btn { flex:1; padding:14px; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; border:none; text-align:center; transition:opacity .15s; }
 .big-action-btn:active { opacity:.8; }
-.big-action-btn.primary { background:#07c160; color:#fff; }
-.big-action-btn.outline { background:#fff; color:#07c160; border:1.5px solid #07c160; }
+.big-action-btn.primary { background:#5D8A6B; color:#fff; }
+.big-action-btn.outline { background:#fff; color:#5D8A6B; border:1.5px solid #5D8A6B; }
 .big-action-btn.ghost { background:#f5f5f5; color:#666; }
 
 .door-section { background:#fffbf0; padding:12px; display:flex; align-items:center; justify-content:space-between; margin:10px 0; }
 .door-label { font-size:12px; color:#999; }
 .door-code { font-size:20px; font-weight:800; font-family:"Courier New",monospace; color:#333; letter-spacing:6px; }
-.door-hint { font-size:12px; color:#e37318; }
+.door-hint { font-size:12px; color:#B8860B; }
 .empty { text-align:center; padding:60px 20px; color:#999; }
 .empty-icon { font-size:48px; margin-bottom:12px; }
 .cancel-note { font-size:11px; color:#999; margin-left:8px; }
 .order-btn { padding:8px 16px; border-radius:8px; font-size:13px; cursor:pointer; border:none; font-weight:500; }
 .order-btn.danger { background:#fff; color:#d54941; border:1.5px solid #d54941; }
-.order-btn.outline { background:#fff; color:#07c160; border:1.5px solid #07c160; }
+.order-btn.outline { background:#fff; color:#5D8A6B; border:1.5px solid #5D8A6B; }
 .order-btn.ghost { background:#f5f5f5; color:#666; }
 
 /* Logistics */
@@ -57,30 +57,31 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .logistics-carrier { font-size:13px; font-weight:600; color:#333; }
 .logistics-carrier .carrier-icon { font-size:16px; margin-right:4px; }
 .logistics-tracking { font-size:12px; color:#666; }
-.logistics-tracking .tracking-num { color:#0052d9; cursor:pointer; }
+.logistics-tracking .tracking-num { color:#5D8A6B; cursor:pointer; }
 .logistics-tracking .tracking-num:hover { text-decoration:underline; }
 .logistics-status-row { display:flex; align-items:center; gap:6px; margin-top:6px; padding-top:6px; border-top:1px solid #eee; }
 .ls-badge { font-size:11px; padding:2px 8px; border-radius:6px; font-weight:600; }
-.ls-badge.pending { background:#fff3e0; color:#e37318; }
-.ls-badge.transit { background:#e3f2fd; color:#0052d9; }
+.ls-badge.pending { background:#fff3e0; color:#B8860B; }
+.ls-badge.transit { background:#e3f2fd; color:#5D8A6B; }
 .ls-badge.delivered { background:#e8f5e9; color:#00a870; }
 .ls-progress { flex:1; display:flex; align-items:center; gap:2px; }
 .ls-step { flex:1; text-align:center; position:relative; }
 .ls-step-dot { width:8px; height:8px; border-radius:50%; display:inline-block; background:#ddd; }
-.ls-step-dot.active { background:#07c160; }
-.ls-step-dot.current { background:#0052d9; box-shadow:0 0 0 3px rgba(0,82,217,.2); }
+.ls-step-dot.active { background:#5D8A6B; }
+.ls-step-dot.current { background:#5D8A6B; box-shadow:0 0 0 3px rgba(0,82,217,.2); }
 .ls-step-label { font-size:9px; color:#bbb; margin-top:2px; display:block; }
-.ls-step-label.active { color:#07c160; font-weight:600; }
-.ls-step-label.current { color:#0052d9; font-weight:600; }
+.ls-step-label.active { color:#5D8A6B; font-weight:600; }
+.ls-step-label.current { color:#5D8A6B; font-weight:600; }
 .ls-line { position:absolute; top:4px; right:-50%; width:100%; height:2px; background:#ddd; z-index:-1; }
-.ls-line.active { background:#07c160; }
+.ls-line.active { background:#5D8A6B; }
 .ls-estimated { font-size:11px; color:#999; margin-top:4px; }
-.logistics-btn { font-size:12px; color:#0052d9; background:none; border:none; cursor:pointer; font-weight:500; padding:2px 6px; }
+.logistics-btn { font-size:12px; color:#5D8A6B; background:none; border:none; cursor:pointer; font-weight:500; padding:2px 6px; }
 .logistics-btn:active { opacity:.7; }
 
 /* Logistics detail modal */
 .lg-modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
-.lg-modal { background:#fff;border-radius:14px;width:340px;max-height:85vh;overflow-y:auto; }
+.lg-modal { background:#fff;border-radius:14px;width:340px;max-height:85vh;overflow-y:auto;scrollbar-width:none; }
+.lg-modal::-webkit-scrollbar { display:none; }
 .lg-modal-header { position:sticky;top:0;background:#fff;padding:16px 16px 0;border-radius:14px 14px 0 0;z-index:1;display:flex;justify-content:space-between;align-items:center; }
 .lg-modal-header h3 { font-size:16px; }
 .lg-modal-close { font-size:20px;cursor:pointer;color:#999;padding:0 4px; }
@@ -91,14 +92,14 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .lg-tl-item { display:flex; gap:12px; position:relative; padding-bottom:20px; }
 .lg-tl-item:last-child { padding-bottom:0; }
 .lg-tl-dot { width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:2px;position:relative;z-index:1; }
-.lg-tl-dot.done { background:#07c160; }
-.lg-tl-dot.current { background:#0052d9; box-shadow:0 0 0 4px rgba(0,82,217,.2); }
+.lg-tl-dot.done { background:#5D8A6B; }
+.lg-tl-dot.current { background:#5D8A6B; box-shadow:0 0 0 4px rgba(0,82,217,.2); }
 .lg-tl-dot.pending { background:#ddd; }
 .lg-tl-line { position:absolute;left:5px;top:16px;width:2px;height:calc(100% - 4px);background:#eee; }
-.lg-tl-line.done { background:#07c160; }
+.lg-tl-line.done { background:#5D8A6B; }
 .lg-tl-content { flex:1; }
 .lg-tl-desc { font-size:13px;color:#333; }
-.lg-tl-desc.current { color:#0052d9; font-weight:600; }
+.lg-tl-desc.current { color:#5D8A6B; font-weight:600; }
 .lg-tl-time { font-size:11px;color:#999;margin-top:2px; }
 
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
@@ -106,7 +107,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
+.nav-item.active { color:#5D8A6B; }
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
 .modal { background:#fff;border-radius:14px;padding:20px;width:300px;text-align:center; }
 .modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
@@ -114,12 +115,12 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .modal-buttons { display:flex;gap:10px; }
 .modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
 .modal-btn.cancel { background:#f5f5f5;color:#666; }
-.modal-btn.confirm { background:#07c160;color:#fff; }
+.modal-btn.confirm { background:#5D8A6B;color:#fff; }
 .modal-btn.danger { background:#d54941;color:#fff; }
 .time-picker { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
 .time-option { padding:10px 8px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; cursor:pointer; font-size:12px; text-align:center; transition:all .15s; }
-.time-option:hover { border-color:#07c160; }
-.time-option.selected { background:#07c160; color:#fff; border-color:#07c160; }
+.time-option:hover { border-color:#5D8A6B; }
+.time-option.selected { background:#5D8A6B; color:#fff; border-color:#5D8A6B; }
 .time-option .ext-time { font-weight:600; display:block; }
 .time-option .ext-price { font-size:10px; display:block; margin-top:2px; }
 </style>
@@ -446,7 +447,7 @@ function renderOrders() {
       }
       var lgHtml = renderLogisticsCard(o.logistics);
       html = '<div class="order-card">' +
-        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-booked" style="background:#fff3e0;color:#e37318;">待发货</span></div>' +
+        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-booked" style="background:#fff3e0;color:#B8860B;">待发货</span></div>' +
         '<div class="order-time">' + (o.date||'') + '</div>' +
         '<div class="order-price">¥' + (o.price||0) + '</div>' +
         '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + shipItemsHtml + '</div>' +
@@ -481,7 +482,7 @@ function renderOrders() {
       }
       var clgHtml = renderLogisticsCard(o.logistics);
       html = '<div class="order-card">' +
-        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-inuse" style="background:#e3f2fd;color:#0052d9;">已完成</span></div>' +
+        '<div class="order-header"><span class="order-room">' + o.roomName + '</span><span class="order-status status-inuse" style="background:#e3f2fd;color:#5D8A6B;">已完成</span></div>' +
         '<div class="order-time">' + (o.date||'') + '</div>' +
         '<div class="order-price">¥' + (o.price||0) + '</div>' +
         '<div style="font-size:13px;color:#666;margin-bottom:8px;">' + shopItemsHtml + '</div>' +
@@ -713,7 +714,7 @@ function showDetail(id) {
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>包间</span><span>' + o.roomName + '</span></div>' +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>日期</span><span>' + (o.date||'') + '</span></div>' +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>时间</span><span>' + (o.time||'') + '</span></div>' +
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>金额</span><span style="font-weight:700;color:#e37318;">¥' + (o.price||0) + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>金额</span><span style="font-weight:700;color:#B8860B;">¥' + (o.price||0) + '</span></div>' +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>支付方式</span><span>' + (o.payment||'—') + '</span></div>' +
     '</div>' +
     '<button class="modal-btn cancel" style="margin-top:12px;width:100%;" onclick="document.getElementById(\'detailModal\').style.display=\'none\'">关闭</button>';
@@ -744,7 +745,7 @@ function showShopDetail(id) {
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>日期</span><span>' + (o.date||'') + '</span></div>' +
     '<div style="display:flex;justify-content:space-between;padding:6px 0;"><span>状态</span><span style="font-weight:600;">' + statusLabel + '</span></div>' +
     '<div style="margin-top:8px;border-top:1px solid #eee;padding-top:8px;">' + itemsHtml + '</div>' +
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #eee;margin-top:8px;"><span>合计</span><span style="font-weight:700;color:#e37318;">¥' + (o.totalAmount || o.price) + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #eee;margin-top:8px;"><span>合计</span><span style="font-weight:700;color:#B8860B;">¥' + (o.totalAmount || o.price) + '</span></div>' +
     '</div>' +
     '<button class="modal-btn cancel" style="margin-top:12px;width:100%;" onclick="document.getElementById(\'detailModal\').style.display=\'none\'">关闭</button>';
   document.getElementById('detailModal').style.display = 'flex';

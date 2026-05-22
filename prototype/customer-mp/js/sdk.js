@@ -280,7 +280,7 @@
         '<button id="sdk-confirm-cancel" style="flex:1;padding:10px;border-radius:8px;border:none;' +
         'background:#f5f5f5;color:#666;font-size:14px;cursor:pointer;">' + (cancelText || '取消') + '</button>' +
         '<button id="sdk-confirm-ok" style="flex:1;padding:10px;border-radius:8px;border:none;' +
-        'background:#07c160;color:#fff;font-size:14px;cursor:pointer;">' + (confirmText || '确定') + '</button>' +
+        'background:#5D8A6B;color:#fff;font-size:14px;cursor:pointer;">' + (confirmText || '确定') + '</button>' +
         '</div></div>';
       document.body.appendChild(overlay);
       document.getElementById('sdk-confirm-ok').onclick = function() { document.body.removeChild(overlay); resolve(true); };

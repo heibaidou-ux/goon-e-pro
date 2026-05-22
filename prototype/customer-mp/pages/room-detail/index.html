@@ -11,20 +11,20 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
 .nav-top { position:fixed; top:10px; right:20px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
-.nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; background:#fff; }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #e8e4de; background:#fff; }
 .back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
 .nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
 .page { flex:1; overflow-y:auto; scrollbar-width:none; }
 .page::-webkit-scrollbar { display:none; }
 
-/* Unified room header card */
+/* Unified room header card — 素雅色调 */
 .room-header-card { margin:0; padding:16px; color:#fff; }
-.room-header-card.gradient-tea { background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%); }
-.room-header-card.gradient-meeting { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); }
-.room-header-card.gradient-exhibition { background:linear-gradient(135deg,#f5af19 0%,#f12711 100%); }
-.room-header-card.gradient-workshop { background:linear-gradient(135deg,#8e9eab 0%,#eef2f3 100%); }
+.room-header-card.gradient-tea { background:linear-gradient(135deg,#5D8A6B 0%,#7BA88E 100%); }
+.room-header-card.gradient-meeting { background:linear-gradient(135deg,#7A8B8B 0%,#A3B5B5 100%); }
+.room-header-card.gradient-exhibition { background:linear-gradient(135deg,#B8860B 0%,#D4A84B 100%); }
+.room-header-card.gradient-workshop { background:linear-gradient(135deg,#8B7D6B 0%,#B5A896 100%); }
 .room-header-top { display:flex; align-items:center; gap:12px; }
-.room-header-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; background:rgba(255,255,255,.25); flex-shrink:0; }
+.room-header-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; background:rgba(255,255,255,.2); flex-shrink:0; }
 .room-header-name { font-size:17px; font-weight:700; }
 .room-header-meta { font-size:12px; opacity:.85; margin-top:2px; }
 .room-header-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
@@ -33,74 +33,81 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 /* Date bar */
 .date-bar { display:flex; align-items:center; padding:10px 12px; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
 .date-bar::-webkit-scrollbar { display:none; }
-.date-chip { min-width:54px; padding:8px 4px; border-radius:10px; text-align:center; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; font-size:11px; transition:all .15s; flex-shrink:0; }
+.date-chip { min-width:54px; padding:8px 4px; border-radius:10px; text-align:center; cursor:pointer; border:1.5px solid #e0d8d0; background:#fff; font-size:11px; transition:all .15s; flex-shrink:0; }
 .date-chip .d-week { font-size:10px; color:#999; }
 .date-chip .d-day { font-size:16px; font-weight:600; margin:1px 0; }
 .date-chip .d-month { font-size:10px; color:#999; }
-.date-chip.today { border-color:#07c160; }
-.date-chip.selected { background:#07c160; color:#fff; border-color:#07c160; }
+.date-chip.today { border-color:#5D8A6B; }
+.date-chip.selected { background:#5D8A6B; color:#fff; border-color:#5D8A6B; }
 .date-chip.selected .d-week, .date-chip.selected .d-month { color:rgba(255,255,255,.7); }
-.date-more { flex-shrink:0; padding:10px 8px; border-radius:10px; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; font-size:12px; color:#666; text-align:center; min-width:42px; }
+.date-more { flex-shrink:0; padding:10px 8px; border-radius:10px; cursor:pointer; border:1.5px solid #e0d8d0; background:#fff; font-size:12px; color:#666; text-align:center; min-width:42px; }
 
 /* Duration selector */
 .section-label { font-size:12px; font-weight:600; color:#333; margin-bottom:8px; }
 .duration-section { padding:12px 12px 4px; }
-.duration-grid { display:flex; gap:8px; }
-.duration-chip { flex:1; padding:12px 4px; border-radius:10px; text-align:center; cursor:pointer; border:1.5px solid #e5e5e5; background:#fff; font-size:13px; font-weight:600; transition:all .15s; }
+.duration-grid { display:flex; gap:6px; flex-wrap:wrap; }
+.duration-chip { flex:1; min-width:60px; padding:10px 4px; border-radius:10px; text-align:center; cursor:pointer; border:1.5px solid #e0d8d0; background:#fff; font-size:12px; font-weight:600; transition:all .15s; }
 .duration-chip:active { opacity:.7; }
-.duration-chip.selected { border-color:#07c160; background:#f0fdf4; color:#07c160; }
+.duration-chip.selected { border-color:#5D8A6B; background:#F2F6F0; color:#5D8A6B; }
+
+/* Custom hours input */
+.custom-hours-row { padding:6px 12px; display:none; align-items:center; gap:8px; }
+.custom-hours-row .ch-label { font-size:12px; color:#666; }
+.custom-hours-input { width:72px; padding:8px 10px; border:1.5px solid #5D8A6B; border-radius:8px; font-size:15px; font-weight:600; color:#5D8A6B; text-align:center; outline:none; background:#F2F6F0; }
+.custom-hours-input:focus { border-color:#4A7A5A; }
+.custom-hours-input::placeholder { color:#bbb; font-weight:400; font-size:13px; }
 
 /* Form rows */
 .form-row { padding:6px 12px; display:flex; align-items:center; gap:8px; }
 .form-label { font-size:12px; font-weight:600; color:#333; min-width:48px; flex-shrink:0; }
-.form-row .now-btn { padding:8px 16px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.form-row .now-btn { padding:8px 16px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
 .form-row .now-btn:active { opacity:.8; }
 .form-row .time-or { font-size:11px; color:#ccc; }
-.form-row select { flex:1; padding:8px 10px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; font-size:13px; color:#333; appearance:auto; }
+.form-row select { flex:1; padding:8px 10px; border-radius:8px; border:1.5px solid #e0d8d0; background:#fff; font-size:13px; color:#333; appearance:auto; }
 .duration-select-wrap { display:inline-block; position:relative; }
-.cd-select { padding:8px 12px; border-radius:8px; border:1.5px solid #07c160; background:#f0fdf4; font-size:13px; font-weight:600; color:#07c160; }
+.cd-select { padding:8px 12px; border-radius:8px; border:1.5px solid #5D8A6B; background:#F2F6F0; font-size:13px; font-weight:600; color:#5D8A6B; }
 
 /* Conflict alert */
-.conflict-alert { margin:4px 12px; padding:10px 14px; border-radius:8px; background:#fff3e0; border:1px solid #ffe082; font-size:12px; color:#e65100; display:none; }
-.conflict-alert .suggest-time { color:#07c160; font-weight:600; cursor:pointer; text-decoration:underline; }
+.conflict-alert { margin:4px 12px; padding:10px 14px; border-radius:8px; background:#FDF6EC; border:1px solid #F0E0C0; font-size:12px; color:#8B7D6B; display:none; }
+.conflict-alert .suggest-time { color:#5D8A6B; font-weight:600; cursor:pointer; text-decoration:underline; }
 
 /* Inline info */
 .info-bar { padding:2px 12px 6px; display:flex; gap:16px; font-size:10px; color:#999; }
 
 /* In-page bottom (subtotal + confirm) */
-.inpage-bottom { padding:16px 12px; border-top:1px solid #f0f0f0; margin-top:8px; }
+.inpage-bottom { padding:16px 12px; border-top:1px solid #e8e4de; margin-top:8px; }
 .inpage-total { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
 .inpage-total .total-label { font-size:13px; color:#999; flex-shrink:0; }
-.inpage-total .total-price { font-size:20px; font-weight:700; color:#e37318; flex-shrink:0; }
+.inpage-total .total-price { font-size:20px; font-weight:700; color:#B8860B; flex-shrink:0; }
 .inpage-total .total-detail { font-size:12px; color:#999; flex:1; text-align:right; }
-.inpage-total .total-detail.active { font-size:17px; font-weight:700; color:#e37318; }
-.inpage-book-btn { width:100%; padding:14px; border-radius:10px; background:#07c160; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; }
+.inpage-total .total-detail.active { font-size:17px; font-weight:700; color:#B8860B; }
+.inpage-book-btn { width:100%; padding:14px; border-radius:10px; background:#5D8A6B; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; }
 .inpage-book-btn:active { opacity:.8; }
-.inpage-book-btn:disabled { background:#ccc; cursor:not-allowed; }
+.inpage-book-btn:disabled { background:#d0d0d0; cursor:not-allowed; }
 
 /* Calendar modal */
 .cal-modal { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
 .cal-modal-content { background:#fff;border-radius:14px;padding:16px;width:320px; }
 .cal-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:10px; }
 .cal-month { font-size:15px;font-weight:600; }
-.cal-nav { width:30px;height:30px;border-radius:50%;border:1.5px solid #e5e5e5;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
+.cal-nav { width:30px;height:30px;border-radius:50%;border:1.5px solid #e0d8d0;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
 .cal-weekdays { display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:#999;margin-bottom:4px; }
 .cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center; }
 .cal-day { padding:8px 0;font-size:13px;border-radius:8px;cursor:pointer; }
-.cal-day:hover { background:#f0fdf4; }
-.cal-day.today { font-weight:700;color:#07c160; }
-.cal-day.selected { background:#07c160;color:#fff;font-weight:600; }
+.cal-day:hover { background:#F2F6F0; }
+.cal-day.today { font-weight:700;color:#5D8A6B; }
+.cal-day.selected { background:#5D8A6B;color:#fff;font-weight:600; }
 .cal-day.other { color:#ddd;cursor:default; }
 .cal-day.past { color:#ddd;cursor:default; }
-.cal-close { margin-top:10px;padding:10px;border-radius:8px;border:none;background:#07c160;color:#fff;font-size:14px;cursor:pointer;width:100%; }
+.cal-close { margin-top:10px;padding:10px;border-radius:8px;border:none;background:#5D8A6B;color:#fff;font-size:14px;cursor:pointer;width:100%; }
 
 .no-booking { text-align:center; padding:40px 20px; color:#999; }
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
-.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.bottom-nav { display:flex; border-top:1px solid #e8e4de; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
+.nav-item.active { color:#5D8A6B; }
 </style>
 </head>
 <body>
@@ -172,7 +179,7 @@ function renderPage() {
     var gc = gradClassMap[room.type] || 'gradient-workshop';
     page.innerHTML =
       '<div class="room-header-card ' + gc + '"><div class="room-header-top"><div class="room-header-icon">' + (heroes[room.type]||'🏠') + '</div><div><div class="room-header-name">' + room.name + '</div><div class="room-header-meta">容纳 ' + room.capacity + '人 · ' + room.area + '㎡ · 非预约空间</div></div></div><div class="room-header-tags">' + room.facilities.map(function(f) { return '<span class="facility-tag">' + f + '</span>'; }).join('') + '</div></div>' +
-      '<div class="no-booking"><div style="font-size:48px;margin-bottom:12px;">' + (roomId==='RM005'?'🏛️':'🔧') + '</div><p style="font-size:16px;font-weight:600;color:#333;">' + (roomId==='RM005'?'自由参观，无需预约':'员工专用空间') + '</p><p style="font-size:13px;margin-top:8px;">' + (roomId==='RM005'?'展厅为开放区域，自由使用。如需使用包间，请选择茶室或会议室预约。':'工作间为员工储物和设备机柜空间，不对外开放。') + '</p><button style="margin-top:16px;padding:10px 24px;border-radius:8px;background:#07c160;color:#fff;border:none;font-size:14px;cursor:pointer;" onclick="location.href=\'../home/index.html\'">查看可预约包间</button></div>';
+      '<div class="no-booking"><div style="font-size:48px;margin-bottom:12px;">' + (roomId==='RM005'?'🏛️':'🔧') + '</div><p style="font-size:16px;font-weight:600;color:#333;">' + (roomId==='RM005'?'自由参观，无需预约':'员工专用空间') + '</p><p style="font-size:13px;margin-top:8px;">' + (roomId==='RM005'?'展厅为开放区域，自由使用。如需使用包间，请选择茶室或会议室预约。':'工作间为员工储物和设备机柜空间，不对外开放。') + '</p><button style="margin-top:16px;padding:10px 24px;border-radius:8px;background:#5D8A6B;color:#fff;border:none;font-size:14px;cursor:pointer;" onclick="location.href=\'../home/index.html\'">查看可预约包间</button></div>';
     return;
   }
 
@@ -181,7 +188,8 @@ function renderPage() {
   page.innerHTML =
     '<div class="room-header-card ' + gc + '"><div class="room-header-top"><div class="room-header-icon">' + (heroes[room.type]||'🏠') + '</div><div><div class="room-header-name">' + room.name + '</div><div class="room-header-meta">容纳 ' + room.capacity + '人 · ' + room.area + '㎡ · ¥' + hourRate + '/小时</div></div></div><div class="room-header-tags">' + facTags + '</div></div>' +
     '<div class="date-bar" id="dateBar"></div>' +
-    '<div class="duration-section"><div class="section-label">选择时长</div><div class="duration-grid" id="durationGrid"></div><div id="customDurationWrap" style="display:none;margin-top:6px"><select class="cd-select" id="customDurationSelect" onchange="pickCustomDuration(this.value)"><option value="">选择时长...</option></select></div></div>' +
+    '<div class="duration-section"><div class="section-label">选择时长</div><div class="duration-grid" id="durationGrid"></div>' +
+    '<div class="custom-hours-row" id="customHoursRow"><span class="ch-label">自定义</span><input class="custom-hours-input" id="customHoursInput" type="number" min="1" max="24" step="0.5" placeholder="时" oninput="onCustomHoursInput(this.value)"><span class="ch-label">小时</span></div></div>' +
     '<div id="timeRow" class="form-row" style="display:none"><div class="form-label">开始时间</div><button class="now-btn" id="nowBtn" onclick="pickNow()">⚡ 现在开始</button><span class="time-or">或</span><select id="timeSelect" onchange="pickTimeFromSelect(this.value)"><option value="">选择时间...</option></select></div>' +
     '<div class="info-bar"><span>🧹 保洁准备(15min)</span><span>📅 约满时段不显示</span></div>' +
     '<div class="conflict-alert" id="conflictAlert"></div>' +
@@ -214,7 +222,7 @@ window.pickDateBar = function(d) {
   selectedDate = d; resetSelection();
   renderDateBar(); renderDurationGrid(); updateBilling();
   document.getElementById('timeRow').style.display = 'none';
-  document.getElementById('customDurationWrap').style.display = 'none';
+  document.getElementById('customHoursRow').style.display = 'none';
   document.getElementById('conflictAlert').style.display = 'none';
 };
 
@@ -263,7 +271,7 @@ window.calPick = function(y, m, d) {
   selectedDate = new Date(y, m, d); resetSelection();
   renderDateBar(); renderDurationGrid(); updateBilling(); hideCalModal();
   document.getElementById('timeRow').style.display = 'none';
-  document.getElementById('customDurationWrap').style.display = 'none';
+  document.getElementById('customHoursRow').style.display = 'none';
   document.getElementById('conflictAlert').style.display = 'none';
 };
 
@@ -301,13 +309,14 @@ function isTimeBlocked(checkStart, checkEnd, roomId, dateStr) {
   return false;
 }
 
-// ── Duration selector ──
+// ── Duration selector with custom hours input ──
 function renderDurationGrid() {
   var durations = [
     { val: 120, label: '2小时' },
-    { val: 180, label: '3小时' },
     { val: 240, label: '4小时' },
-    { val: 'custom', label: '指定时长' },
+    { val: 360, label: '6小时' },
+    { val: 480, label: '8小时' },
+    { val: 'custom', label: '自定义' },
   ];
   var html = '';
   for (var i = 0; i < durations.length; i++) {
@@ -320,41 +329,42 @@ function renderDurationGrid() {
 
 window.pickDuration = function(val) {
   document.getElementById('conflictAlert').style.display = 'none';
+  document.getElementById('timeRow').style.display = 'none';
+  document.getElementById('customHoursRow').style.display = 'none';
+  document.getElementById('customHoursInput').value = '';
+
   if (val === 'custom') {
     isCustomMode = true;
     selectedDuration = null;
     selectedStart = null;
     selectedEnd = null;
     renderDurationGrid();
-    var wrap = document.getElementById('customDurationWrap');
-    wrap.style.display = 'block';
-    var sel = document.getElementById('customDurationSelect');
-    var opts = '<option value="">选择时长...</option>';
-    for (var h = 5; h <= 24; h++) {
-      opts += '<option value="' + (h*60) + '">' + h + '小时</option>';
-    }
-    sel.innerHTML = opts;
-    sel.value = '';
-    document.getElementById('timeRow').style.display = 'none';
+    document.getElementById('customHoursRow').style.display = 'flex';
+    document.getElementById('customHoursInput').focus();
     updateBilling();
   } else {
     isCustomMode = false;
     selectedDuration = val;
     selectedStart = null;
     selectedEnd = null;
-    document.getElementById('customDurationWrap').style.display = 'none';
     renderDurationGrid();
     showTimeSelection();
     updateBilling();
   }
 };
 
-window.pickCustomDuration = function(durStr) {
-  if (!durStr) return;
-  selectedDuration = parseInt(durStr);
-  isCustomMode = true;
-  selectedStart = null;
-  selectedEnd = null;
+// ── Custom hours input handler ──
+window.onCustomHoursInput = function(value) {
+  document.getElementById('conflictAlert').style.display = 'none';
+  var hours = parseFloat(value);
+  if (!hours || hours < 0.5) {
+    selectedDuration = null;
+    document.getElementById('timeRow').style.display = 'none';
+    updateBilling();
+    return;
+  }
+  hours = Math.min(hours, 24);
+  selectedDuration = Math.round(hours * 60);
   showTimeSelection();
   updateBilling();
 };
@@ -507,7 +517,7 @@ function updateBilling() {
   btn.disabled = !canBook;
 }
 
-// -- Go pay --// ── Go pay ──
+// -- Go pay --
 window.goPay = function() {
   var price, detail, durationMin;
   if (isCustomMode) {

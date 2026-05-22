@@ -11,64 +11,72 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
 .nav-top { position:fixed; top:10px; right:20px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
-.nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; background:#fff; }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #e8e4de; background:#fff; }
 .back-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
 .nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
 .page { flex:1; overflow-y:auto; scrollbar-width:none; padding:20px 16px 60px; }
 .page::-webkit-scrollbar { display:none; }
 
-.order-summary { background:#f9fafb; padding:16px; margin-bottom:16px; }
-.summary-row { display:flex; justify-content:space-between; padding:8px 0; font-size:14px; color:#666; border-bottom:1px solid #f0f0f0; }
+.order-summary { background:#FAF8F5; padding:16px; margin-bottom:16px; }
+.summary-row { display:flex; justify-content:space-between; padding:8px 0; font-size:14px; color:#666; border-bottom:1px solid #e8e4de; }
 .summary-row:last-child { border-bottom:none; }
 .summary-row .label { color:#999; }
 .summary-row .value { font-weight:500; color:#333; }
-.summary-row .price { font-weight:700; color:#e37318; font-size:16px; }
+.summary-row .price { font-weight:700; color:#B8860B; font-size:16px; }
+
+/* Customer Source */
+.customer-source-section { margin-bottom:16px; }
+.customer-source-select { width:100%; padding:12px; border:1.5px solid #e0d8d0; border-radius:8px; font-size:14px; color:#333; background:#fff; appearance:auto; }
+.customer-source-select:focus { border-color:#5D8A6B; outline:none; }
+.customer-source-other { display:none; margin-top:8px; }
+.customer-source-other input { width:100%; padding:10px 12px; border:1.5px solid #e0d8d0; border-radius:8px; font-size:14px; outline:none; }
+.customer-source-other input:focus { border-color:#5D8A6B; }
 
 .payment-section { margin-bottom:16px; }
 .section-title { font-size:14px; font-weight:600; color:#333; margin-bottom:12px; }
 .payment-methods { display:flex; flex-direction:column; gap:8px; }
-.pay-method { display:flex; align-items:center; padding:14px; border:2px solid #e5e5e5; cursor:pointer; transition:all .15s; background:#fff; gap:12px; }
-.pay-method:hover { border-color:#07c160; }
-.pay-method.selected { border-color:#07c160; background:#f0fdf4; }
+.pay-method { display:flex; align-items:center; padding:14px; border:2px solid #e0d8d0; cursor:pointer; transition:all .15s; background:#fff; gap:12px; }
+.pay-method:hover { border-color:#5D8A6B; }
+.pay-method.selected { border-color:#5D8A6B; background:#F2F6F0; }
 .pay-method-icon { font-size:24px; width:36px; text-align:center; }
 .pay-method-info { flex:1; }
 .pay-method-name { font-size:14px; font-weight:500; }
 .pay-method-desc { font-size:11px; color:#999; margin-top:2px; }
-.pay-method-check { font-size:18px; color:#07c160; display:none; }
+.pay-method-check { font-size:18px; color:#5D8A6B; display:none; }
 .pay-method.selected .pay-method-check { display:block; }
 
-.balance-warning { background:#fffbf0; padding:12px; margin-top:12px; border:1px solid #ffe0a0; text-align:center; }
-.balance-warning-text { font-size:13px; color:#e37318; margin-bottom:8px; }
-.balance-topup-btn { padding:8px 20px; border-radius:8px; background:#0052d9; color:#fff; border:none; font-size:13px; cursor:pointer; font-weight:600; }
+.balance-warning { background:#FDF6EC; padding:12px; margin-top:12px; border:1px solid #F0E0C0; text-align:center; }
+.balance-warning-text { font-size:13px; color:#B8860B; margin-bottom:8px; }
+.balance-topup-btn { padding:8px 20px; border-radius:8px; background:#7A8B8B; color:#fff; border:none; font-size:13px; cursor:pointer; font-weight:600; }
 
-.coupon-input { background:#fff; padding:14px; margin-bottom:16px; border:2px solid #e5e5e5; display:none; }
-.coupon-input.active { display:block; border-color:#07c160; }
+.coupon-input { background:#fff; padding:14px; margin-bottom:16px; border:2px solid #e0d8d0; display:none; }
+.coupon-input.active { display:block; border-color:#5D8A6B; }
 .coupon-platform-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
 .coupon-platform-row:last-of-type { margin-bottom:0; }
 .cp-label { font-size:12px; font-weight:600; color:#333; min-width:70px; flex-shrink:0; }
-.coupon-field { flex:1; min-width:100px; padding:8px; border:1.5px solid #e5e5e5; font-size:13px; border-radius:6px; }
-.coupon-field:focus { outline:none; border-color:#07c160; }
-.coupon-verify-btn { padding:8px 12px; background:#07c160; color:#fff; border:none; font-size:12px; cursor:pointer; border-radius:6px; font-weight:600; white-space:nowrap; }
+.coupon-field { flex:1; min-width:100px; padding:8px; border:1.5px solid #e0d8d0; font-size:13px; border-radius:6px; }
+.coupon-field:focus { outline:none; border-color:#5D8A6B; }
+.coupon-verify-btn { padding:8px 12px; background:#5D8A6B; color:#fff; border:none; font-size:12px; cursor:pointer; border-radius:6px; font-weight:600; white-space:nowrap; }
 .coupon-verify-btn:active { opacity:.8; }
 .cp-status { font-size:11px; min-width:60px; text-align:right; }
-.cp-status.success { color:#07c160; }
+.cp-status.success { color:#5D8A6B; }
 .cp-status.error { color:#d54941; }
-.coupon-total { font-size:12px; color:#07c160; font-weight:600; margin-top:8px; padding-top:8px; border-top:1px dashed #e5e5e5; text-align:center; }
+.coupon-total { font-size:12px; color:#5D8A6B; font-weight:600; margin-top:8px; padding-top:8px; border-top:1px dashed #e0d8d0; text-align:center; }
 
-.total-section { background:#fff; padding:16px; margin-bottom:16px; border:2px solid #07c160; }
+.total-section { background:#fff; padding:16px; margin-bottom:16px; border:2px solid #5D8A6B; }
 .total-row { display:flex; justify-content:space-between; align-items:center; }
 .total-label { font-size:14px; color:#333; }
-.total-amount { font-size:28px; font-weight:800; color:#e37318; }
-.discount-row { display:flex; justify-content:space-between; font-size:12px; color:#07c160; margin-top:4px; }
+.total-amount { font-size:28px; font-weight:800; color:#B8860B; }
+.discount-row { display:flex; justify-content:space-between; font-size:12px; color:#5D8A6B; margin-top:4px; }
 
 .actions { display:flex; gap:10px; margin-top:8px; }
 .action-btn { flex:1; padding:14px 0; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; border:none; transition:opacity .15s; text-align:center; }
 .action-btn:active { opacity:.8; }
-.action-btn.primary { background:#07c160; color:#fff; }
-.action-btn.ghost { background:#f5f5f5; color:#666; }
+.action-btn.primary { background:#5D8A6B; color:#fff; }
+.action-btn.ghost { background:#F5F0EB; color:#666; }
 
-.tips { background:#fffbf0; padding:14px; margin-bottom:16px; }
-.tips-title { font-size:13px; font-weight:600; color:#e37318; margin-bottom:8px; }
+.tips { background:#FDF8F0; padding:14px; margin-bottom:16px; }
+.tips-title { font-size:13px; font-weight:600; color:#B8860B; margin-bottom:8px; }
 .tips-item { font-size:12px; color:#999; padding:3px 0; }
 
 /* Success view — 开门作为主入口 */
@@ -77,25 +85,25 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .success-sub { font-size:13px; color:#999; margin-bottom:20px; }
 
 .success-actions { margin-bottom:20px; }
-.success-actions .open-door-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:18px; border-radius:14px; background:linear-gradient(135deg,#07c160,#00a854); color:#fff; border:none; font-size:20px; font-weight:700; cursor:pointer; transition:opacity .15s; }
+.success-actions .open-door-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:18px; border-radius:14px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; font-size:20px; font-weight:700; cursor:pointer; transition:opacity .15s; }
 .success-actions .open-door-btn:active { opacity:.85; }
 .success-actions .open-door-btn .door-icon { font-size:30px; }
-.success-actions .pass-area { text-align:center; margin-top:8px; padding:10px 14px; background:#f5f7fa; border-radius:12px; }
+.success-actions .pass-area { text-align:center; margin-top:8px; padding:10px 14px; background:#F5F0EB; border-radius:12px; }
 .success-actions .pass-row { display:flex; align-items:center; justify-content:center; gap:10px; }
 .success-actions .pass-label { font-size:13px; color:#666; }
 .success-actions .pass-text { font-size:22px; font-weight:700; color:#333; letter-spacing:4px; font-family:"Courier New",monospace; cursor:pointer; }
 
-.address-card { background:#f0fdf4; border-radius:12px; padding:14px; text-align:left; margin-bottom:20px; }
+.address-card { background:#F2F6F0; border-radius:12px; padding:14px; text-align:left; margin-bottom:20px; }
 .address-title { font-size:14px; font-weight:600; color:#333; margin-bottom:4px; }
 .address-detail { font-size:12px; color:#666; }
-.nav-btn { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e5e5e5; padding:10px 20px; border-radius:20px; font-size:13px; cursor:pointer; margin-top:10px; color:#333; }
+.nav-btn { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e0d8d0; padding:10px 20px; border-radius:20px; font-size:13px; cursor:pointer; margin-top:10px; color:#333; }
 
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
-.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+.bottom-nav { display:flex; border-top:1px solid #e8e4de; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
+.nav-item.active { color:#5D8A6B; }
 </style>
 </head>
 <body>
@@ -114,6 +122,26 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
         <div class="summary-row"><span class="label">日期</span><span class="value" id="infoDate">—</span></div>
         <div class="summary-row"><span class="label">时段</span><span class="value" id="infoTime">—</span></div>
         <div class="summary-row"><span class="label">金额</span><span class="price" id="infoPrice">¥0</span></div>
+      </div>
+
+      <!-- 客户来源 -->
+      <div class="customer-source-section">
+        <div class="section-title">👤 客户来源</div>
+        <select class="customer-source-select" id="customerSource" onchange="onCustomerSourceChange(this.value)">
+          <option value="">请选择客户来源</option>
+          <option value="老客户">老客户</option>
+          <option value="美大茶室">美大茶室</option>
+          <option value="抖音">抖音</option>
+          <option value="高德地图">高德地图</option>
+          <option value="美大CAFE">美大CAFE</option>
+          <option value="小红书">小红书</option>
+          <option value="会小二">会小二</option>
+          <option value="CAPSS">CAPSS</option>
+          <option value="__other__">其他（自定义输入）</option>
+        </select>
+        <div class="customer-source-other" id="customerSourceOther">
+          <input id="customerSourceOtherInput" placeholder="请输入客户来源" maxlength="20">
+        </div>
       </div>
 
       <div class="payment-section">
@@ -168,9 +196,9 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
         <div class="balance-warning-text" id="balanceWarningText">余额不足</div>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
           <button class="balance-topup-btn" onclick="goTopup()">立即充值</button>
-          <button class="balance-topup-btn" id="combinedPayBtn" style="background:#07c160;display:none;" onclick="selectCombinedPay()">组合支付</button>
+          <button class="balance-topup-btn" id="combinedPayBtn" style="background:#5D8A6B;display:none;" onclick="selectCombinedPay()">组合支付</button>
         </div>
-        <div id="combinedPayInfo" style="display:none;margin-top:8px;font-size:12px;color:#07c160;"></div>
+        <div id="combinedPayInfo" style="display:none;margin-top:8px;font-size:12px;color:#5D8A6B;"></div>
       </div>
 
       <div class="total-section">
@@ -212,6 +240,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
         <div class="summary-row"><span class="label">时段</span><span class="value" id="succTime">—</span></div>
         <div class="summary-row"><span class="label">金额</span><span class="price" id="succPrice">¥0</span></div>
         <div class="summary-row"><span class="label">支付方式</span><span class="value" id="succPayMethod">—</span></div>
+        <div class="summary-row"><span class="label">客户来源</span><span class="value" id="succSource">—</span></div>
       </div>
 
       <!-- 开门 + 密码 左右布局 -->
@@ -224,7 +253,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
           <div class="pass-row">
             <span class="pass-label">备用密码</span>
             <span class="pass-text" id="doorCodeText" onclick="copyCode()">0000</span>
-            <span class="pass-label" style="color:#07c160;cursor:pointer;" onclick="copyCode()">复制</span>
+            <span class="pass-label" style="color:#5D8A6B;cursor:pointer;" onclick="copyCode()">复制</span>
           </div>
         </div>
       </div>
@@ -264,6 +293,8 @@ var noPayment = params.get('noPayment') === '1';
 var couponPayment = params.get('payment') || '';
 
 var userBalance = 280;
+var selectedSource = '';
+
 // Initialize balance from SDK
 API.getBalance().then(function(bal) {
   userBalance = bal;
@@ -281,6 +312,28 @@ document.getElementById('infoTime').textContent = slot + ' · ' + duration + '�
 document.getElementById('infoPrice').textContent = noPayment ? '¥0（券已支付）' : '¥' + price;
 document.getElementById('finalPrice').textContent = noPayment ? '¥0' : '¥' + price;
 document.getElementById('balanceDesc').textContent = '当前余额 ¥' + userBalance;
+
+// Customer source handler
+function onCustomerSourceChange(value) {
+  var otherDiv = document.getElementById('customerSourceOther');
+  if (value === '__other__') {
+    otherDiv.style.display = 'block';
+    document.getElementById('customerSourceOtherInput').focus();
+    selectedSource = '';
+  } else {
+    otherDiv.style.display = 'none';
+    selectedSource = value;
+  }
+}
+
+function getCustomerSource() {
+  var sel = document.getElementById('customerSource');
+  if (sel.value === '__other__') {
+    var customVal = document.getElementById('customerSourceOtherInput').value.trim();
+    return customVal || '其他';
+  }
+  return sel.value || '';
+}
 
 // No-payment mode (coupon verification flow) — hide payment section
 if (noPayment) {
@@ -390,6 +443,13 @@ function updateCouponTotal() {
 function goTopup() { location.href = '../member-center/index.html?action=topup'; }
 
 function confirmPay() {
+  // 校验客户来源
+  var source = getCustomerSource();
+  if (!source) {
+    UI.toast('请选择客户来源');
+    return;
+  }
+
   // No-payment mode: coupon already paid
   if (noPayment) {
     document.getElementById('confirmView').style.display = 'none';
@@ -400,6 +460,7 @@ function confirmPay() {
     document.getElementById('succTime').textContent = slot + ' · ' + duration + '分钟';
     document.getElementById('succPrice').textContent = '¥0（券已支付）';
     document.getElementById('succPayMethod').textContent = couponPayment || '券码支付';
+    document.getElementById('succSource').textContent = source;
     document.getElementById('successSub').textContent = '券已核销，无需额外支付';
     // Read door code from the booking saved by coupon-verify page
     var savedBookings = Utils.lsGet('bookings', []);
@@ -437,6 +498,7 @@ function confirmPay() {
   document.getElementById('succDate').textContent = dateStr;
   document.getElementById('succTime').textContent = slot + ' · ' + duration + '分钟';
   document.getElementById('succPrice').textContent = '¥' + price;
+  document.getElementById('succSource').textContent = source;
 
   if (isCombinedPay) {
     if (price - combinedBalancePart <= 0) {
@@ -461,7 +523,8 @@ function confirmPay() {
     time: slot, price: price, duration: duration, personCount: personCount,
     sessionType: sessionType, endTime: endTime,
     payment: isCombinedPay ? '余额+微信' : (selectedPay === 'coupon' ? couponDetail || '验券' : payMethodLabels[selectedPay]),
-    doorCode: savedDoorCode
+    doorCode: savedDoorCode,
+    customerSource: source
   };
 
   // Use SDK to create booking
@@ -478,7 +541,7 @@ function confirmPay() {
         id: result.orderId, roomId: roomId, roomName: roomName, date: dateStr,
         time: slot, price: price, duration: duration, personCount: personCount,
         doorCode: savedDoorCode, status: 'Booked', sessionType: sessionType,
-        endTime: endTime, payment: legacyPay
+        endTime: endTime, payment: legacyPay, customerSource: source
       });
       localStorage.setItem('mp_bookings', JSON.stringify(legacy));
     } catch(e) {}

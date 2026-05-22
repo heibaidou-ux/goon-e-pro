@@ -20,7 +20,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .page::-webkit-scrollbar { display:none; }
 .remaining-bar { background:#fff; border-radius:12px; padding:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; }
 .remaining-text { font-size:13px; color:#666; }
-.remaining-time { font-size:24px; font-weight:700; color:#e37318; }
+.remaining-time { font-size:24px; font-weight:700; color:#B8860B; }
 .remaining-time.urgent { color:#d54941; }
 .remaining-end { font-size:11px; color:#999; }
 
@@ -31,24 +31,24 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .action-card .ac-icon { font-size:28px; }
 .action-card .ac-label { font-size:14px; font-weight:600; }
 .action-card .ac-sub { font-size:11px; opacity:.7; }
-.action-card.primary { background:linear-gradient(135deg,#07c160,#00a854); color:#fff; box-shadow:0 4px 14px rgba(7,193,96,.35); }
+.action-card.primary { background:linear-gradient(135deg,#5D8A6B,#00a854); color:#fff; box-shadow:0 4px 14px rgba(7,193,96,.35); }
 .action-card.secondary { background:linear-gradient(135deg,#7c4dff,#651fff); color:#fff; box-shadow:0 4px 14px rgba(124,77,255,.3); }
 
 /* Bluetooth music control */
 .music-control { background:#fff; border-radius:12px; padding:16px; margin-bottom:16px; }
 .music-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
-.music-cover { width:48px; height:48px; border-radius:10px; background:linear-gradient(135deg,#07c160,#00a854); display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff; }
+.music-cover { width:48px; height:48px; border-radius:10px; background:linear-gradient(135deg,#5D8A6B,#00a854); display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff; }
 .music-info { flex:1; }
 .music-track { font-size:14px; font-weight:600; }
 .music-artist { font-size:11px; color:#999; margin-top:1px; }
 .music-buttons { display:flex; justify-content:center; gap:24px; }
 .music-btn { width:44px; height:44px; border-radius:50%; border:none; background:#f5f7fa; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .music-btn:active { background:#e5e5e5; }
-.music-btn.play { width:52px; height:52px; background:#07c160; color:#fff; font-size:20px; }
+.music-btn.play { width:52px; height:52px; background:#5D8A6B; color:#fff; font-size:20px; }
 .volume-row { display:flex; align-items:center; gap:10px; margin-top:12px; }
 .volume-icon { font-size:14px; }
 .volume-bar { flex:1; height:6px; background:#e5e5e5; border-radius:3px; position:relative; cursor:pointer; }
-.volume-fill { height:100%; background:#07c160; border-radius:3px; }
+.volume-fill { height:100%; background:#5D8A6B; border-radius:3px; }
 
 /* Audio source selector */
 .source-section { background:#fff; border-radius:14px; padding:14px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,.04); }
@@ -56,7 +56,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .source-buttons { display:flex; gap:10px; }
 .source-btn { flex:1; padding:12px; border-radius:10px; text-align:center; cursor:pointer; font-size:13px; font-weight:500; transition:all .2s; border:1.5px solid #e5e5e5; background:#fff; }
 .source-btn:active { transform:scale(.97); }
-.source-btn.active { border-color:#07c160; background:#f0fdf4; color:#07c160; font-weight:600; }
+.source-btn.active { border-color:#5D8A6B; background:#f0fdf4; color:#5D8A6B; font-weight:600; }
 
 /* Device controls */
 .device-grid { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
@@ -69,23 +69,24 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .device-name { font-size:14px; font-weight:600; }
 .device-status { font-size:11px; color:#999; margin-top:2px; }
 .toggle-switch { width:48px; height:28px; border-radius:14px; background:#e5e5e5; cursor:pointer; position:relative; transition:background .2s; flex-shrink:0; }
-.toggle-switch.on { background:#07c160; }
+.toggle-switch.on { background:#5D8A6B; }
 .toggle-switch::after { content:''; position:absolute; top:2px; left:2px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.15); transition:transform .2s; }
 .toggle-switch.on::after { transform:translateX(20px); }
 
 /* Modal */
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
-.modal { background:#fff;border-radius:14px;padding:20px;width:320px;max-height:85vh;overflow-y:auto;text-align:center; }
+.modal { background:#fff;border-radius:14px;padding:20px;width:320px;max-height:85vh;overflow-y:auto;scrollbar-width:none;text-align:center; }
+.modal::-webkit-scrollbar { display:none; }
 .modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
 .modal p { font-size:13px;color:#666;margin-bottom:16px; }
 .modal-buttons { display:flex;gap:10px; }
 .modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
 .modal-btn.cancel { background:#f5f5f5;color:#666; }
-.modal-btn.primary { background:#07c160;color:#fff; }
+.modal-btn.primary { background:#5D8A6B;color:#fff; }
 .time-picker { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
 .time-option { padding:12px 8px; border-radius:8px; border:1.5px solid #e5e5e5; background:#fff; cursor:pointer; font-size:13px; text-align:center; transition:all .15s; }
-.time-option:hover { border-color:#07c160; }
-.time-option.selected { background:#07c160; color:#fff; border-color:#07c160; }
+.time-option:hover { border-color:#5D8A6B; }
+.time-option.selected { background:#5D8A6B; color:#fff; border-color:#5D8A6B; }
 .time-option .ext-time { font-weight:600; display:block; }
 .time-option .ext-price { font-size:11px; display:block; margin-top:2px; }
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
@@ -93,7 +94,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
+.nav-item.active { color:#5D8A6B; }
 </style>
 </head>
 <body>
@@ -205,7 +206,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
   <div class="modal">
     <h3>确认续订支付</h3>
     <p id="extendPayInfo">续订至 —</p>
-    <div style="font-size:28px;font-weight:800;color:#e37318;margin:8px 0;" id="extendPayAmount">¥0</div>
+    <div style="font-size:28px;font-weight:800;color:#B8860B;margin:8px 0;" id="extendPayAmount">¥0</div>
     <p style="font-size:12px;color:#999;">从账户余额扣除</p>
     <div class="modal-buttons"><button class="modal-btn cancel" onclick="cancelExtendPay()">取消</button><button class="modal-btn primary" onclick="confirmExtendPay()">确认支付</button></div>
   </div>

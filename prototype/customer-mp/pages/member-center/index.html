@@ -15,7 +15,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .page::-webkit-scrollbar { display:none; }
 
 /* First recharge promo banner */
-.promo-banner { background:linear-gradient(135deg,#e37318,#f5a623); padding:14px 16px; color:#fff; display:flex; align-items:center; justify-content:space-between; }
+.promo-banner { background:linear-gradient(135deg,#B8860B,#f5a623); padding:14px 16px; color:#fff; display:flex; align-items:center; justify-content:space-between; }
 .promo-text { font-size:13px; font-weight:500; }
 .promo-text strong { font-size:16px; }
 .promo-tag { background:rgba(255,255,255,.2); padding:4px 12px; border-radius:12px; font-size:11px; }
@@ -45,7 +45,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .logout-wrap { padding:0 16px 20px; }
 .logout-btn { width:100%; padding:14px; background:#fff; color:#d54941; border:1.5px solid #d54941; font-size:15px; font-weight:600; cursor:pointer; }
 .level-badge { display:inline-block; padding:4px 14px; border-radius:20px; font-size:12px; font-weight:600; }
-.level-badge.gold { background:linear-gradient(135deg,#fff3e0,#ffe0b2); color:#e37318; border:1px solid #ffcc80; }
+.level-badge.gold { background:linear-gradient(135deg,#fff3e0,#ffe0b2); color:#B8860B; border:1px solid #ffcc80; }
 .level-badge.silver { background:linear-gradient(135deg,#f5f5f5,#e0e0e0); color:#757575; border:1px solid #bdbdbd; }
 .level-badge.bronze { background:linear-gradient(135deg,#fff8e1,#ffecb3); color:#a1887f; border:1px solid #d7ccc8; }
 .level-badge.diamond { background:linear-gradient(135deg,#e3f2fd,#bbdefb); color:#1565c0; border:1px solid #90caf9; }
@@ -54,7 +54,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
+.nav-item.active { color:#5D8A6B; }
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
 .modal { background:#fff;border-radius:14px;padding:20px;width:300px;text-align:center; }
 .modal h3 { font-size:16px;margin-bottom:8px;color:#333; }
@@ -62,7 +62,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .modal-buttons { display:flex;gap:10px; }
 .modal-btn { flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
 .modal-btn.cancel { background:#f5f5f5;color:#666; }
-.modal-btn.confirm { background:#07c160;color:#fff; }
+.modal-btn.confirm { background:#5D8A6B;color:#fff; }
 </style>
 </head>
 <body>
@@ -147,8 +147,8 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
       <button class="modal-btn" style="background:#f5f5f5;color:#333;width:100%;border:2px solid transparent;text-align:left;padding-left:16px;" onclick="selectTopupPay('alipay',this)">💙 支付宝</button>
       <button class="modal-btn" style="background:#f5f5f5;color:#333;width:100%;border:2px solid transparent;text-align:left;padding-left:16px;" onclick="selectTopupPay('meituan',this)">🟡 美团</button>
     </div>
-    <div style="font-size:12px;color:#e37318;background:#fffbf0;padding:8px;border-radius:8px;margin:8px 0;" id="promoHint">🎉 首充享7折优惠，最高减¥300</div>
-    <div style="font-size:14px;color:#333;margin:8px 0;"><span>充值金额: </span><span style="font-weight:700;color:#e37318;" id="topupTotal">¥0</span></div>
+    <div style="font-size:12px;color:#B8860B;background:#fffbf0;padding:8px;border-radius:8px;margin:8px 0;" id="promoHint">🎉 首充享7折优惠，最高减¥300</div>
+    <div style="font-size:14px;color:#333;margin:8px 0;"><span>充值金额: </span><span style="font-weight:700;color:#B8860B;" id="topupTotal">¥0</span></div>
     <div class="modal-buttons"><button class="modal-btn cancel" onclick="hideTopup()">取消</button><button class="modal-btn confirm" onclick="confirmTopup()">确认充值</button></div>
   </div>
 </div>
@@ -233,7 +233,7 @@ function showTopup() {
 function selectTopupAmount(amount, el) {
   topupAmount = amount;
   document.querySelectorAll('#topupAmounts button').forEach(function(b) { b.style.borderColor = 'transparent'; b.style.background = '#f5f5f5'; b.style.color = '#333'; });
-  el.style.borderColor = '#07c160'; el.style.background = '#f0fdf4'; el.style.color = '#07c160';
+  el.style.borderColor = '#5D8A6B'; el.style.background = '#f0fdf4'; el.style.color = '#5D8A6B';
   document.getElementById('topupTotal').textContent = '¥' + amount;
 }
 
@@ -251,7 +251,7 @@ function updateCustomAmount() {
 function selectTopupPay(method, el) {
   topupPayMethod = method;
   document.querySelectorAll('#topupPayments button').forEach(function(b) { b.style.borderColor = 'transparent'; b.style.background = '#f5f5f5'; b.style.color = '#333'; });
-  el.style.borderColor = '#07c160'; el.style.background = '#f0fdf4'; el.style.color = '#07c160';
+  el.style.borderColor = '#5D8A6B'; el.style.background = '#f0fdf4'; el.style.color = '#5D8A6B';
 }
 
 function confirmTopup() {

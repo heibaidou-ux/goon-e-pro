@@ -20,10 +20,10 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 /* Step indicator */
 .steps { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; }
 .step { display:flex; align-items:center; gap:4px; font-size:12px; color:#999; }
-.step.active { color:#07c160; font-weight:600; }
+.step.active { color:#5D8A6B; font-weight:600; }
 .step .step-num { width:22px; height:22px; border-radius:50%; background:#e5e5e5; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; }
-.step.active .step-num { background:#07c160; }
-.step-done .step-num { background:#07c160; }
+.step.active .step-num { background:#5D8A6B; }
+.step-done .step-num { background:#5D8A6B; }
 .step-line { width:24px; height:1px; background:#e5e5e5; }
 
 /* Step 1: coupon input */
@@ -31,14 +31,14 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .coupon-input-section h3 { font-size:15px; font-weight:600; margin-bottom:12px; }
 .coupon-field-row { display:flex; gap:8px; }
 .coupon-field { flex:1; padding:14px; border:2px solid #e5e5e5; border-radius:10px; font-size:16px; text-align:center; letter-spacing:4px; outline:none; transition:border-color .15s; }
-.coupon-field:focus { border-color:#07c160; }
-.coupon-verify-btn { padding:14px 24px; border-radius:10px; background:#07c160; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; }
+.coupon-field:focus { border-color:#5D8A6B; }
+.coupon-verify-btn { padding:14px 24px; border-radius:10px; background:#5D8A6B; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; }
 
 /* Ticket card */
 .ticket-card { background:linear-gradient(135deg,#fff3e0,#ffe0b2); border-radius:12px; padding:16px; margin-bottom:12px; cursor:pointer; border:2px solid transparent; transition:all .15s; }
-.ticket-card.selected { border-color:#e37318; }
+.ticket-card.selected { border-color:#B8860B; }
 .ticket-card-header { display:flex; justify-content:space-between; align-items:center; }
-.ticket-source { font-size:12px; font-weight:600; color:#e37318; }
+.ticket-source { font-size:12px; font-weight:600; color:#B8860B; }
 .ticket-title { font-size:15px; font-weight:700; margin-top:4px; }
 .ticket-desc { font-size:12px; color:#666; margin-top:2px; }
 .ticket-expiry { font-size:11px; color:#999; margin-top:6px; }
@@ -46,7 +46,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 /* Platform selector */
 .platform-grid { display:flex; gap:10px; margin-bottom:16px; }
 .platform-chip { flex:1; padding:14px; border-radius:10px; text-align:center; cursor:pointer; border:2px solid #e5e5e5; background:#fff; font-size:13px; font-weight:500; transition:all .15s; }
-.platform-chip.selected { border-color:#07c160; background:#f0fdf4; color:#07c160; }
+.platform-chip.selected { border-color:#5D8A6B; background:#f0fdf4; color:#5D8A6B; }
 .platform-chip .plat-icon { font-size:24px; display:block; margin-bottom:4px; }
 
 /* Step 2: room match */
@@ -58,27 +58,27 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .match-sub { font-size:13px; color:#666; margin-top:4px; }
 
 .room-option { display:flex; align-items:center; gap:12px; padding:14px; border:2px solid #e5e5e5; border-radius:12px; margin-bottom:8px; cursor:pointer; transition:all .15s; }
-.room-option.selected { border-color:#07c160; background:#f0fdf4; }
+.room-option.selected { border-color:#5D8A6B; background:#f0fdf4; }
 .room-option-icon { font-size:28px; }
 .room-option-info { flex:1; }
 .room-option-name { font-size:14px; font-weight:600; }
 .room-option-meta { font-size:12px; color:#999; margin-top:2px; }
-.room-option-price { font-size:14px; font-weight:700; color:#e37318; }
+.room-option-price { font-size:14px; font-weight:700; color:#B8860B; }
 
 /* Step 3: time select */
 .time-select-section { display:none; }
 .time-select-section.show { display:block; }
 .time-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .time-header-label { font-size:13px; color:#666; }
-.now-btn { padding:6px 14px; border-radius:16px; background:#07c160; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; }
+.now-btn { padding:6px 14px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:12px; font-weight:600; cursor:pointer; }
 .time-grid { display:flex; flex-wrap:wrap; gap:4px; border:1.5px solid #e5e5e5; padding:8px; }
 .time-cell { padding:8px 4px; border-radius:6px; text-align:center; cursor:pointer; border:1px solid #eee; background:#fff; font-size:11px; width:calc(25% - 3px); }
-.time-cell.selected { background:#07c160; color:#fff; border-color:#07c160; }
+.time-cell.selected { background:#5D8A6B; color:#fff; border-color:#5D8A6B; }
 .time-cell .t-label { font-weight:500; }
 
 /* Bottom action */
 .bottom-action { padding:16px 0 8px; }
-.book-btn { width:100%; padding:16px; border-radius:10px; background:#07c160; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; }
+.book-btn { width:100%; padding:16px; border-radius:10px; background:#5D8A6B; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; }
 .book-btn:disabled { background:#ccc; cursor:not-allowed; }
 .book-btn:active { opacity:.8; }
 
@@ -87,7 +87,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; }
-.nav-item.active { color:#07c160; }
+.nav-item.active { color:#5D8A6B; }
 /* Confirm modal */
 .confirm-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
 .confirm-modal { background:#fff;border-radius:14px;padding:20px;width:300px;text-align:center; }
@@ -96,16 +96,16 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .confirm-modal-buttons { display:flex;gap:10px; }
 .confirm-modal-btn { flex:1;padding:12px;border-radius:8px;font-size:14px;cursor:pointer;border:none;font-weight:600; }
 .confirm-modal-btn.cancel { background:#f5f5f5;color:#666; }
-.confirm-modal-btn.confirm { background:#07c160;color:#fff; }
+.confirm-modal-btn.confirm { background:#5D8A6B;color:#fff; }
 .room-card-fixed { display:flex;align-items:center;gap:12px;padding:14px;border:2px solid #e5e5e5;border-radius:12px;margin-bottom:8px;background:#f9fafb; }
 .room-card-fixed .room-icon { font-size:28px; }
 .room-card-fixed .room-info { flex:1; }
 .room-card-fixed .room-name { font-size:14px;font-weight:600; }
 .room-card-fixed .room-meta { font-size:12px;color:#999;margin-top:2px; }
-.room-card-fixed .room-tag { font-size:11px;color:#07c160;background:#e8f5e9;padding:2px 10px;border-radius:10px; }
+.room-card-fixed .room-tag { font-size:11px;color:#5D8A6B;background:#e8f5e9;padding:2px 10px;border-radius:10px; }
 .empty-room-msg { text-align:center;padding:24px;background:#fff8e1;border-radius:12px;margin-bottom:12px; }
 .empty-room-msg .empty-icon { font-size:32px;margin-bottom:8px; }
-.empty-room-msg .empty-title { font-size:14px;font-weight:600;color:#e37318;margin-bottom:4px; }
+.empty-room-msg .empty-title { font-size:14px;font-weight:600;color:#B8860B;margin-bottom:4px; }
 .empty-room-msg .empty-desc { font-size:12px;color:#999; }
 </style>
 </head>
@@ -385,7 +385,7 @@ function doVerify(code) {
       return '<div class="room-option' + selected + '" onclick="selectCouponRoom(\'' + rid + '\', this)">' +
         '<div class="room-option-icon">' + (r.icon||'🏠') + '</div>' +
         '<div class="room-option-info"><div class="room-option-name">' + r.name + '</div><div class="room-option-meta">可容纳' + r.capacity + '人</div></div>' +
-        '<div style="font-size:12px;color:#07c160;font-weight:600;">请选择 →</div></div>';
+        '<div style="font-size:12px;color:#5D8A6B;font-weight:600;">请选择 →</div></div>';
     }).join('');
     document.getElementById('step2Btn').style.display = '';
   }
@@ -600,12 +600,12 @@ function renderMyCoupons() {
     var expiryDate = new Date(c.expiry);
     var expiryStr = expiryDate.getFullYear() + '-' + String(expiryDate.getMonth()+1).padStart(2,'0') + '-' + String(expiryDate.getDate()).padStart(2,'0');
     return '<div class="ticket-card" onclick="useMyCoupon(\'' + c.id + '\', this)" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">' +
-      '<div class="ticket-card-header"><span class="ticket-source" style="color:#07c160;">🏷️ 系统券</span><span style="font-size:18px;font-weight:800;color:#07c160;">¥' + c.value + '</span></div>' +
+      '<div class="ticket-card-header"><span class="ticket-source" style="color:#5D8A6B;">🏷️ 系统券</span><span style="font-size:18px;font-weight:800;color:#5D8A6B;">¥' + c.value + '</span></div>' +
       '<div class="ticket-title" style="font-size:13px;">' + c.source + ' · 全场通用</div>' +
       '<div class="ticket-expiry">有效期至 ' + expiryStr + '</div></div>';
   }).join('');
   if (unused.length > 5) {
-    el.innerHTML += '<div style="font-size:12px;color:#07c160;text-align:center;padding:8px;cursor:pointer;" onclick="location.href=\'../my-coupons/index.html\'">查看全部 ' + unused.length + ' 张 ›</div>';
+    el.innerHTML += '<div style="font-size:12px;color:#5D8A6B;text-align:center;padding:8px;cursor:pointer;" onclick="location.href=\'../my-coupons/index.html\'">查看全部 ' + unused.length + ' 张 ›</div>';
   }
 }
 

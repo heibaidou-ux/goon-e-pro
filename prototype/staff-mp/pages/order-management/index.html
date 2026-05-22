@@ -18,12 +18,19 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .type-tab-row { display:flex; background:#f0f0f0; border-radius:8px; padding:2px; margin:10px 16px 6px; }
 .type-tab { flex:1; text-align:center; padding:7px; border-radius:6px; font-size:12px; cursor:pointer; color:#999; font-weight:500; transition:all .15s; border:none; background:transparent; }
 .type-tab.active { background:#fff; color:#333; box-shadow:0 1px 3px rgba(0,0,0,.1); }
-/* 筛选行 */
+/* 日期范围筛选 */
+.date-range-row { display:flex; align-items:center; gap:4px; padding:4px 16px 6px; }
+.date-range-row input[type=date] { flex:1; padding:5px 8px; border:1.5px solid #e0d8d0; border-radius:6px; font-size:11px; color:#333; background:#fff; min-width:0; }
+.date-range-row input[type=date]:focus { border-color:#0052d9; outline:none; }
+.date-range-row .dr-label { font-size:11px; color:#999; flex-shrink:0; }
+.date-range-row .dr-btn { padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer; border:none; background:#0052d9; color:#fff; font-weight:500; flex-shrink:0; }
+.date-range-row .dr-btn:active { opacity:.8; }
+/* 状态筛选 */
 .filter-row { display:flex; gap:4px; padding:6px 16px 8px; overflow-x:auto; white-space:nowrap; scrollbar-width:none; -ms-overflow-style:none; }
 .filter-row::-webkit-scrollbar { display:none; }
 .filter-chip { padding:4px 10px; border-radius:12px; font-size:11px; cursor:pointer; border:none; background:#f0f0f0; color:#999; font-weight:500; flex-shrink:0; transition:all .15s; }
 .filter-chip.active { background:#0052d9; color:#fff; }
-.page { flex:1; overflow-y:auto; padding:0 16px 60px; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; padding:0 16px 60px; }
 .page::-webkit-scrollbar { display:none; }
 .order-card { background:#fff; border-radius:12px; padding:12px; margin-bottom:8px; border-left:3px solid #ccc; }
 .order-card.InUse { border-left-color:#00a870; }
@@ -49,9 +56,33 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
 .order-btn.danger { background:#ffebee; color:#d54941; }
 .order-btn.primary { background:#e3f2fd; color:#0052d9; }
 .order-btn.ghost { background:#f5f5f5; color:#666; }
+.order-btn.warning { background:#fff3e0; color:#e37318; }
 .staff-badge { font-size:9px; background:#f3e5f5; color:#9c27b0; padding:1px 5px; border-radius:4px; margin-left:4px; }
+.pay-badge { font-size:9px; padding:1px 5px; border-radius:4px; margin-left:4px; font-weight:400; }
+.pay-badge.wechat { background:#e8f5e9; color:#00a870; }
+.pay-badge.cash { background:#fff3e0; color:#e37318; }
+.pay-badge.transfer { background:#e3f2fd; color:#0052d9; }
+.pay-badge.coupon { background:#f3e5f5; color:#9c27b0; }
 .empty-state { text-align:center; padding:60px 20px; color:#999; }
 .empty-state .icon { font-size:48px; margin-bottom:10px; }
+/* 收款弹窗 */
+.pay-modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:none;align-items:center;justify-content:center; }
+.pay-modal { background:#fff;border-radius:14px;padding:20px;width:320px;max-height:90vh;overflow-y:auto;scrollbar-width:none; }
+.pay-modal::-webkit-scrollbar { display:none; }
+.pay-modal h3 { font-size:16px;font-weight:600;color:#333;margin-bottom:12px;text-align:center; }
+.pay-modal .pm-order-info { font-size:12px;color:#666;margin-bottom:12px;padding:10px;background:#f9fafb;border-radius:8px; }
+.pay-modal .pm-amount { font-size:24px;font-weight:800;color:#1a1a1a;text-align:center;margin-bottom:12px; }
+.pay-method-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px; }
+.pay-method-item { padding:12px 8px;border:2px solid #e0d8d0;border-radius:10px;text-align:center;cursor:pointer;transition:all .15s;background:#fff; }
+.pay-method-item:active { opacity:.7; }
+.pay-method-item.selected { border-color:#0052d9;background:#f0f5ff; }
+.pay-method-item .pm-icon { font-size:22px;display:block;margin-bottom:4px; }
+.pay-method-item .pm-label { font-size:11px;font-weight:500;color:#333; }
+.pay-modal-actions { display:flex;gap:8px; }
+.pay-modal-btn { flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;text-align:center; }
+.pay-modal-btn:active { opacity:.8; }
+.pay-modal-btn.primary { background:#0052d9;color:#fff; }
+.pay-modal-btn.ghost { background:#f5f5f5;color:#666; }
 .bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; }
 .nav-item.active { color:#0052d9; }
@@ -73,6 +104,14 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
     <button class="type-tab" onclick="setOrderType('room',this)">🏢 房间</button>
     <button class="type-tab" onclick="setOrderType('tea',this)">🍵 茶品</button>
   </div>
+  <!-- 日期范围查询 -->
+  <div class="date-range-row">
+    <span class="dr-label">从</span>
+    <input type="date" id="dateStart" onchange="onDateRangeChange()">
+    <span class="dr-label">至</span>
+    <input type="date" id="dateEnd" onchange="onDateRangeChange()">
+    <button class="dr-btn" onclick="applyDateRange()">查询</button>
+  </div>
   <div class="filter-row" id="filterRow">
     <button class="filter-chip active" data-filter="today" onclick="setFilter('today',this)">今天</button>
     <button class="filter-chip" data-filter="all" onclick="setFilter('all',this)">全部</button>
@@ -90,10 +129,51 @@ body { background:#f5f5f5; display:flex; justify-content:center; padding:20px; f
     <div class="nav-item" onclick="location.href='../cleaning-task/index.html'"><div class="nav-icon">🧹</div><div class="nav-label">保洁</div></div>
   </div>
 </div>
+
+<!-- 收款弹窗 -->
+<div class="pay-modal-overlay" id="payModal" onclick="if(event.target===this)closePayModal()">
+  <div class="pay-modal">
+    <h3>💰 收款</h3>
+    <div class="pm-order-info" id="payOrderInfo">订单信息</div>
+    <div class="pm-amount" id="payAmount">¥0</div>
+    <div style="font-size:11px;color:#999;text-align:center;margin-bottom:10px;">选择支付方式</div>
+    <div class="pay-method-grid" id="payMethodGrid">
+      <div class="pay-method-item" data-pay="groupon" onclick="selectPayMethod('groupon',this)">
+        <span class="pm-icon">🎫</span><span class="pm-label">团购券</span>
+      </div>
+      <div class="pay-method-item" data-pay="wechat" onclick="selectPayMethod('wechat',this)">
+        <span class="pm-icon">💚</span><span class="pm-label">微信收款</span>
+      </div>
+      <div class="pay-method-item" data-pay="meituan" onclick="selectPayMethod('meituan',this)">
+        <span class="pm-icon">🟡</span><span class="pm-label">美团收银码</span>
+      </div>
+      <div class="pay-method-item" data-pay="balance" onclick="selectPayMethod('balance',this)">
+        <span class="pm-icon">💰</span><span class="pm-label">会员预充值</span>
+      </div>
+      <div class="pay-method-item" data-pay="transfer" onclick="selectPayMethod('transfer',this)">
+        <span class="pm-icon">🏦</span><span class="pm-label">对公转账</span>
+      </div>
+      <div class="pay-method-item" data-pay="cash" onclick="selectPayMethod('cash',this)">
+        <span class="pm-icon">💵</span><span class="pm-label">现金收款</span>
+      </div>
+      <div class="pay-method-item" data-pay="other" onclick="selectPayMethod('other',this)" style="grid-column:span 2;">
+        <span class="pm-icon">📄</span><span class="pm-label">其他收款</span>
+      </div>
+    </div>
+    <div class="pay-modal-actions">
+      <button class="pay-modal-btn ghost" onclick="closePayModal()">取消</button>
+      <button class="pay-modal-btn primary" onclick="confirmPayment()">确认收款</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var showToast = StaffSDK.UI.toast;
 var currentFilter = 'today';
 var currentType = 'all';
+var dateRangeMode = false;
+var dateRangeStart = '';
+var dateRangeEnd = '';
 
 var roomNames = {};
 var roomTypes = {};
@@ -104,6 +184,14 @@ StaffSDK.API.getRooms().then(function(rooms) {
 var statusLabels = { InUse:'使用中', Booked:'已预订', Completed:'已完成', Cancelled:'已取消' };
 var statusClasses = { InUse:'status-inuse', Booked:'status-booked', Completed:'status-completed', Cancelled:'status-cancelled' };
 
+var paymentMethodLabels = {
+  groupon: '团购券', wechat: '微信收款', meituan: '美团收银码',
+  balance: '会员预充值', transfer: '对公转账', cash: '现金收款', other: '其他收款'
+};
+
+var currentPayBooking = null;
+var selectedPayMethod = null;
+
 function setOrderType(type, el) {
   currentType = type;
   document.querySelectorAll('.type-tab').forEach(function(t) { t.classList.remove('active'); });
@@ -113,8 +201,26 @@ function setOrderType(type, el) {
 
 function setFilter(filter, el) {
   currentFilter = filter;
+  dateRangeMode = false;
   document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
   if (el) el.classList.add('active');
+  renderOrders();
+}
+
+function onDateRangeChange() {
+  dateRangeMode = false;
+}
+
+function applyDateRange() {
+  var start = document.getElementById('dateStart').value;
+  var end = document.getElementById('dateEnd').value;
+  if (!start || !end) { showToast('请选择起止日期'); return; }
+  if (end < start) { showToast('结束日期不能早于开始日期'); return; }
+  dateRangeStart = start;
+  dateRangeEnd = end;
+  dateRangeMode = true;
+  currentFilter = null;
+  document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
   renderOrders();
 }
 
@@ -130,8 +236,13 @@ function renderOrders() {
       bookings = bookings.filter(function(b) { return roomTypes[b.roomId] === 'TeaRoom'; });
     }
 
-    // Apply status filter
-    if (currentFilter === 'today') {
+    // Apply status/date filter
+    if (dateRangeMode) {
+      filtered = bookings.filter(function(b) {
+        var orderDate = b.date || (b.created ? b.created.split('T')[0] : '');
+        return orderDate >= dateRangeStart && orderDate <= dateRangeEnd;
+      });
+    } else if (currentFilter === 'today') {
       filtered = bookings.filter(function(b) { return b.created && b.created.indexOf(today) === 0; });
     } else if (currentFilter === 'all') {
       filtered = bookings;
@@ -156,6 +267,8 @@ function renderOrders() {
       var staffTag = b.isStaffBooking ? '<span class="staff-badge">🏪 代订</span>' : '';
       var amount = b.amount ? StaffSDK.Utils.formatMoney(b.amount) : '—';
       var timeStr = (b.startTime || '').slice(0,5) + '-' + (b.endTime || '').slice(0,5);
+      var payMethod = b.paymentMethod ? paymentMethodLabels[b.paymentMethod] || b.paymentMethod : '';
+      var payTag = payMethod ? '<span class="pay-badge ' + (b.paymentMethod||'') + '">' + payMethod + '</span>' : '';
 
       var actionsHtml = '';
       if (b.status === 'Booked') {
@@ -164,11 +277,17 @@ function renderOrders() {
       } else if (b.status === 'InUse') {
         actionsHtml = '<button class="order-btn danger" onclick="doCheckOut(\'' + b.orderId + '\')">退房结账</button>' +
           '<button class="order-btn primary" onclick="location.href=\'../device-control/index.html?roomId=' + b.roomId + '\'">设备</button>';
+      } else if (b.status === 'Booked' || b.status === 'InUse') {
+        actionsHtml = '<button class="order-btn warning" onclick="openPayModal(\'' + b.orderId + '\')">收款</button>';
+      }
+      // Add payment button for unpaid completed orders
+      if (b.status === 'Completed' && b.paymentStatus !== 'paid') {
+        actionsHtml = '<button class="order-btn warning" onclick="openPayModal(\'' + b.orderId + '\')">收款</button>';
       }
 
       return '<div class="order-card ' + b.status + '">' +
         '<div class="order-header">' +
-        '<span class="order-id">' + b.orderId + staffTag + '</span>' +
+        '<span class="order-id">' + b.orderId + staffTag + payTag + '</span>' +
         '<span class="order-status ' + statusCls + '">' + (statusLabels[b.status] || b.status) + '</span></div>' +
         '<div class="order-room">' + roomName + typeLabel + '</div>' +
         '<div class="order-info">' +
@@ -183,14 +302,62 @@ function renderOrders() {
   });
 }
 
+// ── Payment Modal ──
+function openPayModal(orderId) {
+  StaffSDK.API.getAllBookings().then(function(allBookings) {
+    for (var i = 0; i < allBookings.length; i++) {
+      if (allBookings[i].orderId === orderId) {
+        currentPayBooking = allBookings[i];
+        break;
+      }
+    }
+    if (!currentPayBooking) { showToast('订单不存在'); return; }
+    selectedPayMethod = null;
+    document.querySelectorAll('.pay-method-item').forEach(function(m) { m.classList.remove('selected'); });
+    var roomName = roomNames[currentPayBooking.roomId] || currentPayBooking.roomName || currentPayBooking.roomId;
+    document.getElementById('payOrderInfo').innerHTML = roomName + ' · ' + (currentPayBooking.customerName || currentPayBooking.name || '—');
+    var amount = currentPayBooking.amount || 0;
+    document.getElementById('payAmount').textContent = '¥' + amount;
+    document.getElementById('payModal').style.display = 'flex';
+  });
+}
+
+function closePayModal() {
+  document.getElementById('payModal').style.display = 'none';
+  currentPayBooking = null;
+  selectedPayMethod = null;
+}
+
+function selectPayMethod(method, el) {
+  selectedPayMethod = method;
+  document.querySelectorAll('.pay-method-item').forEach(function(m) { m.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function confirmPayment() {
+  if (!selectedPayMethod) { showToast('请选择支付方式'); return; }
+  if (!currentPayBooking) { showToast('订单信息缺失'); return; }
+
+  StaffSDK.API.updateBooking(currentPayBooking.orderId, {
+    paymentStatus: 'paid',
+    paymentMethod: selectedPayMethod,
+    paidAt: new Date().toISOString()
+  }).then(function() {
+    showToast('收款成功：' + (paymentMethodLabels[selectedPayMethod] || selectedPayMethod));
+    closePayModal();
+    renderOrders();
+  }).catch(function(e) {
+    showToast(e.message || '收款失败');
+  });
+}
+
+// ── Check-in / Check-out / Cancel ──
 function doCheckIn(orderId) {
-  // Check room occupancy before check-in
   StaffSDK.API.getAllBookings().then(function(allBookings) {
     var booking = null;
     allBookings.forEach(function(b) { if (b.orderId === orderId) booking = b; });
     if (!booking) { showToast('订单不存在'); return; }
 
-    // Check if room is occupied by another InUse booking
     var isOccupied = false;
     allBookings.forEach(function(b) {
       if (b.roomId === booking.roomId && b.status === 'InUse' && b.orderId !== orderId) {
@@ -204,9 +371,7 @@ function doCheckIn(orderId) {
       return;
     }
 
-    // Room is free, proceed
     StaffSDK.API.checkIn(orderId).then(function() {
-      // Recalculate endTime based on actual check-in time and later bookings
       var updated = StaffSDK.Utils.lsGet('bookings', []);
       for (var i = 0; i < updated.length; i++) {
         if (updated[i].orderId === orderId) {
@@ -221,8 +386,6 @@ function doCheckIn(orderId) {
             }
           }
           var now = new Date();
-
-          // Check for later bookings on same room+date
           var originalEndStr = b.time ? b.time.split('-')[1] : '';
           var hasLater = false;
           if (originalEndStr && b.date) {
@@ -240,15 +403,12 @@ function doCheckIn(orderId) {
               }
             }
           }
-
           if (hasLater) {
-            // Later booking exists — end at original end time
             var oeParts = originalEndStr.split(':');
             var ne = new Date(b.date);
             ne.setHours(parseInt(oeParts[0]) || 0, parseInt(oeParts[1]) || 0, 0, 0);
             b.endTime = String(ne.getHours()).padStart(2,'0') + ':' + String(ne.getMinutes()).padStart(2,'0');
           } else {
-            // No later booking — full duration from now
             var ne = new Date(now.getTime() + dur * 60000);
             b.endTime = String(ne.getHours()).padStart(2,'0') + ':' + String(ne.getMinutes()).padStart(2,'0');
           }
@@ -267,8 +427,8 @@ function doCheckOut(orderId) {
   StaffSDK.UI.confirm('确认退房', '结束当前订单并触发节能模式？', '确认退房', '取消').then(function(ok) {
     if (!ok) return;
     StaffSDK.API.checkOut(orderId).then(function() {
-      showToast('退房完成，房间转为待打扫');
-      renderOrders();
+      // 退房后弹出收款弹窗
+      openPayModal(orderId);
     }).catch(function(e) { showToast(e.message || '操作失败'); });
   });
 }
