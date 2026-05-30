@@ -35,3 +35,13 @@ temp_*
 
 # Local Claude config
 .claude/settings.local.json
+
+# Google Gemini exported pages (cached browser assets)
+*Google Gemini*
+*Gemini_files*
+
+# Utility scripts
+**/fix.py
+
+# Test artifacts
+test_*.pdf
