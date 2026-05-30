@@ -7,8 +7,8 @@
 <script src="../../js/sdk.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-.phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+body { background:#f5f5f5; margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:100%; max-width:100%; min-height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
 .nav-top { position:fixed; top:10px; right:20px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
 .nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; background:#fff; }
@@ -139,6 +139,9 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
         <div class="platform-chip" onclick="selectPlatform('dianping',this)">
           <span class="plat-icon">⭐</span>大众点评
         </div>
+        <div class="platform-chip" onclick="selectPlatform('gaode',this)">
+          <span class="plat-icon">🗺️</span>高德
+        </div>
       </div>
 
       <h3>输入券码</h3>
@@ -172,6 +175,12 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
           <div class="ticket-title">中茶室休闲体验</div>
           <div class="ticket-desc">适用中茶室A/中茶室B · 含1壶茶</div>
           <div class="ticket-expiry">有效期至 2026-07-01</div>
+        </div>
+        <div class="ticket-card" onclick="selectDemoCoupon(this,'GD009876')">
+          <div class="ticket-card-header"><span class="ticket-source">🗺️ 高德</span></div>
+          <div class="ticket-title">茶室双人体验套餐</div>
+          <div class="ticket-desc">适用大茶室C/中茶室A · 含2小时+茶饮</div>
+          <div class="ticket-expiry">有效期至 2026-12-31</div>
         </div>
       </div>
 
@@ -252,6 +261,7 @@ var couponDB = {
   'DY003456': { source:'抖音', title:'商务会议3小时套餐', matchRooms:['RM001'], price:358, duration:180 },
   'DY007891': { source:'抖音', title:'茶室双人体验套餐', matchRooms:['RM004','RM002'], price:168, duration:120 },
   'DP007891': { source:'大众点评', title:'中茶室休闲体验', matchRooms:['RM002','RM003'], price:88, duration:120 },
+  'GD009876': { source:'高德', title:'茶室双人体验套餐', matchRooms:['RM004','RM002'], price:168, duration:120 },
 };
 
 var rooms = {
@@ -264,8 +274,8 @@ var rooms = {
 };
 
 // Platform prefix map
-var platformPrefix = { meituan:'MT', douyin:'DY', dianping:'DP' };
-var platformHints = { meituan:'美团券码格式：MT + 6位数字，如 MT001298', douyin:'抖音券码格式：DY + 6位数字，如 DY003456', dianping:'大众点评券码格式：DP + 6位数字，如 DP007891' };
+var platformPrefix = { meituan:'MT', douyin:'DY', dianping:'DP', gaode:'GD' };
+var platformHints = { meituan:'美团券码格式：MT + 6位数字，如 MT001298', douyin:'抖音券码格式：DY + 6位数字，如 DY003456', dianping:'大众点评券码格式：DP + 6位数字，如 DP007891', gaode:'高德券码格式：GD + 6位数字，如 GD009876' };
 
 renderMyCoupons();
 

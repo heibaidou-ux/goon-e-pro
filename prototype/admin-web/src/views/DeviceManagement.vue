@@ -5,7 +5,7 @@
     <t-row :gutter="16" style="margin-bottom:20px">
       <t-col :span="3">
         <t-select v-model="filterRoom" placeholder="按房间筛选" clearable>
-          <t-option v-for="r in rooms.rooms" :key="r.roomId" :value="r.roomId" :label="r.name" />
+          <t-option v-for="r in roomList" :key="r.roomId" :value="r.roomId" :label="r.name" />
         </t-select>
       </t-col>
       <t-col :span="2">
@@ -142,8 +142,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { devices, rooms } from '@/mock/data'
+import { ref, computed, onMounted, watch } from 'vue'
+import { devices as mockDevices, rooms as mockRooms } from '@/mock/data'
+import { iotApi, useApiMode } from '@/services/api'
+import type { IoTDevice } from '@/services/types'
 import commandQueue from '@/utils/command-queue'
 
 const filterRoom = ref('')
@@ -154,19 +156,55 @@ const selectedDevice = ref<any>(null)
 const sending = ref(false)
 const lastCmdStatus = ref<string>('')
 const queueLength = ref(0)
+const loading = ref(false)
+
+// Data source: API or mock
+const apiMode = useApiMode()
+const deviceList = ref<IoTDevice[]>([])
+const roomList = ref<any[]>([])
+
+async function loadDevices() {
+  if (apiMode) {
+    loading.value = true
+    try {
+      deviceList.value = await iotApi.devices({
+        room_id: filterRoom.value || undefined,
+        type: filterType.value || undefined,
+        status: filterStatus.value || undefined,
+      })
+      // Load rooms from API too
+      const { default: storeApi } = await import('@/services/api')
+      // Rooms come embedded in stores; we can use iot devices to derive rooms
+      const roomsFromDevices = [...new Set(deviceList.value.map(d => d.room_id))]
+      roomList.value = roomsFromDevices.map(rid => ({ roomId: rid, name: rid }))
+    } catch (e) {
+      console.error('IoT API load failed, falling back to mock', e)
+      deviceList.value = mockDevices.devices as IoTDevice[]
+      roomList.value = mockRooms.rooms
+    } finally {
+      loading.value = false
+    }
+  } else {
+    deviceList.value = mockDevices.devices as IoTDevice[]
+    roomList.value = mockRooms.rooms
+  }
+}
+
+onMounted(loadDevices)
+watch([filterRoom, filterType, filterStatus], loadDevices)
 
 const filteredDevices = computed(() => {
-  let list = devices.devices
-  if (filterRoom.value) list = list.filter(d => d.roomId === filterRoom.value)
+  let list = deviceList.value
+  if (filterRoom.value) list = list.filter(d => d.room_id === filterRoom.value)
   if (filterType.value) list = list.filter(d => d.type === filterType.value)
   if (filterStatus.value) list = list.filter(d => d.status === filterStatus.value)
   return list
 })
 
 const groupedDevices = computed(() => {
-  const sorted = [...rooms.rooms]
+  const sorted = [...roomList.value]
   return sorted.map(room => {
-    const roomDevices = filteredDevices.value.filter(d => d.roomId === room.roomId)
+    const roomDevices = filteredDevices.value.filter(d => d.room_id === room.roomId)
     return {
       roomId: room.roomId,
       roomName: room.name,
@@ -207,7 +245,7 @@ function modeLabel(mode: string) {
 }
 
 function getRoomName(roomId: string) {
-  return rooms.rooms.find(r => r.roomId === roomId)?.name || roomId
+  return roomList.value.find(r => r.roomId === roomId)?.name || roomId
 }
 
 function viewDetail(device: any) {
@@ -220,20 +258,36 @@ function troubleshoot(device: any) {
   drawerVisible.value = true
 }
 
-function sendCmd(action: string) {
+async function sendCmd(action: string) {
   if (!selectedDevice.value) return
   sending.value = true
   lastCmdStatus.value = 'sending'
+
+  if (apiMode) {
+    try {
+      const result = await iotApi.control(selectedDevice.value.device_id, action)
+      lastCmdStatus.value = result.success ? 'success' : 'failed'
+      // Refresh device list to show updated state
+      await loadDevices()
+    } catch (e) {
+      lastCmdStatus.value = 'failed'
+    } finally {
+      setTimeout(() => { sending.value = false }, 500)
+    }
+    return
+  }
+
+  // Mock mode: use command queue
   const cmd = {
-    deviceId: selectedDevice.value.deviceId,
-    deviceName: selectedDevice.value.deviceCode,
-    roomName: getRoomName(selectedDevice.value.roomId),
+    deviceId: selectedDevice.value.device_id,
+    deviceName: selectedDevice.value.name,
+    roomName: getRoomName(selectedDevice.value.room_id),
     type: selectedDevice.value.type as any,
     action,
     operator: localStorage.getItem('erp_user') || '店员',
     sourceIp: window.location.hostname,
   }
-  commandQueue.onEach((c) => {
+  commandQueue.onEach((c: any) => {
     queueLength.value = commandQueue.length
     if (c.deviceId === cmd.deviceId) {
       lastCmdStatus.value = c.status

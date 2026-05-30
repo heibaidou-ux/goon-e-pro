@@ -7,8 +7,8 @@
 <script src="../../js/sdk.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-.phone { width:375px; height:100vh; background:#f5f7fa; display:flex; flex-direction:column; position:relative; }
+body { background:#f5f5f5; margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:100%; max-width:100%; min-height:100vh; background:#f5f7fa; display:flex; flex-direction:column; position:relative; }
 .nav-top { position:absolute; top:10px; right:10px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
 .page { flex:1; height:0; overflow-y:auto; scrollbar-width:none; }
@@ -102,6 +102,13 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .lg-tl-desc.current { color:#5D8A6B; font-weight:600; }
 .lg-tl-time { font-size:11px;color:#999;margin-top:2px; }
 
+
+/* Device controls */
+.device-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; padding:12px 0 0; border-top:1px solid #f0f0f0; margin-top:12px; }
+.device-item { text-align:center; cursor:pointer; padding:8px 4px; border-radius:8px; background:#f9fafb; transition:background .15s; }
+.device-item:active { background:#e8f5e9; }
+.device-icon { font-size:20px; display:block; margin-bottom:2px; }
+.device-label { font-size:10px; color:#666; }
 .toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:100;display:none; }
 .bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; cursor:pointer; color:#999; text-decoration:none; }
@@ -416,6 +423,13 @@ function renderOrders() {
         '<div class="big-actions">' +
           '<button class="big-action-btn primary" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'">🚪 开门</button>' +
           '<button class="big-action-btn outline" onclick="showExtendOrder(\'' + o.id + '\')">⏱ 续订</button>' +
+        '</div>' +
+        '<div class="device-grid">' +
+          '<div class="device-item" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'"><span class="device-icon">💡</span><span class="device-label">灯光</span></div>' +
+          '<div class="device-item" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'"><span class="device-icon">🪟</span><span class="device-label">窗帘</span></div>' +
+          '<div class="device-item" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'"><span class="device-icon">❄️</span><span class="device-label">空调</span></div>' +
+          '<div class="device-item" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'"><span class="device-icon">🎵</span><span class="device-label">音乐</span></div>' +
+          '<div class="device-item" onclick="location.href=\'../room-control/index.html?roomId=' + o.roomId + '&roomName=' + encName + '&duration=' + durationVal + '\'"><span class="device-icon">📱</span><span class="device-label">蓝牙</span></div>' +
         '</div></div>';
     } else if (o.status === 'Booked') {
       var isClose = o.date === '2026-05-08';

@@ -7,13 +7,13 @@
 <script src="../../js/sdk.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-.phone { width:375px; height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+body { background:#f5f5f5; margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:100%; max-width:100%; min-height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
 .page { flex:1; overflow-y:auto; scrollbar-width:none; padding-bottom:60px; }
 .page::-webkit-scrollbar { display:none; }
-.nav-top { position:fixed; top:10px; right:20px; z-index:200; }
+.nav-top { position:fixed; top:10px; right:16px; z-index:200; }
 .nav-top a { font-size:12px; color:#666; text-decoration:none; background:rgba(255,255,255,.95); padding:6px 14px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); }
-.store-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#fff; }
+.store-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#fff; border-bottom:1px solid #f0f0f0; }
 .store-name { font-size:18px; font-weight:700; color:#1a1a1a; }
 .store-select { font-size:13px; color:#5D8A6B; display:flex; align-items:center; gap:4px; cursor:pointer; padding:4px 8px; border-radius:6px; background:#f0f5ff; }
 .user-badge { font-size:11px; color:#5D8A6B; margin-left:6px; font-weight:400; }
@@ -31,9 +31,9 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .active-order-btn.outline { background:rgba(255,255,255,.2); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
 
 /* Carousel — transform-based with auto-rotation + partial next slide */
-.carousel-wrap { position:relative; overflow:hidden; }
+.carousel-wrap { position:relative; overflow:hidden; margin:0; }
 .carousel-track { display:flex; transition:transform .4s ease; }
-.carousel-slide { width:100%; flex-shrink:0; height:200px; display:flex; flex-direction:column; justify-content:flex-end; padding:16px 20px; color:#fff; position:relative; border-radius:12px; overflow:hidden; background-size:cover; background-position:center; background-repeat:no-repeat; cursor:pointer; }
+.carousel-slide { width:100%; flex-shrink:0; height:200px; display:flex; flex-direction:column; justify-content:flex-end; padding:16px 20px; color:#fff; position:relative; overflow:hidden; background-size:cover; background-position:center; background-repeat:no-repeat; cursor:pointer; }
 .carousel-slide .slide-title { font-size:20px; font-weight:700; position:relative; z-index:1; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 .carousel-slide .slide-desc { font-size:13px; margin-top:4px; position:relative; z-index:1; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 .carousel-dots { position:absolute; bottom:8px; right:16px; display:flex; gap:6px; z-index:2; }
@@ -41,7 +41,7 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .carousel-dot.active { background:#fff; width:18px; border-radius:10px; }
 
 /* Four quick shortcuts */
-.quick-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; padding:16px; }
+.quick-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; padding:16px 0; }
 .quick-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; border:none; background:none; padding:10px 4px; transition:transform .15s; }
 .quick-item:active { transform:scale(.95); }
 .quick-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff; background:#5D8A6B; }
@@ -50,14 +50,15 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
 .quick-icon.coupon { background:linear-gradient(135deg,#B8860B,#D4A84B); }
 .quick-icon.profile { background:linear-gradient(135deg,#8B7D6B,#B5A896); }
 .quick-label { font-size:11px; color:#333; font-weight:500; }
-.quick-balance { font-size:13px; font-weight:700; color:#7A8B8B; margin-top:1px; }
+.quick-balance { display:none; }
+.balance-on-icon { position:absolute; bottom:2px; right:2px; font-size:9px; font-weight:700; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); line-height:1; }
 
 /* Section */
-.section { padding:0 16px; margin-bottom:16px; }
-.section-title { font-size:15px; font-weight:600; margin-bottom:12px; color:#1a1a1a; }
+.section { padding:0; margin-bottom:16px; }
+.section-title { font-size:15px; font-weight:600; margin-bottom:12px; color:#1a1a1a; padding:0 16px; }
 
 /* Room list */
-.room-card { display:flex; padding:14px; background:#f9fafb; margin-bottom:10px; cursor:pointer; transition:box-shadow .15s; border-radius:12px; }
+.room-card { display:flex; padding:14px 16px; background:#f9fafb; margin-bottom:1px; cursor:pointer; border-bottom:1px solid #f0f0f0; border-left:none; border-right:none; }
 .room-card:active { background:#f0f0f0; }
 .room-card-img { width:80px; height:80px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:28px; overflow:hidden; }
 .room-card-img img { width:100%; height:100%; object-fit:cover; }
@@ -186,9 +187,9 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
     </div>
 
     <!-- Store Info Bar -->
-    <div style="padding:8px 16px;font-size:12px;color:#558b2f;line-height:1.8;background:#f0fdf4;">
-      <div>📍 广州市天河区珠江新城华夏路28号盈隆大厦16层 · <a href="javascript:openNavigation()" style="color:#2e7d32;text-decoration:none;font-weight:600;">🗺 导航</a></div>
-      <div>
+    <div style="padding:8px 0;font-size:12px;color:#558b2f;line-height:1.8;background:#f0fdf4;">
+      <div style="padding:0 16px;">📍 广州市天河区珠江新城华夏路28号盈隆大厦16层 · <a href="javascript:openNavigation()" style="color:#2e7d32;text-decoration:none;font-weight:600;">🗺 导航</a></div>
+      <div style="padding:0 16px;">
         📞 <a href="tel:020-8888-8888" style="color:#558b2f;text-decoration:none;">020-8888-8888</a>
         · <a href="javascript:showParkingInfo()" style="color:#558b2f;text-decoration:none;">🅿️ 停车</a>
         · 🕐 09:00-23:00
@@ -196,15 +197,18 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
     </div>
 
     <!-- Active order action buttons -->
-    <div class="active-order-banner" id="activeOrderBanner">
+    <div class="active-order-banner" id="activeOrderBanner" onclick="location.href='../my-orders/index.html'" style="cursor:pointer;">
       <div class="active-order-header">
         <span class="active-order-title">⏱ 当前消费</span>
-        <span class="active-order-room" id="activeOrderRoom">—</span>
+        <span style="display:flex;align-items:center;gap:4px;">
+          <span class="active-order-room" id="activeOrderRoom">—</span>
+          <span style="font-size:16px;opacity:.6;">›</span>
+        </span>
       </div>
       <div class="active-order-time" id="activeOrderTime">—</div>
       <div class="active-order-btns">
-        <button class="active-order-btn primary" id="activeOrderDoorBtn">🚪 开门</button>
-        <button class="active-order-btn outline" id="activeOrderServiceBtn">📞 客服</button>
+        <button class="active-order-btn primary" id="activeOrderDoorBtn" onclick="event.stopPropagation();UI.toast('🚪 门已开，请进入')">🚪 开门</button>
+        <button class="active-order-btn outline" id="activeOrderServiceBtn" onclick="event.stopPropagation();doServiceCall(event)">📞 客服</button>
       </div>
     </div>
 
@@ -215,10 +219,10 @@ body { background:#f5f5f5; display:flex; justify-content:center; height:100vh; f
         <span class="quick-label">验券</span>
       </button>
       <button class="quick-item" onclick="handleBalanceClick()" style="position:relative;">
-        <div class="quick-icon balance" id="quickBalanceIcon">💰</div>
+        <div class="quick-icon balance" id="quickBalanceIcon" style="position:relative;">💰
+          <span class="balance-on-icon" id="quickBalance">¥280</span>
+        </div>
         <span class="quick-label">会员余额</span>
-        <span class="quick-balance" id="quickBalance">¥280</span>
-        <span class="eye-icon" id="homeBalanceEye" onclick="event.stopPropagation();toggleHomeBalance()" style="position:absolute;top:4px;right:4px;font-size:10px;cursor:pointer;opacity:.5;">👁</span>
       </button>
       <button class="quick-item" onclick="handleCouponClick()">
         <div class="quick-icon coupon">🏷️</div>
@@ -429,25 +433,6 @@ setInterval(function() { goSlide((currentSlide + 1) % totalSlides); }, 3500);
     banner.classList.add('show');
     document.getElementById('activeOrderRoom').textContent = active.roomName || '—';
     document.getElementById('activeOrderTime').textContent = (active.date || '') + ' ' + (active.time || '');
-    document.getElementById('activeOrderDoorBtn').onclick = function() {
-      UI.toast('🚪 门已开，请进入');
-    };
-    document.getElementById('activeOrderServiceBtn').onclick = function() {
-      var now2 = new Date();
-      var ts = now2.getFullYear() + '-' + String(now2.getMonth()+1).padStart(2,'0') + '-' + String(now2.getDate()).padStart(2,'0') + ' ' + String(now2.getHours()).padStart(2,'0') + ':' + String(now2.getMinutes()).padStart(2,'0');
-      var notification = {
-        id: 'SRV' + Date.now(),
-        type: 'customer_call',
-        roomId: active.roomId || '',
-        roomName: active.roomName || '—',
-        time: ts,
-        message: '客人呼叫服务'
-      };
-      var notifications = JSON.parse(localStorage.getItem('mp_staff_notifications') || '[]');
-      notifications.unshift(notification);
-      localStorage.setItem('mp_staff_notifications', JSON.stringify(notifications));
-      UI.toast('📞 已通知店员，请稍候');
-    };
 })();
 
 // ── QR scan detection ──
@@ -498,6 +483,25 @@ function showQrContextCard(roomName, roomId, tableId) {
 function closeQrContext() {
   document.getElementById('qrContextCard').style.display = 'none';
   localStorage.removeItem('erp_qr_context');
+}
+
+function doServiceCall(e) {
+  if (e) e.stopPropagation();
+  var active = JSON.parse(localStorage.getItem('erp_active_order') || 'null') || {};
+  var now2 = new Date();
+  var ts = now2.getFullYear() + '-' + String(now2.getMonth()+1).padStart(2,'0') + '-' + String(now2.getDate()).padStart(2,'0') + ' ' + String(now2.getHours()).padStart(2,'0') + ':' + String(now2.getMinutes()).padStart(2,'0');
+  var notification = {
+    id: 'SRV' + Date.now(),
+    type: 'customer_call',
+    roomId: active.roomId || '',
+    roomName: active.roomName || '—',
+    time: ts,
+    message: '客人呼叫服务'
+  };
+  var notifications = JSON.parse(localStorage.getItem('mp_staff_notifications') || '[]');
+  notifications.unshift(notification);
+  localStorage.setItem('mp_staff_notifications', JSON.stringify(notifications));
+  UI.toast('📞 已通知店员，请稍候');
 }
 
 function goCartWithRoom() {
@@ -592,16 +596,9 @@ var homeBalVisible = localStorage.getItem('mp_balance_visible') !== 'false';
 
 function applyHomeBalanceVisibility() {
   var el = document.getElementById('quickBalance');
-  var eye = document.getElementById('homeBalanceEye');
   if (!el) return;
   API.getBalance().then(function(bal) {
-    if (homeBalVisible) {
-      el.textContent = Utils.formatMoney(bal);
-      if (eye) eye.textContent = '👁';
-    } else {
-      el.textContent = '****';
-      if (eye) eye.textContent = '👁‍🗨';
-    }
+    el.textContent = homeBalVisible ? Utils.formatMoney(bal) : '****';
   });
 }
 

@@ -128,7 +128,11 @@
       "Bash(node _audit.js)",
       "Bash(node _audit2.js)",
       "Bash(node _audit3.js)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(rm -rf \"C:\\\\Users\\\\王晓东\\\\Documents\\\\高岸管理\\\\盈隆\\\\高岸智能管理系统\\\\高岸ERP\\\\prototype\\\\admin-web-dist\\\\assets\\\\\" && cp -r \"C:\\\\Users\\\\王晓东\\\\Documents\\\\高岸管理\\\\盈隆\\\\高岸智能管理系统\\\\高岸ERP\\\\prototype\\\\admin-web\\\\dist\\\\assets\" \"C:\\\\Users\\\\王晓东\\\\Documents\\\\高岸管理\\\\盈隆\\\\高岸智能管理系统\\\\高岸ERP\\\\prototype\\\\admin-web-dist\\\\\")",
+      "Bash(cp \"C:\\\\Users\\\\王晓东\\\\Documents\\\\高岸管理\\\\盈隆\\\\高岸智能管理系统\\\\高岸ERP\\\\prototype\\\\admin-web\\\\dist\\\\index.html\" \"C:\\\\Users\\\\王晓东\\\\Documents\\\\高岸管理\\\\盈隆\\\\高岸智能管理系统\\\\高岸ERP\\\\prototype\\\\admin-web-dist\\\\index.html\")",
+      "Bash(git *)",
+      "PowerShell(python \"C:\\\\Users\\\\王晓东\\\\Documents\\\\高岸管理\\\\盈隆\\\\高岸智能管理系统\\\\高岸ERP\\\\generate_iot_pdf.py\" 2>&1 | ForEach-Object { Write-Host $_ })"
     ],
     "mode": "bypassPermissions"
   }

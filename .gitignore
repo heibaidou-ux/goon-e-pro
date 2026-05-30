@@ -10,3 +10,28 @@ dist-ssr
 *.sw?
 .vscode/
 .idea/
+
+# Server
+server/*.db
+server/__pycache__/
+server/**/__pycache__/
+server/venv/
+
+# Uploads (keep gitkeep)
+server/uploads/products/*.webp
+server/uploads/products/*.jpg
+server/uploads/products/*.png
+
+# Environment files
+.env
+*.env
+
+# Temp files
+temp_*
+*.tmp
+
+# IDE private configs
+*.private.config.json
+
+# Local Claude config
+.claude/settings.local.json
