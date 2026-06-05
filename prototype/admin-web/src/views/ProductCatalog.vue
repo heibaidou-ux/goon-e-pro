@@ -11,11 +11,7 @@
         </t-col>
         <t-col :span="2">
           <t-select v-model="filterCategory" placeholder="商品分类" clearable>
-            <t-option value="茶叶" label="茶叶" />
-            <t-option value="茶具" label="茶具" />
-            <t-option value="茶点" label="茶点" />
-            <t-option value="套餐" label="套餐" />
-            <t-option value="其他" label="其他" />
+            <t-option v-for="c in categories" :key="c.categoryId" :value="c.categoryId" :label="c.name" />
           </t-select>
         </t-col>
         <t-col :span="2">
@@ -26,25 +22,38 @@
         </t-col>
         <t-col :span="5" style="text-align:right">
           <t-button theme="primary" @click="openAddProduct">+ 新增商品</t-button>
-          <t-button variant="outline" style="margin-left:8px">导入</t-button>
-          <t-button variant="outline" style="margin-left:8px">导出</t-button>
         </t-col>
       </t-row>
 
-      <t-table :data="filteredProducts" :columns="productColumns" row-key="productId" hover stripe>
+      <!-- Loading state -->
+      <t-space v-if="loading" direction="vertical" style="align-items:center;padding:40px">
+        <t-loading :delay="0" />
+        <span style="color:#999">加载中...</span>
+      </t-space>
+
+      <!-- Error state -->
+      <t-alert v-else-if="loadError" theme="error" :message="loadError" close style="margin-bottom:16px" />
+
+      <!-- Empty state -->
+      <t-empty v-else-if="products.length === 0" description="暂无商品数据" style="padding:40px">
+        <t-button theme="primary" @click="openAddProduct">+ 新增商品</t-button>
+      </t-empty>
+
+      <!-- Data table -->
+      <t-table v-else :data="filteredProducts" :columns="productColumns" row-key="productId" hover stripe>
         <template #image="{ row }">
-          <div class="product-thumb" v-if="row.image">
-            <img :src="row.image" :alt="row.name" @error="row.image = ''" />
+          <div class="product-thumb" v-if="row.images?.length">
+            <img :src="row.images[0].urlThumbnail || row.images[0].urlOriginal" :alt="row.name" />
           </div>
           <div class="product-thumb placeholder" v-else :style="{ background: nameGradient(row.name) }">
             {{ row.name.charAt(0) }}
           </div>
         </template>
-        <template #category="{ row }">
-          <t-tag variant="light">{{ row.category }} - {{ row.subCategory }}</t-tag>
+        <template #categoryName="{ row }">
+          <t-tag variant="light">{{ row.categoryName || '未分类' }}</t-tag>
         </template>
         <template #spec="{ row }">
-          <t-tag size="small" variant="outline">{{ row.spec }}</t-tag>
+          <t-tag size="small" variant="outline">{{ row.spec || '—' }}</t-tag>
         </template>
         <template #isFood="{ row }">
           <t-tag v-if="row.isFood" theme="warning" variant="light" size="small">食品</t-tag>
@@ -57,7 +66,7 @@
           <t-space size="small">
             <t-button size="small" variant="text" theme="primary" @click.stop="viewDetail(row)">详情</t-button>
             <t-button size="small" variant="text" theme="default" @click.stop="openEditProduct(row)">编辑</t-button>
-            <t-button size="small" variant="text" :theme="row.status === '上架' ? 'warning' : 'success'" @click.stop="toggleStatus(row)">
+            <t-button size="small" variant="text" :theme="row.status === '上架' ? 'warning' : 'success'" @click.stop="toggleStatus(row)" :loading="row._toggling">
               {{ row.status === '上架' ? '下架' : '上架' }}
             </t-button>
           </t-space>
@@ -69,8 +78,8 @@
     <t-drawer v-model:visible="drawerVisible" :header="selectedProduct?.name || '商品详情'" size="460px" :footer="false">
       <div v-if="selectedProduct" class="detail-wrap">
         <!-- Header Image -->
-        <div class="detail-header-img" v-if="selectedProduct.image">
-          <img :src="selectedProduct.image" :alt="selectedProduct.name" />
+        <div class="detail-header-img" v-if="selectedProduct.images?.length">
+          <img :src="selectedProduct.images[0].urlOriginal" :alt="selectedProduct.name" />
         </div>
         <div class="detail-header-img placeholder" v-else :style="{ background: nameGradient(selectedProduct.name) }">
           <span class="placeholder-text">{{ selectedProduct.name.charAt(0) }}</span>
@@ -83,9 +92,9 @@
             <div class="detail-row"><span class="label">商品编码</span><span>{{ selectedProduct.code }}</span></div>
             <div class="detail-row"><span class="label">商品名称</span><span class="name">{{ selectedProduct.name }}</span></div>
             <div class="detail-row"><span class="label">品牌</span><span>{{ selectedProduct.brand || '—' }}</span></div>
-            <div class="detail-row"><span class="label">分类</span><span><t-tag variant="light" size="small">{{ selectedProduct.category }} / {{ selectedProduct.subCategory }}</t-tag></span></div>
+            <div class="detail-row"><span class="label">分类</span><span><t-tag variant="light" size="small">{{ selectedProduct.categoryName || '未分类' }}</t-tag></span></div>
             <div class="detail-row"><span class="label">规格</span><span><t-tag variant="outline" size="small">{{ selectedProduct.spec }}</t-tag></span></div>
-            <div class="detail-row"><span class="label">单位</span><span>{{ selectedProduct.unit }}</span></div>
+            <div class="detail-row"><span class="label">单位</span><span>{{ selectedProduct.unit || '—' }}</span></div>
             <div class="detail-row"><span class="label">食品标识</span><span><t-tag :theme="selectedProduct.isFood ? 'warning' : 'default'" size="small" variant="light">{{ selectedProduct.isFood ? '食品' : '非食品' }}</t-tag></span></div>
             <div class="detail-row" v-if="selectedProduct.isFood && selectedProduct.shelfLife"><span class="label">保质期</span><span>{{ selectedProduct.shelfLife }}天</span></div>
           </div>
@@ -99,7 +108,7 @@
           <div class="price-cards">
             <div class="price-card">
               <div class="price-label">内部结算价</div>
-              <div class="price-value" style="color:#0052D9">¥{{ selectedProduct.internalPrice }}</div>
+              <div class="price-value" style="color:#0052D9">¥{{ selectedProduct.basePrice }}</div>
             </div>
             <div class="price-card">
               <div class="price-label">建议零售价</div>
@@ -115,35 +124,22 @@
         <t-divider />
 
         <!-- 故事/冲泡建议 -->
-        <div class="detail-section" v-if="selectedProduct.story">
+        <div class="detail-section" v-if="selectedProduct.story || selectedProduct.origin">
           <h4><span class="story-icon">📖</span> 产品故事</h4>
           <div class="story-box">
-            <p>{{ selectedProduct.story }}</p>
+            <p v-if="selectedProduct.story">{{ selectedProduct.story }}</p>
             <div class="story-meta" v-if="selectedProduct.origin">
               <t-tag variant="light" size="small">📍 {{ selectedProduct.origin }}</t-tag>
             </div>
-            <div class="brewing-tips" v-if="selectedProduct.brewingTips">
+            <div class="brewing-tips" v-if="parsedBrewingTips">
               <div class="tips-title">冲泡建议</div>
               <div class="tips-grid">
-                <span class="tip" v-if="selectedProduct.brewingTips.waterTemp !== '—'"><span class="tip-icon">🌡️</span> {{ selectedProduct.brewingTips.waterTemp }}</span>
-                <span class="tip" v-if="selectedProduct.brewingTips.steepTime !== '—'"><span class="tip-icon">⏱️</span> {{ selectedProduct.brewingTips.steepTime }}</span>
-                <span class="tip" v-if="selectedProduct.brewingTips.vessel !== '—'"><span class="tip-icon">🫖</span> {{ selectedProduct.brewingTips.vessel }}</span>
-                <span class="tip" v-if="selectedProduct.brewingTips.method !== '—'"><span class="tip-icon">💧</span> {{ selectedProduct.brewingTips.method }}</span>
+                <span class="tip" v-if="parsedBrewingTips.waterTemp"><span class="tip-icon">🌡️</span> {{ parsedBrewingTips.waterTemp }}</span>
+                <span class="tip" v-if="parsedBrewingTips.steepTime"><span class="tip-icon">⏱️</span> {{ parsedBrewingTips.steepTime }}</span>
+                <span class="tip" v-if="parsedBrewingTips.vessel"><span class="tip-icon">🫖</span> {{ parsedBrewingTips.vessel }}</span>
+                <span class="tip" v-if="parsedBrewingTips.method"><span class="tip-icon">💧</span> {{ parsedBrewingTips.method }}</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        <t-divider />
-
-        <!-- 库存参数 -->
-        <div class="detail-section">
-          <h4>库存参数</h4>
-          <div class="detail-grid">
-            <div class="detail-row"><span class="label">默认供应商</span><span>{{ selectedProduct.defaultSupplier || '—' }}</span></div>
-            <div class="detail-row"><span class="label">采购周期</span><span>{{ selectedProduct.leadTime }}天</span></div>
-            <div class="detail-row"><span class="label">安全库存</span><span>{{ selectedProduct.safeStock }}{{ selectedProduct.unit }}</span></div>
-            <div class="detail-row"><span class="label">最大库存</span><span>{{ selectedProduct.maxStock }}{{ selectedProduct.unit }}</span></div>
           </div>
         </div>
 
@@ -198,20 +194,14 @@
         <t-row :gutter="16">
           <t-col :span="6">
             <t-form-item label="分类">
-              <t-select v-model="formData.category" placeholder="选择分类" @change="onCategoryChange">
-                <t-option value="茶叶" label="茶叶" />
-                <t-option value="茶具" label="茶具" />
-                <t-option value="茶点" label="茶点" />
-                <t-option value="套餐" label="套餐" />
-                <t-option value="其他" label="其他" />
+              <t-select v-model="formData.categoryId" placeholder="选择分类">
+                <t-option v-for="c in categories" :key="c.categoryId" :value="c.categoryId" :label="c.name" />
               </t-select>
             </t-form-item>
           </t-col>
           <t-col :span="6">
-            <t-form-item label="子分类">
-              <t-select v-model="formData.subCategory" placeholder="选择子分类">
-                <t-option v-for="s in subCategoryOptions" :key="s" :value="s" :label="s" />
-              </t-select>
+            <t-form-item label="商品编码">
+              <t-input v-model="formData.code" placeholder="如：TEA-001" />
             </t-form-item>
           </t-col>
         </t-row>
@@ -255,7 +245,7 @@
           </t-col>
           <t-col :span="4">
             <t-form-item label="内部结算价">
-              <t-input v-model.number="formData.internalPrice" type="number" prefix="¥" />
+              <t-input v-model.number="formData.basePrice" type="number" prefix="¥" />
             </t-form-item>
           </t-col>
           <t-col :span="4">
@@ -278,16 +268,21 @@
           </t-col>
         </t-row>
 
-        <t-form-item label="产品故事 / 冲泡建议">
-          <t-textarea v-model="formData.story" placeholder="描述产品故事、产地特色、冲泡建议等内容，将展示在客人端" :rows="3" />
+        <t-form-item label="产品故事">
+          <t-textarea v-model="formData.story" placeholder="描述产品故事、产地特色等内容" :rows="2" />
         </t-form-item>
         <t-form-item label="产地">
           <t-input v-model="formData.origin" placeholder="如：杭州西湖" />
         </t-form-item>
+        <t-form-item label="冲泡建议">
+          <t-input v-model="formData.brewingTips" placeholder="如：85°C冲泡，等待3分钟" />
+        </t-form-item>
 
         <div style="text-align:right;margin-top:16px">
-          <t-button variant="outline" @click="showProductForm = false">取消</t-button>
-          <t-button theme="primary" @click="saveProduct" style="margin-left:8px">{{ editingProduct ? '保存修改' : '提交审批' }}</t-button>
+          <t-button variant="outline" @click="showProductForm = false" :disabled="saving">取消</t-button>
+          <t-button theme="primary" @click="saveProduct" style="margin-left:8px" :loading="saving">
+            {{ editingProduct ? '保存修改' : '创建商品' }}
+          </t-button>
         </div>
       </t-form>
     </t-dialog>
@@ -295,49 +290,70 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
-import supplyChain from '@mock/supply-chain.json'
+import { ref, computed, reactive, onMounted } from 'vue'
+import { productApi } from '../services/api'
+import type { Product, ProductCategory } from '../services/types'
 
 const searchText = ref('')
 const filterCategory = ref('')
 const filterStatus = ref('')
 const drawerVisible = ref(false)
 const showProductForm = ref(false)
-const selectedProduct = ref<any>(null)
-const editingProduct = ref<any>(null)
+const selectedProduct = ref<Product | null>(null)
+const editingProduct = ref<Product | null>(null)
 const dragOver = ref(false)
 const fileInput = ref<HTMLInputElement>()
+const loading = ref(false)
+const saving = ref(false)
+const loadError = ref('')
+
+const products = ref<Product[]>([])
+const categories = ref<ProductCategory[]>([])
 
 const defaultForm = () => ({
-  name: '', category: '茶叶', subCategory: '绿茶', brand: '高岸',
+  name: '', code: '', categoryId: '', brand: '高岸',
   spec: '', unit: '罐', isFood: true, shelfLife: 365,
-  internalPrice: 0, retailPrice: 0,
-  story: '', origin: '',
-  imagePreview: '', imageData: '',
+  basePrice: 0, retailPrice: 0,
+  story: '', origin: '', brewingTips: '',
+  imagePreview: '', imageFile: null as File | null,
+  imageFiles: [] as File[],
 })
 const formData = reactive(defaultForm())
 
 const specOptions = ['250g/罐', '200g/罐', '357g/饼', '150g/盒', '200g/份', '单只装', '100g/罐', '1份', '200ml']
-const subCategoryMap: Record<string, string[]> = {
-  '茶叶': ['绿茶', '红茶', '乌龙茶', '普洱茶'],
-  '茶具': ['茶壶', '茶杯', '茶道配件'],
-  '茶点': ['糕点', '坚果'],
-  '套餐': ['双人套餐', '商务套餐'],
-  '其他': ['其他'],
-}
-const subCategoryOptions = computed(() => subCategoryMap[formData.category] || ['其他'])
 
-function onCategoryChange(val: string) {
-  const opts = subCategoryMap[val] || ['其他']
-  formData.subCategory = opts[0]
+// ── Load data ──
+
+async function loadProducts() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    const result = await productApi.list({ page: 1, page_size: 100 })
+    products.value = result.items
+  } catch (e: any) {
+    loadError.value = '加载商品失败: ' + (e.message || e)
+  } finally {
+    loading.value = false
+  }
 }
 
-const products = ref([...supplyChain.products])
+async function loadCategories() {
+  try {
+    categories.value = await productApi.categories()
+  } catch (e: any) {
+    console.warn('加载分类失败:', e)
+  }
+}
+
+// ── Computed ──
 
 const filteredProducts = computed(() => {
   let list = products.value
-  if (searchText.value) list = list.filter(p => p.name.includes(searchText.value) || p.code.includes(searchText.value))
-  if (filterCategory.value) list = list.filter(p => p.category === filterCategory.value)
+  if (searchText.value) {
+    const q = searchText.value.toLowerCase()
+    list = list.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q))
+  }
+  if (filterCategory.value) list = list.filter(p => p.categoryId === filterCategory.value)
   if (filterStatus.value) list = list.filter(p => p.status === filterStatus.value)
   return list
 })
@@ -346,12 +362,11 @@ const productColumns = [
   { colKey: 'image', title: '图片', width: 70 },
   { colKey: 'code', title: '编码', width: 110 },
   { colKey: 'name', title: '商品名称', width: 140 },
-  { colKey: 'category', title: '分类', width: 130 },
+  { colKey: 'categoryName', title: '分类', width: 130 },
   { colKey: 'spec', title: '规格', width: 100 },
   { colKey: 'isFood', title: '食品', width: 65 },
-  { colKey: 'internalPrice', title: '结算价', width: 75 },
+  { colKey: 'basePrice', title: '结算价', width: 75 },
   { colKey: 'retailPrice', title: '零售价', width: 75 },
-  { colKey: 'safeStock', title: '安全库存', width: 75 },
   { colKey: 'status', title: '状态', width: 65 },
   { colKey: 'actions', title: '操作', width: 180 },
 ]
@@ -363,7 +378,20 @@ function nameGradient(name: string): string {
   return nameGradients[Math.abs(hash) % nameGradients.length]
 }
 
-function viewDetail(product: any) {
+const parsedBrewingTips = computed(() => {
+  const tips = selectedProduct.value?.brewingTips
+  if (!tips) return null
+  try {
+    const parsed = JSON.parse(tips)
+    return typeof parsed === 'object' ? parsed : null
+  } catch {
+    return null
+  }
+})
+
+// ── Actions ──
+
+function viewDetail(product: Product) {
   selectedProduct.value = product
   drawerVisible.value = true
 }
@@ -374,30 +402,99 @@ function openAddProduct() {
   showProductForm.value = true
 }
 
-function openEditProduct(product: any) {
+function openEditProduct(product: Product) {
   editingProduct.value = product
-  drawerVisible.value = true
-  // Populate form
-  formData.name = product.name
-  formData.category = product.category
-  formData.subCategory = product.subCategory
-  formData.brand = product.brand || '高岸'
-  formData.spec = product.spec
-  formData.unit = product.unit
-  formData.isFood = product.isFood
-  formData.shelfLife = product.shelfLife || 365
-  formData.internalPrice = product.internalPrice
-  formData.retailPrice = product.retailPrice
-  formData.story = product.story || ''
-  formData.origin = product.origin || ''
-  formData.imagePreview = product.image || ''
-  formData.imageData = product.image || ''
+  Object.assign(formData, {
+    name: product.name,
+    code: product.code,
+    categoryId: product.categoryId || '',
+    brand: product.brand || '高岸',
+    spec: product.spec || '',
+    unit: product.unit || '罐',
+    isFood: product.isFood,
+    shelfLife: product.shelfLife || 365,
+    basePrice: product.basePrice,
+    retailPrice: product.retailPrice,
+    marketPrice: product.marketPrice,
+    story: product.story || '',
+    origin: product.origin || '',
+    brewingTips: product.brewingTips || '',
+    imagePreview: (product.images?.length ? product.images[0].urlThumbnail || product.images[0].urlOriginal : ''),
+    imageFile: null,
+    imageFiles: [],
+  })
   showProductForm.value = true
 }
 
-function toggleStatus(product: any) {
-  product.status = product.status === '上架' ? '下架' : '上架'
+async function toggleStatus(product: any) {
+  const newStatus = product.status === '上架' ? '下架' : '上架'
+  product._toggling = true
+  try {
+    const updated = await productApi.update(product.productId, { status: newStatus })
+    Object.assign(product, updated)
+  } catch (e: any) {
+    console.error('切换状态失败:', e)
+  } finally {
+    product._toggling = false
+  }
 }
+
+async function saveProduct() {
+  if (!formData.name || !formData.code) return
+  saving.value = true
+
+  try {
+    const payload: any = {
+      name: formData.name,
+      code: formData.code,
+      categoryId: formData.categoryId || undefined,
+      brand: formData.brand,
+      spec: formData.spec,
+      unit: formData.unit,
+      basePrice: Number(formData.basePrice) || 0,
+      retailPrice: Number(formData.retailPrice) || 0,
+      isFood: formData.isFood,
+      shelfLife: formData.isFood ? (Number(formData.shelfLife) || null) : null,
+      story: formData.story || undefined,
+      origin: formData.origin || undefined,
+      brewingTips: formData.brewingTips || undefined,
+    }
+
+    if (editingProduct.value) {
+      // Update existing product
+      const updated = await productApi.update(editingProduct.value.productId, payload)
+      const idx = products.value.findIndex(p => p.productId === editingProduct.value!.productId)
+      if (idx >= 0) products.value[idx] = updated
+
+      // Upload new image if selected
+      if (formData.imageFile) {
+        await productApi.uploadImages(editingProduct.value.productId, [formData.imageFile])
+        await loadProducts()
+      }
+    } else {
+      // Create new product
+      const created = await productApi.create(payload)
+      // Upload image if selected
+      if (formData.imageFile) {
+        await productApi.uploadImages(created.productId, [formData.imageFile])
+        // Reload to get images
+        const fresh = await productApi.get(created.productId)
+        products.value.unshift(fresh)
+      } else {
+        products.value.unshift(created)
+      }
+    }
+
+    showProductForm.value = false
+  } catch (e: any) {
+    console.error('保存商品失败:', e)
+    alert('保存失败: ' + (e.message || e))
+  } finally {
+    saving.value = false
+  }
+}
+
+// ── Image handling ──
 
 function triggerFilePicker() {
   fileInput.value?.click()
@@ -427,140 +524,25 @@ function handlePaste(e: ClipboardEvent) {
 
 function processImage(file: File) {
   if (!file.type.startsWith('image/')) return
+  formData.imageFile = file
   const reader = new FileReader()
   reader.onload = (e) => {
     formData.imagePreview = e.target?.result as string
-    formData.imageData = e.target?.result as string
   }
   reader.readAsDataURL(file)
 }
 
 function removeImage() {
   formData.imagePreview = ''
-  formData.imageData = ''
+  formData.imageFile = null
 }
 
-function saveProduct() {
-  if (!formData.name || !formData.spec) return
+// ── Init ──
 
-  if (editingProduct.value) {
-    // Update existing
-    const p = editingProduct.value
-    p.name = formData.name
-    p.category = formData.category
-    p.subCategory = formData.subCategory
-    p.brand = formData.brand
-    p.spec = formData.spec
-    p.unit = formData.unit
-    p.isFood = formData.isFood
-    p.shelfLife = formData.isFood ? formData.shelfLife : null
-    p.internalPrice = Number(formData.internalPrice)
-    p.retailPrice = Number(formData.retailPrice)
-    p.story = formData.story
-    p.origin = formData.origin
-    if (formData.imageData) p.image = formData.imageData
-  } else {
-    // Add new
-    const id = 'P' + String(products.value.length + 1).padStart(3, '0')
-    const code = formData.category === '茶叶' ? 'TEA-' : formData.category === '茶具' ? 'CUP-' : formData.category === '茶点' ? 'SNK-' : 'PKG-'
-    products.value.push({
-      productId: id,
-      code: code + 'NEW-' + id,
-      name: formData.name,
-      category: formData.category,
-      subCategory: formData.subCategory,
-      brand: formData.brand,
-      spec: formData.spec,
-      unit: formData.unit,
-      isFood: formData.isFood,
-      shelfLife: formData.isFood ? formData.shelfLife : null,
-      internalPrice: Number(formData.internalPrice),
-      retailPrice: Number(formData.retailPrice),
-      marketPrice: 0,
-      defaultSupplier: '',
-      leadTime: 1,
-      safeStock: 10,
-      maxStock: 100,
-      status: '上架',
-      image: formData.imageData || '',
-      story: formData.story,
-      origin: formData.origin,
-      brewingTips: null as any,
-    })
-  }
-
-  // Sync products to localStorage for customer-mp tea-shop
-  syncProductsToMp()
-
-  showProductForm.value = false
-  editingProduct.value = null
-}
-
-// Sync admin products to customer-mp format in localStorage
-function syncProductsToMp() {
-  const tea: any[] = []
-  const snack: any[] = []
-  const ware: any[] = []
-  const mpProducts: any[] = []
-
-  products.value.forEach((p: any) => {
-    const price = p.retailPrice || 0
-    if (p.category === '茶叶') {
-      tea.push({
-        id: 'T' + String(tea.length + 1).padStart(2, '0'),
-        name: p.name,
-        desc: (p.origin || '') + ' · ' + (p.subCategory || ''),
-        price: price,
-        spec: p.spec,
-        icon: '🍃',
-        bg: '#e8f5e9',
-        image: p.image || '',
-        story: p.story || '',
-        origin: p.origin || '',
-        brewingTips: p.brewingTips ? (p.brewingTips.waterTemp + ' · ' + p.brewingTips.steepTime + ' · ' + p.brewingTips.vessel) : '',
-      })
-    } else if (p.category === '茶点') {
-      snack.push({
-        id: 'S' + String(snack.length + 1).padStart(2, '0'),
-        name: p.name,
-        desc: (p.subCategory || '') + ' · ' + (p.spec || ''),
-        price: price,
-        spec: p.spec,
-        icon: '🥮',
-        bg: '#fff8e1',
-        image: p.image || '',
-        story: p.story || '',
-        origin: p.origin || '',
-      })
-    } else {
-      ware.push({
-        id: 'W' + String(ware.length + 1).padStart(2, '0'),
-        name: p.name,
-        desc: (p.subCategory || '') + ' · ' + (p.spec || ''),
-        price: price,
-        spec: p.spec,
-        icon: '🏺',
-        bg: '#efebe9',
-        image: p.image || '',
-        story: p.story || '',
-        origin: p.origin || '',
-        brewingTips: p.brewingTips ? (p.brewingTips.waterTemp + ' · ' + p.brewingTips.steepTime + ' · ' + p.brewingTips.vessel) : '',
-      })
-    }
-  })
-
-  mpProducts.push({ category: 'tea', label: '茶叶', items: tea })
-  mpProducts.push({ category: 'snack', label: '茶点', items: snack })
-  mpProducts.push({ category: 'ware', label: '茶具', items: ware })
-
-  try {
-    localStorage.setItem('admin_sync_products', JSON.stringify(mpProducts))
-    localStorage.setItem('admin_sync_products_time', new Date().toISOString())
-  } catch (e) { /* ignore storage full */ }
-}
-
-// Initial sync to mp on mount
-setTimeout(() => syncProductsToMp(), 500)
+onMounted(() => {
+  loadProducts()
+  loadCategories()
+})
 </script>
 
 <style scoped>
@@ -615,7 +597,6 @@ setTimeout(() => syncProductsToMp(), 500)
 .story-meta { margin-top: 8px; }
 .brewing-tips { margin-top: 12px; padding-top: 10px; border-top: 1px solid #dcedc8; }
 .tips-title { font-size: 12px; font-weight: 600; color: #558b2f; margin-bottom: 6px; }
-.tips-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-.tip { background: #fff; border-radius: 14px; padding: 4px 10px; font-size: 11px; color: #666; display: flex; align-items: center; gap: 3px; }
+.tip { background: #fff; border-radius: 14px; padding: 4px 10px; font-size: 11px; color: #666; display: inline-flex; align-items: center; gap: 3px; }
 .tip-icon { font-size: 12px; }
 </style>

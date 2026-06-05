@@ -14,6 +14,12 @@ class Settings(BaseSettings):
     secret_key: str = "gaoan-erp-secret-key-change-in-production-2026"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 480  # 8 hours
+    refresh_token_expire_days: int = 7
+    # Security (relaxed in dev, tighten for production)
+    cors_allow_credentials: bool = False
+    csrf_enabled: bool = False
+    rate_limit_enabled: bool = False
+    rate_limit_per_minute: int = 60
 
     # File uploads
     upload_dir: str = str(Path(__file__).parent / "uploads")

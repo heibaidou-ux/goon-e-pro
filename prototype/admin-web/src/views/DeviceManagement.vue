@@ -2,72 +2,83 @@
   <div>
     <h2 class="page-header">IoT设备管理</h2>
 
-    <t-row :gutter="16" style="margin-bottom:20px">
-      <t-col :span="3">
-        <t-select v-model="filterRoom" placeholder="按房间筛选" clearable>
-          <t-option v-for="r in roomList" :key="r.roomId" :value="r.roomId" :label="r.name" />
-        </t-select>
-      </t-col>
-      <t-col :span="2">
-        <t-select v-model="filterType" placeholder="按类型筛选" clearable>
-          <t-option value="Lock" label="门锁" />
-          <t-option value="AC" label="空调" />
-          <t-option value="Light" label="灯光" />
-          <t-option value="Curtain" label="窗帘" />
-          <t-option value="Speaker" label="音响" />
-        </t-select>
-      </t-col>
-      <t-col :span="2">
-        <t-select v-model="filterStatus" placeholder="按状态筛选" clearable>
-          <t-option value="Online" label="在线" />
-          <t-option value="Offline" label="离线" />
-          <t-option value="Fault" label="故障" />
-        </t-select>
-      </t-col>
-    </t-row>
+    <!-- Loading -->
+    <t-space v-if="loading" direction="vertical" style="align-items:center;padding:40px">
+      <t-loading />
+      <span style="color:#999">加载中...</span>
+    </t-space>
 
-    <t-row :gutter="16" style="margin-bottom:20px">
-      <t-col :span="2" v-for="stat in stats" :key="stat.label">
-        <t-card :bordered="true" :class="{ 'queue-active': stat.key === 'queue' && stat.value > 0 }">
-          <div class="stat-card">
-            <div class="stat-num" :style="{ color: stat.color }">{{ stat.value }}</div>
-            <div class="stat-label">{{ stat.label }}</div>
-          </div>
-        </t-card>
-      </t-col>
-    </t-row>
+    <template v-else>
+      <!-- Error -->
+      <t-alert v-if="loadError" theme="error" :message="loadError" close style="margin-bottom:16px" />
 
-    <t-card v-for="group in groupedDevices" :key="group.roomId" :title="group.roomName" :bordered="true" style="margin-bottom:16px">
-      <template #subtitle>
-        <t-tag size="small" variant="light">{{ group.devices.length }}台设备</t-tag>
-      </template>
-      <t-table :data="group.devices" :columns="columns" row-key="deviceId" size="small" hover stripe>
-        <template #status="{ row }">
-          <t-tag :theme="deviceStatusTheme(row.status)" size="small" variant="light">
-            {{ deviceStatusLabel(row.status) }}
-          </t-tag>
+      <t-row :gutter="16" style="margin-bottom:20px">
+        <t-col :span="3">
+          <t-select v-model="filterRoom" placeholder="按房间筛选" clearable>
+            <t-option v-for="r in roomList" :key="r.roomId" :value="r.roomId" :label="r.name" />
+          </t-select>
+        </t-col>
+        <t-col :span="2">
+          <t-select v-model="filterType" placeholder="按类型筛选" clearable>
+            <t-option value="Lock" label="门锁" />
+            <t-option value="AC" label="空调" />
+            <t-option value="Light" label="灯光" />
+            <t-option value="Curtain" label="窗帘" />
+            <t-option value="Speaker" label="音响" />
+          </t-select>
+        </t-col>
+        <t-col :span="2">
+          <t-select v-model="filterStatus" placeholder="按状态筛选" clearable>
+            <t-option value="Online" label="在线" />
+            <t-option value="Offline" label="离线" />
+            <t-option value="Fault" label="故障" />
+          </t-select>
+        </t-col>
+      </t-row>
+
+      <t-row :gutter="16" style="margin-bottom:20px">
+        <t-col :span="2" v-for="stat in stats" :key="stat.label">
+          <t-card :bordered="true" :class="{ 'queue-active': stat.key === 'queue' && stat.value > 0 }">
+            <div class="stat-card">
+              <div class="stat-num" :style="{ color: stat.color }">{{ stat.value }}</div>
+              <div class="stat-label">{{ stat.label }}</div>
+            </div>
+          </t-card>
+        </t-col>
+      </t-row>
+
+      <t-card v-for="group in groupedDevices" :key="group.roomId" :title="group.roomName" :bordered="true" style="margin-bottom:16px">
+        <template #subtitle>
+          <t-tag size="small" variant="light">{{ group.devices.length }}台设备</t-tag>
         </template>
-        <template #type="{ row }">
-          <t-tag variant="outline" size="small">{{ deviceTypeLabel(row.type) }}</t-tag>
-        </template>
-        <template #info="{ row }">
-          <span v-if="row.type === 'Lock'">电量 {{ row.batteryLevel }}%</span>
-          <span v-else-if="row.type === 'AC'">{{ row.temperature }}°C · {{ modeLabel(row.mode) }}</span>
-          <span v-else-if="row.type === 'Light'">亮度 {{ row.brightness }}% · {{ row.colorTemp }}K</span>
-          <span v-else-if="row.type === 'Curtain'">{{ row.position === 'open' ? '打开' : row.position === 'closed' ? '关闭' : row.position }}</span>
-          <span v-else-if="row.type === 'Speaker'">音量 {{ row.volume }}% · {{ row.playing ? '播放中' : '已停止' }}</span>
-        </template>
-        <template #protocol="{ row }">
-          <t-tag size="small" variant="light">{{ row.protocol }}</t-tag>
-        </template>
-        <template #actions="{ row }">
-          <t-space size="small">
-            <t-button size="small" variant="text" theme="primary" @click="viewDetail(row)">详情</t-button>
-            <t-button size="small" variant="text" theme="warning" v-if="row.status !== 'Online'" @click="troubleshoot(row)">排障</t-button>
-          </t-space>
-        </template>
-      </t-table>
-    </t-card>
+        <t-table :data="group.devices" :columns="columns" row-key="deviceId" size="small" hover stripe>
+          <template #status="{ row }">
+            <t-tag :theme="deviceStatusTheme(row.status)" size="small" variant="light">
+              {{ deviceStatusLabel(row.status) }}
+            </t-tag>
+          </template>
+          <template #type="{ row }">
+            <t-tag variant="outline" size="small">{{ deviceTypeLabel(row.type) }}</t-tag>
+          </template>
+          <template #info="{ row }">
+            <span v-if="row.type === 'Lock'">电量 {{ row.batteryLevel }}%</span>
+            <span v-else-if="row.type === 'AC'">{{ row.temperature }}°C · {{ modeLabel(row.mode) }}</span>
+            <span v-else-if="row.type === 'Light'">亮度 {{ row.brightness }}% · {{ row.colorTemp }}K</span>
+            <span v-else-if="row.type === 'Curtain'">{{ row.position === 'open' ? '打开' : row.position === 'closed' ? '关闭' : row.position }}</span>
+            <span v-else-if="row.type === 'Speaker'">音量 {{ row.volume }}% · {{ row.playing ? '播放中' : '已停止' }}</span>
+          </template>
+          <template #protocol="{ row }">
+            <t-tag size="small" variant="light">{{ row.protocol }}</t-tag>
+          </template>
+          <template #actions="{ row }">
+            <t-space size="small">
+              <t-button size="small" variant="text" theme="primary" @click="viewDetail(row)">详情</t-button>
+              <t-button size="small" variant="text" theme="warning" v-if="row.status !== 'Online'" @click="troubleshoot(row)">排障</t-button>
+            </t-space>
+          </template>
+        </t-table>
+      </t-card>
+    </template>
 
     <t-drawer v-model:visible="drawerVisible" :header="`${deviceTypeLabel(selectedDevice?.type)} 详情`" size="400px" :footer="false">
       <div v-if="selectedDevice" class="detail-section">
@@ -142,11 +153,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { devices as mockDevices, rooms as mockRooms } from '@/mock/data'
-import { iotApi, useApiMode } from '@/services/api'
-import type { IoTDevice } from '@/services/types'
-import commandQueue from '@/utils/command-queue'
+import { ref, computed, onMounted } from 'vue'
+import { iotApi, roomApi } from '../services/api'
 
 const filterRoom = ref('')
 const filterType = ref('')
@@ -157,59 +165,55 @@ const sending = ref(false)
 const lastCmdStatus = ref<string>('')
 const queueLength = ref(0)
 const loading = ref(false)
+const loadError = ref('')
 
-// Data source: API or mock
-const apiMode = useApiMode()
-const deviceList = ref<IoTDevice[]>([])
+const deviceList = ref<any[]>([])
 const roomList = ref<any[]>([])
 
-async function loadDevices() {
-  if (apiMode) {
-    loading.value = true
-    try {
-      deviceList.value = await iotApi.devices({
-        room_id: filterRoom.value || undefined,
-        type: filterType.value || undefined,
-        status: filterStatus.value || undefined,
-      })
-      // Load rooms from API too
-      const { default: storeApi } = await import('@/services/api')
-      // Rooms come embedded in stores; we can use iot devices to derive rooms
-      const roomsFromDevices = [...new Set(deviceList.value.map(d => d.room_id))]
-      roomList.value = roomsFromDevices.map(rid => ({ roomId: rid, name: rid }))
-    } catch (e) {
-      console.error('IoT API load failed, falling back to mock', e)
-      deviceList.value = mockDevices.devices as IoTDevice[]
-      roomList.value = mockRooms.rooms
-    } finally {
-      loading.value = false
-    }
-  } else {
-    deviceList.value = mockDevices.devices as IoTDevice[]
-    roomList.value = mockRooms.rooms
+// ── Normalize API data ──
+
+function normalizeDevice(d: any) {
+  const attrs = d.attributes || {}
+  return {
+    deviceId: d.device_id,
+    deviceCode: d.ha_entity_id || d.device_id,
+    roomId: d.room_id,
+    room_id: d.room_id,
+    type: d.type,
+    name: d.name,
+    status: d.status,
+    protocol: d.protocol || 'RS485',
+    // Flatten attributes for template access
+    batteryLevel: attrs.battery_level ?? attrs.batteryLevel ?? 100,
+    temperature: attrs.temperature ?? attrs.temp ?? 24,
+    mode: attrs.mode ?? 'auto',
+    brightness: attrs.brightness ?? attrs.brightness ?? 80,
+    colorTemp: attrs.color_temp ?? attrs.colorTemp ?? 4000,
+    position: attrs.position ?? 'open',
+    volume: attrs.volume ?? 50,
+    playing: attrs.playing ?? attrs.is_playing ?? false,
+    source: attrs.source ?? '本地',
   }
 }
 
-onMounted(loadDevices)
-watch([filterRoom, filterType, filterStatus], loadDevices)
+function normalizeRoom(r: any) {
+  return { roomId: r.room_id, name: r.name }
+}
+
+// ── Computed ──
 
 const filteredDevices = computed(() => {
   let list = deviceList.value
-  if (filterRoom.value) list = list.filter(d => d.room_id === filterRoom.value)
+  if (filterRoom.value) list = list.filter(d => d.roomId === filterRoom.value)
   if (filterType.value) list = list.filter(d => d.type === filterType.value)
   if (filterStatus.value) list = list.filter(d => d.status === filterStatus.value)
   return list
 })
 
 const groupedDevices = computed(() => {
-  const sorted = [...roomList.value]
-  return sorted.map(room => {
-    const roomDevices = filteredDevices.value.filter(d => d.room_id === room.roomId)
-    return {
-      roomId: room.roomId,
-      roomName: room.name,
-      devices: roomDevices,
-    }
+  return roomList.value.map(room => {
+    const roomDevices = filteredDevices.value.filter(d => d.roomId === room.roomId)
+    return { roomId: room.roomId, roomName: room.name, devices: roomDevices }
   }).filter(g => g.devices.length > 0)
 })
 
@@ -262,42 +266,21 @@ async function sendCmd(action: string) {
   if (!selectedDevice.value) return
   sending.value = true
   lastCmdStatus.value = 'sending'
-
-  if (apiMode) {
-    try {
-      const result = await iotApi.control(selectedDevice.value.device_id, action)
-      lastCmdStatus.value = result.success ? 'success' : 'failed'
-      // Refresh device list to show updated state
-      await loadDevices()
-    } catch (e) {
-      lastCmdStatus.value = 'failed'
-    } finally {
-      setTimeout(() => { sending.value = false }, 500)
-    }
-    return
-  }
-
-  // Mock mode: use command queue
-  const cmd = {
-    deviceId: selectedDevice.value.device_id,
-    deviceName: selectedDevice.value.name,
-    roomName: getRoomName(selectedDevice.value.room_id),
-    type: selectedDevice.value.type as any,
-    action,
-    operator: localStorage.getItem('erp_user') || '店员',
-    sourceIp: window.location.hostname,
-  }
-  commandQueue.onEach((c: any) => {
-    queueLength.value = commandQueue.length
-    if (c.deviceId === cmd.deviceId) {
-      lastCmdStatus.value = c.status
-      if (c.status === 'success' || c.status === 'failed') {
-        setTimeout(() => { sending.value = false }, 500)
+  try {
+    const result = await iotApi.control(selectedDevice.value.deviceId, action)
+    lastCmdStatus.value = result.success ? 'success' : 'failed'
+    if (result.success) {
+      // Update local device state from result
+      const dev = deviceList.value.find(d => d.deviceId === selectedDevice.value.deviceId)
+      if (dev && result.new_state) {
+        Object.assign(dev, result.new_state)
       }
     }
-  })
-  commandQueue.enqueue(cmd)
-  queueLength.value = commandQueue.length
+  } catch {
+    lastCmdStatus.value = 'failed'
+  } finally {
+    setTimeout(() => { sending.value = false }, 500)
+  }
 }
 
 const columns = [
@@ -308,6 +291,27 @@ const columns = [
   { colKey: 'protocol', title: '协议', width: 70 },
   { colKey: 'actions', title: '操作', width: 120 },
 ]
+
+// ── Load ──
+
+async function loadData() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    const [devices, rooms] = await Promise.all([
+      iotApi.devices().catch(() => []),
+      roomApi.list().catch(() => []),
+    ])
+    deviceList.value = (devices || []).map(normalizeDevice)
+    roomList.value = (rooms || []).map(normalizeRoom)
+  } catch (e: any) {
+    loadError.value = '加载设备数据失败: ' + (e.message || e)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadData)
 </script>
 
 <style scoped>

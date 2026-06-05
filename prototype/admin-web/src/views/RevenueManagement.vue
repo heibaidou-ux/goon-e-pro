@@ -4,171 +4,239 @@
 
     <t-row :gutter="16" style="margin-bottom:20px">
       <t-col :span="6">
-        <t-date-range-picker v-model="dateRange" style="width:100%" separator="至" />
+        <t-date-range-picker v-model="dateRange" style="width:100%" separator="至" @change="loadRevenue" />
       </t-col>
       <t-col :span="2">
-        <t-select v-model="selectedStore" placeholder="选择门店" clearable>
-          <t-option value="盈隆店" label="盈隆店" />
-          <t-option value="盈丰店" label="盈丰店" />
-          <t-option value="金德店" label="金德店" />
+        <t-select v-model="selectedStore" placeholder="选择门店" clearable @change="loadRevenue">
+          <t-option v-for="s in stores" :key="s.storeId" :value="s.storeId" :label="s.name" />
         </t-select>
       </t-col>
-      <t-col :span="2">
-        <t-button @click="loadRevenue">查询</t-button>
+      <t-col :span="4" style="text-align:right">
+        <t-button theme="primary" @click="showAddDialog = true">+ 手动记一笔</t-button>
       </t-col>
     </t-row>
 
-    <t-row :gutter="16" style="margin-bottom:20px">
-      <t-col :span="6">
-        <t-card title="日营收趋势" :bordered="true">
-          <div class="chart-placeholder">
-            <div v-for="(d, i) in revenueTrend" :key="i" class="bar-wrapper" :style="{ height: d.amount / maxAmount * 160 + 'px' }">
-              <div class="bar" :style="{ background: d.color || '#0052D9' }"></div>
-              <div class="bar-label">{{ d.date.slice(5) }}</div>
-            </div>
-          </div>
-        </t-card>
-      </t-col>
-      <t-col :span="3">
-        <t-card title="收入科目分布" :bordered="true">
-          <div v-for="item in accountSummary" :key="item.name" class="account-row">
-            <span class="account-name">{{ item.name }}</span>
-            <div class="account-bar-bg">
-              <div class="account-bar" :style="{ width: item.percent + '%', background: item.color }"></div>
-            </div>
-            <span class="account-amount">¥{{ item.amount.toLocaleString() }}</span>
-          </div>
-        </t-card>
-      </t-col>
-      <t-col :span="3">
-        <t-card title="收入汇总" :bordered="true">
-          <div class="summary-item"><span>总收入</span><span class="summary-val">¥{{ totalRevenue.toLocaleString() }}</span></div>
-          <div class="summary-item"><span>线上收入</span><span class="summary-val">¥{{ onlineRevenue.toLocaleString() }}</span></div>
-          <div class="summary-item"><span>线下收入</span><span class="summary-val">¥{{ offlineRevenue.toLocaleString() }}</span></div>
-          <t-divider />
-          <div class="summary-item"><span>平台补贴</span><span class="summary-val green">¥{{ platformSubsidy.toLocaleString() }}</span></div>
-          <div class="summary-item"><span>会员充值</span><span class="summary-val green">¥{{ memberRecharge.toLocaleString() }}</span></div>
-        </t-card>
-      </t-col>
-    </t-row>
+    <!-- Loading -->
+    <t-space v-if="loading" direction="vertical" style="align-items:center;padding:40px">
+      <t-loading />
+      <span style="color:#999">加载中...</span>
+    </t-space>
 
-    <t-card :bordered="true">
-      <t-table :data="revenueData" :columns="revenueColumns" row-key="date+storeName" hover stripe>
-        <template #platformBreakdown="{ row }">
-          <t-space size="small">
-            <t-tag v-for="(v, k) in row.platformBreakdown" :key="k" size="small" variant="light">{{ k }}: ¥{{ v }}</t-tag>
-          </t-space>
-        </template>
-      </t-table>
-    </t-card>
+    <!-- Error -->
+    <t-alert v-else-if="loadError" theme="error" :message="loadError" close style="margin-bottom:16px" />
+
+    <template v-else>
+      <t-row :gutter="16" style="margin-bottom:20px">
+        <t-col :span="6">
+          <t-card title="日营收趋势" :bordered="true">
+            <div class="chart-placeholder" v-if="revenueTrend.length">
+              <div v-for="(d, i) in revenueTrend" :key="i" class="bar-wrapper" :style="{ height: d.amount / maxAmount * 160 + 'px' }">
+                <div class="bar" :style="{ background: d.color }"></div>
+                <div class="bar-label">{{ d.day.slice(5) }}</div>
+              </div>
+            </div>
+            <t-empty v-else description="暂无趋势数据" />
+          </t-card>
+        </t-col>
+        <t-col :span="3">
+          <t-card title="收入方式分布" :bordered="true">
+            <div v-for="item in paymentSummary" :key="item.name" class="account-row">
+              <span class="account-name">{{ item.name }}</span>
+              <div class="account-bar-bg">
+                <div class="account-bar" :style="{ width: item.percent + '%', background: item.color }"></div>
+              </div>
+              <span class="account-amount">¥{{ item.amount.toLocaleString() }}</span>
+            </div>
+          </t-card>
+        </t-col>
+        <t-col :span="3">
+          <t-card title="收入汇总" :bordered="true">
+            <div class="summary-item"><span>总收入</span><span class="summary-val">¥{{ totalAmount.toLocaleString() }}</span></div>
+            <div class="summary-item"><span>笔数</span><span class="summary-val">{{ totalCount }}</span></div>
+            <div class="summary-item"><span>线上</span><span class="summary-val">¥{{ onlineAmount.toLocaleString() }}</span></div>
+            <div class="summary-item"><span>线下</span><span class="summary-val green">¥{{ offlineAmount.toLocaleString() }}</span></div>
+          </t-card>
+        </t-col>
+      </t-row>
+
+      <t-card :bordered="true">
+        <t-table :data="revenueList" :columns="revenueColumns" row-key="revenueId" hover stripe>
+          <template #type="{ row }">
+            <t-tag size="small" variant="light">{{ row.type }}</t-tag>
+          </template>
+          <template #paymentMethod="{ row }">
+            <t-tag size="small" variant="outline">{{ row.paymentMethod }}</t-tag>
+          </template>
+        </t-table>
+        <t-empty v-if="revenueList.length === 0" description="暂无收入记录" style="padding:40px" />
+      </t-card>
+    </template>
+
+    <!-- Add Revenue Dialog -->
+    <t-dialog v-model:visible="showAddDialog" header="记一笔收入" width="480px" :footer="false">
+      <t-form layout="vertical">
+        <t-row :gutter="16">
+          <t-col :span="8">
+            <t-form-item label="金额">
+              <t-input v-model.number="addForm.amount" type="number" prefix="¥" placeholder="0.00" />
+            </t-form-item>
+          </t-col>
+          <t-col :span="4">
+            <t-form-item label="支付方式">
+              <t-select v-model="addForm.paymentMethod">
+                <t-option value="WeChat" label="微信" />
+                <t-option value="Alipay" label="支付宝" />
+                <t-option value="Cash" label="现金" />
+                <t-option value="Card" label="银行卡" />
+                <t-option value="Transfer" label="转账" />
+              </t-select>
+            </t-form-item>
+          </t-col>
+        </t-row>
+        <t-form-item label="收入类型">
+          <t-select v-model="addForm.type">
+            <t-option value="RoomRental" label="房间租用" />
+            <t-option value="ProductSales" label="商品零售" />
+            <t-option value="Recharge" label="会员充值" />
+            <t-option value="Deposit" label="押金" />
+            <t-option value="Other" label="其他" />
+          </t-select>
+        </t-form-item>
+        <div style="text-align:right;margin-top:16px">
+          <t-button variant="outline" @click="showAddDialog = false">取消</t-button>
+          <t-button theme="primary" @click="saveRevenue" style="margin-left:8px" :loading="saving">保存</t-button>
+        </div>
+      </t-form>
+    </t-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import finance from '@mock/finance.json'
+import { ref, computed, onMounted } from 'vue'
+import { financeApi } from '../services/api'
 
-const dateRange = ref(['2026-04-25', '2026-05-04'])
+const dateRange = ref(['', ''])
 const selectedStore = ref('')
+const loading = ref(false)
+const loadError = ref('')
+const showAddDialog = ref(false)
+const saving = ref(false)
 
-// ── Read real shop orders from localStorage ──
-function getLocalShopOrders(): any[] {
+const stores = ref<any[]>([])
+const revenueList = ref<any[]>([])
+const dailyStats = ref<any[]>([])
+
+const addForm = ref({ amount: 0, paymentMethod: 'WeChat', type: 'RoomRental' })
+
+const barColors = ['#0052D9','#00A870','#E37318','#9C27B0','#D54941','#2D9C9C','#F5A623']
+
+// ── Load ──
+
+async function loadStores() {
   try {
-    const raw = localStorage.getItem('shop_orders') || localStorage.getItem('mp_shop_orders')
-    if (raw) return JSON.parse(raw)
-  } catch (e) { /* ignore */ }
-  return []
+    const { storeApi } = await import('../services/api')
+    stores.value = await storeApi.list()
+  } catch { /* ignore */ }
 }
 
-// ── Build daily revenue entries from shop orders ──
-function buildShopRevenueDays(): Record<string, { totalAmount: number; orderCount: number }> {
-  const orders = getLocalShopOrders()
-  const byDate: Record<string, { totalAmount: number; orderCount: number }> = {}
-  orders.forEach((o: any) => {
-    const d = (o.createdAt || '').slice(0, 10)
-    if (!d) return
-    if (!byDate[d]) byDate[d] = { totalAmount: 0, orderCount: 0 }
-    byDate[d].totalAmount += o.totalAmount || 0
-    byDate[d].orderCount++
-  })
-  return byDate
+async function loadRevenue() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    const startDate = dateRange.value[0] || undefined
+    const endDate = dateRange.value[1] || undefined
+
+    const result = await financeApi.listRevenue({
+      storeId: selectedStore.value || undefined,
+      startDate,
+      endDate,
+      page_size: 200,
+    })
+    revenueList.value = result.items
+
+    const stats = await financeApi.revenueStats({
+      storeId: selectedStore.value || undefined,
+      days: 30,
+    })
+    dailyStats.value = stats || []
+  } catch (e: any) {
+    loadError.value = '加载收入数据失败: ' + (e.message || e)
+  } finally {
+    loading.value = false
+  }
 }
 
-// ── Compute total retail revenue from shop orders ──
-const shopRevenueTotal = computed(() => {
-  const byDate = buildShopRevenueDays()
-  let total = 0
-  for (const d in byDate) total += byDate[d].totalAmount
-  return total
-})
+// ── Computed ──
 
-const shopOrderCount = computed(() => {
-  const byDate = buildShopRevenueDays()
-  let count = 0
-  for (const d in byDate) count += byDate[d].orderCount
-  return count
-})
+const totalAmount = computed(() => revenueList.value.reduce((s, r) => s + (r.amount || 0), 0))
+const totalCount = computed(() => revenueList.value.length)
+const onlineAmount = computed(() =>
+  revenueList.value.filter(r => r.paymentMethod !== 'Cash').reduce((s, r) => s + (r.amount || 0), 0)
+)
+const offlineAmount = computed(() =>
+  revenueList.value.filter(r => r.paymentMethod === 'Cash').reduce((s, r) => s + (r.amount || 0), 0)
+)
 
-// ── Merge shop order days into static revenue data ──
-const revenueData = computed(() => {
-  const shopDays = buildShopRevenueDays()
-  return finance.dailyRevenue.map(r => {
-    const dateKey = r.date
-    const shop = shopDays[dateKey]
-    if (shop) {
-      return {
-        ...r,
-        totalAmount: r.totalAmount + shop.totalAmount,
-        orderCount: r.orderCount + shop.orderCount,
-        platformBreakdown: {
-          ...r.platformBreakdown,
-          '小程序': (r.platformBreakdown['小程序'] || 0) + shop.totalAmount,
-        }
-      }
-    }
-    return r
-  })
-})
-
-const filteredRevenue = computed(() => {
-  let list = revenueData.value
-  if (selectedStore.value) list = list.filter(r => r.storeName === selectedStore.value)
-  return list
-})
-
-const revenueTrend = computed(() => {
-  return filteredRevenue.value.map((r, i) => ({ ...r, amount: r.totalAmount, color: ['#0052D9','#00A870','#E37318','#9C27B0','#D54941','#2D9C9C','#F5A623'][i % 7] }))
-})
+const revenueTrend = computed(() =>
+  (dailyStats.value || []).map((d: any, i: number) => ({
+    ...d,
+    amount: d.total || 0,
+    color: barColors[i % barColors.length],
+  }))
+)
 
 const maxAmount = computed(() => Math.max(...revenueTrend.value.map(d => d.amount), 1))
 
-const totalRevenue = computed(() => filteredRevenue.value.reduce((s, r) => s + r.totalAmount, 0))
-const onlineRevenue = computed(() => filteredRevenue.value.reduce((s, r) => s + (r.platformBreakdown['美团'] || 0) + (r.platformBreakdown['抖音'] || 0) + (r.platformBreakdown['小程序'] || 0), 0))
-const offlineRevenue = computed(() => filteredRevenue.value.reduce((s, r) => s + (r.platformBreakdown['线下'] || 0), 0))
-const platformSubsidy = 1850
-const memberRecharge = 3200
-
-const accountSummary = computed(() => {
-  const roomRevenue = totalRevenue.value - shopRevenueTotal.value
-  const items = [
-    { name: '空间租用', amount: Math.max(roomRevenue, 0), color: '#0052D9' },
-    { name: '商品零售', amount: shopRevenueTotal.value, color: '#00A870' },
-    { name: '平台补贴', amount: platformSubsidy, color: '#E37318' },
-    { name: '其他收入', amount: Math.round(totalRevenue.value * 0.1), color: '#9C27B0' },
-  ]
-  const total = items.reduce((s, i) => s + i.amount, 0)
-  return items.map(i => ({ ...i, percent: total > 0 ? Math.round(i.amount / total * 100) : 0 }))
+const paymentSummary = computed(() => {
+  const byMethod: Record<string, number> = {}
+  revenueList.value.forEach(r => {
+    const m = r.paymentMethod || '其他'
+    byMethod[m] = (byMethod[m] || 0) + (r.amount || 0)
+  })
+  const total = Object.values(byMethod).reduce((s, v) => s + v, 0)
+  const colorMap: Record<string, string> = { WeChat: '#07C160', Alipay: '#1677FF', Cash: '#FAAD14', Card: '#0052D9', Transfer: '#9C27B0' }
+  return Object.entries(byMethod).map(([name, amount]) => ({
+    name, amount, color: colorMap[name] || '#999',
+    percent: total > 0 ? Math.round(amount / total * 100) : 0,
+  }))
 })
 
-function loadRevenue() { /* trigger recompute */ }
-
 const revenueColumns = [
-  { colKey: 'date', title: '日期', width: 100 },
+  { colKey: 'receivedAt', title: '日期', width: 160 },
   { colKey: 'storeName', title: '门店', width: 80 },
-  { colKey: 'totalAmount', title: '总金额', width: 100 },
-  { colKey: 'orderCount', title: '订单数', width: 70 },
-  { colKey: 'platformBreakdown', title: '平台分布', ellipsis: true },
+  { colKey: 'amount', title: '金额', width: 90 },
+  { colKey: 'type', title: '类型', width: 100 },
+  { colKey: 'paymentMethod', title: '支付方式', width: 90 },
 ]
+
+// ── Actions ──
+
+async function saveRevenue() {
+  if (!addForm.value.amount) return
+  saving.value = true
+  try {
+    await financeApi.createRevenue({
+      storeId: selectedStore.value || 'ST001',
+      amount: addForm.value.amount,
+      paymentMethod: addForm.value.paymentMethod,
+      type: addForm.value.type,
+    })
+    showAddDialog.value = false
+    addForm.value = { amount: 0, paymentMethod: 'WeChat', type: 'RoomRental' }
+    await loadRevenue()
+  } catch (e: any) {
+    console.error('保存收入失败:', e)
+  } finally {
+    saving.value = false
+  }
+}
+
+// ── Init ──
+
+onMounted(async () => {
+  await loadStores()
+  await loadRevenue()
+})
 </script>
 
 <style scoped>

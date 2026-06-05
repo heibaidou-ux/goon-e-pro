@@ -2,68 +2,79 @@
   <div>
     <h2 class="page-header">订单管理</h2>
 
-    <t-card :bordered="true">
-      <t-tabs v-model="activeTab" @change="onTabChange">
-        <t-tab-panel value="shop" :label="'茶品订单 (' + shopOrderList.length + ')'"></t-tab-panel>
-        <t-tab-panel value="room" :label="'包间订单 (' + roomOrderList.length + ')'"></t-tab-panel>
-      </t-tabs>
+    <!-- Loading -->
+    <t-space v-if="loading" direction="vertical" style="align-items:center;padding:40px">
+      <t-loading />
+      <span style="color:#999">加载中...</span>
+    </t-space>
 
-      <!-- 茶品订单 -->
-      <div v-if="activeTab === 'shop'" class="tab-content">
-        <t-table
-          :data="shopOrderList"
-          :columns="shopColumns"
-          row-key="orderId"
-          hover
-          stripe
-          size="small"
-          :pagination="{ pageSize: 20, total: shopOrderList.length }"
-        >
-          <template #items="{ row }">
-            <span class="cell-ellipsis" :title="formatItems(row.items)">{{ formatItems(row.items) }}</span>
-          </template>
-          <template #totalAmount="{ row }">
-            <span class="cell-amount">¥{{ row.totalAmount }}</span>
-          </template>
-          <template #createdAt="{ row }">
-            {{ (row.createdAt || '').slice(0, 16).replace('T', ' ') }}
-          </template>
-          <template #_logistics="{ row }">
-            <t-tag :theme="lgStatusTheme(row._logistics?.status)" size="small" variant="light">
-              {{ lgStatusLabel(row._logistics?.status) }}
-            </t-tag>
-          </template>
-          <template #actions="{ row }">
-            <t-space size="small">
-              <t-button size="small" variant="text" theme="primary" @click="openLogistics(row)">物流管理</t-button>
-              <t-button size="small" variant="text" theme="default" @click="viewTimeline(row)">详情</t-button>
-            </t-space>
-          </template>
-        </t-table>
-      </div>
+    <template v-else>
+      <!-- Error -->
+      <t-alert v-if="loadError" theme="error" :message="loadError" close style="margin-bottom:16px" />
 
-      <!-- 包间订单 -->
-      <div v-if="activeTab === 'room'" class="tab-content">
-        <t-table
-          :data="roomOrderList"
-          :columns="roomColumns"
-          row-key="orderId"
-          hover
-          stripe
-          size="small"
-          :pagination="{ pageSize: 20, total: roomOrderList.length }"
-        >
-          <template #totalAmount="{ row }">
-            <span class="cell-amount">¥{{ row.totalAmount }}</span>
-          </template>
-          <template #status="{ row }">
-            <t-tag :theme="row.status === 'InUse' ? 'primary' : row.status === 'Booked' ? 'warning' : row.status === 'Completed' ? 'success' : 'default'" size="small" variant="light">
-              {{ row.status === 'InUse' ? '使用中' : row.status === 'Booked' ? '已预定' : row.status === 'Completed' ? '已结束' : row.status }}
-            </t-tag>
-          </template>
-        </t-table>
-      </div>
-    </t-card>
+      <t-card :bordered="true">
+        <t-tabs v-model="activeTab" @change="onTabChange">
+          <t-tab-panel value="shop" :label="'茶品订单 (' + shopOrderList.length + ')'"></t-tab-panel>
+          <t-tab-panel value="room" :label="'包间订单 (' + roomOrderList.length + ')'"></t-tab-panel>
+        </t-tabs>
+
+        <!-- 茶品订单 -->
+        <div v-if="activeTab === 'shop'" class="tab-content">
+          <t-table
+            :data="shopOrderList"
+            :columns="shopColumns"
+            row-key="orderId"
+            hover
+            stripe
+            size="small"
+            :pagination="{ pageSize: 20, total: shopOrderList.length }"
+          >
+            <template #items="{ row }">
+              <span class="cell-ellipsis" :title="formatItems(row.items)">{{ formatItems(row.items) }}</span>
+            </template>
+            <template #totalAmount="{ row }">
+              <span class="cell-amount">¥{{ row.totalAmount }}</span>
+            </template>
+            <template #createdAt="{ row }">
+              {{ (row.createdAt || '').slice(0, 16).replace('T', ' ') }}
+            </template>
+            <template #_logistics="{ row }">
+              <t-tag :theme="lgStatusTheme(row._logistics?.status)" size="small" variant="light">
+                {{ lgStatusLabel(row._logistics?.status) }}
+              </t-tag>
+            </template>
+            <template #actions="{ row }">
+              <t-space size="small">
+                <t-button size="small" variant="text" theme="primary" @click="openLogistics(row)">物流管理</t-button>
+                <t-button size="small" variant="text" theme="default" @click="viewTimeline(row)">详情</t-button>
+              </t-space>
+            </template>
+          </t-table>
+        </div>
+
+        <!-- 包间订单 -->
+        <div v-if="activeTab === 'room'" class="tab-content">
+          <t-table
+            :data="roomOrderList"
+            :columns="roomColumns"
+            row-key="orderId"
+            hover
+            stripe
+            size="small"
+            :pagination="{ pageSize: 20, total: roomOrderList.length }"
+          >
+            <template #totalAmount="{ row }">
+              <span class="cell-amount">¥{{ row.totalAmount }}</span>
+            </template>
+            <template #status="{ row }">
+              <t-tag :theme="row.status === 'InUse' ? 'primary' : row.status === 'Booked' ? 'warning' : row.status === 'Completed' ? 'success' : 'default'" size="small" variant="light">
+                {{ row.status === 'InUse' ? '使用中' : row.status === 'Booked' ? '已预定' : row.status === 'Completed' ? '已结束' : row.status }}
+              </t-tag>
+            </template>
+          </t-table>
+        </div>
+      </t-card>
+    </template>
 
     <!-- Logistics Management Dialog -->
     <t-dialog v-model:visible="lgVisible" header="物流管理" width="520px" :footer="false">
@@ -134,22 +145,66 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
-import { orders, shopOrders } from '@/mock/data'
+import { ref, computed, reactive, onMounted } from 'vue'
+import { orderApi, shopApi } from '../services/api'
+
+const loading = ref(false)
+const loadError = ref('')
 
 type TabValue = 'shop' | 'room'
 
 const activeTab = ref<TabValue>('shop')
 
+// ── Data refs ──
+const shopOrdersRaw = ref<any[]>([])
+const roomOrdersRaw = ref<any[]>([])
+
+// ── Normalize ──
+
+function normalizeShopOrder(o: any) {
+  return {
+    orderId: o.orderId || o.order_no || o.orderNo || '',
+    customerName: o.customerName || o.customer_name || '',
+    customerPhone: o.customerPhone || o.customer_phone || '',
+    roomId: o.roomId || o.room_id || '',
+    tableId: o.tableId || o.table_id || '',
+    totalAmount: o.totalAmount ?? o.total_amount ?? 0,
+    status: o.status || '',
+    paymentMethod: o.paymentMethod || o.payment_method || '',
+    note: o.note || '',
+    items: (o.items || []).map((i: any) => ({
+      productId: i.productId || i.product_id,
+      productName: i.productName || i.product_name || '',
+      name: i.productName || i.product_name || i.name || '',
+      spec: i.spec || '',
+      quantity: i.quantity || 0,
+      unitPrice: i.unitPrice ?? i.unit_price ?? 0,
+    })),
+    createdAt: o.createdAt || o.created_at || '',
+  }
+}
+
+function normalizeRoomOrder(o: any) {
+  return {
+    orderId: o.orderId || o.order_id || '',
+    roomId: o.roomId || o.room_id || '',
+    roomName: o.roomName || o.room_name || (o.room?.name || ''),
+    customerName: o.customerName || o.customer_name || '',
+    customerPhone: o.customerPhone || o.customer_phone || '',
+    date: o.date || '',
+    startTime: o.startTime || o.start_time || '',
+    endTime: o.endTime || o.end_time || '',
+    duration: o.duration ?? 0,
+    totalAmount: o.totalAmount ?? o.total_amount ?? 0,
+    status: o.status || '',
+    scene: o.scene || '',
+    doorCode: o.doorCode || o.door_code || '',
+    paymentStatus: o.paymentStatus || o.payment_status || '',
+    createdAt: o.createdAt || o.created_at || '',
+  }
+}
+
 // ── Shop orders ──
-const shopOrderList = computed(() => {
-  const raw = shopOrders as any[]
-  return raw.map(o => {
-    const log = getOrderLogistics(o.orderId)
-    if (log) o._logistics = log
-    return o
-  }).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
-})
 
 function getOrderLogistics(orderId: string): any {
   try {
@@ -158,6 +213,14 @@ function getOrderLogistics(orderId: string): any {
   } catch (e) { /* ignore */ }
   return null
 }
+
+const shopOrderList = computed(() => {
+  return shopOrdersRaw.value.map(o => {
+    const log = getOrderLogistics(o.orderId)
+    if (log) o._logistics = log
+    return o
+  }).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+})
 
 function lgStatusLabel(status?: string): string {
   const map: Record<string, string> = { pending: '待发货', transit: '运输中', delivered: '已签收' }
@@ -180,9 +243,9 @@ const shopColumns = [
 ]
 
 // ── Room orders ──
+
 const roomOrderList = computed(() => {
-  const arr = (orders?.orders || []) as any[]
-  return arr.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+  return [...roomOrdersRaw.value].sort((a, b) => (b.date || '').localeCompare(a.date || ''))
 })
 
 const roomColumns = [
@@ -224,7 +287,6 @@ function saveLogistics() {
     updatedAt: new Date().toISOString(),
   }
   localStorage.setItem('shop_logistics_' + lgOrder.value.orderId, JSON.stringify(data))
-  // Update in-memory copy
   lgOrder.value._logistics = data
   lgVisible.value = false
 }
@@ -262,6 +324,40 @@ function formatItems(items: any[] | undefined): string {
   if (!items || !items.length) return '—'
   return items.map((i: any) => i.name || i.productName || '').join('、')
 }
+
+// ── Load ──
+
+async function loadData() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    // Load room orders from API
+    const roomOrders = await orderApi.list().catch(() => [] as any[])
+    roomOrdersRaw.value = (roomOrders || []).map(normalizeRoomOrder)
+
+    // Load shop orders from API + localStorage
+    const [apiShopOrders] = await Promise.all([
+      shopApi.list().catch(() => [] as any[]),
+    ])
+    const fromApi = (apiShopOrders || []).map(normalizeShopOrder)
+
+    // Also load client-side shop orders from localStorage
+    const localRaw = localStorage.getItem('shop_orders') || localStorage.getItem('mp_shop_orders')
+    const fromLocal: any[] = localRaw ? JSON.parse(localRaw).map(normalizeShopOrder) : []
+
+    // Merge: API first, localStorage overwrites duplicates
+    const merged = new Map<string, any>()
+    for (const o of fromApi) merged.set(o.orderId, o)
+    for (const o of fromLocal) merged.set(o.orderId, o)
+    shopOrdersRaw.value = Array.from(merged.values())
+  } catch (e: any) {
+    loadError.value = '加载订单数据失败: ' + (e.message || e)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadData)
 </script>
 
 <style scoped>

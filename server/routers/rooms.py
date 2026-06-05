@@ -1,11 +1,13 @@
-import json
+"""房间管理 API — 基于 D02/D03 新模型（store_dev, operations）"""
+import json, uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_
 
 from database import get_db
-from models.room import Store, Room, RoomOrder
+from models.store_dev import Store, Room
+from models.operations import Order, OrderItem, Customer
 from models.user import User
 from schemas.order import StoreOut, RoomOut, RoomOrderOut, RoomOrderCreate
 from services.auth_service import get_current_user
@@ -15,27 +17,26 @@ router = APIRouter(prefix="/api", tags=["房间管理"])
 
 @router.get("/stores", response_model=list[StoreOut])
 async def list_stores(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Store).where(Store.is_active == True))
+    result = await db.execute(select(Store).where(Store.status != "Closed"))
     stores = result.scalars().all()
     out = []
     for s in stores:
         room_result = await db.execute(
-            select(Room).where(Room.store_id == s.store_id, Room.is_active == True)
+            select(Room).where(Room.storeId == s.storeId, Room.status == "Active")
         )
         rooms_list = room_result.scalars().all()
-        store_out = StoreOut(
-            id=s.id, store_id=s.store_id, name=s.name,
-            address=s.address, phone=s.phone, is_active=s.is_active,
+        out.append(StoreOut(
+            id=s.id, store_id=s.storeId, name=s.name,
+            address=s.address, phone=s.phone, is_active=(s.status == "Operating"),
             rooms=[RoomOut(
-                id=r.id, room_id=r.room_id, store_id=r.store_id,
+                id=r.id, room_id=r.roomId, store_id=r.storeId,
                 name=r.name, type=r.type, capacity=r.capacity,
-                floor=r.floor, price_per_hour=r.price_per_hour,
-                price_per_half_hour=r.price_per_half_hour,
-                facilities=json.loads(r.facilities) if isinstance(r.facilities, str) else (r.facilities or []),
-                description=r.description, is_active=r.is_active,
+                floor=r.floor or "", price_per_hour=0,
+                price_per_half_hour=0,
+                facilities=json.loads(r.facilities) if isinstance(r.facilities, str) and r.facilities else [],
+                description=r.description or "", is_active=(r.status == "Active"),
             ) for r in rooms_list]
-        )
-        out.append(store_out)
+        ))
     return out
 
 
@@ -45,41 +46,39 @@ async def list_rooms(
     room_type: Optional[str] = Query(None, alias="type"),
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(Room).where(Room.is_active == True)
+    query = select(Room).where(Room.status == "Active")
     if store_id:
-        query = query.where(Room.store_id == store_id)
+        query = query.where(Room.storeId == store_id)
     if room_type:
         query = query.where(Room.type == room_type)
 
     result = await db.execute(query.order_by(Room.name))
     rooms = result.scalars().all()
     return [RoomOut(
-        id=r.id, room_id=r.room_id, store_id=r.store_id,
+        id=r.id, room_id=r.roomId, store_id=r.storeId,
         name=r.name, type=r.type, capacity=r.capacity,
-        floor=r.floor, price_per_hour=r.price_per_hour,
-        price_per_half_hour=r.price_per_half_hour,
-        facilities=json.loads(r.facilities) if isinstance(r.facilities, str) else (r.facilities or []),
-        description=r.description, is_active=r.is_active,
+        floor=r.floor or "", price_per_hour=0, price_per_half_hour=0,
+        facilities=json.loads(r.facilities) if isinstance(r.facilities, str) and r.facilities else [],
+        description=r.description or "", is_active=(r.status == "Active"),
     ) for r in rooms]
 
 
 @router.get("/rooms/{room_id}", response_model=RoomOut)
 async def get_room(room_id: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Room).where(Room.room_id == room_id))
+    result = await db.execute(select(Room).where(Room.roomId == room_id))
     room = result.scalar_one_or_none()
     if not room:
         raise HTTPException(status_code=404, detail="房间不存在")
     return RoomOut(
-        id=room.id, room_id=room.room_id, store_id=room.store_id,
+        id=room.id, room_id=room.roomId, store_id=room.storeId,
         name=room.name, type=room.type, capacity=room.capacity,
-        floor=room.floor, price_per_hour=room.price_per_hour,
-        price_per_half_hour=room.price_per_half_hour,
-        facilities=json.loads(room.facilities) if isinstance(room.facilities, str) else (room.facilities or []),
-        description=room.description, is_active=room.is_active,
+        floor=room.floor or "", price_per_hour=0, price_per_half_hour=0,
+        facilities=json.loads(room.facilities) if isinstance(room.facilities, str) and room.facilities else [],
+        description=room.description or "", is_active=(room.status == "Active"),
     )
 
 
-# ── Room Orders ──
+# ── Room Orders (from new Order model, orderType='Room') ──
 
 @router.get("/orders", response_model=list[RoomOrderOut])
 async def list_orders(
@@ -87,38 +86,41 @@ async def list_orders(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    query = select(RoomOrder)
+    query = select(Order).where(Order.orderType == "Room")
     if status_filter:
-        query = query.where(RoomOrder.status == status_filter)
-    query = query.order_by(RoomOrder.created_at.desc())
+        query = query.where(Order.status == status_filter)
+    query = query.order_by(Order.createdAt.desc())
     result = await db.execute(query)
     orders = result.scalars().all()
 
     out = []
     for o in orders:
         room = None
-        if o.room_id:
-            r_result = await db.execute(select(Room).where(Room.room_id == o.room_id))
+        if o.roomId:
+            r_result = await db.execute(select(Room).where(Room.roomId == o.roomId))
             r = r_result.scalar_one_or_none()
             if r:
                 room = RoomOut(
-                    id=r.id, room_id=r.room_id, store_id=r.store_id,
+                    id=r.id, room_id=r.roomId, store_id=r.storeId,
                     name=r.name, type=r.type, capacity=r.capacity,
-                    floor=r.floor, price_per_hour=r.price_per_hour,
-                    price_per_half_hour=r.price_per_half_hour,
-                    facilities=json.loads(r.facilities) if isinstance(r.facilities, str) else (r.facilities or []),
-                    description=r.description, is_active=r.is_active,
+                    floor=r.floor or "", price_per_hour=0, price_per_half_hour=0,
+                    facilities=json.loads(r.facilities) if isinstance(r.facilities, str) and r.facilities else [],
+                    description=r.description or "", is_active=(r.status == "Active"),
                 )
 
         out.append(RoomOrderOut(
-            id=o.id, order_id=o.order_id, room_id=o.room_id,
-            customer_name=o.customer_name, customer_phone=o.customer_phone,
-            date=o.date, start_time=o.start_time, end_time=o.end_time,
-            duration=o.duration, total_amount=o.total_amount,
-            status=o.status, scene=o.scene, door_code=o.door_code,
-            source=o.source, payment_status=o.payment_status,
-            check_in_time=o.check_in_time, check_out_time=o.check_out_time,
-            created_at=o.created_at, room=room,
+            id=o.id, order_id=o.orderId, room_id=o.roomId or "",
+            customer_name="", customer_phone="",
+            date=o.bookingStartTime.strftime("%Y-%m-%d") if o.bookingStartTime else "",
+            start_time=o.bookingStartTime.strftime("%H:%M") if o.bookingStartTime else "",
+            end_time=o.bookingEndTime.strftime("%H:%M") if o.bookingEndTime else "",
+            duration=0,
+            total_amount=o.totalAmount,
+            status=o.status, scene="", door_code=o.doorPassword or "",
+            source=o.platform, payment_status="Paid" if o.paidAmount else "Unpaid",
+            check_in_time=o.actualStartTime.strftime("%H:%M") if o.actualStartTime else None,
+            check_out_time=o.actualEndTime.strftime("%H:%M") if o.actualEndTime else None,
+            created_at=o.createdAt, room=room,
         ))
     return out
 
@@ -126,36 +128,39 @@ async def list_orders(
 @router.get("/orders/active", response_model=list[RoomOrderOut])
 async def get_active_orders(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(RoomOrder).where(
-            or_(RoomOrder.status == "InUse", RoomOrder.status == "Booked")
-        ).order_by(RoomOrder.created_at.desc())
+        select(Order).where(
+            Order.orderType == "Room",
+            or_(Order.status == "InUse", Order.status == "PendingUse")
+        ).order_by(Order.createdAt.desc())
     )
     orders = result.scalars().all()
 
     out = []
     for o in orders:
         room = None
-        if o.room_id:
-            r_result = await db.execute(select(Room).where(Room.room_id == o.room_id))
+        if o.roomId:
+            r_result = await db.execute(select(Room).where(Room.roomId == o.roomId))
             r = r_result.scalar_one_or_none()
             if r:
                 room = RoomOut(
-                    id=r.id, room_id=r.room_id, store_id=r.store_id,
+                    id=r.id, room_id=r.roomId, store_id=r.storeId,
                     name=r.name, type=r.type, capacity=r.capacity,
-                    floor=r.floor, price_per_hour=r.price_per_hour,
-                    price_per_half_hour=r.price_per_half_hour,
-                    facilities=json.loads(r.facilities) if isinstance(r.facilities, str) else (r.facilities or []),
-                    description=r.description, is_active=r.is_active,
+                    floor=r.floor or "", price_per_hour=0, price_per_half_hour=0,
+                    facilities=json.loads(r.facilities) if isinstance(r.facilities, str) and r.facilities else [],
+                    description=r.description or "", is_active=(r.status == "Active"),
                 )
         out.append(RoomOrderOut(
-            id=o.id, order_id=o.order_id, room_id=o.room_id,
-            customer_name=o.customer_name, customer_phone=o.customer_phone,
-            date=o.date, start_time=o.start_time, end_time=o.end_time,
-            duration=o.duration, total_amount=o.total_amount,
-            status=o.status, scene=o.scene, door_code=o.door_code,
-            source=o.source, payment_status=o.payment_status,
-            check_in_time=o.check_in_time, check_out_time=o.check_out_time,
-            created_at=o.created_at, room=room,
+            id=o.id, order_id=o.orderId, room_id=o.roomId or "",
+            customer_name="", customer_phone="",
+            date=o.bookingStartTime.strftime("%Y-%m-%d") if o.bookingStartTime else "",
+            start_time=o.bookingStartTime.strftime("%H:%M") if o.bookingStartTime else "",
+            end_time=o.bookingEndTime.strftime("%H:%M") if o.bookingEndTime else "",
+            duration=0, total_amount=o.totalAmount,
+            status=o.status, scene="", door_code=o.doorPassword or "",
+            source=o.platform, payment_status="Paid" if o.paidAmount else "Unpaid",
+            check_in_time=o.actualStartTime.strftime("%H:%M") if o.actualStartTime else None,
+            check_out_time=o.actualEndTime.strftime("%H:%M") if o.actualEndTime else None,
+            created_at=o.createdAt, room=room,
         ))
     return out
 
@@ -165,35 +170,30 @@ async def create_order(
     data: RoomOrderCreate,
     db: AsyncSession = Depends(get_db),
 ):
-    # Generate order_id
-    result = await db.execute(select(func.count()).select_from(RoomOrder))
-    count = result.scalar() or 0
-    order_id = f"ORD{count + 1:06d}"
-
-    order = RoomOrder(
-        order_id=order_id,
-        room_id=data.room_id,
-        customer_name=data.customer_name,
-        customer_phone=data.customer_phone,
-        date=data.date,
-        start_time=data.start_time,
-        end_time=data.end_time,
-        duration=data.duration,
-        total_amount=data.total_amount,
-        scene=data.scene,
-        source=data.source,
-        status="Booked",
-        payment_status="Unpaid",
+    order_id = uuid.uuid4().hex[:12]
+    order = Order(
+        orderId=order_id,
+        orderNumber=f"ROOM{order_id[:8].upper()}",
+        storeId="",
+        customerId="",
+        roomId=data.room_id,
+        orderType="Room",
+        status="PendingUse",
+        totalAmount=data.total_amount,
+        paidAmount=data.total_amount,
+        platform=data.source or "Offline",
+        bookingStartTime=f"{data.date} {data.start_time}" if data.date else None,
+        bookingEndTime=f"{data.date} {data.end_time}" if data.date else None,
     )
     db.add(order)
     await db.commit()
     await db.refresh(order)
     return RoomOrderOut(
-        id=order.id, order_id=order.order_id, room_id=order.room_id,
-        customer_name=order.customer_name, customer_phone=order.customer_phone,
-        date=order.date, start_time=order.start_time, end_time=order.end_time,
-        duration=order.duration, total_amount=order.total_amount,
-        status=order.status, scene=order.scene, door_code=order.door_code,
-        source=order.source, payment_status=order.payment_status,
-        created_at=order.created_at,
+        id=order.id, order_id=order.orderId, room_id=order.roomId or "",
+        customer_name=data.customer_name, customer_phone=data.customer_phone,
+        date=data.date, start_time=data.start_time, end_time=data.end_time,
+        duration=data.duration, total_amount=data.total_amount,
+        status=order.status, scene=data.scene or "", door_code="",
+        source=data.source, payment_status="Paid",
+        created_at=order.createdAt,
     )

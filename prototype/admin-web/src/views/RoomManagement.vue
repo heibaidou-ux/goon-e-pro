@@ -1,73 +1,86 @@
 <template>
   <div>
     <h2 class="page-header">房间管理</h2>
-    <t-card :bordered="true">
-      <t-row :gutter="16" style="margin-bottom:20px">
-        <t-col :span="3">
-          <t-input v-model="searchText" placeholder="搜索房间名称..." clearable>
-            <template #prefix-icon><t-icon name="search" /></template>
-          </t-input>
-        </t-col>
-        <t-col :span="2">
-          <t-select v-model="filterType" placeholder="房间类型" clearable>
-            <t-option value="MeetingRoom" label="会议室" />
-            <t-option value="TeaRoom" label="茶室" />
-            <t-option value="Exhibition" label="展厅" />
-            <t-option value="Workspace" label="工作间" />
-          </t-select>
-        </t-col>
-      </t-row>
 
-      <t-table
-        :data="filteredRooms"
-        :columns="columns"
-        row-key="roomId"
-        hover
-        stripe
-      >
-        <template #type="{ row }">
-          <t-tag variant="light">{{ roomTypeLabel(row.type) }}</t-tag>
-        </template>
-        <template #status="{ row }">
-          <t-tag
-            :style="{ background: getStatusColor(row.roomId), color: '#fff', border: 'none' }"
-            size="small"
-          >{{ getStatusLabel(row.roomId) }}</t-tag>
-        </template>
-        <template #pricing="{ row }">
-          <span v-if="row.pricePerHour > 0">¥{{ row.pricePerHour }}/时 · ¥{{ row.pricePerHalfHour }}/半小时</span>
-          <span v-else style="color:#999">免费</span>
-        </template>
-        <template #currentOrder="{ row }">
-          <t-tag v-if="getRoomOrder(row.roomId)" theme="primary" variant="light" size="small">
-            {{ getRoomOrder(row.roomId)?.customerName }} {{ getRoomOrder(row.roomId)?.startTime }}-{{ getRoomOrder(row.roomId)?.endTime }}
-          </t-tag>
-          <span v-else style="color:#999">—</span>
-        </template>
-        <template #facilities="{ row }">
-          <t-space size="small">
-            <t-tag v-for="f in row.facilities" :key="f" size="small" variant="light">{{ f }}</t-tag>
-          </t-space>
-        </template>
-        <template #actions="{ row }">
-          <t-space>
-            <t-button size="small" variant="text" theme="primary" @click="viewDetail(row)">详情</t-button>
-            <t-button size="small" variant="text" theme="primary" @click="editRoom(row)">编辑</t-button>
-            <t-button size="small" variant="text" theme="warning" @click="openQRCode(row)">溯源码</t-button>
-          </t-space>
-        </template>
-      </t-table>
-    </t-card>
+    <!-- Loading -->
+    <t-space v-if="loading" direction="vertical" style="align-items:center;padding:40px">
+      <t-loading />
+      <span style="color:#999">加载中...</span>
+    </t-space>
+
+    <template v-else>
+      <!-- Error -->
+      <t-alert v-if="loadError" theme="error" :message="loadError" close style="margin-bottom:16px" />
+
+      <t-card :bordered="true">
+        <t-row :gutter="16" style="margin-bottom:20px">
+          <t-col :span="3">
+            <t-input v-model="searchText" placeholder="搜索房间名称..." clearable>
+              <template #prefix-icon><t-icon name="search" /></template>
+            </t-input>
+          </t-col>
+          <t-col :span="2">
+            <t-select v-model="filterType" placeholder="房间类型" clearable>
+              <t-option value="MeetingRoom" label="会议室" />
+              <t-option value="TeaRoom" label="茶室" />
+              <t-option value="Exhibition" label="展厅" />
+              <t-option value="Workspace" label="工作间" />
+            </t-select>
+          </t-col>
+        </t-row>
+
+        <t-table
+          :data="filteredRooms"
+          :columns="columns"
+          row-key="roomId"
+          hover
+          stripe
+        >
+          <template #type="{ row }">
+            <t-tag variant="light">{{ roomTypeLabel(row.type) }}</t-tag>
+          </template>
+          <template #status="{ row }">
+            <t-tag
+              :style="{ background: getStatusColor(row.roomId), color: '#fff', border: 'none' }"
+              size="small"
+            >{{ getStatusLabel(row.roomId) }}</t-tag>
+          </template>
+          <template #pricing="{ row }">
+            <span v-if="row.pricePerHour > 0">¥{{ row.pricePerHour }}/时 · ¥{{ row.pricePerHalfHour }}/半小时</span>
+            <span v-else style="color:#999">免费</span>
+          </template>
+          <template #currentOrder="{ row }">
+            <t-tag v-if="getRoomOrder(row.roomId)" theme="primary" variant="light" size="small">
+              {{ getRoomOrder(row.roomId)?.customerName }} {{ getRoomOrder(row.roomId)?.startTime }}-{{ getRoomOrder(row.roomId)?.endTime }}
+            </t-tag>
+            <span v-else style="color:#999">—</span>
+          </template>
+          <template #facilities="{ row }">
+            <t-space size="small">
+              <t-tag v-for="f in row.facilities" :key="f" size="small" variant="light">{{ f }}</t-tag>
+            </t-space>
+          </template>
+          <template #actions="{ row }">
+            <t-space>
+              <t-button size="small" variant="text" theme="primary" @click="viewDetail(row)">详情</t-button>
+              <t-button size="small" variant="text" theme="primary" @click="editRoom(row)">编辑</t-button>
+              <t-button size="small" variant="text" theme="warning" @click="openQRCode(row)">溯源码</t-button>
+            </t-space>
+          </template>
+        </t-table>
+        <t-empty v-if="filteredRooms.length === 0" description="暂无房间数据" style="padding:40px" />
+      </t-card>
+    </template>
 
     <!-- 房间详情抽屉 -->
     <t-drawer v-model:visible="drawerVisible" :header="`${selectedRoom?.name} 详情`" size="400px" :footer="false">
       <div v-if="selectedRoom" class="room-detail">
         <div class="detail-section">
           <h4>基本信息</h4>
-          <div class="detail-row"><span>房间编号</span><span>{{ selectedRoom.roomCode }}</span></div>
+          <div class="detail-row"><span>房间编号</span><span>{{ selectedRoom.roomCode || selectedRoom.roomId }}</span></div>
           <div class="detail-row"><span>房间类型</span><span>{{ roomTypeLabel(selectedRoom.type) }}</span></div>
           <div class="detail-row"><span>容纳人数</span><span>{{ selectedRoom.capacity }}人</span></div>
-          <div class="detail-row"><span>面积</span><span>{{ selectedRoom.area }}㎡</span></div>
+          <div class="detail-row"><span>面积</span><span>{{ selectedRoom.area || '—' }}㎡</span></div>
           <div class="detail-row"><span>当前状态</span><t-tag size="small" :style="{ background: getStatusColor(selectedRoom.roomId), color: '#fff', border: 'none' }">{{ getStatusLabel(selectedRoom.roomId) }}</t-tag></div>
         </div>
         <t-divider />
@@ -125,8 +138,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { rooms, orders, devices, getRoomStatusColor, getRoomStatusLabel } from '@/mock/data'
+import { ref, computed, onMounted } from 'vue'
+import { roomApi, orderApi, iotApi } from '../services/api'
+
+const loading = ref(false)
+const loadError = ref('')
 
 const searchText = ref('')
 const filterType = ref('')
@@ -137,10 +153,55 @@ const qrRoom = ref<any>(null)
 const qrTableId = ref(1)
 const qrTableOptions = ref([1])
 
+const rooms = ref<any[]>([])
+const orders = ref<any[]>([])
+const devices = ref<any[]>([])
+
+// ── Normalize ──
+
+function normalizeRoom(r: any) {
+  return {
+    roomId: r.room_id,
+    roomCode: r.room_id,
+    name: r.name,
+    type: r.type || '',
+    capacity: r.capacity || 0,
+    area: r.area || 0,
+    pricePerHour: r.price_per_hour || 0,
+    pricePerHalfHour: r.price_per_half_hour || 0,
+    facilities: r.facilities || [],
+    status: r.is_active ? 'Active' : 'Inactive',
+    bookable: true,
+  }
+}
+
+function normalizeOrder(o: any) {
+  return {
+    orderId: o.order_id,
+    roomId: o.room_id,
+    customerName: o.customer_name || '',
+    startTime: o.start_time || '',
+    endTime: o.end_time || '',
+    status: o.status,
+  }
+}
+
+function normalizeDevice(d: any) {
+  return {
+    deviceId: d.device_id,
+    roomId: d.room_id,
+    type: d.type,
+    deviceCode: d.ha_entity_id || d.device_id,
+    status: d.status,
+  }
+}
+
+// ── Computed ──
+
 const filteredRooms = computed(() => {
-  let list = rooms.rooms
+  let list = rooms.value
   if (searchText.value) {
-    list = list.filter(r => r.name.includes(searchText.value))
+    list = list.filter(r => (r.name || '').includes(searchText.value))
   }
   if (filterType.value) {
     list = list.filter(r => r.type === filterType.value)
@@ -150,29 +211,30 @@ const filteredRooms = computed(() => {
 
 const roomDevices = computed(() => {
   if (!selectedRoom.value) return []
-  return devices.devices.filter(d => d.roomId === selectedRoom.value.roomId)
+  return devices.value.filter((d: any) => d.roomId === selectedRoom.value.roomId)
 })
 
+const statusColorMap: Record<string, string> = { Active: '#00A870', Inactive: '#999', Maintenance: '#E37318' }
+const statusLabelMap: Record<string, string> = { Active: '正常', Inactive: '停用', Maintenance: '维护中' }
+
 function getStatusColor(roomId: string): string {
-  const room = rooms.rooms.find(r => r.roomId === roomId)
-  if (room && room.status !== 'Active') return getRoomStatusColor(room.status)
-  const order = orders.orders.find(o => o.roomId === roomId && (o.status === 'InUse' || o.status === 'Booked'))
-  if (order) {
-    return order.status === 'InUse' ? '#366EF4' : '#9C27B0'
-  }
+  const room = rooms.value.find((r: any) => r.roomId === roomId)
+  if (room && room.status !== 'Active') return statusColorMap[room.status] || '#999'
+  const order = orders.value.find((o: any) => o.roomId === roomId && (o.status === 'InUse' || o.status === 'Booked'))
+  if (order) return order.status === 'InUse' ? '#366EF4' : '#9C27B0'
   return '#00A870'
 }
 
 function getStatusLabel(roomId: string): string {
-  const room = rooms.rooms.find(r => r.roomId === roomId)
-  if (room && room.status !== 'Active') return getRoomStatusLabel(room.status)
-  const order = orders.orders.find(o => o.roomId === roomId && (o.status === 'InUse' || o.status === 'Booked'))
+  const room = rooms.value.find((r: any) => r.roomId === roomId)
+  if (room && room.status !== 'Active') return statusLabelMap[room.status] || room.status
+  const order = orders.value.find((o: any) => o.roomId === roomId && (o.status === 'InUse' || o.status === 'Booked'))
   if (order) return order.status === 'InUse' ? '使用中' : '已预定'
   return '空闲'
 }
 
 function getRoomOrder(roomId: string) {
-  return orders.orders.find(o => o.roomId === roomId && (o.status === 'InUse' || o.status === 'Booked'))
+  return orders.value.find((o: any) => o.roomId === roomId && (o.status === 'InUse' || o.status === 'Booked'))
 }
 
 function openQRCode(room: any) {
@@ -260,6 +322,29 @@ const columns = [
   { colKey: 'facilities', title: '设施', ellipsis: true },
   { colKey: 'actions', title: '操作', width: 140 },
 ]
+
+// ── Load ──
+
+async function loadData() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    const [roomData, orderData, deviceData] = await Promise.all([
+      roomApi.list().catch(() => []),
+      orderApi.list().catch(() => []),
+      iotApi.devices().catch(() => []),
+    ])
+    rooms.value = (roomData || []).map(normalizeRoom)
+    orders.value = (orderData || []).map(normalizeOrder)
+    devices.value = (deviceData || []).map(normalizeDevice)
+  } catch (e: any) {
+    loadError.value = '加载房间数据失败: ' + (e.message || e)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadData)
 </script>
 
 <style scoped>

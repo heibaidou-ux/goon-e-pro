@@ -1,3 +1,4 @@
+"""IoT 管理 API — 基于 D08 新模型（tech.py）"""
 import json
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -5,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_
 
 from database import get_db
-from models.iot import IoTDevice, IoTAlert, IoTScene
+from models.tech import IoTDevice, AlertRecord, SmartScene
 from models.user import User
 from schemas.iot import (
     DeviceOut, DeviceControlReq, SceneActivateReq,
@@ -18,7 +19,6 @@ router = APIRouter(prefix="/api/iot", tags=["IoT管理"])
 
 
 # ── Devices ──
-
 
 @router.get("/health")
 async def iot_health():
@@ -86,7 +86,6 @@ async def control_device(
 
 # ── Scenes ──
 
-
 @router.get("/scenes")
 async def list_scenes():
     """Get all scene templates."""
@@ -106,7 +105,6 @@ async def activate_scene(
 
 # ── Alerts ──
 
-
 @router.get("/alerts")
 async def list_alerts(
     room_id: Optional[str] = Query(None, alias="room_id"),
@@ -122,7 +120,6 @@ async def list_alerts(
 
 # ── Stats ──
 
-
 @router.get("/stats")
 async def get_stats():
     """Get IoT device statistics for dashboard."""
@@ -131,11 +128,10 @@ async def get_stats():
 
 # ── Database helpers ──
 
-
 async def _upsert_device(db: AsyncSession, dev: dict):
     """Persist device info to DB for reference/tracking."""
     result = await db.execute(
-        select(IoTDevice).where(IoTDevice.device_id == dev["device_id"])
+        select(IoTDevice).where(IoTDevice.deviceId == dev["device_id"])
     )
     existing = result.scalar_one_or_none()
     if existing:
@@ -143,14 +139,14 @@ async def _upsert_device(db: AsyncSession, dev: dict):
         existing.attributes = json.dumps(dev.get("attributes", {}), ensure_ascii=False)
     else:
         db.add(IoTDevice(
-            device_id=dev["device_id"],
-            room_id=dev.get("room_id", ""),
+            deviceId=dev["device_id"],
+            roomId=dev.get("room_id", ""),
             type=dev.get("type", ""),
             name=dev.get("name", ""),
-            ha_entity_id=dev.get("ha_entity_id", ""),
+            haEntityId=dev.get("ha_entity_id", ""),
             protocol=dev.get("protocol", "Modbus"),
-            slave_id=dev.get("slave_id"),
-            sub_address=dev.get("sub_address"),
+            slaveId=dev.get("slave_id"),
+            subAddress=dev.get("sub_address"),
             status=dev.get("status", "Offline"),
             attributes=json.dumps(dev.get("attributes", {}), ensure_ascii=False),
         ))

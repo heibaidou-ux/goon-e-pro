@@ -7,65 +7,76 @@
       <h2 class="page-header">告警中心</h2>
     </div>
 
-    <t-row :gutter="16" style="margin-bottom:20px">
-      <t-col :span="2" v-for="s in stats" :key="s.label">
-        <t-card :bordered="true">
-          <div class="stat-card">
-            <div class="stat-num" :style="{ color: s.color }">{{ s.value }}</div>
-            <div class="stat-label">{{ s.label }}</div>
-          </div>
-        </t-card>
-      </t-col>
-    </t-row>
+    <!-- Loading -->
+    <t-space v-if="loading" direction="vertical" style="align-items:center;padding:40px">
+      <t-loading />
+      <span style="color:#999">加载中...</span>
+    </t-space>
 
-    <t-card :bordered="true">
-      <t-row :gutter="16" style="margin-bottom:16px">
-        <t-col :span="2">
-          <t-select v-model="filterSeverity" placeholder="告警级别" clearable>
-            <t-option value="Error" label="严重" />
-            <t-option value="Warning" label="警告" />
-            <t-option value="Info" label="信息" />
-          </t-select>
-        </t-col>
-        <t-col :span="2">
-          <t-select v-model="filterStatus" placeholder="处理状态" clearable>
-            <t-option value="Unresolved" label="未处理" />
-            <t-option value="Acknowledged" label="已确认" />
-            <t-option value="Resolved" label="已解决" />
-          </t-select>
-        </t-col>
-        <t-col :span="2">
-          <t-select v-model="filterRoom" placeholder="按房间筛选" clearable>
-            <t-option v-for="r in rooms.rooms" :key="r.roomId" :value="r.roomId" :label="r.name" />
-          </t-select>
+    <template v-else>
+      <!-- Error -->
+      <t-alert v-if="loadError" theme="error" :message="loadError" close style="margin-bottom:16px" />
+
+      <t-row :gutter="16" style="margin-bottom:20px">
+        <t-col :span="2" v-for="s in stats" :key="s.label">
+          <t-card :bordered="true">
+            <div class="stat-card">
+              <div class="stat-num" :style="{ color: s.color }">{{ s.value }}</div>
+              <div class="stat-label">{{ s.label }}</div>
+            </div>
+          </t-card>
         </t-col>
       </t-row>
 
-      <t-table :data="filteredAlerts" :columns="columns" row-key="alertId" hover stripe>
-        <template #severity="{ row }">
-          <t-tag :theme="severityTheme(row.severity)" size="small" variant="light">{{ severityLabel(row.severity) }}</t-tag>
-        </template>
-        <template #assignedRole="{ row }">
-          <t-tag size="small" variant="light" :theme="row.assignedRole === '客服' ? 'success' : 'primary'">
-            {{ row.assignedRole || '—' }}
-          </t-tag>
-        </template>
-        <template #status="{ row }">
-          <t-tag
-            :theme="row.status === 'Unresolved' ? 'danger' : row.status === 'Acknowledged' ? 'warning' : 'success'"
-            size="small" variant="light"
-          >{{ statusLabel(row.status) }}</t-tag>
-        </template>
-        <template #actions="{ row }">
-          <t-space size="small">
-            <t-button v-if="row.status === 'Unresolved'" size="small" theme="warning" variant="text" @click="openHandleModal(row)">处理</t-button>
-            <t-button v-if="row.status === 'Acknowledged'" size="small" theme="success" variant="text" @click="openResolveModal(row)">解决</t-button>
-            <t-button v-if="row.status === 'Resolved'" size="small" variant="text" disabled style="color:#ccc">已处理</t-button>
-            <t-button size="small" variant="text" theme="primary" @click="viewDetail(row)">详情</t-button>
-          </t-space>
-        </template>
-      </t-table>
-    </t-card>
+      <t-card :bordered="true">
+        <t-row :gutter="16" style="margin-bottom:16px">
+          <t-col :span="2">
+            <t-select v-model="filterSeverity" placeholder="告警级别" clearable>
+              <t-option value="Error" label="严重" />
+              <t-option value="Warning" label="警告" />
+              <t-option value="Info" label="信息" />
+            </t-select>
+          </t-col>
+          <t-col :span="2">
+            <t-select v-model="filterStatus" placeholder="处理状态" clearable>
+              <t-option value="Unresolved" label="未处理" />
+              <t-option value="Acknowledged" label="已确认" />
+              <t-option value="Resolved" label="已解决" />
+            </t-select>
+          </t-col>
+          <t-col :span="2">
+            <t-select v-model="filterRoom" placeholder="按房间筛选" clearable>
+              <t-option v-for="r in rooms" :key="r.roomId" :value="r.roomId" :label="r.name" />
+            </t-select>
+          </t-col>
+        </t-row>
+
+        <t-table :data="filteredAlerts" :columns="columns" row-key="alertId" hover stripe>
+          <template #severity="{ row }">
+            <t-tag :theme="severityTheme(row.severity)" size="small" variant="light">{{ severityLabel(row.severity) }}</t-tag>
+          </template>
+          <template #assignedRole="{ row }">
+            <t-tag size="small" variant="light" :theme="row.assignedRole === '客服' ? 'success' : 'primary'">
+              {{ row.assignedRole || '—' }}
+            </t-tag>
+          </template>
+          <template #status="{ row }">
+            <t-tag
+              :theme="row.status === 'Unresolved' ? 'danger' : row.status === 'Acknowledged' ? 'warning' : 'success'"
+              size="small" variant="light"
+            >{{ statusLabel(row.status) }}</t-tag>
+          </template>
+          <template #actions="{ row }">
+            <t-space size="small">
+              <t-button v-if="row.status === 'Unresolved'" size="small" theme="warning" variant="text" @click="openHandleModal(row)">处理</t-button>
+              <t-button v-if="row.status === 'Acknowledged'" size="small" theme="success" variant="text" @click="openResolveModal(row)">解决</t-button>
+              <t-button v-if="row.status === 'Resolved'" size="small" variant="text" disabled style="color:#ccc">已处理</t-button>
+              <t-button size="small" variant="text" theme="primary" @click="viewDetail(row)">详情</t-button>
+            </t-space>
+          </template>
+        </t-table>
+      </t-card>
+    </template>
 
     <!-- Detail Drawer -->
     <t-drawer v-model:visible="drawerVisible" header="告警详情" size="400px" :footer="false">
@@ -107,7 +118,7 @@
       </div>
     </t-drawer>
 
-    <!-- Handle Modal (确认 + 处理方式) -->
+    <!-- Handle Modal -->
     <t-dialog v-model:visible="handleModalVisible" header="处理告警" width="480px" :footer="false">
       <div v-if="handlingAlert">
         <div class="handle-alert-info">
@@ -188,11 +199,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { alerts, rooms } from '@/mock/data'
+import { iotApi, roomApi } from '../services/api'
 
 const router = useRouter()
+
+const loading = ref(false)
+const loadError = ref('')
 
 const filterSeverity = ref('')
 const filterStatus = ref('')
@@ -200,7 +214,6 @@ const filterRoom = ref('')
 const drawerVisible = ref(false)
 const selectedAlert = ref<any>(null)
 
-// Handle modal
 const handleModalVisible = ref(false)
 const resolveModalVisible = ref(false)
 const handlingAlert = ref<any>(null)
@@ -208,6 +221,9 @@ const handlingMethod = ref('')
 const handlingMethodCustom = ref('')
 const handlingNote = ref('')
 const resolveNote = ref('')
+
+const alertList = ref<any[]>([])
+const rooms = ref<any[]>([])
 
 const methodsForCS = ['更换电池', '重启设备', '清洁维护', '检查连接线', '恢复出厂设置']
 const methodsForTech = ['更换电池', '重启设备', '固件升级', '更换硬件模块', '检查RS485/Zigbee线路', '联系厂商维修']
@@ -224,7 +240,7 @@ const canConfirmHandle = computed(() => {
 })
 
 const filteredAlerts = computed(() => {
-  let list = alerts.alerts
+  let list = alertList.value
   if (filterSeverity.value) list = list.filter(a => a.severity === filterSeverity.value)
   if (filterStatus.value) list = list.filter(a => a.status === filterStatus.value)
   if (filterRoom.value) list = list.filter(a => a.roomId === filterRoom.value)
@@ -232,7 +248,7 @@ const filteredAlerts = computed(() => {
 })
 
 const stats = computed(() => {
-  const all = alerts.alerts
+  const all = alertList.value
   return [
     { label: '告警总数', value: all.length, color: '#0052D9' },
     { label: '未处理', value: all.filter(a => a.status === 'Unresolved').length, color: '#D54941' },
@@ -254,7 +270,7 @@ function statusLabel(status: string) {
 }
 
 function deviceTypeLabel(type: string) {
-  const map: Record<string, string> = { Lock: '门锁', AC: '空调', Light: '灯光', Curtain: '窗帘', Speaker: '音响' }
+  const map: Record<string, string> = { Lock: '门锁', AC: '空调', Light: '灯光', Curtain: '窗帘', Speaker: '音响', Sensor: '传感器' }
   return map[type] || type
 }
 
@@ -305,7 +321,6 @@ function escalateToTech() {
   alert.handlingNote = handlingNote.value || '客服无法解决，转交技术人员'
   alert.assignedRole = '技术'
   alert.assignedName = '阿强'
-  alert.assignedTo = 'EMP003'
   alert.escalatedAt = new Date().toLocaleString('zh-CN')
   alert.escalatedFrom = '客服'
   handleModalVisible.value = false
@@ -321,6 +336,51 @@ const columns = [
   { colKey: 'status', title: '状态', width: 80 },
   { colKey: 'actions', title: '操作', width: 160 },
 ]
+
+// ── Normalize ──
+
+function normalizeAlert(a: any) {
+  return {
+    alertId: a.alert_id,
+    roomId: a.room_id,
+    roomName: a.room_name,
+    deviceCode: a.device_code,
+    deviceType: a.device_type,
+    severity: a.severity,
+    type: a.type,
+    message: a.message,
+    detail: a.detail,
+    status: a.status,
+    assignedRole: a.assigned_role,
+    assignedName: a.assigned_name,
+    createdAt: a.created_at,
+  }
+}
+
+function normalizeRoom(r: any) {
+  return { roomId: r.room_id, name: r.name }
+}
+
+// ── Load ──
+
+async function loadData() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    const [alerts, roomData] = await Promise.all([
+      iotApi.alerts().catch(() => []),
+      roomApi.list().catch(() => []),
+    ])
+    alertList.value = (alerts || []).map(normalizeAlert)
+    rooms.value = (roomData || []).map(normalizeRoom)
+  } catch (e: any) {
+    loadError.value = '加载告警数据失败: ' + (e.message || e)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadData)
 </script>
 
 <style scoped>

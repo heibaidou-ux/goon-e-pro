@@ -4,119 +4,150 @@
 
     <t-alert message="系统自动比对每笔订单与平台结算价，差额>0.1元自动标红。月结前必须处理完所有异常项。" theme="info" style="margin-bottom:20px" />
 
-    <!-- 核销状态漏斗 -->
-    <t-row :gutter="16" style="margin-bottom:20px">
-      <t-col :span="2" v-for="s in recStats" :key="s.label">
-        <t-card :bordered="true" :class="['stat-card-wrap', { 'stat-active': activeFunnel === s.key }]" @click="activeFunnel = s.key">
-          <div class="stat-card">
-            <div class="stat-num" :style="{ color: s.color }">{{ s.value }}</div>
-            <div class="stat-label">{{ s.label }}</div>
-            <div class="stat-sub" v-if="s.sub">{{ s.sub }}</div>
-          </div>
-        </t-card>
-      </t-col>
-    </t-row>
+    <!-- Loading -->
+    <t-space v-if="loading" direction="vertical" style="align-items:center;padding:40px">
+      <t-loading />
+      <span style="color:#999">加载中...</span>
+    </t-space>
 
-    <!-- 待确认流水池 -->
-    <t-card :bordered="true" title="⏳ 待确认流水" style="margin-bottom:20px">
-      <template #subtitle>
-        <t-tag variant="light" theme="danger">{{ unmatchedTxs.length }}笔待核销</t-tag>
-      </template>
-      <t-table :data="unmatchedTxs" :columns="unmatchedColumns" row-key="txId" hover stripe>
-        <template #risk="{ row }">
-          <t-tag :theme="row.risk === 'high' ? 'danger' : row.risk === 'medium' ? 'warning' : 'success'" size="small">
-            {{ row.risk === 'high' ? '高风险' : row.risk === 'medium' ? '中风险' : '低风险' }}
-          </t-tag>
-        </template>
-        <template #diffAmount="{ row }">
-          <span :style="{ color: row.diffAmount > 10 ? '#D54941' : '#E37318', fontWeight: 600 }">
-            ¥{{ row.diffAmount }} ({{ row.diffRate }})
-          </span>
-        </template>
-        <template #reason="{ row }">
-          <t-tag variant="light" theme="warning" size="small">{{ row.reason }}</t-tag>
-        </template>
-        <template #actions="{ row }">
-          <t-space size="small">
-            <t-button size="small" theme="primary" variant="text" @click="confirmTx(row)">确认</t-button>
-            <t-button size="small" variant="text" @click="showTxDetail(row)">详情</t-button>
-          </t-space>
-        </template>
-      </t-table>
-    </t-card>
+    <template v-else>
+      <!-- Error -->
+      <t-alert v-if="loadError" theme="error" :message="loadError" close style="margin-bottom:16px" />
 
-    <!-- 差异工单列表 -->
-    <t-card :bordered="true" title="📋 对账差异工单">
-      <template #subtitle>
-        <t-space>
-          <t-tag variant="light">已匹配 {{ tasks.filter(t => t.diffAmount === 0).length }}</t-tag>
-          <t-tag variant="light" theme="danger">异常 {{ tasks.filter(t => t.diffAmount > 0).length }}</t-tag>
-        </t-space>
-      </template>
-      <template #actions>
-        <t-button size="small" variant="outline" theme="primary" @click="showToast('导出对账报表')">导出报表</t-button>
-      </template>
+      <!-- Reconciliation Tickets -->
+      <t-card title="对账工单" :bordered="true" style="margin-bottom:20px">
+        <template #actions>
+          <t-button size="small" variant="outline" theme="primary" @click="showToast('导出对账报表')">导出报表</t-button>
+        </template>
+        <t-table :data="reconTickets" :columns="ticketColumns" row-key="ticketId" hover stripe size="small">
+          <template #revenue="{ row }">¥{{ (row.totalRevenue || 0).toLocaleString() }}</template>
+          <template #expense="{ row }">¥{{ (row.totalExpense || 0).toLocaleString() }}</template>
+          <template #net="{ row }">
+            <span :style="{ color: (row.netAmount || 0) >= 0 ? '#00A870' : '#D54941', fontWeight: 600 }">¥{{ (row.netAmount || 0).toLocaleString() }}</span>
+          </template>
+          <template #status="{ row }">
+            <t-tag :theme="row.status === 'Confirmed' ? 'success' : 'warning'" size="small" variant="light">
+              {{ row.status === 'Confirmed' ? '已确认' : '待确认' }}
+            </t-tag>
+          </template>
+          <template #actions="{ row }">
+            <t-button v-if="row.status !== 'Confirmed'" size="small" theme="success" variant="text" @click="confirmTicket(row)">确认</t-button>
+          </template>
+        </t-table>
+        <t-empty v-if="reconTickets.length === 0" description="暂无对账工单" style="padding:40px" />
+      </t-card>
 
-      <t-row :gutter="16" style="margin-bottom:16px">
-        <t-col :span="2">
-          <t-select v-model="filterPlatform" placeholder="平台" clearable>
-            <t-option value="美团" label="美团" />
-            <t-option value="抖音" label="抖音" />
-            <t-option value="ERP" label="ERP内部" />
-          </t-select>
-        </t-col>
-        <t-col :span="2">
-          <t-select v-model="filterMatchStatus" placeholder="核销状态" clearable>
-            <t-option value="matched" label="已匹配" />
-            <t-option value="abnormal" label="异常" />
-          </t-select>
-        </t-col>
-        <t-col :span="2">
-          <t-select v-model="filterRecStatus" placeholder="处理状态" clearable>
-            <t-option value="待处理" label="待处理" />
-            <t-option value="已通过" label="已通过" />
-          </t-select>
-        </t-col>
-        <t-col :span="2">
-          <t-select v-model="filterChannel" placeholder="渠道" clearable>
-            <t-option value="包间预订" label="包间预订" />
-            <t-option value="到店餐饮" label="到店餐饮" />
-            <t-option value="团购套餐" label="团购套餐" />
-            <t-option value="会员充值" label="会员充值" />
-            <t-option value="线下收款" label="线下收款" />
-          </t-select>
+      <!-- 核销状态漏斗 -->
+      <t-row :gutter="16" style="margin-bottom:20px">
+        <t-col :span="2" v-for="s in recStats" :key="s.label">
+          <t-card :bordered="true" :class="['stat-card-wrap', { 'stat-active': activeFunnel === s.key }]" @click="activeFunnel = s.key">
+            <div class="stat-card">
+              <div class="stat-num" :style="{ color: s.color }">{{ s.value }}</div>
+              <div class="stat-label">{{ s.label }}</div>
+              <div class="stat-sub" v-if="s.sub">{{ s.sub }}</div>
+            </div>
+          </t-card>
         </t-col>
       </t-row>
 
-      <t-table :data="filteredTasks" :columns="taskColumns" row-key="taskId" hover stripe>
-        <template #type="{ row }">
-          <t-tag :theme="row.type === '金额一致' ? 'success' : 'danger'" size="small" variant="light">{{ row.type }}</t-tag>
+      <!-- 待确认流水池 -->
+      <t-card :bordered="true" title="⏳ 待确认流水" style="margin-bottom:20px">
+        <template #subtitle>
+          <t-tag variant="light" theme="danger">{{ unmatchedTxs.length }}笔待核销</t-tag>
         </template>
-        <template #matchStatus="{ row }">
-          <t-tag :theme="row.diffAmount === 0 ? 'success' : 'danger'" size="small" variant="light">
-            {{ row.diffAmount === 0 ? '✅ 已匹配' : '❌ 异常' }}
-          </t-tag>
-        </template>
-        <template #diffAmount="{ row }">
-          <span v-if="row.diffAmount > 0" style="color:#D54941;font-weight:600">¥{{ row.diffAmount }}</span>
-          <span v-else style="color:#00A870">—</span>
-        </template>
-        <template #diffReason="{ row }">
-          <t-tag v-if="row.diffReason" variant="light" theme="warning" size="small">{{ row.diffReason }}</t-tag>
-          <span v-else style="color:#999">—</span>
-        </template>
-        <template #status="{ row }">
-          <t-tag :theme="row.status === '待处理' ? 'warning' : 'success'" size="small" variant="light">{{ row.status }}</t-tag>
-        </template>
-        <template #actions="{ row }">
-          <t-space size="small">
-            <t-button v-if="row.status === '待处理' && row.diffAmount === 0" size="small" theme="success" variant="text" @click="markResolved(row)">标记已处理</t-button>
-            <t-button v-if="row.status === '待处理' && row.diffAmount > 0" size="small" theme="warning" variant="text" @click="openManualAlign(row)">手动对齐</t-button>
-            <t-button size="small" variant="text" theme="primary" @click="selectedTask=row;taskDetailVisible=true">详情</t-button>
+        <t-table :data="unmatchedTxs" :columns="unmatchedColumns" row-key="txId" hover stripe>
+          <template #risk="{ row }">
+            <t-tag :theme="row.risk === 'high' ? 'danger' : row.risk === 'medium' ? 'warning' : 'success'" size="small">
+              {{ row.risk === 'high' ? '高风险' : row.risk === 'medium' ? '中风险' : '低风险' }}
+            </t-tag>
+          </template>
+          <template #diffAmount="{ row }">
+            <span :style="{ color: row.diffAmount > 10 ? '#D54941' : '#E37318', fontWeight: 600 }">
+              ¥{{ row.diffAmount }} ({{ row.diffRate }})
+            </span>
+          </template>
+          <template #reason="{ row }">
+            <t-tag variant="light" theme="warning" size="small">{{ row.reason }}</t-tag>
+          </template>
+          <template #actions="{ row }">
+            <t-space size="small">
+              <t-button size="small" theme="primary" variant="text" @click="confirmTx(row)">确认</t-button>
+              <t-button size="small" variant="text" @click="showTxDetail(row)">详情</t-button>
+            </t-space>
+          </template>
+        </t-table>
+      </t-card>
+
+      <!-- 差异工单列表 -->
+      <t-card :bordered="true" title="📋 对账差异工单">
+        <template #subtitle>
+          <t-space>
+            <t-tag variant="light">已匹配 {{ tasks.filter(t => t.diffAmount === 0).length }}</t-tag>
+            <t-tag variant="light" theme="danger">异常 {{ tasks.filter(t => t.diffAmount > 0).length }}</t-tag>
           </t-space>
         </template>
-      </t-table>
-    </t-card>
+
+        <t-row :gutter="16" style="margin-bottom:16px">
+          <t-col :span="2">
+            <t-select v-model="filterPlatform" placeholder="平台" clearable>
+              <t-option value="美团" label="美团" />
+              <t-option value="抖音" label="抖音" />
+              <t-option value="ERP" label="ERP内部" />
+            </t-select>
+          </t-col>
+          <t-col :span="2">
+            <t-select v-model="filterMatchStatus" placeholder="核销状态" clearable>
+              <t-option value="matched" label="已匹配" />
+              <t-option value="abnormal" label="异常" />
+            </t-select>
+          </t-col>
+          <t-col :span="2">
+            <t-select v-model="filterRecStatus" placeholder="处理状态" clearable>
+              <t-option value="待处理" label="待处理" />
+              <t-option value="已通过" label="已通过" />
+            </t-select>
+          </t-col>
+          <t-col :span="2">
+            <t-select v-model="filterChannel" placeholder="渠道" clearable>
+              <t-option value="包间预订" label="包间预订" />
+              <t-option value="到店餐饮" label="到店餐饮" />
+              <t-option value="团购套餐" label="团购套餐" />
+              <t-option value="会员充值" label="会员充值" />
+              <t-option value="线下收款" label="线下收款" />
+            </t-select>
+          </t-col>
+        </t-row>
+
+        <t-table :data="filteredTasks" :columns="taskColumns" row-key="taskId" hover stripe>
+          <template #type="{ row }">
+            <t-tag :theme="row.type === '金额一致' ? 'success' : 'danger'" size="small" variant="light">{{ row.type }}</t-tag>
+          </template>
+          <template #matchStatus="{ row }">
+            <t-tag :theme="row.diffAmount === 0 ? 'success' : 'danger'" size="small" variant="light">
+              {{ row.diffAmount === 0 ? '✅ 已匹配' : '❌ 异常' }}
+            </t-tag>
+          </template>
+          <template #diffAmount="{ row }">
+            <span v-if="row.diffAmount > 0" style="color:#D54941;font-weight:600">¥{{ row.diffAmount }}</span>
+            <span v-else style="color:#00A870">—</span>
+          </template>
+          <template #diffReason="{ row }">
+            <t-tag v-if="row.diffReason" variant="light" theme="warning" size="small">{{ row.diffReason }}</t-tag>
+            <span v-else style="color:#999">—</span>
+          </template>
+          <template #status="{ row }">
+            <t-tag :theme="row.status === '待处理' ? 'warning' : 'success'" size="small" variant="light">{{ row.status }}</t-tag>
+          </template>
+          <template #actions="{ row }">
+            <t-space size="small">
+              <t-button v-if="row.status === '待处理' && row.diffAmount === 0" size="small" theme="success" variant="text" @click="markResolved(row)">标记已处理</t-button>
+              <t-button v-if="row.status === '待处理' && row.diffAmount > 0" size="small" theme="warning" variant="text" @click="openManualAlign(row)">手动对齐</t-button>
+              <t-button size="small" variant="text" theme="primary" @click="selectedTask=row;taskDetailVisible=true">详情</t-button>
+            </t-space>
+          </template>
+        </t-table>
+      </t-card>
+    </template>
 
     <!-- 手动对齐对话框 -->
     <t-dialog v-model:visible="alignDialogVisible" header="手动对齐" width="420px" :footer="false">
@@ -162,8 +193,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import finance from '@mock/finance.json'
+import { ref, computed, onMounted } from 'vue'
+import { financeApi } from '../services/api'
+
+const loading = ref(false)
+const loadError = ref('')
 
 const filterPlatform = ref('')
 const filterMatchStatus = ref('')
@@ -176,15 +210,17 @@ const alignDialogVisible = ref(false)
 const alignTask = ref<any>(null)
 const alignRemark = ref('')
 
-const tasks = finance.reconciliationTasks
-const unmatchedTxs = finance.unmatchedTransactions
+const reconTickets = ref<any[]>([])
+const tasks = ref<any[]>([])
+const unmatchedTxs = ref<any[]>([])
 
 const recStats = computed(() => {
-  const total = tasks.length
-  const matched = tasks.filter(t => t.diffAmount === 0).length
-  const abnormal = tasks.filter(t => t.diffAmount > 0 && t.status === '待处理').length
-  const resolved = tasks.filter(t => t.status === '已通过').length
-  const totalDiff = tasks.filter(t => t.status === '待处理').reduce((s, t) => s + t.diffAmount, 0)
+  const list = tasks.value
+  const total = list.length
+  const matched = list.filter(t => t.diffAmount === 0).length
+  const abnormal = list.filter(t => t.diffAmount > 0 && t.status === '待处理').length
+  const resolved = list.filter(t => t.status === '已通过').length
+  const totalDiff = list.filter(t => t.status === '待处理').reduce((s: number, t: any) => s + (t.diffAmount || 0), 0)
   return [
     { key: 'all', label: '工单总数', value: total, color: '#0052D9', sub: `${matched}已匹配 · ${abnormal}异常` },
     { key: 'matched', label: '已匹配', value: matched, color: '#00A870', sub: '自动核销通过' },
@@ -194,7 +230,7 @@ const recStats = computed(() => {
 })
 
 const filteredTasks = computed(() => {
-  let list = tasks
+  let list = tasks.value
   if (filterPlatform.value) list = list.filter(t => t.platform === filterPlatform.value)
   if (filterMatchStatus.value === 'matched') list = list.filter(t => t.diffAmount === 0)
   if (filterMatchStatus.value === 'abnormal') list = list.filter(t => t.diffAmount > 0)
@@ -230,9 +266,20 @@ const unmatchedColumns = [
   { colKey: 'actions', title: '操作', width: 120 },
 ]
 
+const ticketColumns = [
+  { colKey: 'ticketId', title: '编号', width: 80 },
+  { colKey: 'period', title: '周期', width: 100 },
+  { colKey: 'storeName', title: '门店', width: 80 },
+  { colKey: 'revenue', title: '应收', width: 100 },
+  { colKey: 'expense', title: '应付', width: 100 },
+  { colKey: 'net', title: '净额', width: 100 },
+  { colKey: 'status', title: '状态', width: 80 },
+  { colKey: 'actions', title: '操作', width: 80 },
+]
+
 function markResolved(row: any) {
   row.status = '已通过'
-  row.handler = localStorage.getItem('erp_user') || '店员'
+  row.handler = JSON.parse(localStorage.getItem('erp_user') || '{}').display_name || '店员'
   row.remark = '已核实处理'
 }
 
@@ -244,12 +291,11 @@ function openManualAlign(row: any) {
 
 function confirmManualAlign() {
   if (!alignRemark.value.trim()) { showToast('请填写调账备注理由'); return }
-  const user = localStorage.getItem('erp_user') || '店员'
+  const user = JSON.parse(localStorage.getItem('erp_user') || '{}').display_name || '店员'
   alignTask.value.status = '已通过'
   alignTask.value.handler = user
   alignTask.value.remark = `人工调账: ${alignRemark.value}`
   alignDialogVisible.value = false
-  // 生成审计日志
   const auditLogs = JSON.parse(localStorage.getItem('erp_audit_logs') || '[]')
   auditLogs.push({
     id: `ADJ${Date.now()}`,
@@ -268,13 +314,21 @@ function confirmManualAlign() {
 }
 
 function confirmTx(row: any) {
-  const idx = unmatchedTxs.indexOf(row)
-  if (idx > -1) unmatchedTxs.splice(idx, 1)
+  const idx = unmatchedTxs.value.indexOf(row)
+  if (idx > -1) unmatchedTxs.value.splice(idx, 1)
   showToast('已确认，转入正常流水')
 }
 
 function showTxDetail(row: any) {
   showToast(`订单 ${row.orderNo}: 系统价 ¥${row.systemAmount} / 平台结算 ¥${row.platformSettlement}`)
+}
+
+async function confirmTicket(row: any) {
+  try {
+    await financeApi.listReconciliationTickets() // placeholder - no dedicated confirm API
+    row.status = 'Confirmed'
+    showToast('已确认')
+  } catch { /* ignore */ }
 }
 
 function showToast(msg: string) {
@@ -284,6 +338,42 @@ function showToast(msg: string) {
   document.body.appendChild(el)
   setTimeout(() => el.remove(), 2000)
 }
+
+async function loadData() {
+  loading.value = true
+  loadError.value = ''
+  try {
+    const tickets = await financeApi.listReconciliationTickets()
+    reconTickets.value = tickets || []
+  } catch (e: any) {
+    loadError.value = '加载对账数据失败: ' + (e.message || e)
+  } finally {
+    loading.value = false
+  }
+}
+
+// ── Default mock data for detail-level reconciliation (no backend API yet) ──
+tasks.value = [
+  { taskId: 'REC001', platform: '美团', orderNo: 'MT20260508001', systemAmount: 168, platformAmount: 158, diffAmount: 10, status: '待处理', type: '金额不一致', createdAt: '2026-05-08', handler: '', remark: '', diffReason: '美团扣点调整(5.8%)', channel: '到店餐饮' },
+  { taskId: 'REC002', platform: '抖音', orderNo: 'DY20260508003', systemAmount: 258, platformAmount: 258, diffAmount: 0, status: '已通过', type: '金额一致', createdAt: '2026-05-08', handler: '系统', remark: '自动通过', diffReason: '', channel: '团购套餐' },
+  { taskId: 'REC003', platform: 'ERP', orderNo: 'SYS20260507002', systemAmount: 0, platformAmount: 120, diffAmount: 120, status: '待处理', type: '平台有记录、系统无记录', createdAt: '2026-05-07', handler: '', remark: '', diffReason: '系统无对应订单', channel: '到店餐饮' },
+  { taskId: 'REC004', platform: '美团', orderNo: 'MT20260507005', systemAmount: 198, platformAmount: 198, diffAmount: 0, status: '已通过', type: '金额一致', createdAt: '2026-05-07', handler: '系统', remark: '自动通过', diffReason: '', channel: '包间预订' },
+  { taskId: 'REC005', platform: 'ERP', orderNo: 'SYS20260506001', systemAmount: 340, platformAmount: 0, diffAmount: 340, status: '待处理', type: '系统有记录、平台无记录', createdAt: '2026-05-06', handler: '', remark: '', diffReason: '平台无对应结算', channel: '线下收款' },
+  { taskId: 'REC006', platform: '美团', orderNo: 'MT20260509002', systemAmount: 480, platformAmount: 462, diffAmount: 18, status: '待处理', type: '金额不一致', createdAt: '2026-05-09', handler: '', remark: '', diffReason: '美团平台活动补贴扣减', channel: '包间预订' },
+  { taskId: 'REC007', platform: '抖音', orderNo: 'DY20260509005', systemAmount: 328, platformAmount: 310, diffAmount: 18, status: '待处理', type: '金额不一致', createdAt: '2026-05-09', handler: '', remark: '', diffReason: '抖音超值团扣点差异', channel: '团购套餐' },
+  { taskId: 'REC008', platform: '美团', orderNo: 'MT20260509008', systemAmount: 168, platformAmount: 168, diffAmount: 0, status: '已通过', type: '金额一致', createdAt: '2026-05-09', handler: '系统', remark: '自动通过', diffReason: '', channel: '到店餐饮' },
+  { taskId: 'REC009', platform: 'ERP', orderNo: 'SYS20260508010', systemAmount: 560, platformAmount: 560, diffAmount: 0, status: '已通过', type: '金额一致', createdAt: '2026-05-08', handler: '系统', remark: '自动通过', diffReason: '', channel: '会员充值' },
+  { taskId: 'REC010', platform: '抖音', orderNo: 'DY20260507012', systemAmount: 0, platformAmount: 88, diffAmount: 88, status: '待处理', type: '平台有记录、系统无记录', createdAt: '2026-05-07', handler: '', remark: '', diffReason: '系统无对应订单', channel: '到店餐饮' },
+]
+unmatchedTxs.value = [
+  { txId: 'UM001', platform: '美团', orderNo: 'MT20260509003', systemAmount: 580, platformSettlement: 552, diffAmount: 28, diffRate: '4.8%', detectedAt: '2026-05-09', reason: '美团扣点 + 商家补贴', risk: 'high', channel: '包间预订' },
+  { txId: 'UM002', platform: '抖音', orderNo: 'DY20260508006', systemAmount: 388, platformSettlement: 368, diffAmount: 20, diffRate: '5.2%', detectedAt: '2026-05-08', reason: '抖音平台服务费', risk: 'medium', channel: '团购套餐' },
+  { txId: 'UM003', platform: '美团', orderNo: 'MT20260507009', systemAmount: 168, platformSettlement: 162, diffAmount: 6, diffRate: '3.6%', detectedAt: '2026-05-07', reason: '美团会员优惠券', risk: 'low', channel: '到店餐饮' },
+  { txId: 'UM004', platform: '线下', orderNo: 'OFF20260508001', systemAmount: 1200, platformSettlement: 0, diffAmount: 1200, diffRate: '100%', detectedAt: '2026-05-08', reason: '线下现金收款(待确认入账)', risk: 'medium', channel: '包间预订' },
+  { txId: 'UM005', platform: '美团', orderNo: 'MT20260506011', systemAmount: 880, platformSettlement: 836, diffAmount: 44, diffRate: '5.0%', detectedAt: '2026-05-06', reason: '美团大促活动分摊', risk: 'high', channel: '包间预订' },
+]
+
+onMounted(loadData)
 </script>
 
 <style scoped>

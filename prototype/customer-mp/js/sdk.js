@@ -10,6 +10,16 @@
 (function(win) {
   'use strict';
 
+  // ── 桌面端手机模拟样式：限制宽度+居中 ──
+  if (win.innerWidth > 640) {
+    var ds = document.createElement('style');
+    ds.textContent = 'body{background:#e8e8e8!important;display:flex;justify-content:center}.phone{' +
+      'max-width:430px!important;margin:0 auto;box-shadow:0 0 32px rgba(0,0,0,.15);min-height:100vh;' +
+      'border-radius:0}@media(min-height:700px){.phone{margin:24px auto;min-height:calc(100vh - 48px);' +
+      'border-radius:20px;overflow:hidden}}';
+    document.head.appendChild(ds);
+  }
+
   // ═══════════════════════════════════════════
   //  1. 内嵌Mock数据（与shared-mock/ 一一对应）
   // ═══════════════════════════════════════════

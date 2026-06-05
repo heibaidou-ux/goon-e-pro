@@ -1,0 +1,6 @@
+@echo off
+echo Killing old mock server...
+wsl pkill -9 -f "python mock_ha"
+echo Starting mock server from Windows project path...
+wsl python3 /mnt/c/Users/王晓东/Documents/高岸管理/盈隆/高岸智能管理系统/高岸ERP/server/iot_src/mock_ha.py
+pause

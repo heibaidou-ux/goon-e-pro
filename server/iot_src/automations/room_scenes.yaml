@@ -1,0 +1,122 @@
+# 盈隆店 房间场景自动化配置
+# 部署到 HA 的 /config/automations.yaml 或通过UI导入
+
+- id: "scene_dachashi_movie"
+  alias: "大茶室观影模式"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.大茶室按键1
+      to: "on"
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.大茶室吊灯
+          - input_boolean.大茶室背景灯
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.大茶室筒灯
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.大茶室功放音量
+      data:
+        value: 30
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.大茶室按键1
+
+- id: "scene_dachashi_meeting"
+  alias: "大茶室会议模式"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.大茶室按键2
+      to: "on"
+  action:
+    - service: input_boolean.turn_on
+      target:
+        entity_id:
+          - input_boolean.大茶室吊灯
+          - input_boolean.大茶室背景灯
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.大茶室筒灯
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.大茶室功放音量
+      data:
+        value: 50
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.大茶室按键2
+
+- id: "scene_dachashi_all_off"
+  alias: "大茶室全部关闭"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.大茶室按键6
+      to: "on"
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.大茶室总开关
+          - input_boolean.大茶室筒灯
+          - input_boolean.大茶室吊灯
+          - input_boolean.大茶室背景灯
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.大茶室按键6
+
+- id: "scene_zhongchashi_all_on"
+  alias: "中茶室全部开启"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.中茶室总开关
+      to: "on"
+  action:
+    - service: input_boolean.turn_on
+      target:
+        entity_id:
+          - input_boolean.中茶室筒灯
+          - input_boolean.中茶室吊灯
+          - input_boolean.中茶室背景灯
+
+- id: "scene_zhongchashi_all_off"
+  alias: "中茶室全部关闭"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.中茶室总开关
+      to: "off"
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.中茶室筒灯
+          - input_boolean.中茶室吊灯
+          - input_boolean.中茶室背景灯
+
+- id: "scene_xiaochashi_vent"
+  alias: "小茶室排风扇联动"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.小茶室总开关
+      to: "on"
+  action:
+    - service: input_boolean.turn_on
+      target:
+        entity_id:
+          - input_boolean.小茶室筒灯
+          - input_boolean.小茶室排风扇
+
+- id: "scene_xiaochashi_vent_off"
+  alias: "小茶室排风扇关闭"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.小茶室总开关
+      to: "off"
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.小茶室筒灯
+          - input_boolean.小茶室排风扇

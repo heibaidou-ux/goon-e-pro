@@ -1,0 +1,105 @@
+盈隆店 HA IoT 边缘控制系统 — 开发规范文档
+
+版本：1.0 | 日期：2026-05-30
+用途：Claude Code 在战66 WSL 上离线开发的参考规范
+部署目标：M710Q (192.168.2.65) Docker HA
+
+---
+
+一、系统架构
+
+ERP（店员用）→ HA (M710Q) → 物理设备（聚英继电器/485总线）
+
+- HA地址：http://192.168.2.65:8123
+- 登录：admin / admin123
+- 当前集成：input_boolean（模拟开关）、input_number（音量）、Template（窗帘/功放状态）
+- 暂无MQTT，暂无Modbus
+
+---
+
+二、当前实体列表
+
+大茶室
+- input_boolean：大茶室按键1~6、大茶室背景灯、大茶室吊灯
+- input_number：大茶室功放音量（当前50%）
+- Template：大茶室窗帘（状态：已打开）、大茶室功放状态（在线）
+
+大会议室（区域）
+- 大会议室总开关、大会议室筒灯1、大会议室筒灯2、大会议室吊灯
+
+中茶室（区域）
+- 中茶室总开关、中茶室筒灯、中茶室吊灯、中茶室背景灯
+
+大茶室（区域）
+- 大茶室总开关、大茶室筒灯、大茶室吊灯、大茶室背景灯
+
+小茶室（区域）
+- 小茶室总开关、小茶室筒灯、小茶室排风扇
+
+ 注意：所有开关都是 input_boolean（虚拟），未绑定真实硬件
+
+---
+
+三、开发规范
+
+代码结构
+yinglong-iot/
+├── README.md
+├── requirements.txt     # requests, python-dotenv, paho-mqtt
+├── scripts/
+│   ├── control_light.py    # 灯光控制
+│   ├── query_states.py     # 查询状态
+│   └── simulate_panel.py   # 模拟面板按键
+├── automations/
+│   └── room_scenes.yaml
+├── mqtt_bridge/
+│   └── bridge.py
+└── docs/
+    └── entity_mapping.md
+
+
+HA REST API 调用
+import os, requests
+from dotenv import load_dotenv
+load_dotenv()
+HA_URL = os.getenv("HA_URL", "http://192.168.2.65:8123")
+TOKEN = os.getenv("HA_TOKEN")
+
+def toggle_light(entity_id):
+    url = f"{HA_URL}/api/services/input_boolean/toggle"
+    headers = {"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json"}
+    return requests.post(url, json={"entity_id": entity_id}, headers=headers).json()
+
+def get_state(entity_id):
+    url = f"{HA_URL}/api/states/{entity_id}"
+    headers = {"Authorization": f"Bearer {TOKEN}"}
+    return requests.get(url, headers=headers).json()
+
+
+开发原则
+1. 先模拟再联调 — 所有代码在WSL上用虚拟input_boolean跑通
+2. 每个功能一个脚本 — 单一职责，便于测试和移植
+3. 配置文件与代码分离 — HA_URL/TOKEN写在.env中
+
+HA API 端点
+| 用途 | 方法 | URL |
+| 获取所有状态 | GET | /api/states |
+| 调用服务 | POST | /api/services/{domain}/{service} |
+| 获取配置 | GET | /api/config |
+
+---
+
+四、部署流程（回来后执行）
+
+1. 战66代码复制到M710Q
+2. 配置MQTT/Modbus集成
+3. 部署Mosquitto MQTT broker
+4. 启动mqtt_bridge连接真实硬件
+5. 联调聚英继电器485总线
+
+---
+
+五、实体ID命名规范（后续真实设备）
+
+light.大会议室_筒灯1 / switch.大茶室_背景灯 / cover.大茶室_窗帘 / media_player.大茶室_功放
+当前阶段用 input_boolean. 前缀即可。

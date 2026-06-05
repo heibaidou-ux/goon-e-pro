@@ -35,7 +35,7 @@ class ImageService:
         img.save(path, "WEBP" if path.suffix.lower() == ".webp" else None,
                  quality=quality, optimize=True)
 
-    def process_product_image(self, content: bytes, product_id: int,
+    def process_product_image(self, content: bytes, product_id: str,
                               file_ext: str = ".jpg") -> dict:
         """
         Process uploaded product image:
@@ -92,7 +92,7 @@ class ImageService:
         return urls
 
     @staticmethod
-    def delete_product_images(product_id: int):
+    def delete_product_images(product_id: str):
         """Delete all image files for a product."""
         base_dir = Path(settings.upload_dir) / "products" / str(product_id)
         if base_dir.exists():

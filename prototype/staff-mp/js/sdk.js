@@ -2,9 +2,21 @@
  * 高岸ERP 店员端 SDK — Mock数据层 + API接口
  * 与客人端(customer-mp/js/sdk.js)共享同一数据模型和localStorage前缀，
  * 确保两端数据互通。
+ *
+ * 切换为真实API: localStorage.setItem('staff_use_api', 'true')
  */
 (function(win) {
   'use strict';
+
+  // ── 桌面端手机模拟样式：限制宽度+居中 ──
+  if (win.innerWidth > 640) {
+    var ds = document.createElement('style');
+    ds.textContent = 'body{background:#e8e8e8!important;display:flex;justify-content:center}.phone{' +
+      'max-width:430px!important;margin:0 auto;box-shadow:0 0 32px rgba(0,0,0,.15);min-height:100vh;' +
+      'border-radius:0}@media(min-height:700px){.phone{margin:24px auto;min-height:calc(100vh - 48px);' +
+      'border-radius:20px;overflow:hidden}}';
+    document.head.appendChild(ds);
+  }
 
   // ═══════════════════════════════════════════
   //  1. 内嵌Mock数据（与customer-mp一致）
@@ -236,8 +248,26 @@
   };
 
   // ═══════════════════════════════════════════
-  //  4. API接口
+  //  4. 真实API请求支持
   // ═══════════════════════════════════════════
+
+  var API_BASE = localStorage.getItem('erp_api_base') || 'http://localhost:8000';
+  var USE_API = localStorage.getItem('staff_use_api') === 'true';
+
+  function apiRequest(method, path, body) {
+    var url = API_BASE + path;
+    var opts = {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+    };
+    var token = localStorage.getItem('staff_api_token');
+    if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+    if (body) opts.body = JSON.stringify(body);
+    return fetch(url, opts).then(function(res) {
+      if (!res.ok) return res.text().then(function(t) { throw new Error(t); });
+      return res.json();
+    });
+  }
 
   function delay(ms) {
     ms = ms || (300 + Math.random() * 400);
@@ -248,8 +278,16 @@
 
   // ── 店员认证 ──
 
-  /** 店员登录 */
   API.staffLogin = function(staffId, password) {
+    if (USE_API) {
+      return apiRequest('POST', '/api/auth/login', { username: staffId, password: password }).then(function(res) {
+        localStorage.setItem('staff_api_token', res.access_token);
+        var user = res.user;
+        lsSet('staff_logged_in', true);
+        lsSet('staff_user', { staffId: user.username, name: user.display_name, role: user.role, phone: user.phone || '' });
+        return { staffId: user.username, name: user.display_name, role: user.role, phone: user.phone || '' };
+      });
+    }
     return delay().then(function() {
       var staffList = lsGet('staff_list', [
         { staffId:'S001', name:'小林', role:'店长',    phone:'13800138001', password:'8888' },
@@ -268,6 +306,7 @@
   API.staffLogout = function() {
     lsRemove('staff_logged_in');
     lsRemove('staff_user');
+    localStorage.removeItem('staff_api_token');
     return Promise.resolve({ success: true });
   };
 
@@ -282,6 +321,20 @@
   // ── 房间 ──
 
   API.getRooms = function(bookableOnly) {
+    if (USE_API) {
+      return apiRequest('GET', '/api/rooms').then(function(rooms) {
+        if (bookableOnly) rooms = rooms.filter(function(r) { return r.bookable !== false; });
+        return rooms.map(function(r) {
+          return {
+            roomId: r.roomId, name: r.name, type: r.type || 'TeaRoom',
+            capacity: r.capacity, area: r.area || 0,
+            facilities: typeof r.facilities === 'string' ? JSON.parse(r.facilities) : (r.facilities || []),
+            pricePerHour: r.pricePerHour || 0, pricePerHalfHour: r.pricePerHalfHour || 0,
+            status: r.status || 'Active', bookable: r.bookable !== false,
+          };
+        });
+      });
+    }
     return delay().then(function() {
       var rooms = MOCK.rooms.slice();
       if (bookableOnly) rooms = rooms.filter(function(r) { return r.bookable !== false; });
@@ -290,6 +343,9 @@
   };
 
   API.getRoomById = function(roomId) {
+    if (USE_API) {
+      return apiRequest('GET', '/api/rooms/' + roomId);
+    }
     return delay().then(function() {
       var room = null;
       MOCK.rooms.forEach(function(r) { if (r.roomId === roomId) room = r; });
@@ -300,7 +356,6 @@
 
   /**
    * 计算房间实时状态（通过 mp_bookings 动态计算）
-   * 返回: { status: 'Active'|'Booked'|'InUse'|'Cleaning'|'Maintenance', booking: object|null, remaining: number }
    */
   API.computeRoomStatus = function(roomId) {
     var bookings = lsGet('bookings', []);
@@ -308,7 +363,6 @@
     var roomBookings = bookings.filter(function(b) {
       return b.roomId === roomId && b.status !== 'Cancelled' && b.status !== 'Completed';
     });
-    // 使用中: status === 'InUse'
     var inUse = null;
     roomBookings.forEach(function(b) { if (b.status === 'InUse') inUse = b; });
     if (inUse) {
@@ -316,7 +370,6 @@
       var remaining = Math.max(0, Math.round((end - now) / 60000));
       return { status: 'InUse', booking: inUse, remaining: remaining };
     }
-    // 已预订: status === 'Booked' 且未过期
     var booked = null;
     roomBookings.forEach(function(b) {
       if (b.status === 'Booked') {
@@ -325,13 +378,11 @@
       }
     });
     if (booked) return { status: 'Booked', booking: booked, remaining: 0 };
-    // 检查维修状态（存于 mp_room_maintenance）
     var maintenance = lsGet('room_maintenance', {});
     if (maintenance[roomId]) return { status: 'Maintenance', booking: null, remaining: 0 };
     return { status: 'Active', booking: null, remaining: 0 };
   };
 
-  /** 获取所有房间的实时状态 */
   API.getAllRoomStatus = function() {
     var results = [];
     MOCK.rooms.forEach(function(r) {
@@ -348,6 +399,9 @@
   // ── 设备 ──
 
   API.getRoomDevices = function(roomId) {
+    if (USE_API) {
+      return apiRequest('GET', '/api/iot/devices?room_id=' + roomId);
+    }
     return delay().then(function() {
       return MOCK.devices.filter(function(d) { return d.roomId === roomId; }).map(function(d) {
         var copy = {};
@@ -358,6 +412,9 @@
   };
 
   API.controlDevice = function(deviceId, command) {
+    if (USE_API) {
+      return apiRequest('POST', '/api/iot/control', { device_id: deviceId, action: command.action || 'set', params: command });
+    }
     return delay(200).then(function() {
       var dev = null;
       MOCK.devices.forEach(function(d) { if (d.deviceId === deviceId) dev = d; });
@@ -369,6 +426,9 @@
   };
 
   API.executeScene = function(roomId, sceneId) {
+    if (USE_API) {
+      return apiRequest('POST', '/api/iot/scenes/activate', { room_id: roomId, scene: sceneId });
+    }
     return delay(800).then(function() {
       var scene = null;
       MOCK.scenes.forEach(function(s) { if (s.sceneId === sceneId) scene = s; });
@@ -391,18 +451,27 @@
   };
 
   API.getActiveAlerts = function() {
+    if (USE_API) {
+      return apiRequest('GET', '/api/iot/alerts?status=Active');
+    }
     return delay().then(function() {
       return MOCK.alerts.filter(function(a) { return a.status === 'Active'; });
     });
   };
 
   API.getScenes = function() {
+    if (USE_API) {
+      return apiRequest('GET', '/api/iot/scenes');
+    }
     return delay().then(function() { return JSON.parse(JSON.stringify(MOCK.scenes)); });
   };
 
-  // ── 订单（共用 mp_bookings） ──
+  // ── 订单（共用 mp_bookings / 后端API） ──
 
   API.getAllBookings = function() {
+    if (USE_API) {
+      return apiRequest('GET', '/api/orders');
+    }
     return delay().then(function() {
       var bookings = lsGet('bookings', []);
       return bookings.sort(function(a, b) { return new Date(b.created) - new Date(a.created); });
@@ -410,6 +479,9 @@
   };
 
   API.getBookingById = function(orderId) {
+    if (USE_API) {
+      return apiRequest('GET', '/api/orders/' + encodeURIComponent(orderId));
+    }
     return delay().then(function() {
       var bookings = lsGet('bookings', []);
       var found = null;
@@ -419,8 +491,10 @@
     });
   };
 
-  /** 店员代客预订 */
   API.createStaffBooking = function(booking) {
+    if (USE_API) {
+      return apiRequest('POST', '/api/orders', booking);
+    }
     return delay(500).then(function() {
       var bookings = lsGet('bookings', []);
       var orderId = 'ORD' + String(Date.now()).slice(-6);
@@ -441,6 +515,9 @@
   };
 
   API.checkIn = function(orderId) {
+    if (USE_API) {
+      return apiRequest('POST', '/api/orders/' + encodeURIComponent(orderId) + '/checkin');
+    }
     return delay(200).then(function() {
       var bookings = lsGet('bookings', []);
       var found = false;
@@ -454,6 +531,9 @@
   };
 
   API.checkOut = function(orderId) {
+    if (USE_API) {
+      return apiRequest('POST', '/api/orders/' + encodeURIComponent(orderId) + '/checkout');
+    }
     return delay(200).then(function() {
       var bookings = lsGet('bookings', []);
       var found = false;
@@ -467,6 +547,9 @@
   };
 
   API.cancelBooking = function(orderId) {
+    if (USE_API) {
+      return apiRequest('POST', '/api/orders/' + encodeURIComponent(orderId) + '/cancel');
+    }
     return delay(200).then(function() {
       var bookings = lsGet('bookings', []);
       bookings.forEach(function(b) { if (b.orderId === orderId) b.status = 'Cancelled'; });
@@ -480,7 +563,6 @@
       var maintenance = lsGet('room_maintenance', {});
       maintenance[roomId] = { reason: reason, restoreTime: restoreTime || '', setAt: new Date().toISOString() };
       lsSet('room_maintenance', maintenance);
-      // 记录审计日志
       API.addAuditLog(roomId, 'setMaintenance', reason);
       return { success: true };
     });
@@ -514,7 +596,7 @@
     return delay().then(function() { return JSON.parse(JSON.stringify(MOCK.inspections)); });
   };
 
-  // ── 对账工单（模拟数据） ──
+  // ── 对账工单 ──
 
   API.getReconciliationOrders = function() {
     return delay().then(function() {
@@ -575,7 +657,6 @@
       var users = lsGet('users', {});
       var member = users[phone];
       if (!member) throw new Error('未找到该会员');
-      // 获取该会员的订单
       var bookings = lsGet('bookings', []);
       var memberOrders = [];
       bookings.forEach(function(b) { if (b.phone && b.phone.replace(/\D/g,'') === phone.replace(/\D/g,'')) memberOrders.push(b); });
@@ -622,6 +703,19 @@
   // ── 统计 ──
 
   API.getTodayStats = function() {
+    if (USE_API) {
+      return apiRequest('GET', '/api/finance/dashboard?storeId=YINGLONG').then(function(d) {
+        return {
+          revenue: d.monthRevenue || 0,
+          orderCount: 0,
+          guestCount: 0,
+          alerts: 0,
+          pendingCleaning: 0,
+          pendingReconciliation: 0,
+          pendingAudit: d.pendingExpenses || 0,
+        };
+      });
+    }
     return delay().then(function() {
       var bookings = lsGet('bookings', []);
       var today = new Date();
@@ -676,7 +770,12 @@
         if (!iso) return '';
         var d = new Date(iso);
         return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      }
+      },
+      isApiMode: function() { return USE_API; },
+      toggleApiMode: function(enable) {
+        localStorage.setItem('staff_use_api', enable ? 'true' : 'false');
+        location.reload();
+      },
     }
   };
 
