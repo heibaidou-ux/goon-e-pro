@@ -1,1 +1,23 @@
-<view class="page"><view class="banner">&#x1F3E0; 扫码点单加购</view><scroll-view class="tabs" scroll-x><view class="tab {{cat==&quot;&quot;?&quot;active&quot;:&quot;&quot;}}" bindtap="setCat" data-cat="">全部</view><view class="tab {{cat==&quot;Tea&quot;?&quot;active&quot;:&quot;&quot;}}" bindtap="setCat" data-cat="Tea">茶叶</view><view class="tab {{cat==&quot;Snack&quot;?&quot;active&quot;:&quot;&quot;}}" bindtap="setCat" data-cat="Snack">茶点</view></scroll-view><view class="list"><view class="item" wx:for="{{items}}" wx:key="productId"><text>{{item.name}}</text><text class="price">&#165;{{item.price}}</text><view class="qty"><text bindtap="dec" data-id="{{item.productId}}">-</text><text>{{item._qty||0}}</text><text bindtap="inc" data-id="{{item.productId}}">+</text></view></view></view><view class="bar" wx:if="{{total>0}}"><text>&#165;{{total}}</text><button bindtap="submit">挂账</button></view></view>
+<view class="page">
+  <view class="banner">🏠 扫码点单加购</view>
+  <scroll-view class="tabs" scroll-x>
+    <view class="tab {{tabAll}}" bindtap="setCat" data-cat="">全部</view>
+    <view class="tab {{tabTea}}" bindtap="setCat" data-cat="Tea">茶叶</view>
+    <view class="tab {{tabSnack}}" bindtap="setCat" data-cat="Snack">茶点</view>
+  </scroll-view>
+  <view class="list">
+    <view class="item" wx:for="{{items}}" wx:key="productId">
+      <text>{{item.name}}</text>
+      <text class="price">¥{{item.price}}</text>
+      <view class="qty">
+        <text bindtap="dec" data-id="{{item.productId}}">-</text>
+        <text>{{item._qty || 0}}</text>
+        <text bindtap="inc" data-id="{{item.productId}}">+</text>
+      </view>
+    </view>
+  </view>
+  <view class="bar" wx:if="{{total > 0}}">
+    <text>¥{{total}}</text>
+    <button bindtap="submit">挂账</button>
+  </view>
+</view>

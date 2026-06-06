@@ -1,1 +1,55 @@
-const API = require("../../utils/api");Page({data:{products:[],items:[],cat:"",total:0,roomId:""},onLoad(e){this.setData({roomId:e.room_id||""});API.getProducts().then(products=>{const p=products.map(x=>({...x,_qty:0}));this.setData({products:p,items:p})})},setCat(e){const cat=e.currentTarget.dataset.cat;const list=cat?this.data.products.filter(p=>p.category===cat):this.data.products;this.setData({cat:cat,items:list})},inc(e){const id=e.currentTarget.dataset.id;const p=this.data.products.map(x=>x.productId===id?{...x,_qty:(x._qty||0)+1}:x);this.setData({products:p,items:p.filter(x=>!this.data.cat||x.category===this.data.cat)},()=>this.calc())},dec(e){const id=e.currentTarget.dataset.id;const p=this.data.products.map(x=>x.productId===id&&x._qty>0?{...x,_qty:x._qty-1}:x);this.setData({products:p,items:p.filter(x=>!this.data.cat||x.category===this.data.cat)},()=>this.calc())},calc(){const t=this.data.products.reduce((s,x)=>s+(x._qty||0)*x.price,0);this.setData({total:t.toFixed(2)})},submit(){const items=this.data.products.filter(x=>x._qty>0).map(x=>({productId:x.productId,quantity:x._qty,unitPrice:x.price}));API.createScanOrder({roomId:this.data.roomId,storeId:"ST001",items}).then(()=>{wx.showToast({title:"加购成功",icon:"success"});this.setData({products:this.data.products.map(x=>({...x,_qty:0})),total:0})}).catch(()=>wx.showToast({title:"下单失败",icon:"none"}))}})
+const API = require("../../utils/api")
+
+Page({
+  data: {
+    products: [], items: [], cat: "", total: 0, roomId: "",
+    tabAll: "active", tabTea: "", tabSnack: ""
+  },
+
+  onLoad(e) {
+    this.setData({ roomId: e.room_id || "" })
+    API.getProducts().then(products => {
+      const p = products.map(x => ({ ...x, _qty: 0 }))
+      this.setData({ products: p, items: p })
+    })
+  },
+
+  setCat(e) {
+    const cat = e.currentTarget.dataset.cat
+    const list = cat ? this.data.products.filter(p => p.category === cat) : this.data.products
+    this.setData({
+      cat: cat,
+      items: list,
+      tabAll: cat === "" ? "active" : "",
+      tabTea: cat === "Tea" ? "active" : "",
+      tabSnack: cat === "Snack" ? "active" : ""
+    })
+  },
+
+  inc(e) {
+    const id = e.currentTarget.dataset.id
+    const p = this.data.products.map(x => x.productId === id ? { ...x, _qty: (x._qty || 0) + 1 } : x)
+    this.setData({ products: p, items: p.filter(x => !this.data.cat || x.category === this.data.cat) }, () => this.calc())
+  },
+
+  dec(e) {
+    const id = e.currentTarget.dataset.id
+    const p = this.data.products.map(x => x.productId === id && x._qty > 0 ? { ...x, _qty: x._qty - 1 } : x)
+    this.setData({ products: p, items: p.filter(x => !this.data.cat || x.category === this.data.cat) }, () => this.calc())
+  },
+
+  calc() {
+    const t = this.data.products.reduce((s, x) => s + (x._qty || 0) * x.price, 0)
+    this.setData({ total: t.toFixed(2) })
+  },
+
+  submit() {
+    const items = this.data.products.filter(x => x._qty > 0).map(x => ({
+      productId: x.productId, quantity: x._qty, unitPrice: x.price
+    }))
+    API.createScanOrder({ roomId: this.data.roomId, storeId: "ST001", items }).then(() => {
+      wx.showToast({ title: "加购成功", icon: "success" })
+      this.setData({ products: this.data.products.map(x => ({ ...x, _qty: 0 })), total: 0 })
+    }).catch(() => wx.showToast({ title: "下单失败", icon: "none" }))
+  }
+})
