@@ -1,6 +1,9 @@
 # 微信小程序上传私钥（从mp.weixin.qq.com下载，不可泄露）
 private.key
 
+# 本地凭据备忘
+CREDENTIALS_README.md
+
 # 预览二维码
 preview-*.jpg
 
