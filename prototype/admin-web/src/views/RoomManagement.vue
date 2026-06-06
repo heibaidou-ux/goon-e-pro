@@ -27,6 +27,11 @@
               <t-option value="Workspace" label="工作间" />
             </t-select>
           </t-col>
+          <t-col :span="3" style="text-align:right">
+            <t-button theme="primary" variant="outline" @click="batchGenerateAllQr" :loading="batchGenerating">
+              📱 批量生成房间码
+            </t-button>
+          </t-col>
         </t-row>
 
         <t-table
@@ -65,6 +70,7 @@
               <t-button size="small" variant="text" theme="primary" @click="viewDetail(row)">详情</t-button>
               <t-button size="small" variant="text" theme="primary" @click="editRoom(row)">编辑</t-button>
               <t-button size="small" variant="text" theme="warning" @click="openQRCode(row)">溯源码</t-button>
+              <t-button v-if="row.roomCode" size="small" variant="text" theme="default" @click="renewQRCode(row)">换码</t-button>
             </t-space>
           </template>
         </t-table>
@@ -132,14 +138,53 @@
             ⬇️ 下载溯源码
           </t-button>
         </t-space>
+
+        <t-divider style="margin:16px 0" />
+        <t-space size="small" style="width:100%">
+          <t-button variant="text" theme="primary" size="small" @click="loadQRHistory(qrRoom)">
+            📜 查看换码历史
+          </t-button>
+          <t-button v-if="qrRoom.roomCode" variant="text" theme="danger" size="small" @click="confirmRenew(qrRoom)">
+            🔄 重新生成（旧码失效）
+          </t-button>
+        </t-space>
       </div>
     </t-dialog>
+
+    <!-- Batch QR Result Dialog -->
+    <t-dialog v-model:visible="showBatchQRDialog" header="批量生成结果" width="500px" :footer="false">
+      <t-alert v-if="batchResult.success" theme="success" :message="`成功为 ${batchResult.count} 个房间生成溯源码`" style="margin-bottom:12px" />
+      <t-alert v-else theme="error" :message="batchResult.error || '生成失败'" style="margin-bottom:12px" />
+      <t-table v-if="batchResult.items?.length" :data="batchResult.items" :columns="batchResultColumns" row-key="roomId" size="small" max-height="300" />
+    </t-dialog>
+
+    <!-- Renew Confirm Dialog -->
+    <t-dialog v-model:visible="showRenewConfirm" header="确认更换溯源码" width="380px" :confirm-btn="{ content: '确认更换', theme: 'danger', loading: renewing }" :cancel-btn="{}" @confirm="doRenew">
+      <p style="margin-bottom:12px;font-size:14px;color:#666">更换后，<strong>{{ renewRoom?.name }}</strong> 的旧溯源码将立即失效。</p>
+      <t-alert theme="warning" message="客人桌上已有的旧码需同步更换，请确保新码立牌/贴纸已准备就绪。" />
+    </t-dialog>
+
+    <!-- QR History Drawer -->
+    <t-drawer v-model:visible="showQRHistory" :header="`${historyRoom?.name} — 换码历史`" size="400px" :footer="false">
+      <div v-if="qrHistoryList.length === 0" style="text-align:center;padding:40px;color:#999">暂无换码记录</div>
+      <t-timeline v-else>
+        <t-timeline-item v-for="h in qrHistoryList" :key="h.logId" :label="h.operatedAt">
+          <div><strong>{{ h.actionLabel }}</strong></div>
+          <div style="font-size:12px;color:#999">
+            <span v-if="h.oldRoomCode">旧码: {{ h.oldRoomCode }}</span>
+            <span v-if="h.oldRoomCode && h.newRoomCode"> → </span>
+            <span v-if="h.newRoomCode">新码: {{ h.newRoomCode }}</span>
+          </div>
+          <div style="font-size:11px;color:#bbb">操作人: {{ h.operatorId }}</div>
+        </t-timeline-item>
+      </t-timeline>
+    </t-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { roomApi, orderApi, iotApi } from '../services/api'
+import { roomApi, orderApi, iotApi, scanApi } from '../services/api'
 
 const loading = ref(false)
 const loadError = ref('')
@@ -156,6 +201,21 @@ const qrTableOptions = ref([1])
 const rooms = ref<any[]>([])
 const orders = ref<any[]>([])
 const devices = ref<any[]>([])
+
+// V1.1 批量二维码
+const showBatchQRDialog = ref(false)
+const batchGenerating = ref(false)
+const batchResult = ref<{ success: boolean; count: number; items: any[]; error?: string }>({ success: false, count: 0, items: [] })
+
+// V1.1 换码
+const showRenewConfirm = ref(false)
+const renewing = ref(false)
+const renewRoom = ref<any>(null)
+
+// V1.1 换码历史
+const showQRHistory = ref(false)
+const historyRoom = ref<any>(null)
+const qrHistoryList = ref<any[]>([])
 
 // ── Normalize ──
 
@@ -345,6 +405,90 @@ async function loadData() {
 }
 
 onMounted(loadData)
+
+// ═══════════════════════════════════════════
+// V1.1 批量二维码生成
+// ═══════════════════════════════════════════
+
+const batchResultColumns = [
+  { colKey: 'roomName', title: '房间', width: 100 },
+  { colKey: 'qrPayload', title: '溯源码Payload', ellipsis: true },
+]
+
+async function batchGenerateAllQr() {
+  batchGenerating.value = true
+  try {
+    const storeId = localStorage.getItem('erp_store_id') || 'S001'
+    const res = await scanApi.batchQrCodes(storeId)
+    batchResult.value = { success: true, count: res.count, items: res.items }
+    showBatchQRDialog.value = true
+    showToast(`已为 ${res.count} 个房间生成溯源码`)
+  } catch (e: any) {
+    batchResult.value = { success: false, count: 0, items: [], error: e.message || '生成失败' }
+    showBatchQRDialog.value = true
+  } finally {
+    batchGenerating.value = false
+  }
+}
+
+// ═══════════════════════════════════════════
+// V1.1 换码
+// ═══════════════════════════════════════════
+
+function confirmRenew(room: any) {
+  renewRoom.value = room
+  showRenewConfirm.value = true
+}
+
+async function doRenew() {
+  if (!renewRoom.value) return
+  renewing.value = true
+  try {
+    const res = await scanApi.renewQrCode(renewRoom.value.roomId)
+    showToast(`✅ 溯源码已更换: ${res.newRoomCode}`)
+    showRenewConfirm.value = false
+    // Refresh data to show updated room code
+    await loadData()
+  } catch (e: any) {
+    showToast('❌ 换码失败: ' + (e.message || e))
+  } finally {
+    renewing.value = false
+  }
+}
+
+// ═══════════════════════════════════════════
+// V1.1 换码历史
+// ═══════════════════════════════════════════
+
+async function loadQRHistory(room: any) {
+  historyRoom.value = room
+  showQRHistory.value = true
+  // Parse room.qrHistory JSON to get timeline
+  try {
+    if (room.qrHistory) {
+      const parsed = typeof room.qrHistory === 'string' ? JSON.parse(room.qrHistory) : room.qrHistory
+      qrHistoryList.value = (parsed || []).map((h: any, i: number) => ({
+        logId: `h_${i}`,
+        operatedAt: h.changedAt?.replace('T', ' ') || '',
+        actionLabel: '换码',
+        oldRoomCode: h.oldCode || '',
+        newRoomCode: h.newCode || '',
+        operatorId: h.changedBy || '',
+      }))
+    } else {
+      // No history in room data — show initial generation entry
+      qrHistoryList.value = [{
+        logId: 'init',
+        operatedAt: room.createdAt?.replace('T', ' ') || '—',
+        actionLabel: '初始生成',
+        newRoomCode: room.roomCode || '—',
+        operatorId: '系统',
+      }]
+    }
+  } catch {
+    qrHistoryList.value = []
+  }
+}
 </script>
 
 <style scoped>

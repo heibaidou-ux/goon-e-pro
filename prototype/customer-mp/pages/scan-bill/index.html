@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>房间账单</title>
+<script src="../../js/sdk.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:100%; max-width:100%; min-height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; padding-bottom:80px; }
+.page::-webkit-scrollbar { display:none; }
+
+.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:10; }
+.header-back { font-size:20px; cursor:pointer; padding:4px; color:#333; text-decoration:none; }
+.header-title { font-size:17px; font-weight:700; color:#1a1a1a; flex:1; }
+
+/* Room info */
+.room-header { padding:16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; }
+.room-header-name { font-size:20px; font-weight:700; margin-bottom:4px; }
+.room-header-order { font-size:12px; opacity:.8; }
+
+/* Summary card */
+.summary-card { margin:12px 16px; background:#fff; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.summary-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:14px; }
+.summary-row .label { color:#666; }
+.summary-row .value { font-weight:600; color:#333; }
+.summary-row.room-charge .value { color:#333; }
+.summary-row.scan-total .value { color:#B8860B; }
+.summary-divider { height:1px; background:#f0f0f0; margin:4px 0; }
+.summary-row.total { border-top:1px solid #e8e8e8; margin-top:4px; padding-top:12px; font-size:16px; }
+.summary-row.total .value { color:#B8860B; font-size:20px; }
+
+/* Order list */
+.section-title { padding:16px 16px 8px; font-size:14px; font-weight:600; color:#666; }
+.order-card { margin:0 16px 10px; background:#fff; border-radius:12px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.order-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.order-card-time { font-size:12px; color:#999; }
+.order-card-status { font-size:11px; padding:2px 8px; border-radius:10px; background:#f0fdf4; color:#2e7d32; }
+.order-card-status.cancelled { background:#fce4e4; color:#e53935; }
+.order-card-items { margin-bottom:8px; }
+.order-card-item { display:flex; justify-content:space-between; font-size:13px; color:#666; padding:2px 0; }
+.order-card-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f5f5f5; padding-top:8px; }
+.order-card-total { font-weight:600; color:#B8860B; }
+.order-card-cancel { font-size:12px; color:#e53935; cursor:pointer; border:none; background:none; padding:4px; }
+.order-card-cancel:disabled { color:#ccc; cursor:not-allowed; }
+.order-card-cancel:active { opacity:.7; }
+
+/* Empty state */
+.empty-state { text-align:center; padding:60px 20px; }
+.empty-icon { font-size:48px; margin-bottom:12px; }
+.empty-text { font-size:14px; color:#ccc; }
+
+/* Bottom bar */
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f0f0f0; padding:10px 16px; display:flex; align-items:center; gap:12px; z-index:20; max-width:430px; margin:0 auto; }
+.bottom-info { flex:1; }
+.bottom-label { font-size:12px; color:#999; }
+.bottom-total { font-size:18px; font-weight:700; color:#B8860B; }
+.bottom-btn { padding:12px 24px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.bottom-btn:active { opacity:.85; }
+.bottom-btn.disabled { opacity:.4; pointer-events:none; }
+
+/* Settle dialog */
+.settle-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.5); display:none; align-items:flex-end; justify-content:center; z-index:30; }
+.settle-sheet { background:#fff; border-radius:16px 16px 0 0; width:100%; max-width:430px; padding:24px 20px; padding-bottom:30px; }
+.settle-title { font-size:16px; font-weight:600; text-align:center; margin-bottom:16px; }
+.settle-amount { text-align:center; margin-bottom:20px; }
+.settle-amount-label { font-size:13px; color:#999; }
+.settle-amount-value { font-size:32px; font-weight:700; color:#B8860B; margin-top:4px; }
+.settle-option { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid #f5f5f5; }
+.settle-option-label { font-size:14px; color:#333; }
+.settle-select { padding:8px 12px; border:1px solid #ddd; border-radius:8px; font-size:14px; background:#fff; }
+.settle-btns { display:flex; gap:10px; margin-top:20px; }
+.settle-btn-cancel { flex:1; padding:14px; border-radius:10px; border:1px solid #ddd; background:#fff; font-size:15px; cursor:pointer; }
+.settle-btn-ok { flex:2; padding:14px; border-radius:10px; border:none; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+.settle-btn-ok:active { opacity:.85; }
+
+/* Loading / Error */
+.loading-state { text-align:center; padding:80px 20px; }
+.loading-spinner { width:32px; height:32px; border:3px solid #e8e8e8; border-top-color:#5D8A6B; border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 12px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-text { color:#999; font-size:14px; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="header">
+    <a class="header-back" href="javascript:history.back()">‹</a>
+    <div class="header-title">房间账单</div>
+  </div>
+
+  <div class="page" id="app">
+    <!-- Loading -->
+    <div id="loadingState" class="loading-state">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">加载账单中...</div>
+    </div>
+
+    <!-- Error -->
+    <div id="errorState" class="empty-state" style="display:none">
+      <div class="empty-icon">⚠️</div>
+      <div class="empty-text" id="errorText">账单加载失败</div>
+      <button style="margin-top:16px;padding:10px 32px;background:#5D8A6B;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;" onclick="loadBill()">重试</button>
+    </div>
+
+    <!-- Content -->
+    <div id="contentArea" style="display:none">
+      <div class="room-header">
+        <div class="room-header-name" id="roomName"></div>
+        <div class="room-header-order" id="roomOrderId"></div>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <div class="summary-row room-charge"><span class="label">🏠 房费</span><span class="value" id="roomCharge">¥0</span></div>
+        <div class="summary-row scan-total"><span class="label">🛒 扫码加购</span><span class="value" id="scanTotal">¥0</span></div>
+        <div class="summary-divider"></div>
+        <div class="summary-row total"><span class="label">待结算</span><span class="value" id="pendingPayment">¥0</span></div>
+      </div>
+
+      <!-- Orders -->
+      <div class="section-title">加购明细</div>
+      <div id="orderList"></div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar" id="bottomBar" style="display:none">
+    <div class="bottom-info">
+      <div class="bottom-label">挂账总计</div>
+      <div class="bottom-total" id="bottomTotal">¥0.00</div>
+    </div>
+    <button class="bottom-btn" id="settleBtn" onclick="showSettle()">🧹 结算</button>
+  </div>
+
+  <!-- Settle dialog -->
+  <div class="settle-overlay" id="settleOverlay">
+    <div class="settle-sheet">
+      <div class="settle-title">挂账结算</div>
+      <div class="settle-amount">
+        <div class="settle-amount-label">待结算金额</div>
+        <div class="settle-amount-value" id="settleAmount">¥0.00</div>
+      </div>
+      <div class="settle-option">
+        <span class="settle-option-label">支付方式</span>
+        <select class="settle-select" id="settlePayment">
+          <option value="WxPay">微信支付</option>
+          <option value="AliPay">支付宝</option>
+          <option value="MemberBalance">会员余额</option>
+          <option value="Cash">现金</option>
+        </select>
+      </div>
+      <div class="settle-option">
+        <span class="settle-option-label">开具发票</span>
+        <label><input type="checkbox" id="settleInvoice" /> 需要发票</label>
+      </div>
+      <div class="settle-btns">
+        <button class="settle-btn-cancel" onclick="hideSettle()">取消</button>
+        <button class="settle-btn-ok" onclick="doSettle()">✅ 确认结算</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var ROOM_ID = '';
+var STORE_ID = '';
+var billData = null;
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  ROOM_ID = params.get('room_id') || '';
+  STORE_ID = params.get('store_id') || '';
+  if (!ROOM_ID) {
+    showError('缺少房间信息');
+  } else {
+    loadBill();
+  }
+})();
+
+function loadBill() {
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('errorState').style.display = 'none';
+  document.getElementById('contentArea').style.display = 'none';
+  document.getElementById('bottomBar').style.display = 'none';
+
+  ERP.SDK.API.getScanBill(ROOM_ID).then(function(bill) {
+    billData = bill;
+    renderBill(bill);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('contentArea').style.display = 'block';
+    if (bill.scanOrders && bill.scanOrders.length > 0) {
+      document.getElementById('bottomBar').style.display = 'flex';
+    }
+  }).catch(function(err) {
+    document.getElementById('loadingState').style.display = 'none';
+    showError(err.message || '加载失败');
+  });
+}
+
+function showError(msg) {
+  document.getElementById('errorState').style.display = 'block';
+  document.getElementById('errorText').textContent = msg;
+}
+
+function renderBill(bill) {
+  document.getElementById('roomName').textContent = '🏠 ' + (bill.roomName || '房间');
+  document.getElementById('roomOrderId').textContent = '房间订单：' + (bill.activeOrderId || '—');
+
+  document.getElementById('roomCharge').textContent = '¥' + (bill.billSummary.roomCharge || 0).toFixed(2);
+  document.getElementById('scanTotal').textContent = '¥' + (bill.billSummary.scanTotal || 0).toFixed(2);
+  document.getElementById('pendingPayment').textContent = '¥' + (bill.billSummary.pendingPayment || 0).toFixed(2);
+  document.getElementById('bottomTotal').textContent = '¥' + (bill.billSummary.scanTotal || 0).toFixed(2);
+
+  // Render order list
+  var orders = bill.scanOrders || [];
+  var html = '';
+  if (orders.length === 0) {
+    html = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">暂无加购记录</div></div>';
+  } else {
+    orders.forEach(function(o) {
+      var itemsHtml = '';
+      (o.items || []).forEach(function(item) {
+        itemsHtml += '<div class="order-card-item"><span>' + item.productName + '</span><span>×' + item.quantity + '  ¥' + item.subtotal.toFixed(2) + '</span></div>';
+      });
+      var statusClass = o.status === '已撤销' ? 'cancelled' : '';
+      html += '<div class="order-card">' +
+        '<div class="order-card-header">' +
+          '<span class="order-card-time">' + (o.createdAt ? o.createdAt.replace('T',' ').slice(0,16) : '') + '</span>' +
+          '<span class="order-card-status ' + statusClass + '">' + o.status + '</span>' +
+        '</div>' +
+        '<div class="order-card-items">' + itemsHtml + '</div>' +
+        '<div class="order-card-footer">' +
+          '<span class="order-card-total">¥' + o.totalAmount.toFixed(2) + '</span>' +
+          '<button class="order-card-cancel" onclick="cancelOrder(\'' + o.orderId + '\')"' + (o.canCancel ? '' : ' disabled') + '>' + (o.canCancel ? '撤销' : '不可撤销') + '</button>' +
+        '</div></div>';
+    });
+  }
+  document.getElementById('orderList').innerHTML = html;
+}
+
+function cancelOrder(orderId) {
+  ERP.SDK.UI.confirm('确认撤销', '撤销后该商品将从挂账中移除，库存自动回滚。', '确认撤销', '再想想').then(function(confirmed) {
+    if (!confirmed) return;
+    ERP.SDK.API.cancelScanOrder(orderId).then(function(res) {
+      ERP.SDK.UI.toast('✅ 已撤销');
+      loadBill(); // refresh
+    }).catch(function(err) {
+      ERP.SDK.UI.toast('❌ 撤销失败：' + (err.message || ''));
+    });
+  });
+}
+
+function showSettle() {
+  var total = billData ? billData.billSummary.scanTotal : 0;
+  document.getElementById('settleAmount').textContent = '¥' + total.toFixed(2);
+  document.getElementById('settleOverlay').style.display = 'flex';
+}
+
+function hideSettle() {
+  document.getElementById('settleOverlay').style.display = 'none';
+}
+
+function doSettle() {
+  var payment = document.getElementById('settlePayment').value;
+  var invoice = document.getElementById('settleInvoice').checked;
+
+  ERP.SDK.API.settleScanBill(ROOM_ID, {
+    paymentMethod: payment,
+    issueInvoice: invoice,
+    useMemberBalance: payment === 'MemberBalance'
+  }).then(function(res) {
+    hideSettle();
+    var msg = '✅ 结算成功！共 ' + res.ordersSettled + ' 笔，金额 ¥' + res.totalAmount.toFixed(2);
+    if (res.invoiceNumber) msg += '\n发票号：' + res.invoiceNumber;
+    ERP.SDK.UI.toast(msg, 3000);
+    loadBill(); // refresh
+  }).catch(function(err) {
+    ERP.SDK.UI.toast('❌ 结算失败：' + (err.message || ''));
+  });
+}
+</script>
+</body>
+</html>

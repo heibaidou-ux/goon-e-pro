@@ -11,6 +11,7 @@ const routeResourceMap: Record<string, string> = {
   '/alerts': 'MENU_ALERTS',
   '/audit': 'MENU_AUDIT',
   '/orders': 'MENU_ORDERS',
+  '/scan-bills': 'MENU_SCAN_BILLS',
   '/products': 'MENU_PRODUCTS',
   '/purchases': 'MENU_PURCHASES',
   '/inventory': 'MENU_INVENTORY',
@@ -54,6 +55,7 @@ const router = createRouter({
     { path: '/audit', name: 'AuditLog', component: () => import('@/views/AuditLog.vue'), meta: { title: '操作审计' } },
 
     { path: '/orders', name: 'OrderManagement', component: () => import('@/views/OrderManagement.vue'), meta: { title: '订单管理' } },
+    { path: '/scan-bills', name: 'ScanBillManagement', component: () => import('@/views/ScanBillManagement.vue'), meta: { title: '扫码账单管理' } },
 
     // D05 供应链域
     { path: '/products', name: 'ProductCatalog', component: () => import('@/views/ProductCatalog.vue'), meta: { title: '商品目录管理' } },

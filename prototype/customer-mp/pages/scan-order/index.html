@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>扫码点单</title>
+<script src="../../js/sdk.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f5f5; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:100%; max-width:100%; min-height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+.page { flex:1; overflow-y:auto; scrollbar-width:none; padding-bottom:80px; }
+.page::-webkit-scrollbar { display:none; }
+
+/* Header */
+.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:12px; }
+.header-back { font-size:20px; cursor:pointer; padding:4px; color:#333; text-decoration:none; }
+.header-title { font-size:17px; font-weight:700; color:#1a1a1a; flex:1; }
+
+/* Room banner */
+.room-banner { background:linear-gradient(135deg,#f0fdf4,#e8f5e9); padding:12px 16px; border-bottom:1px solid #dcedc8; display:flex; align-items:center; gap:8px; font-size:13px; color:#333; }
+.room-banner-icon { font-size:18px; }
+.room-banner-text { flex:1; }
+.room-banner-text strong { color:#2e7d32; }
+
+/* Category tabs */
+.cat-tabs { display:flex; padding:10px 16px; gap:8px; background:#fff; border-bottom:1px solid #f5f5f5; position:sticky; top:56px; z-index:9; overflow-x:auto; scrollbar-width:none; }
+.cat-tabs::-webkit-scrollbar { display:none; }
+.cat-tab { flex-shrink:0; padding:7px 18px; border-radius:18px; font-size:13px; cursor:pointer; background:#f5f5f5; color:#666; border:none; transition:all .15s; }
+.cat-tab.active { background:#5D8A6B; color:#fff; }
+
+/* Products */
+.product-list { padding:10px 16px; }
+.product-card { display:flex; padding:12px; border-radius:12px; background:#fafafa; margin-bottom:10px; align-items:center; }
+.product-img { width:52px; height:52px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; background:#f0f0f0; }
+.product-body { flex:1; margin-left:12px; }
+.product-name { font-size:14px; font-weight:600; color:#333; }
+.product-desc { font-size:11px; color:#999; margin-top:2px; }
+.product-footer { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+.product-price { font-size:16px; font-weight:700; color:#B8860B; }
+.product-price .unit { font-size:11px; font-weight:400; color:#999; }
+.qty-ctrl { display:flex; align-items:center; gap:8px; }
+.qty-btn { width:26px; height:26px; border-radius:50%; border:1px solid #ddd; background:#fff; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#333; font-weight:600; }
+.qty-btn:active { background:#f0f0f0; }
+.qty-btn.disabled { opacity:.3; pointer-events:none; }
+.qty-num { font-size:14px; font-weight:600; min-width:20px; text-align:center; color:#333; }
+
+/* Bottom bar */
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f0f0f0; padding:10px 16px; display:flex; align-items:center; gap:12px; z-index:20; max-width:430px; margin:0 auto; }
+.bottom-info { flex:1; }
+.bottom-count { font-size:12px; color:#999; }
+.bottom-total { font-size:18px; font-weight:700; color:#B8860B; }
+.bottom-hint { font-size:11px; color:#bbb; margin-top:1px; }
+.bottom-btn { padding:12px 24px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.bottom-btn:active { opacity:.85; }
+.bottom-btn.disabled { opacity:.5; pointer-events:none; }
+
+/* Confirm dialog */
+.confirm-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.5); display:none; align-items:flex-end; justify-content:center; z-index:30; }
+.confirm-sheet { background:#fff; border-radius:16px 16px 0 0; width:100%; max-width:430px; padding:24px 20px; padding-bottom:30px; }
+.confirm-title { font-size:16px; font-weight:600; text-align:center; margin-bottom:16px; }
+.confirm-items { max-height:240px; overflow-y:auto; margin-bottom:16px; }
+.confirm-item { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #f5f5f5; }
+.confirm-item-name { flex:1; font-size:14px; }
+.confirm-item-qty { color:#999; margin-right:16px; font-size:13px; }
+.confirm-item-price { font-weight:600; color:#B8860B; font-size:14px; }
+.confirm-total { display:flex; justify-content:space-between; padding:12px 0; border-top:1px solid #e8e8e8; font-size:16px; font-weight:600; }
+.confirm-total .label { color:#666; }
+.confirm-total .value { color:#B8860B; }
+.confirm-hint { font-size:12px; color:#999; text-align:center; padding:10px 0; }
+.confirm-btns { display:flex; gap:10px; margin-top:8px; }
+.confirm-btn-cancel { flex:1; padding:14px; border-radius:10px; border:1px solid #ddd; background:#fff; font-size:15px; cursor:pointer; }
+.confirm-btn-ok { flex:2; padding:14px; border-radius:10px; border:none; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+.confirm-btn-ok:active { opacity:.85; }
+
+/* Success toast overlay */
+.success-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:40; }
+.success-box { background:#fff; border-radius:16px; padding:40px 32px; text-align:center; width:300px; }
+.success-box-icon { font-size:48px; margin-bottom:12px; }
+.success-box-title { font-size:18px; font-weight:700; color:#333; margin-bottom:8px; }
+.success-box-desc { font-size:14px; color:#999; margin-bottom:20px; line-height:1.5; }
+.success-box-btn { padding:12px 0; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; width:100%; }
+.success-box-btn.outline { background:#fff; color:#5D8A6B; border:1.5px solid #5D8A6B; margin-top:8px; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- Header -->
+  <div class="header">
+    <a class="header-back" href="javascript:history.back()">‹</a>
+    <div class="header-title">扫码点单</div>
+  </div>
+
+  <!-- Room banner -->
+  <div class="room-banner">
+    <span class="room-banner-icon">🏠</span>
+    <span class="room-banner-text">当前房间：<strong id="roomName">加载中...</strong> · 加购自动挂入账单</span>
+  </div>
+
+  <!-- Category tabs -->
+  <div class="cat-tabs" id="catTabs">
+    <button class="cat-tab active" data-cat="" onclick="switchCategory(this, '')">全部</button>
+    <button class="cat-tab" data-cat="Tea" onclick="switchCategory(this, 'Tea')">🍵 茶叶</button>
+    <button class="cat-tab" data-cat="Snack" onclick="switchCategory(this, 'Snack')">🍪 茶点</button>
+    <button class="cat-tab" data-cat="Ware" onclick="switchCategory(this, 'Ware')">🏺 茶具</button>
+  </div>
+
+  <!-- Page content -->
+  <div class="page" id="productList"></div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <div class="bottom-info">
+      <div class="bottom-count" id="cartCount">已选 0 件</div>
+      <div class="bottom-total" id="cartTotal">¥0.00</div>
+      <div class="bottom-hint">扫码加购 · 挂账消费</div>
+    </div>
+    <button class="bottom-btn disabled" id="checkoutBtn" onclick="showConfirm()">加入账单</button>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-sheet">
+      <div class="confirm-title">确认加入房间账单</div>
+      <div class="confirm-items" id="confirmItems"></div>
+      <div class="confirm-total"><span class="label">合计（挂账）</span><span class="value" id="confirmTotal">¥0.00</span></div>
+      <div class="confirm-hint">💡 订单金额将挂入房间账单，离店时统一结算</div>
+      <div class="confirm-btns">
+        <button class="confirm-btn-cancel" onclick="hideConfirm()">取消</button>
+        <button class="confirm-btn-ok" onclick="submitOrder()">✅ 确认加入账单</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success overlay -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <div class="success-box-icon">✅</div>
+      <div class="success-box-title">点单成功！</div>
+      <div class="success-box-desc" id="successDesc">商品已挂入房间账单</div>
+      <button class="success-box-btn" onclick="continueOrder()">继续点单</button>
+      <button class="success-box-btn outline" onclick="goToBill()">查看房间账单</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var ROOM_ID = '';
+var STORE_ID = '';
+var products = [];
+var cart = {}; // { productId: { product, qty } }
+var currentCat = '';
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  ROOM_ID = params.get('room_id') || '';
+  STORE_ID = params.get('store_id') || '';
+  if (ROOM_ID) {
+    ERP.SDK.API.scanRoomStatus(ROOM_ID).then(function(info) {
+      document.getElementById('roomName').textContent = info.roomName + (info.storeName ? ' · ' + info.storeName : '');
+    }).catch(function() {});
+  }
+  loadProducts();
+})();
+
+function loadProducts() {
+  ERP.SDK.API.getProducts().then(function(list) {
+    products = list;
+    renderProducts();
+  });
+}
+
+function switchCategory(btn, cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(function(el) { el.classList.remove('active'); });
+  btn.classList.add('active');
+  renderProducts();
+}
+
+function renderProducts() {
+  var list = products;
+  if (currentCat) list = list.filter(function(p) { return p.category === currentCat; });
+  var html = '<div class="product-list">';
+  list.forEach(function(p) {
+    var qty = cart[p.productId] ? cart[p.productId].qty : 0;
+    html += '<div class="product-card">' +
+      '<div class="product-img">' + (p.image || '📦') + '</div>' +
+      '<div class="product-body">' +
+        '<div class="product-name">' + p.name + '</div>' +
+        '<div class="product-desc">' + (p.desc || '') + '</div>' +
+        '<div class="product-footer">' +
+          '<div class="product-price">¥' + p.price.toFixed(2) + ' <span class="unit">/份</span></div>' +
+          '<div class="qty-ctrl">' +
+            '<button class="qty-btn' + (qty === 0 ? ' disabled' : '') + '" onclick="decQty(\'' + p.productId + '\')">−</button>' +
+            '<span class="qty-num">' + qty + '</span>' +
+            '<button class="qty-btn" onclick="incQty(\'' + p.productId + '\')">+</button>' +
+          '</div>' +
+        '</div>' +
+      '</div></div>';
+  });
+  if (list.length === 0) html += '<div style="text-align:center;padding:60px 20px;color:#ccc;font-size:14px;">暂无商品</div>';
+  html += '</div>';
+  document.getElementById('productList').innerHTML = html;
+  updateCartBar();
+}
+
+function incQty(id) {
+  if (!cart[id]) {
+    var p = null;
+    products.forEach(function(pr) { if (pr.productId === id) p = pr; });
+    if (!p) return;
+    cart[id] = { product: p, qty: 0 };
+  }
+  cart[id].qty++;
+  renderProducts();
+}
+
+function decQty(id) {
+  if (!cart[id] || cart[id].qty <= 0) return;
+  cart[id].qty--;
+  if (cart[id].qty === 0) delete cart[id];
+  renderProducts();
+}
+
+function updateCartBar() {
+  var count = 0, total = 0;
+  for (var id in cart) {
+    count += cart[id].qty;
+    total += cart[id].qty * cart[id].product.price;
+  }
+  document.getElementById('cartCount').textContent = '已选 ' + count + ' 件';
+  document.getElementById('cartTotal').textContent = '¥' + total.toFixed(2);
+  var btn = document.getElementById('checkoutBtn');
+  if (count > 0) {
+    btn.classList.remove('disabled');
+    btn.textContent = '加入账单 · ¥' + total.toFixed(2);
+  } else {
+    btn.classList.add('disabled');
+    btn.textContent = '加入账单';
+  }
+}
+
+function showConfirm() {
+  var count = 0, total = 0;
+  var html = '';
+  for (var id in cart) {
+    count += cart[id].qty;
+    total += cart[id].qty * cart[id].product.price;
+    html += '<div class="confirm-item">' +
+      '<span class="confirm-item-name">' + cart[id].product.name + '</span>' +
+      '<span class="confirm-item-qty">×' + cart[id].qty + '</span>' +
+      '<span class="confirm-item-price">¥' + (cart[id].qty * cart[id].product.price).toFixed(2) + '</span>' +
+      '</div>';
+  }
+  document.getElementById('confirmItems').innerHTML = html;
+  document.getElementById('confirmTotal').textContent = '¥' + total.toFixed(2);
+  document.getElementById('confirmOverlay').style.display = 'flex';
+}
+
+function hideConfirm() {
+  document.getElementById('confirmOverlay').style.display = 'none';
+}
+
+function submitOrder() {
+  var items = [];
+  for (var id in cart) {
+    items.push({
+      productId: id,
+      quantity: cart[id].qty,
+      unitPrice: cart[id].product.price
+    });
+  }
+  if (items.length === 0) return;
+
+  ERP.SDK.API.createScanOrder({
+    roomId: ROOM_ID,
+    storeId: STORE_ID || 'ST001',
+    items: items
+  }).then(function(result) {
+    hideConfirm();
+    document.getElementById('successDesc').textContent = '共 ' + result.itemCount + ' 件商品，金额 ¥' + result.totalAmount.toFixed(2) + ' 已挂入房间账单';
+    document.getElementById('successOverlay').style.display = 'flex';
+    cart = {};
+    renderProducts();
+  }).catch(function(err) {
+    ERP.SDK.UI.toast('❌ 下单失败：' + (err.message || '网络异常'));
+  });
+}
+
+function continueOrder() {
+  document.getElementById('successOverlay').style.display = 'none';
+}
+
+function goToBill() {
+  window.location.href = '../scan-bill/index.html?room_id=' + ROOM_ID + '&store_id=' + STORE_ID;
+}
+</script>
+</body>
+</html>

@@ -661,6 +661,121 @@
     return delay().then(function() { return JSON.parse(JSON.stringify(MOCK.inspections)); });
   };
 
+  // ── 扫码消费（V1.1）──
+
+  /** 扫码验证房间状态（防误扫） */
+  API.scanRoomStatus = function(roomId) {
+    return delay().then(function() {
+      var room = null;
+      MOCK.rooms.forEach(function(r) { if (r.roomId === roomId) room = r; });
+      if (!room) throw new Error('房间不存在');
+      // 模拟有进行中的订单
+      var activeOrder = {
+        orderId: "ORD001", status: "InUse",
+        start: "2026-06-06T10:00:00", end: "2026-06-06T12:00:00"
+      };
+      return {
+        roomId: roomId,
+        roomName: room.name,
+        storeId: "ST001",
+        storeName: "盈隆店",
+        status: room.status === 'Active' ? 'Active' : 'Inactive',
+        hasActiveOrder: roomId === 'RM004' || roomId === 'RM002',
+        activeOrderId: activeOrder.orderId,
+        message: '欢迎使用 ' + room.name + '，可扫码加购'
+      };
+    });
+  };
+
+  /** 获取房间扫码账单 */
+  API.getScanBill = function(roomId) {
+    return delay().then(function() {
+      return {
+        roomId: roomId,
+        roomName: roomId === 'RM004' ? '大茶室C' : '中茶室A',
+        activeOrderId: 'ORD001',
+        billId: 'BILL001',
+        billStatus: 'Active',
+        billSummary: {
+          roomCharge: 180,
+          scanTotal: 156,
+          pendingPayment: 156,
+          totalPaid: 180
+        },
+        scanOrders: [
+          {
+            orderId: 'SCAN001', orderNumber: 'SCAN20260606001',
+            createdAt: new Date().toISOString(),
+            items: [{ productName: '安吉白茶', quantity: 1, subtotal: 68 }],
+            totalAmount: 68, status: '挂账中', canCancel: true
+          },
+          {
+            orderId: 'SCAN002', orderNumber: 'SCAN20260606002',
+            createdAt: new Date().toISOString(),
+            items: [{ productName: '手工茶点A', quantity: 2, subtotal: 76 }],
+            totalAmount: 76, status: '挂账中', canCancel: true
+          },
+          {
+            orderId: 'SCAN003', orderNumber: 'SCAN20260606003',
+            createdAt: new Date().toISOString(),
+            items: [{ productName: '定制茶具A', quantity: 1, subtotal: 12 }],
+            totalAmount: 12, status: '挂账中', canCancel: false
+          }
+        ]
+      };
+    });
+  };
+
+  /** 扫码下单/加购 */
+  API.createScanOrder = function(data) {
+    return delay(500).then(function() {
+      var orderId = 'SCAN' + String(Date.now()).slice(-6);
+      return {
+        orderId: orderId,
+        orderNumber: 'SCAN' + new Date().toISOString().slice(0,10).replace(/-/g,'') + orderId.slice(-4).toUpperCase(),
+        roomId: data.roomId,
+        storeId: data.storeId,
+        totalAmount: data.items.reduce(function(s, i) { return s + (i.unitPrice || 0) * (i.quantity || 1); }, 0),
+        itemCount: data.items.length,
+        status: 'Completed',
+        tags: ['扫码加购'],
+        message: '扫码点单成功，已挂入房间账单'
+      };
+    });
+  };
+
+  /** 撤销扫码订单 */
+  API.cancelScanOrder = function(orderId) {
+    return delay(200).then(function() {
+      return {
+        success: true,
+        orderId: orderId,
+        refundStatus: '无需退款（挂账未支付）',
+        stockRollback: true,
+        cancelledAt: new Date().toISOString(),
+        message: '扫码订单已成功撤销'
+      };
+    });
+  };
+
+  /** 结算挂账 */
+  API.settleScanBill = function(roomId, data) {
+    return delay(500).then(function() {
+      return {
+        success: true,
+        settleId: 'STL' + String(Date.now()).slice(-6),
+        roomId: roomId,
+        totalAmount: 156,
+        memberBalanceUsed: data.useMemberBalance ? 50 : 0,
+        paymentAmount: data.useMemberBalance ? 106 : 156,
+        paymentMethod: data.paymentMethod || 'WxPay',
+        ordersSettled: 3,
+        invoiceNumber: data.issueInvoice ? ('INV-20260606-' + String(Date.now()).slice(-4)) : null,
+        message: '结算成功，共 3 笔订单'
+      };
+    });
+  };
+
   // ═══════════════════════════════════════════
   //  5. 导出全局对象
   // ═══════════════════════════════════════════
