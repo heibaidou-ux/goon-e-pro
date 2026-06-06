@@ -1,0 +1,8 @@
+# 微信小程序上传私钥（从mp.weixin.qq.com下载，不可泄露）
+private.key
+
+# 预览二维码
+preview-*.jpg
+
+# node_modules
+node_modules/
