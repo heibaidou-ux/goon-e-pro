@@ -1,0 +1,14 @@
+.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+.header-title { font-size:18px; font-weight:700; }
+.header-store { font-size:12px; color:#666; }
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:16px; background:#fff; margin-bottom:12px; }
+.stat-card { text-align:center; padding:12px 4px; background:#f5f7fa; border-radius:10px; }
+.stat-num { display:block; font-size:22px; font-weight:700; color:#0052d9; }
+.stat-label { font-size:11px; color:#999; margin-top:4px; display:block; }
+.quick-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:16px; background:#fff; margin-bottom:12px; }
+.action-item { text-align:center; padding:16px 8px; background:#f5f7fa; border-radius:10px; font-size:14px; }
+.section-title { font-size:15px; font-weight:600; padding:0 16px; margin-bottom:10px; display:block; }
+.todo-list { padding:0 16px; }
+.todo-item { padding:12px 14px; background:#fff; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; font-size:13px; }
+.todo-item.high { border-left:3px solid #e53935; }
+.todo-deadline { color:#999; font-size:11px; }

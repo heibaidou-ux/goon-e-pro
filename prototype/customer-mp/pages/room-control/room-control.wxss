@@ -1,0 +1,13 @@
+.room-header { padding:16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; font-size:18px; font-weight:700; }
+.scene-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:16px; background:#fff; margin-bottom:12px; }
+.scene-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px 8px; border-radius:12px; border:1.5px solid #ddd; background:#f9f9f9; }
+.section-title { display:block; padding:0 16px 8px; font-size:14px; font-weight:600; color:#666; }
+.device-list { padding:0 16px; }
+.device-item { display:flex; align-items:center; padding:14px; background:#fff; border-radius:10px; margin-bottom:8px; }
+.device-icon { font-size:22px; margin-right:12px; }
+.device-info { flex:1; }
+.device-name { font-size:14px; font-weight:500; display:block; }
+.device-status { font-size:11px; }
+.device-status.online { color:#00A870; }
+.device-status.offline { color:#e53935; }
+.device-control { width:120px; }

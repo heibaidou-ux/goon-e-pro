@@ -1,0 +1,12 @@
+.confirm-card { margin:12px 16px; background:#fff; border-radius:12px; padding:16px; }
+.confirm-title { font-size:16px; font-weight:600; display:block; margin-bottom:12px; }
+.confirm-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f5f5f5; font-size:14px; }
+.confirm-row.total { border-top:2px solid #e8e8e8; margin-top:8px; padding-top:12px; font-size:16px; font-weight:600; }
+.confirm-row .label { color:#999; }
+.price { color:#B8860B; }
+.payment-card { margin:0 16px; background:#fff; border-radius:12px; padding:16px; }
+.payment-title { font-size:15px; font-weight:600; display:block; margin-bottom:10px; }
+.payment-option { padding:14px 16px; border:1.5px solid #e8e8e8; border-radius:10px; margin-bottom:8px; font-size:14px; }
+.payment-option.active { border-color:#5D8A6B; background:#f0fdf4; color:#2e7d32; }
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; padding:12px 16px; background:#fff; border-top:1px solid #f0f0f0; }
+.submit-btn { width:100%; padding:14px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; }

@@ -1,0 +1,30 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/dashboard/dashboard",
+    "pages/room-status/room-status",
+    "pages/device-monitor/device-monitor",
+    "pages/device-control/device-control",
+    "pages/scene-control/scene-control",
+    "pages/cleaning-task/cleaning-task",
+    "pages/inspection/inspection",
+    "pages/order-management/order-management",
+    "pages/product-management/product-management",
+    "pages/attendance/attendance",
+    "pages/scheduling/scheduling",
+    "pages/todo/todo",
+    "pages/profile/profile",
+    "pages/receivable/receivable",
+    "pages/reconciliation/reconciliation"
+  ],
+  "window": {
+    "navigationBarTitleText": "高岸ERP · 店员端",
+    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f5f5f5"
+  },
+  "networkTimeout": {
+    "request": 10000
+  },
+  "sitemapLocation": "sitemap.json"
+}

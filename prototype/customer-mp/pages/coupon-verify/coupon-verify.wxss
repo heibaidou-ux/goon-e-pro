@@ -1,0 +1,8 @@
+.page { padding:40px 24px; }
+.verify-card { background:#fff; border-radius:12px; padding:24px; }
+.verify-title { font-size:18px; font-weight:600; display:block; margin-bottom:16px; text-align:center; }
+.verify-input { width:100%; padding:14px; border:1.5px solid #ddd; border-radius:10px; font-size:16px; text-align:center; }
+.verify-btn { width:100%; padding:14px; background:#5D8A6B; color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:600; margin-top:12px; }
+.verify-btn[disabled] { background:#ccc; }
+.verify-result { margin-top:12px; text-align:center; font-size:14px; display:block; }
+.verify-hint { font-size:12px; color:#999; margin-top:16px; display:block; text-align:center; }

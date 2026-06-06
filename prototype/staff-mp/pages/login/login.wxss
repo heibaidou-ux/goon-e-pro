@@ -1,0 +1,12 @@
+.page { padding: 40px 28px; min-height: 100vh; }
+.logo { text-align: center; margin-bottom: 32px; }
+.logo-icon { font-size: 48px; }
+.logo-name { font-size: 20px; font-weight: 700; color: #1a365d; margin-top: 8px; }
+.logo-sub { font-size: 12px; color: #999; margin-top: 4px; }
+.form-group { margin-bottom: 20px; }
+.form-label { font-size: 13px; color: #333; font-weight: 500; margin-bottom: 6px; display: block; }
+.form-input { width: 100%; padding: 14px; border: 1.5px solid #e5e5e5; border-radius: 10px; font-size: 15px; }
+.login-btn { width: 100%; padding: 16px; border-radius: 12px; background: #0052d9; color: #fff; font-size: 16px; font-weight: 600; margin-top: 8px; }
+.login-btn[disabled] { background: #ccc; }
+.error-msg { color: #d54941; font-size: 13px; text-align: center; margin-top: 12px; }
+.hint { font-size: 12px; color: #999; margin-top: 16px; text-align: center; }

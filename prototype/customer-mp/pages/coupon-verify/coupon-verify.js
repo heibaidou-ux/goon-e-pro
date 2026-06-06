@@ -1,0 +1,2 @@
+const API = require('../../utils/api')
+Page({ data: { code: '', result: null }, onCode(e) { this.setData({ code: e.detail.value, result: null }) }, doVerify() { API.verifyCoupon(this.data.code).then(r => this.setData({ result: { success: true, ...r } })).catch(err => this.setData({ result: { success: false, error: err.message } })) } })

@@ -1,0 +1,15 @@
+.filter-bar { display:flex; padding:12px 16px; gap:8px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.filter-tab { padding:6px 16px; border-radius:16px; font-size:13px; background:#f5f5f5; color:#666; }
+.filter-tab.active { background:#5D8A6B; color:#fff; }
+.order-list { padding:12px 16px; }
+.order-card { padding:14px; background:#fff; border-radius:12px; margin-bottom:10px; }
+.order-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:15px; font-weight:600; }
+.order-status { font-size:11px; padding:2px 8px; border-radius:10px; }
+.order-status.inuse { background:#e3f2fd; color:#1565c0; }
+.order-status.booked { background:#f3e5f5; color:#7b1fa2; }
+.order-status.completed { background:#f0fdf4; color:#2e7d32; }
+.order-time { font-size:12px; color:#999; display:block; }
+.order-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:8px; border-top:1px solid #f5f5f5; padding-top:8px; }
+.order-amount { font-size:16px; font-weight:700; color:#B8860B; }
+.order-paid { font-size:11px; color:#999; }
+.empty { text-align:center; padding:60px; color:#ccc; font-size:14px; }

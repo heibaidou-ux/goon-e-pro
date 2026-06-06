@@ -1,0 +1,82 @@
+<!-- 高岸茶室 首页 -->
+<view class="page">
+
+  <!-- 顶部导航 -->
+  <view class="nav-top">
+    <view class="store-header">
+      <view class="store-name">🍵 高岸茶室</view>
+      <view class="store-select" bindtap="switchStore">
+        <text>盈隆店</text>
+        <text>▼</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 进行中订单横幅 -->
+  <view class="active-order-banner {{hasActiveOrder ? 'show' : ''}}">
+    <view class="active-order-header">
+      <text class="active-order-title">📋 进行中</text>
+      <text class="active-order-room">{{activeOrder.roomName}}</text>
+    </view>
+    <view class="active-order-time">{{activeOrder.startTime}} - {{activeOrder.endTime}}</view>
+    <view class="active-order-btns">
+      <button class="active-order-btn primary" bindtap="goRoomControl">房内智控</button>
+      <button class="active-order-btn outline" bindtap="goScanOrder">扫码加购</button>
+    </view>
+  </view>
+
+  <!-- 轮播 -->
+  <view class="carousel-wrap">
+    <swiper class="carousel-swiper" indicator-dots="{{true}}" indicator-color="rgba(255,255,255,0.4)" indicator-active-color="#fff" autoplay interval="4000" circular>
+      <swiper-item wx:for="{{carousels}}" wx:key="index">
+        <view class="carousel-slide" style="background:linear-gradient(135deg,{{item.color1}},#{{item.color2}})">
+          <view class="slide-title">{{item.title}}</view>
+          <view class="slide-desc">{{item.desc}}</view>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-grid">
+    <view class="quick-item" bindtap="goRoomList">
+      <view class="quick-icon brand">🏠</view>
+      <text class="quick-label">预约房间</text>
+    </view>
+    <view class="quick-item" bindtap="goTeaShop">
+      <view class="quick-icon balance">🛒</view>
+      <text class="quick-label">茶品商城</text>
+    </view>
+    <view class="quick-item" bindtap="goMyCoupons">
+      <view class="quick-icon coupon">🎫</view>
+      <text class="quick-label">优惠券</text>
+    </view>
+    <view class="quick-item" bindtap="goMember">
+      <view class="quick-icon profile">👤</view>
+      <text class="quick-label">会员中心</text>
+      <text class="balance-on-icon" wx:if="{{balance > 0}}">¥{{balance}}</text>
+    </view>
+  </view>
+
+  <!-- 推荐房间 -->
+  <view class="section">
+    <view class="section-title">
+      <text>推荐包间</text>
+      <text class="section-more" bindtap="goRoomList">查看全部 ›</text>
+    </view>
+    <scroll-view class="room-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="room-card" wx:for="{{rooms}}" wx:key="roomId" bindtap="goRoomDetail" data-roomid="{{item.roomId}}">
+        <view class="room-card-img">{{item.type === 'TeaRoom' ? '🍵' : item.type === 'MeetingRoom' ? '💼' : '🏠'}}</view>
+        <view class="room-card-body">
+          <view class="room-card-name">{{item.name}}</view>
+          <view class="room-card-tags">
+            <text class="room-tag">{{item.capacity}}人</text>
+            <text class="room-tag">{{item.area}}㎡</text>
+          </view>
+          <view class="room-card-price">¥{{item.pricePerHour}}<text class="unit">/时</text></view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+</view>

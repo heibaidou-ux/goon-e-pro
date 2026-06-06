@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/room-list/room-list",
+    "pages/room-detail/room-detail",
+    "pages/booking-confirm/booking-confirm",
+    "pages/tea-shop/tea-shop",
+    "pages/my-orders/my-orders",
+    "pages/member-center/member-center",
+    "pages/scan-landing/scan-landing",
+    "pages/scan-order/scan-order",
+    "pages/scan-bill/scan-bill",
+    "pages/room-control/room-control",
+    "pages/my-coupons/my-coupons",
+    "pages/coupon-verify/coupon-verify",
+    "pages/finance-workbench/finance-workbench",
+    "pages/gm-workbench/gm-workbench",
+    "pages/investor-workbench/investor-workbench",
+    "pages/technician-workbench/technician-workbench"
+  ],
+  "window": {
+    "navigationBarTitleText": "高岸茶室",
+    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f5f5f5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#5D8A6B",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/tea-shop/tea-shop",
+        "text": "茶品",
+        "iconPath": "images/tab-shop.png",
+        "selectedIconPath": "images/tab-shop-active.png"
+      },
+      {
+        "pagePath": "pages/my-orders/my-orders",
+        "text": "订单",
+        "iconPath": "images/tab-orders.png",
+        "selectedIconPath": "images/tab-orders-active.png"
+      },
+      {
+        "pagePath": "pages/member-center/member-center",
+        "text": "我的",
+        "iconPath": "images/tab-me.png",
+        "selectedIconPath": "images/tab-me-active.png"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 10000
+  },
+  "sitemapLocation": "sitemap.json"
+}
