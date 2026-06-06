@@ -6,12 +6,12 @@ from models.brand import Organization, BusinessGoal, GoalMetric, BrandAsset, Con
 from models.store_dev import (LegalEntity, Territory, Store, StoreSiteSelection, StoreConstruction,
                               ConstructionCost, DesignDrawing, Room, RoomPricing, RoomPersonPricing,
                               TimeSlotCoefficient, HolidayCalendar, ActivityCalendar,
-                              DurationDiscountRule, NightPackage)
+                              DurationDiscountRule, NightPackage, QrCodeAuditLog)
 
 # D03 门店运营域
 from models.operations import (Customer, CustomerTag, MemberCard, RechargeRecord, Order, OrderItem,
                                RoomAppointment, RoomStatus, CleaningTask, InspectionTemplate,
-                               InspectionTask, InspectionItemResult, RectificationTask)
+                               InspectionTask, InspectionItemResult, RectificationTask, ScanBill)
 
 # D04 市场营销域
 from models.marketing import (Campaign, CouponTemplate, Coupon, Lead, Opportunity, MarketingList,
@@ -49,10 +49,10 @@ all_models = [
     # D02
     LegalEntity, Territory, Store, StoreSiteSelection, StoreConstruction, ConstructionCost,
     DesignDrawing, Room, RoomPricing, RoomPersonPricing, TimeSlotCoefficient, HolidayCalendar,
-    ActivityCalendar, DurationDiscountRule, NightPackage,
+    ActivityCalendar, DurationDiscountRule, NightPackage, QrCodeAuditLog,
     # D03
     Customer, CustomerTag, MemberCard, RechargeRecord, Order, OrderItem, RoomAppointment, RoomStatus,
-    CleaningTask, InspectionTemplate, InspectionTask, InspectionItemResult, RectificationTask,
+    CleaningTask, InspectionTemplate, InspectionTask, InspectionItemResult, RectificationTask, ScanBill,
     # D04
     Campaign, CouponTemplate, Coupon, Lead, Opportunity, MarketingList, CustomerSegment,
     ThirdPartyActivity, CampaignEffect, Channel,

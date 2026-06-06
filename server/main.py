@@ -59,6 +59,13 @@ app.include_router(scan.router)
 app.include_router(shop.router)
 app.include_router(iot.router)
 app.include_router(finance.router)
+app.include_router(brand.router)
+app.include_router(store_dev.router)
+app.include_router(operations.router)
+app.include_router(marketing.router)
+app.include_router(finance_ext.router)
+app.include_router(hr.router)
+app.include_router(tech.router)
 
 
 @app.get("/api/health")

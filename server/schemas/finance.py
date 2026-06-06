@@ -40,7 +40,8 @@ class RevenueFlowOut(BaseModel):
 
 
 class RevenueFlowListOut(BaseModel):
-    total: float  # sum of amounts
+    total: int  # item count for pagination
+    totalSum: float = 0  # sum of amounts
     items: List[RevenueFlowOut]
     page: int = 1
     page_size: int = 20

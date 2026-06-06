@@ -78,7 +78,7 @@ class Order(Base):
     paidAmount = Column(Float)
     paymentMethod = Column(String(30))
     paymentTime = Column(DateTime)
-    platform = Column(String(20), nullable=False)  # MiniProgram/MT/DY/Offline
+    platform = Column(String(20), nullable=False)  # MiniProgram/MT/DY/Offline/ScanQR
     platformOrderId = Column(String(64))
     bookingStartTime = Column(DateTime)
     bookingEndTime = Column(DateTime)
@@ -88,8 +88,35 @@ class Order(Base):
     settleCycle = Column(String(10))
     cancellationTime = Column(DateTime)
     cancellationReason = Column(String(500))
+    # V1.1 扫码消费扩展字段
+    tags = Column(Text)  # JSON array: ["扫码加购","房间888"]
+    tagMeta = Column(Text)  # JSON object: {"sourceRoom":"R888","billStatus":"挂账中"}
+    parentRoomOrderId = Column(String(32), ForeignKey("orders.orderId"), nullable=True)  # 所属房间主订单ID
+    billId = Column(String(32), nullable=True)  # FK→ScanBill（挂账结算关联）
     createdAt = Column(DateTime, server_default=func.now())
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+
+
+class ScanBill(Base):
+    """扫码挂账账单 — 记录一个房间在入住期间的扫码消费汇总"""
+    __tablename__ = "scan_bills"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    billId = Column(String(32), unique=True, nullable=False, index=True)
+    roomId = Column(String(32), ForeignKey("rooms.roomId"), nullable=False)
+    roomOrderId = Column(String(32), ForeignKey("orders.orderId"), nullable=False)
+    storeId = Column(String(32), ForeignKey("stores.storeId"), nullable=False)
+    status = Column(String(20), default="Active")  # Active(挂账中)/Settled(已结算)/Cancelled(已撤销)
+    totalAmount = Column(Float, nullable=False, default=0)
+    settledAmount = Column(Float, nullable=False, default=0)
+    orderCount = Column(Integer, nullable=False, default=0)
+    settledOrderCount = Column(Integer, nullable=False, default=0)
+    memberBalanceUsed = Column(Float, default=0)
+    paymentAmount = Column(Float, default=0)
+    paymentMethod = Column(String(30))
+    settledAt = Column(DateTime)
+    invoiceNumber = Column(String(32))
+    createdAt = Column(DateTime, server_default=func.now())
+    updatedAt = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
 
 class OrderItem(Base):

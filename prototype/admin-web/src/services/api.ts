@@ -421,22 +421,22 @@ export const financeApi = {
 // ═══════════════════════════════════════════
 export const brandApi = {
   async listOrganizations(): Promise<Organization[]> {
-    return request<Organization[]>('GET', '/api/brand/organizations')
+    return request<Organization[]>('GET', '/api/brand/orgs')
   },
   async getOrganization(orgId: string): Promise<Organization> {
-    return request<Organization>('GET', `/api/brand/organizations/${orgId}`)
+    return request<Organization>('GET', `/api/brand/orgs/${orgId}`)
   },
   async createOrganization(data: Partial<Organization>): Promise<Organization> {
-    return request<Organization>('POST', '/api/brand/organizations', data)
+    return request<Organization>('POST', '/api/brand/orgs', data)
   },
   async updateOrganization(orgId: string, data: Partial<Organization>): Promise<Organization> {
-    return request<Organization>('PUT', `/api/brand/organizations/${orgId}`, data)
+    return request<Organization>('PUT', `/api/brand/orgs/${orgId}`, data)
   },
   async deleteOrganization(orgId: string): Promise<void> {
-    return request('DELETE', `/api/brand/organizations/${orgId}`)
+    return request('DELETE', `/api/brand/orgs/${orgId}`)
   },
   async organizationTree(): Promise<Organization[]> {
-    return request<Organization[]>('GET', '/api/brand/organizations/tree')
+    return request<Organization[]>('GET', '/api/brand/orgs/tree')
   },
 
   async listBusinessGoals(params?: { orgId?: string; year?: number }): Promise<BusinessGoal[]> {
@@ -931,4 +931,186 @@ export const techApi = {
   async getPendingCommands(): Promise<CommandQueueEntry[]> {
     return request<CommandQueueEntry[]>('GET', '/api/tech/command-queue/pending')
   },
+}
+
+// ═══════════════════════════════════════════
+// Scan QR — 扫码消费
+// ═══════════════════════════════════════════
+export const scanApi = {
+  /** 获取房间二维码（返回payload，不返回图片文件） */
+  async getRoomQrCode(roomId: string, tableId?: string): Promise<QrCodeData> {
+    const q = tableId ? `?tableId=${tableId}` : ''
+    return request<QrCodeData>('GET', `/api/scan/qrcode/${roomId}${q}`)
+  },
+
+  /** 批量生成门店房间二维码 */
+  async batchQrCodes(storeId: string, roomIds?: string[]): Promise<QrCodeBatchData> {
+    const q = new URLSearchParams({ storeId })
+    if (roomIds?.length) q.set('roomIds', roomIds.join(','))
+    return request<QrCodeBatchData>('GET', `/api/scan/qrcode/batch?${q}`)
+  },
+
+  /** 更换房间二维码 */
+  async renewQrCode(roomId: string): Promise<QrRenewData> {
+    return request<QrRenewData>('POST', `/api/scan/qrcode/${roomId}/renew`)
+  },
+
+  /** 扫码验证房间状态（防误扫） */
+  async getRoomScanStatus(roomId: string): Promise<RoomScanStatus> {
+    return request<RoomScanStatus>('GET', `/api/scan/room/${roomId}`)
+  },
+
+  /** 扫码下单/加购 */
+  async createScanOrder(data: ScanOrderCreateReq): Promise<ScanOrderResult> {
+    return request<ScanOrderResult>('POST', '/api/scan/order', data)
+  },
+
+  /** 查询房间扫码账单 */
+  async getRoomBill(roomId: string): Promise<ScanBillInfo> {
+    return request<ScanBillInfo>('GET', `/api/scan/bill/${roomId}`)
+  },
+
+  /** 撤销扫码订单 */
+  async cancelScanOrder(orderId: string): Promise<CancelScanResult> {
+    return request<CancelScanResult>('PUT', `/api/scan/order/${orderId}/cancel`)
+  },
+
+  /** 结算房间挂账 */
+  async settleRoomBill(roomId: string, data: SettleBillReq): Promise<SettleBillResult> {
+    return request<SettleBillResult>('POST', `/api/scan/bill/${roomId}/settle`, data)
+  },
+}
+
+// ── Type Definitions ──
+
+export interface QrCodeData {
+  roomId: string
+  roomName: string
+  storeId: string
+  scanUrl: string
+  qrPayload: string
+}
+
+export interface QrCodeBatchItem {
+  roomId: string
+  roomName: string
+  qrPayload: string
+  scanUrl: string
+}
+
+export interface QrCodeBatchData {
+  storeId: string
+  count: number
+  items: QrCodeBatchItem[]
+}
+
+export interface QrRenewData {
+  roomId: string
+  oldRoomCode: string
+  newRoomCode: string
+  qrPayload: string
+  scanUrl: string
+}
+
+export interface RoomScanStatus {
+  roomId: string
+  roomName: string
+  storeId: string
+  storeName?: string
+  status: string
+  hasActiveOrder: boolean
+  activeOrderId?: string
+  message: string
+}
+
+export interface ScanOrderItemReq {
+  productId: string
+  quantity?: number
+  unitPrice?: number
+  specId?: string
+  remark?: string
+}
+
+export interface ScanOrderCreateReq {
+  roomId: string
+  storeId: string
+  customerId?: string
+  customerName?: string
+  customerPhone?: string
+  items: ScanOrderItemReq[]
+  source?: string
+}
+
+export interface ScanOrderResult {
+  orderId: string
+  orderNumber: string
+  roomId: string
+  storeId: string
+  totalAmount: number
+  itemCount: number
+  status: string
+  tags?: string[]
+  message: string
+}
+
+export interface ScanBillSummary {
+  roomCharge: number
+  scanTotal: number
+  pendingPayment: number
+  totalPaid: number
+}
+
+export interface ScanBillOrderItem {
+  productName: string
+  quantity: number
+  subtotal: number
+}
+
+export interface ScanBillOrderInfo {
+  orderId: string
+  orderNumber: string
+  createdAt: string
+  items: ScanBillOrderItem[]
+  totalAmount: number
+  status: string
+  canCancel: boolean
+}
+
+export interface ScanBillInfo {
+  roomId: string
+  roomName?: string
+  activeOrderId?: string
+  billId?: string
+  billStatus?: string
+  billSummary: ScanBillSummary
+  scanOrders: ScanBillOrderInfo[]
+}
+
+export interface SettleBillReq {
+  paymentMethod?: string
+  settleItems?: string
+  useMemberBalance?: boolean
+  issueInvoice?: boolean
+}
+
+export interface SettleBillResult {
+  success: boolean
+  settleId?: string
+  roomId: string
+  totalAmount: number
+  memberBalanceUsed: number
+  paymentAmount: number
+  paymentMethod: string
+  ordersSettled: number
+  invoiceNumber?: string
+  message: string
+}
+
+export interface CancelScanResult {
+  success: boolean
+  orderId: string
+  refundStatus: string
+  stockRollback: boolean
+  cancelledAt?: string
+  message: string
 }

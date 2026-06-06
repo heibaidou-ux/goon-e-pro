@@ -136,6 +136,10 @@ class Room(Base):
     description = Column(String(500))
     sortOrder = Column(Integer)
     status = Column(String(20), default="Active")  # Active/Inactive/Maintenance
+    # V1.1 扫码消费扩展字段
+    qrCodeUrl = Column(String(500))  # 二维码图片URL（CDN存储）
+    qrUpdatedAt = Column(DateTime)  # 二维码最后更新时间
+    qrHistory = Column(Text)  # JSON: 二维码变更历史列表
     createdAt = Column(DateTime, server_default=func.now())
 
 
@@ -217,3 +221,16 @@ class NightPackage(Base):
     durationMinutes = Column(Integer, nullable=False)
     applicableTimeRange = Column(Text, nullable=False)
     status = Column(String(20), default="Active")
+
+
+class QrCodeAuditLog(Base):
+    """二维码操作审计日志"""
+    __tablename__ = "qr_code_audit_logs"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    logId = Column(String(32), unique=True, nullable=False, index=True)
+    roomId = Column(String(32), ForeignKey("rooms.roomId"), nullable=False)
+    action = Column(String(20), nullable=False)  # Generate(生成)/Renew(更换)/Invalidate(失效)/Print(打印)
+    oldRoomCode = Column(String(20))  # 旧房间码（更换时记录）
+    newRoomCode = Column(String(20))  # 新房间码
+    operatorId = Column(String(32), nullable=False)
+    operatedAt = Column(DateTime, server_default=func.now())
