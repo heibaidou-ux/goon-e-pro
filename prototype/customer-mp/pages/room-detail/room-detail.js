@@ -101,8 +101,8 @@ Page({
     var today = this.data.today
     var weekNames = ['日','一','二','三','四','五','六']
 
-    // 第13条：改为显示4天保证所有元素完整可见
-    for (var i = 0; i < 4; i++) {
+    // 显示5天填满屏幕宽度
+    for (var i = 0; i < 5; i++) {
       var d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i)
       var isToday = d.toDateString() === today.toDateString()
       var isSelected = d.toDateString() === selected.toDateString()

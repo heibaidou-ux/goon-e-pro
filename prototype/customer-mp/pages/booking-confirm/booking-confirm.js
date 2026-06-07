@@ -139,7 +139,10 @@ Page({
   },
 
   confirmPay: function() {
-    if (!this.data.selectedSource) { wx.showToast({ title: '请选择客户来源', icon: 'none' }); return }
+    // 只有店员才校验客户来源
+    if (this.data.isStaff && !this.data.selectedSource) {
+      wx.showToast({ title: '请选择客户来源', icon: 'none' }); return
+    }
     if (!this.data.noPayment) {
       if (this.data.selectedPay == 'balance' && !this.data.isCombinedPay && this.data.balance < this.data.price) {
         wx.showToast({ title: '余额不足，请选择组合支付或先充值', icon: 'none' }); return

@@ -15,6 +15,7 @@
 .coupon-field { flex:1; padding:14px; border:2px solid #e5e5e5; border-radius:16px; font-size:16px; text-align:center; }
 .coupon-field:focus { border-color:#5D8A6B; }
 .coupon-verify-btn { padding:14px 24px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:15px; font-weight:600; white-space:nowrap; }
+.scan-btn { padding:14px 8px; font-size:18px; color:#5D8A6B; letter-spacing:2px; font-weight:700; }
 .ticket-card { background:linear-gradient(135deg,#fff3e0,#ffe0b2); border-radius:16px; padding:16px; margin-bottom:12px; border:2px solid transparent; }
 .ticket-card.selected { border-color:#B8860B; }
 .ticket-source { font-size:12px; font-weight:600; color:#B8860B; display:block; }

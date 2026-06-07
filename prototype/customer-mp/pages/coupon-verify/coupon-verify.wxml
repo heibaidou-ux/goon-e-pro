@@ -26,6 +26,7 @@
       <text class="h3">输入券码</text>
       <view class="coupon-field-row">
         <input class="coupon-field" placeholder="请输入券码" value="{{couponCode}}" bindinput="onCouponInput" maxlength="12" />
+        <text class="scan-btn" bindtap="scanCouponCode">[  ]</text>
         <button class="coupon-verify-btn" bindtap="verifyCoupon">验券</button>
       </view>
       <text class="format-hint">{{platformHint}}</text>

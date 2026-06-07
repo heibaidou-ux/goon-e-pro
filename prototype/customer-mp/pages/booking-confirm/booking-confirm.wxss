@@ -20,38 +20,38 @@
 .payment-section { margin-bottom:16px; }
 .payment-methods { display:flex; flex-direction:column; gap:8px; }
 .pay-method { display:flex; align-items:center; padding:14px; border:2px solid #e0d8d0; border-radius:16px; background:#fff; gap:12px; }
-.pay-method.selected { border-color:#0052D9; background:#F2F6F0; }
+.pay-method.selected { border-color:#5D8A6B; background:#F2F6F0; }
 .pay-method-icon { font-size:24px; width:36px; text-align:center; }
 .pay-method-info { flex:1; }
 .pay-method-name { font-size:14px; font-weight:500; display:block; }
 .pay-method-desc { font-size:11px; color:#999; margin-top:2px; display:block; }
-.pay-method-check { font-size:18px; color:#0052D9; }
+.pay-method-check { font-size:18px; color:#5D8A6B; }
 .coupon-box { background:#fff; padding:14px; margin-bottom:16px; border:2px solid #e0d8d0; border-radius:8px; }
 .coupon-platform-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
 .cp-label { font-size:12px; font-weight:600; color:#333; min-width:70px; }
 .coupon-field { flex:1; min-width:100px; padding:8px; border:1.5px solid #e0d8d0; font-size:13px; border-radius:6px; }
-.coupon-verify-btn { padding:8px 12px; background:#0052D9; color:#fff; border:none; font-size:12px; border-radius:6px; font-weight:600; white-space:nowrap; }
+.coupon-verify-btn { padding:8px 12px; background:#5D8A6B; color:#fff; border:none; font-size:12px; border-radius:6px; font-weight:600; white-space:nowrap; }
 .scan-coupon { font-size:20px; cursor:pointer; padding:4px; }
 .cp-status { font-size:11px; min-width:60px; text-align:right; }
-.cp-status.success { color:#0052D9; }
+.cp-status.success { color:#5D8A6B; }
 .cp-status.error { color:#d54941; }
-.coupon-total { font-size:12px; color:#0052D9; font-weight:600; margin-top:8px; padding-top:8px; border-top:1px dashed #e0d8d0; text-align:center; display:block; }
+.coupon-total { font-size:12px; color:#5D8A6B; font-weight:600; margin-top:8px; padding-top:8px; border-top:1px dashed #e0d8d0; text-align:center; display:block; }
 .balance-warning { background:#FDF6EC; padding:12px; margin-top:12px; border:1px solid #F0E0C0; text-align:center; border-radius:8px; }
 .balance-warning-text { font-size:13px; color:#B8860B; margin-bottom:8px; display:block; }
 .balance-warning-btns { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
 .balance-btn { padding:8px 20px; border-radius:8px; background:#7A8B8B; color:#fff; border:none; font-size:13px; font-weight:600; }
-.combined-pay-info { font-size:12px; color:#0052D9; margin-top:8px; display:block; }
-.total-section { background:#fff; padding:16px; margin-bottom:16px; border:2px solid #0052D9; border-radius:8px; }
+.combined-pay-info { font-size:12px; color:#5D8A6B; margin-top:8px; display:block; }
+.total-section { background:#fff; padding:16px; margin-bottom:16px; border:2px solid #5D8A6B; border-radius:8px; }
 .total-row { display:flex; justify-content:space-between; align-items:center; }
 .total-label { font-size:14px; color:#333; }
 .total-amount { font-size:28px; font-weight:800; color:#B8860B; }
-.discount-row { display:flex; justify-content:space-between; font-size:12px; color:#0052D9; margin-top:4px; }
+.discount-row { display:flex; justify-content:space-between; font-size:12px; color:#5D8A6B; margin-top:4px; }
 .tips { background:#FDF8F0; padding:14px; margin-bottom:16px; border-radius:8px; }
 .tips-title { font-size:13px; font-weight:600; color:#B8860B; margin-bottom:8px; display:block; }
 .tips-item { font-size:12px; color:#999; padding:3px 0; display:block; }
 .actions { display:flex; gap:10px; margin-top:8px; }
 .action-btn { flex:1; padding:14px 0; border-radius:16px; font-size:15px; font-weight:600; text-align:center; border:none; }
-.action-btn.primary { background:#0052D9; color:#fff; }
+.action-btn.primary { background:#5D8A6B; color:#fff; }
 .action-btn.ghost { background:#F5F0EB; color:#666; }
 .address-section { text-align:center; padding-top:16px; }
 .address-card { background:#F2F6F0; border-radius:16px; padding:14px; text-align:left; }
@@ -63,16 +63,17 @@
 .success-title { font-size:20px; font-weight:700; color:#1a1a1a; margin-bottom:4px; display:block; }
 .success-sub { font-size:13px; color:#999; margin-bottom:20px; display:block; }
 .success-actions { margin-bottom:20px; }
-.open-door-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:18px; border-radius:16px; background:linear-gradient(135deg,#0052D9,#7BA88E); color:#fff; border:none; font-size:20px; font-weight:700; }
+.open-door-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:18px; border-radius:16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; font-size:20px; font-weight:700; }
 .door-icon { font-size:30px; }
 .pass-area { text-align:center; margin-top:8px; padding:10px 14px; background:#F5F0EB; border-radius:16px; }
 .pass-row { display:flex; align-items:center; justify-content:center; gap:10px; }
 .pass-label { font-size:13px; color:#666; }
 .pass-text { font-size:22px; font-weight:700; color:#333; letter-spacing:4px; }
-.pass-copy { color:#0052D9; font-size:13px; }
+.pass-copy { color:#5D8A6B; font-size:13px; }
 .bottom-nav { display:flex; border-top:1px solid #e8e4de; background:#fff; flex-shrink:0; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; color:#999; }
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; display:block; }
-.nav-item.active { color:#0052D9; }
+.nav-item.active { color:#5D8A6B; }
+
 

@@ -72,6 +72,14 @@ Page({
     this.setData({ pendingCode: code, showConfirmModal: true })
   },
 
+  scanCouponCode: function() {
+    var self = this
+    wx.scanCode({ onlyFromCamera: true, success: function(res) {
+      self.setData({ couponCode: res.result })
+      wx.showToast({ title: '扫码成功', icon: 'none' })
+    }})
+  },
+
   hideConfirmModal: function() { this.setData({ showConfirmModal: false, pendingCode: '' }) },
 
   confirmCouponUse: function() {
