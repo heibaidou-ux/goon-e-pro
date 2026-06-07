@@ -85,13 +85,20 @@
       <view class="bottom-action"><button class="book-btn" bindtap="goToTimeSelect">选择时段</button></view>
     </view>
 
-    <!-- Step 3: Time select -->
+    <!-- 6.1 Step 3: Time select — 按booking-confirm风格复刻 -->
     <view class="time-select-section" wx:elif="{{step==3}}">
-      <view class="time-header"><text class="time-header-label">选择开始时段</text><button class="now-btn" bindtap="pickNow">⚡ 现在开始</button></view>
-      <view class="time-grid">
-        <view class="time-cell {{selectedTime==item?'selected':''}}" wx:for="{{timeSlots}}" wx:key="*this" bindtap="selectTime" data-time="{{item}}"><text class="t-label">{{item}}</text></view>
+      <!-- 6.2 时间段限制：当前时间之后的才可选 -->
+      <button class="now-btn" bindtap="pickNow">⚡ 现在开始</button>
+      <view class="confirm-card">
+        <view class="confirm-row" wx:for="{{timeSlots}}" wx:key="*this" bindtap="selectTime" data-time="{{item.time}}">
+          <text class="label">{{item.label}}</text>
+          <text class="price" wx:if="{{item.available}}">{{item.time}}</text>
+          <text class="price" wx:else style="color:#ccc;">已过时段</text>
+        </view>
       </view>
-      <view class="bottom-action"><button class="book-btn" disabled="{{!selectedTime}}" bindtap="confirmBooking">确认预约</button></view>
+      <view class="bottom-bar">
+        <button class="submit-btn" disabled="{{!selectedTime}}" bindtap="confirmBooking">确认预约</button>
+      </view>
     </view>
   </view>
 

@@ -102,22 +102,42 @@ Page({
 
   goToTimeSelect: function() { this.setData({ step: 3 }) },
 
+  // 6.2 时间段限制：当前时间之后的时间段才可选中
   generateTimeSlots: function() {
     var slots = []
+    var now = new Date()
+    var curMin = now.getHours() * 60 + now.getMinutes()
     for (var h = 9; h < 22; h++) {
-      slots.push(String(h).padStart(2,'0') + ':00')
-      slots.push(String(h).padStart(2,'0') + ':30')
+      for (var m = 0; m < 60; m += 30) {
+        var min = h * 60 + m
+        var timeStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')
+        var available = min >= curMin
+        slots.push({ time: timeStr, label: timeStr, available: available, min: min })
+      }
     }
     this.setData({ timeSlots: slots })
   },
 
   selectTime: function(e) {
-    this.setData({ selectedTime: e.currentTarget.dataset.time })
+    var ds = e.currentTarget.dataset
+    var slots = this.data.timeSlots
+    for (var i = 0; i < slots.length; i++) {
+      if (slots[i].time === ds.time && !slots[i].available) {
+        wx.showToast({ title: '该时段已过，请选择其他时段', icon: 'none' })
+        return
+      }
+    }
+    this.setData({ selectedTime: ds.time })
   },
 
   pickNow: function() {
     var now = new Date()
-    var t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0')
+    var curMin = now.getHours() * 60 + now.getMinutes()
+    var roundedMin = Math.ceil(curMin / 30) * 30
+    var h = Math.floor(roundedMin / 60)
+    var m = roundedMin % 60
+    if (h >= 22) { wx.showToast({ title: '已过营业时间', icon: 'none' }); return }
+    var t = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')
     this.setData({ selectedTime: t })
     wx.showToast({ title: '已选择 ' + t + ' 开始', icon: 'none' })
   },
