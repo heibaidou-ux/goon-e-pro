@@ -1,9 +1,28 @@
 <view class="page">
-  <!-- sticky顶部导航 -->
-  <view class="nav-top">
-    <view class="store-header">
-      <text class="store-name">高岸茶室</text>
-      <text class="store-select" bindtap="showStoreSelector">盈隆店 ▾</text>
+
+  <!-- 状态栏占位 -->
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <!-- 门店头部 -->
+  <view class="store-header">
+    <text class="store-name">高岸茶室</text>
+    <text class="store-select" bindtap="showStoreSelector">盈隆店 ▾</text>
+  </view>
+
+  <!-- QR上下文卡片（房间码场景，默认隐藏） -->
+  <view class="qr-context-card" wx:if="{{qrRoomId}}">
+    <view class="qr-context-row">
+      <text class="qr-icon">📍</text>
+      <view class="qr-body">
+        <text class="qr-title">您正在 <text class="qr-bold">{{qrRoomName}}</text></text>
+        <text class="qr-desc">桌号: {{qrTableId}}号桌 · 已自动识别位置</text>
+      </view>
+      <button class="qr-btn" bindtap="goCartWithRoom">点茶品 →</button>
+    </view>
+    <view class="qr-actions">
+      <button class="qr-action" bindtap="showRoomBill">🧾 查看挂账</button>
+      <button class="qr-action" bindtap="goOrders">📋 查看订单</button>
+      <button class="qr-close" bindtap="closeQrContext">✕</button>
     </view>
   </view>
 
@@ -25,21 +44,22 @@
     </view>
   </view>
 
-  <!-- 门店信息栏(导航/电话/营业时间) -->
+  <!-- 门店信息栏（导航/电话/停车/营业时间） -->
   <view class="store-info-bar">
-    <view class="store-info-row">
+    <view class="info-row">
       <text>📍 广州市天河区珠江新城华夏路28号盈隆大厦16层</text>
-      <text class="store-info-link" bindtap="openNavigation">🗺 导航</text>
+      <text class="info-link" bindtap="openNavigation">🗺 导航</text>
     </view>
-    <view class="store-info-row">
+    <view class="info-row">
       <text>📞 020-8888-8888</text>
-      <text class="store-info-link" bindtap="callPhone">📞 电话</text>
+      <text class="info-link" bindtap="callPhone">📞 电话</text>
+      <text class="info-link" bindtap="showParkingInfo">🅿️ 停车</text>
       <text>🕐 09:00-23:00</text>
     </view>
   </view>
 
-  <!-- 当前消费（绿色底色） -->
-  <view class="active-order-banner {{hasActiveOrder ? 'show' : ''}}" bindtap="goMyOrders">
+  <!-- 当前消费（绿色渐变底色） -->
+  <view class="active-order-banner {{hasActiveOrder?'show':''}}" bindtap="goMyOrders">
     <view class="active-order-header">
       <text class="active-order-title">⏱ 当前消费</text>
       <view class="active-order-room-row">
@@ -55,14 +75,14 @@
     </view>
   </view>
 
-  <!-- 四个快捷入口（加底色） -->
+  <!-- 四个快捷入口（渐变底色） -->
   <view class="quick-grid">
     <button class="quick-item" bindtap="goCouponVerify">
       <view class="quick-icon brand">🎫</view>
       <text class="quick-label">验券</text>
     </button>
     <button class="quick-item" bindtap="handleBalanceClick">
-      <view class="quick-icon balance">¥{{balanceDisplay}}</view>
+      <view class="quick-icon balance">{{balanceIcon}}<text class="balance-amt">{{balanceDisplay}}</text></view>
       <text class="quick-label">会员余额</text>
     </button>
     <button class="quick-item" bindtap="handleCouponClick">
@@ -77,7 +97,7 @@
 
   <!-- 可预约包间 -->
   <view class="section">
-    <view class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+    <view class="section-title">
       <text>可预约包间</text>
       <text class="section-more" bindtap="goRoomList">查看全部 ›</text>
     </view>
@@ -96,9 +116,9 @@
     </scroll-view>
   </view>
 
-  <!-- 精选茶品（消除左右边距） -->
+  <!-- 精选茶品（左右去边距） -->
   <view class="section">
-    <view class="section-title" style="display:flex;justify-content:space-between;align-items:center;padding:16px 0 0 16px;">
+    <view class="section-title tea-title">
       <text>🍵 精选茶品</text>
       <text class="cart-link" bindtap="goCartPage">🛒 购物车<text class="cart-badge" wx:if="{{cartCount>0}}">{{cartCount}}</text></text>
     </view>
@@ -110,7 +130,7 @@
           <text class="tea-card-desc">{{item.desc}}</text>
           <view class="tea-card-footer">
             <text class="tea-card-price">¥{{item.price}}</text>
-            <view class="tea-card-qty">
+            <view class="qty-ctrl">
               <text class="qty-btn-sm" wx:if="{{item._qty>0}}" bindtap="decQty" data-pid="{{item.productId}}">−</text>
               <text class="qty-num-sm" wx:if="{{item._qty>0}}">{{item._qty}}</text>
               <text class="tea-card-btn" catchtap="incQty" data-pid="{{item.productId}}" data-name="{{item.name}}" data-price="{{item.price}}">{{item._qty>0?'+':'+ 加购'}}</text>
@@ -121,7 +141,7 @@
     </view>
   </view>
 
-  <!-- 店员端入口 -->
+  <!-- 员工入口 -->
   <view class="staff-entrance" bindtap="goStaffLogin"><text>🔒 员工通道</text></view>
 
   <!-- 底部导航 -->

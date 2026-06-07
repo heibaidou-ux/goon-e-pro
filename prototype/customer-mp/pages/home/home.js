@@ -2,14 +2,11 @@ var API = require('../../utils/api')
 
 Page({
   data: {
-    // 14.4 加载状态
+    statusBarHeight: 44,
     loading: true,
-    // 14.5 错误提示
     errorMsg: '',
-    // 当前消费
     hasActiveOrder: false,
     activeOrder: { roomName: '', timeStr: '', roomId: '' },
-    // 轮播
     currentSlide: 0,
     carousels: [
       { title: '高岸茶室', desc: '城市中的静谧茶空间 · 商务社交新选择', img: '../../images/中英文标题LOGO-蓝天白云-16比9-A.jpg', url: '' },
@@ -17,49 +14,32 @@ Page({
       { title: '精选包间', desc: '大茶室 · 会议室 · 中茶室 · 满足不同需求', img: '../../images/茶荟头图-空间-诗梳风大茶室.jpg', url: '../home/index.html' },
       { title: '优惠券大放送', desc: '领取专属优惠券，到店享更多折扣', img: '../../images/金德大诗梳风004.jpg', url: '../coupon-verify/index.html' }
     ],
-    // 房间
     rooms: [],
-    // 茶品
     teaProducts: [],
-    // 购物车
     cartCount: 0,
-    // 会员余额（直接显示金额，不添加图标）
     balance: 0,
     balanceDisplay: '',
-    // QR扫码状态
-    qrRoomId: '',
-    qrRoomName: '',
-    qrTableId: '',
-    // 弹窗
-    showStoreModal: false,
-    showParkingModal: false,
-    showLoginModal: false,
-    showBillModal: false,
-    showQrWarning: false,
-    qrWarningText: '',
-    // 登录
-    loginMode: 'login',
-    loginPhone: '138****8888',
-    loginCode: '8888',
-    regPhone: '',
-    regName: '',
-    regCode: '',
-    // 挂账
-    billItems: [],
-    billTotal: 0,
-    // 待处理操作（登录后跳转）
-    pendingAction: null,
-    // 登录状态
-    isLoggedIn: false
+    balanceIcon: '💰',
+    qrRoomId: '', qrRoomName: '', qrTableId: '',
+    showStoreModal: false, showParkingModal: false, showLoginModal: false,
+    showBillModal: false, showQrWarning: false, qrWarningText: '',
+    loginMode: 'login', loginPhone: '138****8888', loginCode: '8888',
+    regPhone: '', regName: '', regCode: '',
+    billItems: [], billTotal: 0,
+    pendingAction: null, isLoggedIn: false
   },
 
   onLoad: function() {
-    this.initPage()
-    // 从全局读取余额显隐设置
+    var self = this
+    try {
+      var sys = wx.getSystemInfoSync()
+      self.setData({ statusBarHeight: sys.statusBarHeight || 44 })
+    } catch(e) {}
     try {
       var v = wx.getStorageSync('balance_visible')
-      if (v !== '') this.setData({ balanceVisible: v })
+      if (v !== '') self.setData({ balanceVisible: v })
     } catch(e) {}
+    self.initPage()
   },
 
   onShow: function() {
@@ -95,41 +75,27 @@ Page({
       var user = results[2]
       var balance = results[3] || 0
 
-      // 房间列表 — 原型渲染方式
       var rooms = []
       for (var i = 0; i < roomsData.length; i++) {
         var r = roomsData[i]
         if (r.bookable === false) continue
-        var facilities = (r.facilities || []).join(' · ')
         rooms.push({
           roomId: r.roomId, name: r.name,
           capacity: r.capacity, area: r.area,
-          metaLine: (r.capacity || '—') + '人 · ' + (r.area || '—') + '㎡ · ' + facilities,
+          metaLine: (r.capacity || '—') + '人 · ' + (r.area || '—') + '㎡ · ' + (r.facilities || []).join(' · '),
           pricePerHour: r.pricePerHour || 120,
-          icon: icons[r.type] || '🏠',
-          bgColor: colors[r.type] || '#f0f0f0'
+          icon: icons[r.type] || '🏠', bgColor: colors[r.type] || '#f0f0f0'
         })
       }
-      // 茶品 — 原型渲染方式
       var teas = []
       for (var i = 0; i < productsData.length; i++) {
         var t = productsData[i]
         var vis = visualMap[t.productId] || { icon: '🍵', bg: '#f0f0f0' }
-        teas.push({
-          productId: t.productId, name: t.name, desc: t.desc || '',
-          price: t.price, icon: vis.icon, bg: vis.bg, _qty: 0
-        })
+        teas.push({ productId: t.productId, name: t.name, desc: t.desc || '', price: t.price, icon: vis.icon, bg: vis.bg, _qty: 0 })
       }
 
-      self.setData({
-        rooms: rooms,
-        teaProducts: teas,
-        balance: balance,
-        isLoggedIn: !!user
-      })
+      self.setData({ rooms: rooms, teaProducts: teas, balance: balance, isLoggedIn: !!user })
       self.updateBalanceDisplay()
-
-      // 更新会员等级图标（原型updateQuickIcons）
       if (user) {
         var levels = { Gold: '💎', Silver: '💰', Bronze: '👛', Diamond: '💳' }
         self.setData({ balanceIcon: levels[user.memberLevel] || '💰' })
@@ -145,184 +111,95 @@ Page({
     API.getUserOrders().then(function(orders) {
       var active = null
       for (var i = 0; i < orders.length; i++) {
-        if (orders[i].status === 'InUse' || orders[i].status === 'Booked') {
-          active = orders[i]; break
-        }
+        if (orders[i].status === 'InUse' || orders[i].status === 'Booked') { active = orders[i]; break }
       }
       if (active) {
         self.setData({
           hasActiveOrder: true,
-          activeOrder: {
-            roomName: active.roomName || '大茶室C',
-            roomId: active.roomId || '',
-            timeStr: (active.date || '') + ' ' + (active.time || '')
-          }
+          activeOrder: { roomName: active.roomName || '大茶室C', roomId: active.roomId || '', timeStr: (active.date || '') + ' ' + (active.time || '') }
         })
-      } else {
-        self.setData({ hasActiveOrder: false })
-      }
+      } else { self.setData({ hasActiveOrder: false }) }
     })
   },
 
-  updateBalanceDisplay: function() {
-    this.setData({ balanceDisplay: '¥' + this.data.balance })
-  },
+  updateBalanceDisplay: function() { this.setData({ balanceDisplay: '¥' + this.data.balance }) },
 
-  // ── 轮播 ──
-  onSwiperChange: function(e) {
-    this.setData({ currentSlide: e.detail.current })
-  },
-
-  goSlide: function(e) {
-    this.setData({ currentSlide: parseInt(e.currentTarget.dataset.idx) })
-  },
-
+  onSwiperChange: function(e) { this.setData({ currentSlide: e.detail.current }) },
+  goSlide: function(e) { this.setData({ currentSlide: parseInt(e.currentTarget.dataset.idx) }) },
   onCarouselTap: function(e) {
+    var urls = ['', '/pages/member-center/member-center?action=topup', '/pages/room-list/room-list', '/pages/coupon-verify/coupon-verify']
     var idx = e.currentTarget.dataset.index
-    var url = this.data.carousels[idx].url
-    if (url) {
-      var pageMap = {
-        '../member-center/index.html?action=topup': '/pages/member-center/member-center?action=topup',
-        '../home/index.html': '/pages/home/home',
-        '../coupon-verify/index.html': '/pages/coupon-verify/coupon-verify'
-      }
-      var target = pageMap[url]
-      if (target) wx.navigateTo({ url: target })
-    }
+    if (idx >= 0 && idx < urls.length && urls[idx]) wx.navigateTo({ url: urls[idx] })
   },
 
-  // ── 快捷入口 ──
   handleBalanceClick: function() {
-    if (!this.data.isLoggedIn) {
-      this.setData({ pendingAction: 'profile', showLoginModal: true })
-      return
-    }
+    if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'profile', showLoginModal: true }); return }
     wx.navigateTo({ url: '/pages/member-center/member-center' })
   },
-
   handleCouponClick: function() {
-    if (!this.data.isLoggedIn) {
-      this.setData({ pendingAction: 'coupon', showLoginModal: true })
-      return
-    }
+    if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'coupon', showLoginModal: true }); return }
     wx.navigateTo({ url: '/pages/my-coupons/my-coupons' })
   },
-
   goProfile: function() {
-    if (!this.data.isLoggedIn) {
-      this.setData({ pendingAction: 'profile', showLoginModal: true })
-      return
-    }
+    if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'profile', showLoginModal: true }); return }
     wx.navigateTo({ url: '/pages/member-center/member-center' })
   },
-
   goRoom: function(e) {
-    if (!this.data.isLoggedIn) {
-      this.setData({ pendingAction: 'room-' + e.currentTarget.dataset.roomid, showLoginModal: true })
-      return
-    }
+    if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'room-' + e.currentTarget.dataset.roomid, showLoginModal: true }); return }
     wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId=' + e.currentTarget.dataset.roomid })
   },
 
-  // ── 茶品 ──
-  showProductDetail: function(e) {
-    wx.showModal({
-      title: e.currentTarget.dataset.name,
-      content: e.currentTarget.dataset.desc + '\n¥' + e.currentTarget.dataset.price,
-      showCancel: true,
-      cancelText: '关闭',
-      confirmText: '加入购物车',
-      success: function(res) {
-        if (res.confirm) {
-          // 调用addToCart
-        }
-      }
-    })
-    // 实际原型是跳转到tea-shop详情页
+  showProductDetail: function(e) { wx.showModal({ title: e.currentTarget.dataset.name, content: e.currentTarget.dataset.desc + '\n¥' + e.currentTarget.dataset.price }) },
+  incQty: function(e) {
+    var pid = e.currentTarget.dataset.pid, name = e.currentTarget.dataset.name, price = parseFloat(e.currentTarget.dataset.price)
+    var products = this.data.teaProducts
+    for (var i = 0; i < products.length; i++) { if (products[i].productId === pid) { products[i]._qty = (products[i]._qty || 0) + 1; break } }
+    this.setData({ teaProducts: products })
+    API.addToCart({ productId: pid, name: name, price: price }).then(this.loadCartCount.bind(this))
   },
-
-  addToCart: function(e) {
+  decQty: function(e) {
     var pid = e.currentTarget.dataset.pid
-    var name = e.currentTarget.dataset.name
-    var price = parseFloat(e.currentTarget.dataset.price)
+    var products = this.data.teaProducts
+    for (var i = 0; i < products.length; i++) { if (products[i].productId === pid && products[i]._qty > 0) { products[i]._qty--; break } }
+    this.setData({ teaProducts: products })
+    API.removeFromCart(pid).then(this.loadCartCount.bind(this))
+  },
+  loadCartCount: function() {
     var self = this
-    API.addToCart({ productId: pid, name: name, price: price }).then(function(cart) {
-      var count = 0
-      for (var i = 0; i < cart.length; i++) { count += cart[i].qty || 1 }
-      self.setData({ cartCount: count })
-    })
+    API.getCart().then(function(cart) { var count = 0; for (var i = 0; i < cart.length; i++) { count += cart[i].qty || 1 } self.setData({ cartCount: count }) })
   },
 
-  goCartPage: function() {
-    var self = this
-    API.getCart().then(function(cart) {
-      if (cart.length === 0) { wx.showToast({ title: '购物车为空', icon: 'none' }); return }
-      wx.navigateTo({ url: '/pages/tea-shop/tea-shop?tab=cart' })
-    })
-  },
-
-  // ── 导航 ──
   goRoomList: function() { wx.navigateTo({ url: '/pages/room-list/room-list' }) },
   goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
   goMyOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },
   goMemberCenter: function() { wx.navigateTo({ url: '/pages/member-center/member-center' }) },
   goCouponVerify: function() { wx.navigateTo({ url: '/pages/coupon-verify/coupon-verify' }) },
   goStaffLogin: function() { wx.navigateTo({ url: '/pages/staff-login/staff-login' }) },
+  goCartPage: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?tab=cart' }) },
+  goSmartControl: function() { wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + this.data.activeOrder.roomId }) },
   goOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },
 
-  // ── 当前消费 ──
   openDoor: function() { wx.showToast({ title: '🚪 门已开，请进入', icon: 'none' }) },
+  callService: function() { wx.showToast({ title: '📞 已通知店员，请稍候', icon: 'none' }) },
+  callPhone: function() { wx.makePhoneCall({ phoneNumber: '020-8888-8888' }) },
+  openNavigation: function() { wx.showToast({ title: '🗺 正在打开导航...', icon: 'none' }) },
 
-  callService: function() {
-    wx.showToast({ title: '📞 已通知店员，请稍候', icon: 'none' })
-  },
-
-  // ── 门店信息 ──
-  openNavigation: function() {
-    wx.showToast({ title: '🗺 正在打开导航...', icon: 'none' })
-  },
-
-  callPhone: function() {
-    wx.makePhoneCall({ phoneNumber: '020-8888-8888' })
-  },
-
-  // ── 门店选择 ──
   showStoreSelector: function() { this.setData({ showStoreModal: true }) },
   hideStoreSelector: function() { this.setData({ showStoreModal: false }) },
-  toastComing: function() { wx.showToast({ title: '即将上线', icon: 'none' }) },
-
-  // ── 停车 ──
   showParkingInfo: function() { this.setData({ showParkingModal: true }) },
   hideParkingInfo: function() { this.setData({ showParkingModal: false }) },
-
-  // ── 挂账 ──
-  showRoomBill: function() {
-    if (!this.data.qrRoomId) { wx.showToast({ title: '未检测到房间信息', icon: 'none' }); return }
-    this.setData({ showBillModal: true })
-  },
+  toastComing: function() { wx.showToast({ title: '即将上线', icon: 'none' }) },
+  showRoomBill: function() { this.setData({ showBillModal: true }) },
   hideRoomBill: function() { this.setData({ showBillModal: false }) },
-
-  // ── QR未启用 ──
-  showQrWarning: function(msg) { this.setData({ showQrWarning: true, qrWarningText: msg }) },
-  hideQrWarning: function() { this.setData({ showQrWarning: false }) },
-
-  // ── QR上下文 ──
   closeQrContext: function() { this.setData({ qrRoomId: '', qrRoomName: '', qrTableId: '' }) },
-  goCartWithRoom: function() {
-    var q = '?room_id=' + this.data.qrRoomId + '&room_name=' + encodeURIComponent(this.data.qrRoomName) + '&table_id=' + this.data.qrTableId
-    wx.navigateTo({ url: '/pages/tea-shop/tea-shop' + q })
-  },
+  goCartWithRoom: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?room_id=' + this.data.qrRoomId }) },
 
-  // ── 登录 ──
-  switchLoginTab: function(e) {
-    this.setData({ loginMode: e.currentTarget.dataset.mode })
-  },
+  switchLoginTab: function(e) { this.setData({ loginMode: e.currentTarget.dataset.mode }) },
   onLoginPhone: function(e) { this.setData({ loginPhone: e.detail.value }) },
   onLoginCode: function(e) { this.setData({ loginCode: e.detail.value }) },
   onRegPhone: function(e) { this.setData({ regPhone: e.detail.value }) },
   onRegName: function(e) { this.setData({ regName: e.detail.value }) },
   getVerifyCode: function() { wx.showToast({ title: '验证码已发送: 8888', icon: 'none' }) },
-
   doLogin: function() {
     var self = this
     wx.showLoading({ title: '登录中...' })
@@ -331,12 +208,8 @@ Page({
       self.setData({ isLoggedIn: true, showLoginModal: false, balance: user.balance || 0 })
       wx.showToast({ title: '登录成功', icon: 'none' })
       self.handlePendingAction()
-    }).catch(function(err) {
-      wx.hideLoading()
-      wx.showToast({ title: err.message || '登录失败', icon: 'none' })
-    })
+    }).catch(function(err) { wx.hideLoading(); wx.showToast({ title: err.message || '登录失败', icon: 'none' }) })
   },
-
   doRegister: function() {
     var self = this
     wx.showLoading({ title: '注册中...' })
@@ -345,30 +218,14 @@ Page({
       self.setData({ isLoggedIn: true, showLoginModal: false, balance: user.balance || 0 })
       wx.showToast({ title: '注册成功', icon: 'none' })
       self.handlePendingAction()
-    }).catch(function(err) {
-      wx.hideLoading()
-      wx.showToast({ title: err.message || '注册失败', icon: 'none' })
-    })
+    }).catch(function(err) { wx.hideLoading(); wx.showToast({ title: err.message || '注册失败', icon: 'none' }) })
   },
-
   handlePendingAction: function() {
     var action = this.data.pendingAction
     if (!action) return
     this.setData({ pendingAction: null })
-    var self = this
-    if (action.indexOf('room-') === 0) {
-      var roomId = action.replace('room-', '')
-      setTimeout(function() { wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId=' + roomId }) }, 300)
-    } else if (action === 'profile') {
-      setTimeout(function() { wx.navigateTo({ url: '/pages/member-center/member-center' }) }, 300)
-    }
+    if (action.indexOf('room-') === 0) { wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId=' + action.replace('room-', '') }) }
+    else if (action === 'profile') { wx.navigateTo({ url: '/pages/member-center/member-center' }) }
   },
-
-  // 14.4 加载/错误
-  clearError: function() { this.setData({ errorMsg: '' }) },
-
-  // 第3条/第24条 智控
-  goSmartControl: function() {
-    wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + this.data.activeOrder.roomId })
-  }
+  clearError: function() { this.setData({ errorMsg: '' }) }
 })
