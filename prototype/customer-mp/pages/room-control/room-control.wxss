@@ -1,13 +1,19 @@
-.room-header { padding:16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; font-size:18px; font-weight:700; }
-.scene-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:16px; background:#fff; margin-bottom:12px; }
-.scene-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px 8px; border-radius:12px; border:1.5px solid #ddd; background:#f9f9f9; }
-.section-title { display:block; padding:0 16px 8px; font-size:14px; font-weight:600; color:#666; }
+page { background:#f5f5f5; margin:0; padding:0; }
+.phone { width:100%; min-height:100vh; background:#f5f5f5; display:flex; flex-direction:column; }
+.nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #e8e4de; background:#fff; }
+.back-btn { font-size:20px; padding:4px; margin-right:8px; }
+.nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
+.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+.section-label { font-size:14px; font-weight:600; color:#333; padding:16px 16px 8px; display:block; }
 .device-list { padding:0 16px; }
-.device-item { display:flex; align-items:center; padding:14px; background:#fff; border-radius:10px; margin-bottom:8px; }
+.device-item { display:flex; align-items:center; padding:14px; background:#fff; border-radius:10px; margin-bottom:8px; flex-wrap:wrap; }
 .device-icon { font-size:22px; margin-right:12px; }
-.device-info { flex:1; }
+.device-info { flex:1; min-width:80px; }
 .device-name { font-size:14px; font-weight:500; display:block; }
-.device-status { font-size:11px; }
+.device-status { font-size:11px; display:block; }
 .device-status.online { color:#00A870; }
 .device-status.offline { color:#e53935; }
-.device-control { width:120px; }
+.ac-control { display:flex; align-items:center; gap:8px; }
+.temp-label { font-size:18px; font-weight:700; color:#333; min-width:30px; text-align:center; }
+.temp-btns { display:flex; flex-direction:column; gap:2px; }
+.temp-btn { width:24px; height:24px; border-radius:50%; border:1px solid #ddd; background:#fff; font-size:14px; display:flex; align-items:center; justify-content:center; padding:0; line-height:1; }

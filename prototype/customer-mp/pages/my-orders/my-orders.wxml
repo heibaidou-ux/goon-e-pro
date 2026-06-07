@@ -1,1 +1,105 @@
-<view class="page"><view class="filter-bar"><view class="filter-tab {{filter === 'all' ? 'active' : ''}}" bindtap="setFilter" data-filter="all">全部</view><view class="filter-tab {{filter === 'InUse' ? 'active' : ''}}" bindtap="setFilter" data-filter="InUse">进行中</view><view class="filter-tab {{filter === 'Booked' ? 'active' : ''}}" bindtap="setFilter" data-filter="Booked">已预订</view><view class="filter-tab {{filter === 'Completed' ? 'active' : ''}}" bindtap="setFilter" data-filter="Completed">已完成</view></view><view class="order-list"><view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId"><view class="order-card-header"><text>{{item.roomName || '房间'}}</text><text class="order-status {{item.status.toLowerCase()}}">{{item.statusLabel || item.status}}</text></view><text class="order-time">{{item.start}} - {{item.end}}</text><view class="order-card-footer"><text class="order-amount">¥{{item.amount || 0}}</text><text class="order-paid">{{item.paymentMethod}}</text></view></view></view><view class="empty" wx:if="{{filteredOrders.length === 0}}">暂无订单</view></view>
+<view class="phone">
+  <!-- Tabs -->
+  <view class="tab-bar">
+    <view class="tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">全部</view>
+    <view class="tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">进行中</view>
+    <view class="tab {{tabIndex==2?'active':''}}" bindtap="switchTab" data-tab="2">已完成</view>
+  </view>
+
+  <view class="page">
+    <!-- Order list -->
+    <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId">
+      <view class="order-header">
+        <text class="order-room">{{item.roomName}}</text>
+        <text class="order-status {{item.statusClass}}">{{item.statusLabel}}</text>
+      </view>
+      <text class="order-time">{{item.timeStr}}</text>
+      <text class="order-price">¥{{item.amount}}</text>
+
+      <!-- Door section for active orders -->
+      <view class="door-section" wx:if="{{item.status=='InUse' || item.status=='Booked'}}">
+        <view>
+          <text class="door-label">门禁密码</text>
+          <text class="door-code">{{item.doorCode || '0000'}}</text>
+        </view>
+        <text class="door-hint">备用开门方式</text>
+      </view>
+
+      <!-- 第22条：消费中取消变灰，改为结束订单 -->
+      <view class="big-actions" wx:if="{{item.status=='InUse'}}">
+        <button class="big-action-btn primary" bindtap="openDoor" data-id="{{item.orderId}}">🚪 开门</button>
+        <button class="big-action-btn outline" bindtap="callService" data-id="{{item.orderId}}">📞 客服</button>
+        <button class="big-action-btn ghost" bindtap="endOrder" data-id="{{item.orderId}}">结束订单</button>
+      </view>
+      <view class="big-actions" wx:elif="{{item.status=='Booked'}}">
+        <button class="big-action-btn primary" bindtap="goRoomControl" data-id="{{item.orderId}}">📋 订单详情</button>
+        <button class="big-action-btn ghost" bindtap="cancelOrder" data-id="{{item.orderId}}">取消订单</button>
+      </view>
+
+      <!-- Completed: logistics status -->
+      <view class="logistics-card" wx:if="{{item.status=='Completed' && item.logistics}}">
+        <view class="logistics-header">
+          <text class="logistics-carrier"><text class="carrier-icon">{{item.logistics.icon}}</text>{{item.logistics.carrier}}</text>
+          <button class="logistics-btn" bindtap="showLogistics" data-id="{{item.orderId}}">详情</button>
+        </view>
+        <text class="logistics-tracking">运单号：<text class="tracking-num" bindtap="copyTracking" data-code="{{item.logistics.trackingNum}}">{{item.logistics.trackingNum}}</text></text>
+        <view class="logistics-status-row">
+          <text class="ls-badge {{item.logistics.statusBadge}}">{{item.logistics.statusLabel}}</text>
+          <view class="ls-progress">
+            <view class="ls-step" wx:for="{{item.logistics.steps}}" wx:key="index">
+              <view class="ls-line {{item.active?'active':''}}"></view>
+              <view class="ls-step-dot {{item.active?'active':''}} {{item.current?'current':''}}"></view>
+              <text class="ls-step-label {{item.active?'active':''}} {{item.current?'current':''}}">{{item.label}}</text>
+            </view>
+          </view>
+          <text class="ls-estimated">{{item.logistics.estimated}}</text>
+        </view>
+      </view>
+
+      <!-- Completed: actions -->
+      <view class="big-actions" wx:elif="{{item.status=='Completed'}}">
+        <button class="big-action-btn outline" bindtap="reBook" data-id="{{item.orderId}}">再次预约</button>
+        <button class="big-action-btn ghost" bindtap="goRoomDetail" data-id="{{item.orderId}}">查看详情</button>
+      </view>
+    </view>
+
+    <!-- Empty state -->
+    <view class="empty" wx:if="{{filteredOrders.length==0}}">
+      <text class="empty-icon">📋</text>
+      <text>暂无订单</text>
+    </view>
+  </view>
+
+  <!-- Bottom nav -->
+  <view class="bottom-nav">
+    <view class="nav-item" bindtap="goHome"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
+    <view class="nav-item" bindtap="goRoomList"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
+    <view class="nav-item" bindtap="goTeaShop"><text class="nav-icon">🍵</text><text class="nav-label">茶品</text></view>
+    <view class="nav-item active"><text class="nav-icon">📋</text><text class="nav-label">订单</text></view>
+    <view class="nav-item" bindtap="goMember"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
+  </view>
+</view>
+
+<!-- Logistics modal -->
+<view class="lg-modal-overlay" wx:if="{{showLogisticsModal}}" bindtap="hideLogistics">
+  <view class="lg-modal" catchtap="">
+    <view class="lg-modal-header">
+      <text class="lg-title">物流详情</text>
+      <text class="lg-modal-close" bindtap="hideLogistics">✕</text>
+    </view>
+    <view class="lg-track-info">
+      <text class="lg-carrier">{{logisticsData.carrier}}</text>
+      <text>运单号：{{logisticsData.trackingNum}}</text>
+    </view>
+    <view class="lg-timeline">
+      <view class="lg-tl-item" wx:for="{{logisticsData.timeline}}" wx:key="index">
+        <view class="lg-tl-line {{item.active?'done':''}}"></view>
+        <view class="lg-tl-dot {{item.status}}"></view>
+        <view class="lg-tl-content">
+          <text class="lg-tl-title">{{item.title}}</text>
+          <text class="lg-tl-time">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

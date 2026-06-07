@@ -1,1 +1,35 @@
-<view class="page"><view class="room-header">{{roomName}} 智控</view><view class="scene-grid"><view class="scene-btn" wx:for="{{scenes}}" wx:key="sceneId" style="background:{{item.color}}20; border-color:{{item.color}}" bindtap="activateScene" data-id="{{item.sceneId}}"><text style="font-size:20px">{{item.icon}}</text><text style="font-size:12px; margin-top:4px; color:{{item.color}}">{{item.name}}</text></view></view><text class="section-title">设备控制</text><view class="device-list"><view class="device-item" wx:for="{{devices}}" wx:key="deviceId"><view class="device-icon">{{item.typeIcon || '📡'}}</view><view class="device-info"><text class="device-name">{{item.typeLabel || item.type}}</text><text class="device-status {{item.status === 'Online' ? 'online' : 'offline'}}">{{item.status === 'Online' ? '在线' : '离线'}}</text></view><view class="device-control" wx:if="{{item.type === 'Light'}}"><slider value="{{item.brightness || 0}}" min="0" max="100" show-value bindchanging="onLightChange" data-id="{{item.deviceId}}" /></view><switch wx:elif="{{item.type === 'AC'}}" checked="{{item.mode === 'cool'}}" bindchange="onAcToggle" data-id="{{item.deviceId}}" /><switch wx:elif="{{item.type === 'Speaker'}}" checked="{{item.playing}}" bindchange="onSpeakerToggle" data-id="{{item.deviceId}}" /><switch wx:elif="{{item.type === 'Curtain'}}" checked="{{item.position === 'open'}}" bindchange="onCurtainToggle" data-id="{{item.deviceId}}" /></view></view></view>
+<view class="phone">
+  <view class="nav-bar">
+    <view class="back-btn" bindtap="goBack">←</view>
+    <text class="nav-title">{{roomName}} 智控</text>
+  </view>
+  <view class="page">
+    <text class="section-label">设备控制</text>
+    <view class="device-list">
+      <view class="device-item" wx:for="{{devices}}" wx:key="deviceId">
+        <text class="device-icon">{{item.typeIcon}}</text>
+        <view class="device-info">
+          <text class="device-name">{{item.typeLabel}}</text>
+          <text class="device-status {{item.status == 'Online' ? 'online' : 'offline'}}">{{item.status == 'Online' ? '在线' : '离线'}}</text>
+        </view>
+        <!-- 第26条：门锁开关 -->
+        <switch wx:if="{{item.type == 'Lock'}}" checked="{{item.locked !== false}}" bindchange="onLockToggle" data-id="{{item.deviceId}}" />
+        <!-- 第27条：空调温度调节 -->
+        <view wx:elif="{{item.type == 'AC'}}" class="ac-control">
+          <text class="temp-label">{{item.temperature || 24}}°</text>
+          <view class="temp-btns">
+            <button class="temp-btn" bindtap="onTempDown" data-id="{{item.deviceId}}">−</button>
+            <button class="temp-btn" bindtap="onTempUp" data-id="{{item.deviceId}}">+</button>
+          </view>
+          <switch checked="{{item.mode == 'cool'}}" bindchange="onAcToggle" data-id="{{item.deviceId}}" />
+        </view>
+        <!-- 第28条：灯光开/关按钮 -->
+        <switch wx:elif="{{item.type == 'Light'}}" checked="{{item.brightness > 0}}" bindchange="onLightToggle" data-id="{{item.deviceId}}" />
+        <!-- 第29条：窗帘0-100%滑条 -->
+        <slider wx:elif="{{item.type == 'Curtain'}}" value="{{item.position == 'open' ? 100 : item.positionNum || 0}}" min="0" max="100" show-value bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
+        <!-- 第30条：背景音乐开/关 -->
+        <switch wx:elif="{{item.type == 'Speaker'}}" checked="{{item.playing}}" bindchange="onSpeakerToggle" data-id="{{item.deviceId}}" />
+      </view>
+    </view>
+  </view>
+</view>
