@@ -1,4 +1,4 @@
-﻿<view class="phone">
+<view class="phone">
   <view class="nav-bar">
     <view class="back-btn" bindtap="goBack">←</view>
     <text class="nav-title">{{room.name}}</text>
@@ -13,9 +13,7 @@
             <text class="room-header-meta">容纳 {{room.capacity}}人 · {{room.area}}㎡ · 非预约空间</text>
           </view>
         </view>
-        <view class="room-header-tags">
-          <text class="facility-tag" wx:for="{{room.facilities}}" wx:key="*this">{{item}}</text>
-        </view>
+        <view class="room-header-tags"><text class="facility-tag" wx:for="{{room.facilities}}" wx:key="*this">{{item}}</text></view>
       </view>
       <view class="no-booking">
         <text class="nb-icon">{{roomId=='RM005'?'🏛️':'🔧'}}</text>
@@ -33,18 +31,17 @@
             <text class="room-header-meta">容纳 {{room.capacity}}人 · {{room.area}}㎡ · ¥{{hourRate}}/小时</text>
           </view>
         </view>
-        <view class="room-header-tags">
-          <text class="facility-tag" wx:for="{{room.facilities}}" wx:key="*this">{{item}}</text>
-        </view>
+        <view class="room-header-tags"><text class="facility-tag" wx:for="{{room.facilities}}" wx:key="*this">{{item}}</text></view>
       </view>
-      <scroll-view class="date-bar" scroll-x enhanced show-scrollbar="{{false}}">
+      <!-- 日期：一行横向排列，5天+更多按钮 -->
+      <view class="date-bar">
         <view class="date-chip {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}}" wx:for="{{dateChips}}" wx:key="index" bindtap="pickDate" data-index="{{index}}">
           <text class="d-week">{{item.week}}</text>
           <text class="d-day">{{item.day}}</text>
           <text class="d-month">{{item.month}}月</text>
         </view>
         <view class="date-more" bindtap="showCalModal">更多▾</view>
-      </scroll-view>
+      </view>
       <view class="duration-section">
         <text class="section-label">选择时长</text>
         <view class="duration-grid">
@@ -72,10 +69,7 @@
           </view>
         </picker>
       </view>
-      <view class="info-bar">
-        <text>🧹 保洁准备(15min)</text>
-        <text>📅 约满时段不显示</text>
-      </view>
+      <view class="info-bar"><text>🧹 保洁准备(15min)</text><text>📅 约满时段不显示</text></view>
       <view class="conflict-alert" wx:if="{{conflictMsg}}">
         <text wx:if="{{suggestTime}}">⚠️ 该时段已被预约。</text>
         <text class="suggest-time" wx:if="{{suggestTime}}" bindtap="applySuggested">建议从 {{suggestTime}} 开始 ›</text>
@@ -106,9 +100,7 @@
       <text class="cal-month">{{calYear}}年 {{calMonth+1}}月</text>
       <view class="cal-nav" bindtap="calChangeMonth" data-dir="1">▶</view>
     </view>
-    <view class="cal-weekdays">
-      <text wx:for="{{weekNames}}" wx:key="*this">{{item}}</text>
-    </view>
+    <view class="cal-weekdays"><text wx:for="{{weekNames}}" wx:key="*this">{{item}}</text></view>
     <view class="cal-grid">
       <view class="cal-day {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isPast || item.isOther ? 'past' : ''}} {{item.isEmpty ? 'empty' : ''}}" wx:for="{{calDays}}" wx:key="index" bindtap="calPick" data-day="{{item.day}}" data-month="{{item.month}}" data-year="{{item.year}}" data-past="{{item.isPast}}">
         <text wx:if="{{!item.isEmpty}}">{{item.day}}</text>
