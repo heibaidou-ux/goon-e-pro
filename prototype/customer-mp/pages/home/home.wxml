@@ -1,29 +1,9 @@
-<view class="page">
-
-  <!-- 状态栏占位 -->
-  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+<view class="page" style="padding-top:{{topPadding}}px;">
 
   <!-- 门店头部 -->
   <view class="store-header">
     <text class="store-name">高岸茶室</text>
     <text class="store-select" bindtap="showStoreSelector">盈隆店 ▾</text>
-  </view>
-
-  <!-- QR上下文卡片（房间码场景，默认隐藏） -->
-  <view class="qr-context-card" wx:if="{{qrRoomId}}">
-    <view class="qr-context-row">
-      <text class="qr-icon">📍</text>
-      <view class="qr-body">
-        <text class="qr-title">您正在 <text class="qr-bold">{{qrRoomName}}</text></text>
-        <text class="qr-desc">桌号: {{qrTableId}}号桌 · 已自动识别位置</text>
-      </view>
-      <button class="qr-btn" bindtap="goCartWithRoom">点茶品 →</button>
-    </view>
-    <view class="qr-actions">
-      <button class="qr-action" bindtap="showRoomBill">🧾 查看挂账</button>
-      <button class="qr-action" bindtap="goOrders">📋 查看订单</button>
-      <button class="qr-close" bindtap="closeQrContext">✕</button>
-    </view>
   </view>
 
   <!-- 轮播图 -->
@@ -44,99 +24,52 @@
     </view>
   </view>
 
-  <!-- 门店信息栏（导航/电话/停车/营业时间） -->
+  <!-- 门店信息栏 -->
   <view class="store-info-bar">
-    <view class="info-row">
-      <text>📍 广州市天河区珠江新城华夏路28号盈隆大厦16层</text>
-      <text class="info-link" bindtap="openNavigation">🗺 导航</text>
-    </view>
-    <view class="info-row">
-      <text>📞 020-8888-8888</text>
-      <text class="info-link" bindtap="callPhone">📞 电话</text>
-      <text class="info-link" bindtap="showParkingInfo">🅿️ 停车</text>
-      <text>🕐 09:00-23:00</text>
-    </view>
+    <view class="info-row"><text>📍 广州市天河区珠江新城华夏路28号盈隆大厦16层</text><text class="info-link" bindtap="openNavigation">🗺 导航</text></view>
+    <view class="info-row"><text>📞 020-8888-8888</text><text class="info-link" bindtap="callPhone">📞 电话</text><text class="info-link" bindtap="showParkingInfo">🅿️ 停车</text><text>🕐 09:00-23:00</text></view>
   </view>
 
-  <!-- 当前消费（绿色渐变底色） -->
-  <view class="active-order-banner {{hasActiveOrder?'show':''}}" bindtap="goMyOrders">
-    <view class="active-order-header">
+  <!-- 当前消费 -->
+  <view class="active-order-banner {{hasActiveOrder?'show':''}}">
+    <view class="active-order-header" bindtap="goMyOrders">
       <text class="active-order-title">⏱ 当前消费</text>
-      <view class="active-order-room-row">
-        <text class="active-order-room">{{activeOrder.roomName}}</text>
-        <text class="active-order-arrow">›</text>
-      </view>
+      <view class="active-order-room-row"><text class="active-order-room">{{activeOrder.roomName}}</text><text class="active-order-arrow">›</text></view>
     </view>
     <text class="active-order-time">{{activeOrder.timeStr}}</text>
     <view class="active-order-btns">
-      <button class="active-order-btn primary" catchtap="openDoor">🚪 开门</button>
-      <button class="active-order-btn primary" catchtap="goSmartControl">🔧 智控</button>
-      <button class="active-order-btn outline" catchtap="callService">📞 客服</button>
+      <view class="active-order-btn primary" catchtap="openDoor">🚪 开门</view>
+      <view class="active-order-btn primary" catchtap="goSmartControl">🔧 智控</view>
+      <view class="active-order-btn outline" catchtap="callService">📞 客服</view>
     </view>
   </view>
 
-  <!-- 四个快捷入口（渐变底色） -->
+  <!-- 四个快捷入口 -->
   <view class="quick-grid">
-    <button class="quick-item" bindtap="goCouponVerify">
-      <view class="quick-icon brand">🎫</view>
-      <text class="quick-label">验券</text>
-    </button>
-    <button class="quick-item" bindtap="handleBalanceClick">
-      <view class="quick-icon balance">{{balanceIcon}}<text class="balance-amt">{{balanceDisplay}}</text></view>
-      <text class="quick-label">会员余额</text>
-    </button>
-    <button class="quick-item" bindtap="handleCouponClick">
-      <view class="quick-icon coupon">🏷️</view>
-      <text class="quick-label">优惠券</text>
-    </button>
-    <button class="quick-item" bindtap="goProfile">
-      <view class="quick-icon profile">👤</view>
-      <text class="quick-label">我的</text>
-    </button>
+    <view class="quick-item" bindtap="goCouponVerify"><view class="quick-icon brand">🎫</view><text class="quick-label">验券</text></view>
+    <view class="quick-item" bindtap="handleBalanceClick"><view class="quick-icon balance">{{balanceIcon}}<text class="balance-amt">{{balanceDisplay}}</text></view><text class="quick-label">会员余额</text></view>
+    <view class="quick-item" bindtap="handleCouponClick"><view class="quick-icon coupon">🏷️</view><text class="quick-label">优惠券</text></view>
+    <view class="quick-item" bindtap="goProfile"><view class="quick-icon profile">👤</view><text class="quick-label">我的</text></view>
   </view>
 
   <!-- 可预约包间 -->
   <view class="section">
-    <view class="section-title">
-      <text>可预约包间</text>
-      <text class="section-more" bindtap="goRoomList">查看全部 ›</text>
-    </view>
+    <view class="section-title"><text>可预约包间</text><text class="section-more" bindtap="goRoomList">查看全部 ›</text></view>
     <scroll-view class="room-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="room-card" wx:for="{{rooms}}" wx:key="roomId" bindtap="goRoom" data-roomid="{{item.roomId}}">
         <view class="room-card-img" style="background:{{item.bgColor}}">{{item.icon}}</view>
-        <view class="room-card-body">
-          <text class="room-card-name">{{item.name}}</text>
-          <view class="room-card-tags">
-            <text class="room-tag">{{item.capacity}}人</text>
-            <text class="room-tag">{{item.area}}㎡</text>
-          </view>
-          <text class="room-card-price">¥{{item.pricePerHour}}<text class="unit">/时</text></text>
-        </view>
+        <view class="room-card-body"><text class="room-card-name">{{item.name}}</text><view class="room-card-tags"><text class="room-tag">{{item.capacity}}人</text><text class="room-tag">{{item.area}}㎡</text></view><text class="room-card-price">¥{{item.pricePerHour}}<text class="unit">/时</text></text></view>
       </view>
     </scroll-view>
   </view>
 
-  <!-- 精选茶品（左右去边距） -->
+  <!-- 精选茶品 -->
   <view class="section">
-    <view class="section-title tea-title">
-      <text>🍵 精选茶品</text>
-      <text class="cart-link" bindtap="goCartPage">🛒 购物车<text class="cart-badge" wx:if="{{cartCount>0}}">{{cartCount}}</text></text>
-    </view>
+    <view class="section-title tea-title"><text>🍵 精选茶品</text><text class="cart-link" bindtap="goCartPage">🛒 购物车<text class="cart-badge" wx:if="{{cartCount>0}}">{{cartCount}}</text></text></view>
     <view class="tea-grid">
       <view class="tea-card" wx:for="{{teaProducts}}" wx:key="productId">
         <view class="tea-card-img" style="background:{{item.bg}}" bindtap="showProductDetail" data-pid="{{item.productId}}" data-name="{{item.name}}" data-desc="{{item.desc}}" data-price="{{item.price}}">{{item.icon}}</view>
-        <view class="tea-card-body">
-          <text class="tea-card-name">{{item.name}}</text>
-          <text class="tea-card-desc">{{item.desc}}</text>
-          <view class="tea-card-footer">
-            <text class="tea-card-price">¥{{item.price}}</text>
-            <view class="qty-ctrl">
-              <text class="qty-btn-sm" wx:if="{{item._qty>0}}" bindtap="decQty" data-pid="{{item.productId}}">−</text>
-              <text class="qty-num-sm" wx:if="{{item._qty>0}}">{{item._qty}}</text>
-              <text class="tea-card-btn" catchtap="incQty" data-pid="{{item.productId}}" data-name="{{item.name}}" data-price="{{item.price}}">{{item._qty>0?'+':'+ 加购'}}</text>
-            </view>
-          </view>
-        </view>
+        <view class="tea-card-body"><text class="tea-card-name">{{item.name}}</text><text class="tea-card-desc">{{item.desc}}</text><view class="tea-card-footer"><text class="tea-card-price">¥{{item.price}}</text><view class="qty-ctrl"><text class="qty-btn-sm" wx:if="{{item._qty>0}}" bindtap="decQty" data-pid="{{item.productId}}">−</text><text class="qty-num-sm" wx:if="{{item._qty>0}}">{{item._qty}}</text><text class="tea-card-btn" catchtap="incQty" data-pid="{{item.productId}}" data-name="{{item.name}}" data-price="{{item.price}}">{{item._qty>0?'+':'+ 加购'}}</text></view></view></view>
       </view>
     </view>
   </view>
@@ -156,26 +89,24 @@
 
 <!-- 门店选择弹窗 -->
 <view class="modal-overlay" hidden="{{!showStoreModal}}" bindtap="hideStoreSelector">
-  <view class="modal" catchtap="">
-    <text class="modal-title">选择门店</text>
+  <view class="modal" catchtap=""><text class="modal-title">选择门店</text>
     <view class="store-option active"><text>📍 盈隆店</text><text style="color:#5D8A6B;">✓ 当前</text></view>
     <view class="store-option coming" bindtap="toastComing"><text>📍 珠江新城店</text><text class="store-coming-tag">即将上线</text></view>
     <view class="store-option coming" bindtap="toastComing"><text>📍 琶洲店</text><text class="store-coming-tag">即将上线</text></view>
-    <button class="modal-close" bindtap="hideStoreSelector">关闭</button>
+    <view class="modal-close" bindtap="hideStoreSelector">关闭</view>
   </view>
 </view>
 
 <!-- 停车指引弹窗 -->
 <view class="modal-overlay" hidden="{{!showParkingModal}}" bindtap="hideParkingInfo">
-  <view class="modal parking-modal" catchtap="">
-    <text class="modal-title" style="text-align:center;">🅿️ 停车指引</text>
+  <view class="modal parking-modal" catchtap=""><text class="modal-title" style="text-align:center;">🅿️ 停车指引</text>
     <view class="parking-content">
       <view class="parking-section"><text class="ps-title">📍 停车场位置</text><text class="ps-text">盈隆大厦地下停车场（B2-B4层）入口位于大厦东侧华夏路辅路</text></view>
       <view class="parking-section"><text class="ps-title">💰 收费标准</text><view class="ps-text"><text class="ps-tag free">前30分钟免费</text><text class="ps-tag paid">¥8/小时</text><text class="ps-tag paid">¥64/天封顶</text></view></view>
-      <view class="parking-section"><text class="ps-title">🚗 车位信息</text><text class="ps-text">总车位约300个。新能源充电桩：B3层东区（快充20个，慢充30个）</text></view>
+      <view class="parking-section"><text class="ps-title">🚗 车位信息</text><text class="ps-text">总车位约300个</text></view>
       <view class="parking-section"><text class="ps-title">📌 温馨提示</text><text class="ps-text">高峰时段车位较紧张，建议绿色出行</text></view>
     </view>
-    <button class="modal-close" bindtap="hideParkingInfo">我知道了</button>
+    <view class="modal-close" bindtap="hideParkingInfo">我知道了</view>
   </view>
 </view>
 
@@ -185,21 +116,18 @@
     <view class="login-card">
       <text class="login-card-title">{{loginMode=='login'?'登录':'注册'}}</text>
       <text class="login-card-sub">高岸茶室 · 会员中心</text>
-      <view class="login-tabs">
-        <text class="login-tab {{loginMode=='login'?'active':''}}" bindtap="switchLoginTab" data-mode="login">登录</text>
-        <text class="login-tab {{loginMode=='register'?'active':''}}" bindtap="switchLoginTab" data-mode="register">注册</text>
-      </view>
+      <view class="login-tabs"><text class="login-tab {{loginMode=='login'?'active':''}}" bindtap="switchLoginTab" data-mode="login">登录</text><text class="login-tab {{loginMode=='register'?'active':''}}" bindtap="switchLoginTab" data-mode="register">注册</text></view>
       <view wx:if="{{loginMode=='login'}}">
         <view class="form-item"><text class="form-label">手机号</text><input class="form-input" placeholder="请输入手机号" value="{{loginPhone}}" bindinput="onLoginPhone" /></view>
-        <view class="form-item"><text class="form-label">验证码</text><view class="code-row"><input class="form-input" placeholder="验证码" value="{{loginCode}}" bindinput="onLoginCode" /><button class="code-btn" bindtap="getVerifyCode">获取验证码</button></view></view>
-        <button class="form-btn" bindtap="doLogin">登 录</button>
+        <view class="form-item"><text class="form-label">验证码</text><view class="code-row"><input class="form-input" placeholder="验证码" value="{{loginCode}}" bindinput="onLoginCode" /><view class="code-btn" bindtap="getVerifyCode">获取验证码</view></view></view>
+        <view class="form-btn" bindtap="doLogin">登 录</view>
         <text class="form-switch" bindtap="switchLoginTab" data-mode="register">没有账号？立即注册 →</text>
       </view>
       <view wx:else>
         <view class="form-item"><text class="form-label">手机号</text><input class="form-input" placeholder="请输入手机号" bindinput="onRegPhone" /></view>
         <view class="form-item"><text class="form-label">昵称</text><input class="form-input" placeholder="请输入昵称" bindinput="onRegName" /></view>
-        <view class="form-item"><text class="form-label">验证码</text><view class="code-row"><input class="form-input" placeholder="验证码" /><button class="code-btn" bindtap="getVerifyCode">获取验证码</button></view></view>
-        <button class="form-btn" bindtap="doRegister">注 册</button>
+        <view class="form-item"><text class="form-label">验证码</text><view class="code-row"><input class="form-input" placeholder="验证码" /><view class="code-btn" bindtap="getVerifyCode">获取验证码</view></view></view>
+        <view class="form-btn" bindtap="doRegister">注 册</view>
         <text class="form-switch" bindtap="switchLoginTab" data-mode="login">已有账号？立即登录 →</text>
       </view>
       <text class="login-hint">演示环境，任意手机号即可登录</text>
@@ -207,13 +135,6 @@
   </view>
 </view>
 
-<!-- 加载状态 -->
-<view class="loading-overlay" wx:if="{{loading}}">
-  <view class="loading-spinner"></view>
-  <text class="loading-text">加载中...</text>
-</view>
-
-<!-- 错误提示 -->
-<view class="error-toast" wx:if="{{errorMsg}}" bindtap="clearError">
-  <text class="error-toast-text">{{errorMsg}}</text>
-</view>
+<!-- 加载/错误 -->
+<view class="loading-overlay" wx:if="{{loading}}"><view class="loading-spinner"></view><text class="loading-text">加载中...</text></view>
+<view class="error-toast" wx:if="{{errorMsg}}" bindtap="clearError"><text>{{errorMsg}}</text></view>

@@ -1,13 +1,10 @@
 <view class="phone">
-  <!-- Tabs -->
   <view class="tab-bar">
     <view class="tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">全部</view>
     <view class="tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">进行中</view>
     <view class="tab {{tabIndex==2?'active':''}}" bindtap="switchTab" data-tab="2">已完成</view>
   </view>
-
   <view class="page">
-    <!-- Order list -->
     <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId">
       <view class="order-header">
         <text class="order-room">{{item.roomName}}</text>
@@ -15,32 +12,29 @@
       </view>
       <text class="order-time">{{item.timeStr}}</text>
       <text class="order-price">¥{{item.amount}}</text>
-
-      <!-- Door section for active orders -->
-      <view class="door-section" wx:if="{{item.status=='InUse' || item.status=='Booked'}}">
-        <view>
-          <text class="door-label">门禁密码</text>
-          <text class="door-code">{{item.doorCode || '0000'}}</text>
-        </view>
+      <view class="door-section" wx:if="{{item.status=='InUse' || item.status=='Booked' || item.status=='in_use'}}">
+        <view><text class="door-label">门禁密码</text><text class="door-code">{{item.doorCode || '0000'}}</text></view>
         <text class="door-hint">备用开门方式</text>
       </view>
-
-      <!-- 第22条：消费中取消变灰，改为结束订单 -->
-      <view class="big-actions" wx:if="{{item.status=='InUse'}}">
-        <button class="big-action-btn primary" bindtap="openDoor" data-id="{{item.orderId}}">🚪 开门</button>
-        <button class="big-action-btn outline" bindtap="callService" data-id="{{item.orderId}}">📞 客服</button>
-        <button class="big-action-btn ghost" bindtap="endOrder" data-id="{{item.orderId}}">结束订单</button>
+      <!-- 消费中→结束订单，已预订→取消订单 -->
+      <view class="big-actions" wx:if="{{item.status=='InUse' || item.status=='in_use'}}">
+        <view class="big-action-btn primary" bindtap="openDoor" data-id="{{item.orderId}}">🚪 开门</view>
+        <view class="big-action-btn outline" bindtap="callService" data-id="{{item.orderId}}">📞 客服</view>
+        <view class="big-action-btn ghost" bindtap="cancelOrEndOrder" data-id="{{item.orderId}}">结束订单</view>
       </view>
       <view class="big-actions" wx:elif="{{item.status=='Booked'}}">
-        <button class="big-action-btn primary" bindtap="goRoomControl" data-id="{{item.orderId}}">📋 订单详情</button>
-        <button class="big-action-btn ghost" bindtap="cancelOrder" data-id="{{item.orderId}}">取消订单</button>
+        <view class="big-action-btn primary" bindtap="goRoomControl" data-id="{{item.orderId}}">📋 订单详情</view>
+        <view class="big-action-btn ghost" bindtap="cancelOrEndOrder" data-id="{{item.orderId}}">取消订单</view>
       </view>
-
-      <!-- Completed: logistics status -->
+      <view class="big-actions" wx:elif="{{item.status=='Completed'}}">
+        <view class="big-action-btn outline" bindtap="reBook" data-id="{{item.orderId}}">再次预约</view>
+        <view class="big-action-btn ghost" bindtap="goRoomDetail" data-id="{{item.orderId}}">查看详情</view>
+      </view>
+      <!-- 物流 -->
       <view class="logistics-card" wx:if="{{item.status=='Completed' && item.logistics}}">
         <view class="logistics-header">
-          <text class="logistics-carrier"><text class="carrier-icon">{{item.logistics.icon}}</text>{{item.logistics.carrier}}</text>
-          <button class="logistics-btn" bindtap="showLogistics" data-id="{{item.orderId}}">详情</button>
+          <text class="logistics-carrier">{{item.logistics.icon}} {{item.logistics.carrier}}</text>
+          <view class="logistics-btn" bindtap="showLogistics" data-id="{{item.orderId}}">详情</view>
         </view>
         <text class="logistics-tracking">运单号：<text class="tracking-num" bindtap="copyTracking" data-code="{{item.logistics.trackingNum}}">{{item.logistics.trackingNum}}</text></text>
         <view class="logistics-status-row">
@@ -55,22 +49,9 @@
           <text class="ls-estimated">{{item.logistics.estimated}}</text>
         </view>
       </view>
-
-      <!-- Completed: actions -->
-      <view class="big-actions" wx:elif="{{item.status=='Completed'}}">
-        <button class="big-action-btn outline" bindtap="reBook" data-id="{{item.orderId}}">再次预约</button>
-        <button class="big-action-btn ghost" bindtap="goRoomDetail" data-id="{{item.orderId}}">查看详情</button>
-      </view>
     </view>
-
-    <!-- Empty state -->
-    <view class="empty" wx:if="{{filteredOrders.length==0}}">
-      <text class="empty-icon">📋</text>
-      <text>暂无订单</text>
-    </view>
+    <view class="empty" wx:if="{{filteredOrders.length==0}}"><text class="empty-icon">📋</text><text>暂无订单</text></view>
   </view>
-
-  <!-- Bottom nav -->
   <view class="bottom-nav">
     <view class="nav-item" bindtap="goHome"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
     <view class="nav-item" bindtap="goRoomList"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
@@ -79,26 +60,15 @@
     <view class="nav-item" bindtap="goMember"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
   </view>
 </view>
-
-<!-- Logistics modal -->
 <view class="lg-modal-overlay" wx:if="{{showLogisticsModal}}" bindtap="hideLogistics">
   <view class="lg-modal" catchtap="">
-    <view class="lg-modal-header">
-      <text class="lg-title">物流详情</text>
-      <text class="lg-modal-close" bindtap="hideLogistics">✕</text>
-    </view>
-    <view class="lg-track-info">
-      <text class="lg-carrier">{{logisticsData.carrier}}</text>
-      <text>运单号：{{logisticsData.trackingNum}}</text>
-    </view>
+    <view class="lg-modal-header"><text class="lg-title">物流详情</text><text class="lg-modal-close" bindtap="hideLogistics">✕</text></view>
+    <view class="lg-track-info"><text class="lg-carrier">{{logisticsData.carrier}}</text><text>运单号：{{logisticsData.trackingNum}}</text></view>
     <view class="lg-timeline">
       <view class="lg-tl-item" wx:for="{{logisticsData.timeline}}" wx:key="index">
         <view class="lg-tl-line {{item.active?'done':''}}"></view>
         <view class="lg-tl-dot {{item.status}}"></view>
-        <view class="lg-tl-content">
-          <text class="lg-tl-title">{{item.title}}</text>
-          <text class="lg-tl-time">{{item.time}}</text>
-        </view>
+        <view class="lg-tl-content"><text class="lg-tl-title">{{item.title}}</text><text class="lg-tl-time">{{item.time}}</text></view>
       </view>
     </view>
   </view>

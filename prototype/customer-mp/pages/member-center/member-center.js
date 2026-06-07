@@ -11,6 +11,12 @@ Page({
   },
 
   onShow: function() {
+    // 第一条：从storage恢复余额显隐状态
+    try {
+      var v = wx.getStorageSync('balance_visible')
+      if (v !== '') this.data.balanceVisible = v
+    } catch(e) {}
+
     var self = this
     var user = API.getCurrentUser()
     if (user) {
@@ -43,7 +49,6 @@ Page({
     var visible = !this.data.balanceVisible
     this.setData({ balanceVisible: visible })
     this.updateBalanceDisplay()
-    // 存到全局，首页也读取这个设置
     try { wx.setStorageSync('balance_visible', visible) } catch(e) {}
   },
 
@@ -54,24 +59,14 @@ Page({
   showTopup: function() {
     this.setData({ showRechargeModal: true, selectedAmount: 100, selectedPayment: 'WeChat' })
   },
-
   hideRecharge: function() { this.setData({ showRechargeModal: false }) },
-
-  selectAmount: function(e) {
-    this.setData({ selectedAmount: parseInt(e.currentTarget.dataset.amount) })
-  },
-
-  selectPayment: function(e) {
-    this.setData({ selectedPayment: e.currentTarget.dataset.payment })
-  },
+  selectAmount: function(e) { this.setData({ selectedAmount: parseInt(e.currentTarget.dataset.amount) }) },
+  selectPayment: function(e) { this.setData({ selectedPayment: e.currentTarget.dataset.payment }) },
 
   confirmRecharge: function() {
     var self = this
     var method = self.data.selectedPayment
-    if (method === 'Balance') {
-      wx.showToast({ title: '余额充值不支持余额支付', icon: 'none' })
-      return
-    }
+    if (method === 'Balance') { wx.showToast({ title: '余额充值不支持余额支付', icon: 'none' }); return }
     this.setData({ showRechargeModal: false })
     wx.showLoading({ title: '充值中...' })
     API.topUp(self.data.selectedAmount, method).then(function(r) {
@@ -79,22 +74,13 @@ Page({
       wx.showToast({ title: '✅ 充值成功！+¥' + r.amount + (r.bonus > 0 ? ' (赠送¥' + r.bonus + ')' : ''), icon: 'success' })
       self.setData({ balance: r.newBalance })
       self.updateBalanceDisplay()
-    }).catch(function(err) {
-      wx.hideLoading()
-      wx.showToast({ title: err.message || '充值失败', icon: 'none' })
-    })
+    }).catch(function(err) { wx.hideLoading(); wx.showToast({ title: err.message || '充值失败', icon: 'none' }) })
   },
 
   handleLogout: function() {
     wx.showModal({
-      title: '退出登录',
-      content: '确定要退出当前账号吗？',
-      success: function(res) {
-        if (res.confirm) {
-          API.logout()
-          wx.reLaunch({ url: '/pages/home/home' })
-        }
-      }
+      title: '退出登录', content: '确定要退出当前账号吗？',
+      success: function(res) { if (res.confirm) { API.logout(); wx.reLaunch({ url: '/pages/home/home' }) } }
     })
   }
 })

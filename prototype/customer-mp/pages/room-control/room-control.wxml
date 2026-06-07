@@ -1,34 +1,82 @@
 <view class="phone">
   <view class="nav-bar">
     <view class="back-btn" bindtap="goBack">←</view>
-    <text class="nav-title">{{roomName}} 智控</text>
+    <text class="nav-title">{{roomName}}</text>
   </view>
   <view class="page">
-    <text class="section-label">设备控制</text>
+    <!-- 房间名+倒计时 -->
+    <view class="room-info-bar">
+      <view class="room-info-left">
+        <text class="room-info-name">{{roomName}}</text>
+        <text class="room-info-time">剩余时间 <text class="countdown">{{countdown}}</text></text>
+      </view>
+      <text class="room-info-end">结束时间 {{endTime}}</text>
+    </view>
+
+    <!-- 两大操作按钮 -->
+    <view class="action-btns">
+      <view class="action-btn renew" bindtap="renewOrder">
+        <text class="action-icon">🕐</text>
+        <text class="action-text">续订</text>
+      </view>
+      <view class="action-btn tea" bindtap="goTeaShop">
+        <text class="action-icon">🍵</text>
+        <text class="action-text">茶品</text>
+      </view>
+    </view>
+
+    <!-- 音乐播放器 -->
+    <view class="music-section">
+      <text class="section-title">🎵 背景音乐</text>
+      <view class="music-player">
+        <view class="music-info">
+          <text class="music-name">{{currentTrack}}</text>
+          <text class="music-artist">{{trackArtist}}</text>
+        </view>
+        <view class="music-controls">
+          <text class="music-btn" bindtap="prevTrack">⏮</text>
+          <text class="music-btn play-btn" bindtap="togglePlay">{{isPlaying?'⏸':'▶️'}}</text>
+          <text class="music-btn" bindtap="nextTrack">⏭</text>
+        </view>
+        <view class="music-volume">
+          <text class="vol-label">音量</text>
+          <slider value="{{volume}}" min="0" max="100" bindchanging="onVolumeChange" />
+          <text class="vol-num">{{volume}}%</text>
+        </view>
+        <view class="music-source">
+          <text class="source-label">音源</text>
+          <view class="source-options">
+            <text class="source-tag {{source=='bluetooth'?'active':''}}" bindtap="switchSource" data-source="bluetooth">蓝牙</text>
+            <text class="source-tag {{source=='bgm'?'active':''}}" bindtap="switchSource" data-source="bgm">背景音乐</text>
+            <text class="source-tag {{source=='ha_push'?'active':''}}" bindtap="switchSource" data-source="ha_push">HA提示音</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 设备控制 -->
+    <text class="section-title">设备控制</text>
     <view class="device-list">
       <view class="device-item" wx:for="{{devices}}" wx:key="deviceId">
         <text class="device-icon">{{item.typeIcon}}</text>
         <view class="device-info">
           <text class="device-name">{{item.typeLabel}}</text>
-          <text class="device-status {{item.status == 'Online' ? 'online' : 'offline'}}">{{item.status == 'Online' ? '在线' : '离线'}}</text>
+          <text class="device-status {{item.status=='Online'?'online':'offline'}}">{{item.status=='Online'?'在线':'离线'}}</text>
         </view>
-        <!-- 第26条：门锁开关 -->
-        <switch wx:if="{{item.type == 'Lock'}}" checked="{{item.locked !== false}}" bindchange="onLockToggle" data-id="{{item.deviceId}}" />
-        <!-- 第27条：空调温度调节 -->
-        <view wx:elif="{{item.type == 'AC'}}" class="ac-control">
-          <text class="temp-label">{{item.temperature || 24}}°</text>
-          <view class="temp-btns">
-            <button class="temp-btn" bindtap="onTempDown" data-id="{{item.deviceId}}">−</button>
-            <button class="temp-btn" bindtap="onTempUp" data-id="{{item.deviceId}}">+</button>
-          </view>
-          <switch checked="{{item.mode == 'cool'}}" bindchange="onAcToggle" data-id="{{item.deviceId}}" />
+        <!-- 门锁 -->
+        <switch wx:if="{{item.type=='Lock'}}" checked="{{item.locked!==false}}" bindchange="onLockToggle" data-id="{{item.deviceId}}" />
+        <!-- 空调温度半圆环 -->
+        <view wx:elif="{{item.type=='AC'}}" class="ac-ring">
+          <text class="ac-temp">{{item.temperature||24}}°</text>
+          <slider value="{{item.temperature||24}}" min="16" max="30" bindchanging="onTempChange" data-id="{{item.deviceId}}" />
+          <switch checked="{{item.mode=='cool'}}" bindchange="onAcToggle" data-id="{{item.deviceId}}" />
         </view>
-        <!-- 第28条：灯光开/关按钮 -->
-        <switch wx:elif="{{item.type == 'Light'}}" checked="{{item.brightness > 0}}" bindchange="onLightToggle" data-id="{{item.deviceId}}" />
-        <!-- 第29条：窗帘0-100%滑条 -->
-        <slider wx:elif="{{item.type == 'Curtain'}}" value="{{item.position == 'open' ? 100 : item.positionNum || 0}}" min="0" max="100" show-value bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
-        <!-- 第30条：背景音乐开/关 -->
-        <switch wx:elif="{{item.type == 'Speaker'}}" checked="{{item.playing}}" bindchange="onSpeakerToggle" data-id="{{item.deviceId}}" />
+        <!-- 灯光开关 -->
+        <switch wx:elif="{{item.type=='Light'}}" checked="{{item.brightness>0}}" bindchange="onLightToggle" data-id="{{item.deviceId}}" />
+        <!-- 窗帘滑条 -->
+        <slider wx:elif="{{item.type=='Curtain'}}" value="{{item.position=='open'?100:item.positionNum||0}}" min="0" max="100" show-value bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
+        <!-- 音响保留开/关 -->
+        <switch wx:elif="{{item.type=='Speaker'}}" checked="{{item.playing}}" bindchange="onSpeakerToggle" data-id="{{item.deviceId}}" />
       </view>
     </view>
   </view>
