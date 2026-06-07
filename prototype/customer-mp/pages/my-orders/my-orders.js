@@ -12,16 +12,35 @@ Page({
   loadOrders: function() {
     var self = this
     API.getUserOrders().then(function(orders) {
+      var now = new Date()
+      var todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0')
+      var curMin = now.getHours() * 60 + now.getMinutes()
+
       var mapped = orders.map(function(o) {
+        // 自动判断订单状态：根据当前时间
+        var status = o.status
+        if (status === 'Booked' && o.date === todayStr && o.time) {
+          var parts = o.time.split('-')
+          if (parts.length === 2) {
+            var startParts = parts[0].split(':')
+            var endParts = parts[1].split(':')
+            var startMin = parseInt(startParts[0])*60 + parseInt(startParts[1])
+            var endMin = parseInt(endParts[0])*60 + parseInt(endParts[1])
+            if (curMin >= startMin && curMin < endMin) {
+              status = 'InUse'
+            }
+          }
+        }
+
         var statusClass = 'status-completed', statusLabel = '已完成'
-        if (o.status === 'InUse' || o.status === 'in_use') { statusClass = 'status-inuse'; statusLabel = '使用中' }
-        else if (o.status === 'Booked') { statusClass = 'status-booked'; statusLabel = '已预订' }
+        if (status === 'InUse' || status === 'in_use') { statusClass = 'status-inuse'; statusLabel = '使用中' }
+        else if (status === 'Booked') { statusClass = 'status-booked'; statusLabel = '已预订' }
 
         var log = null
-        if (o.status === 'Completed' && o.orderId === 'ORD003') {
+        if (status === 'Completed' && o.orderId === 'ORD003') {
           log = { carrier: '顺丰速运', icon: '📦', trackingNum: 'SF1234567890', statusBadge: 'transit', statusLabel: '运输中', estimated: '预计明日送达', steps: [{ label: '已下单', active: true }, { label: '已发货', active: true, current: true }, { label: '派送中', active: false }, { label: '已签收', active: false }] }
         }
-        return { orderId: o.orderId, roomName: o.roomName || '房间', status: o.status, statusClass: statusClass, statusLabel: statusLabel, timeStr: (o.date||'')+' '+(o.time||(o.start?o.start.slice(0,5)+'-'+o.end.slice(0,5):'')), amount: o.amount||0, doorCode: o.doorCode||'0000', logistics: log }
+        return { orderId: o.orderId, roomName: o.roomName || '房间', status: status, statusClass: statusClass, statusLabel: statusLabel, timeStr: (o.date||'')+' '+(o.time||(o.start?o.start.slice(0,5)+'-'+o.end.slice(0,5):'')), amount: o.amount||0, doorCode: o.doorCode||'0000', logistics: log }
       })
       self.setData({ orders: mapped })
       self.filterOrders()

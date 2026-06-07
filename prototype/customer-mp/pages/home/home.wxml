@@ -38,8 +38,8 @@
     </view>
     <text class="active-order-time">{{activeOrder.timeStr}}</text>
     <view class="active-order-btns">
-      <view class="active-order-btn primary" catchtap="openDoor">🚪 开门</view>
-      <view class="active-order-btn primary" catchtap="goSmartControl">🔧 智控</view>
+      <view class="active-order-btn outline" catchtap="openDoor">🚪 开门</view>
+      <view class="active-order-btn outline" catchtap="goSmartControl">🔧 智控</view>
       <view class="active-order-btn outline" catchtap="callService">📞 客服</view>
     </view>
   </view>

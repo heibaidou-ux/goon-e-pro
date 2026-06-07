@@ -1,18 +1,18 @@
 page { background:#f5f5f5; margin:0; padding:0; }
-.phone { width:100%; min-height:100vh; display:flex; flex-direction:column; }
+.phone { width:100%; min-height:100vh; display:flex; flex-direction:column; background:#f5f5f5; }
 .nav-bar { display:flex; align-items:center; padding:12px 16px; background:#fff; }
 .back-btn { font-size:20px; padding:4px; margin-right:8px; }
 .nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
 .page { flex:1; overflow-y:auto; padding-bottom:60px; }
-.room-info-bar { display:flex; justify-content:space-between; align-items:center; padding:16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; }
+.room-info-bar { display:flex; justify-content:space-between; align-items:center; padding:16px; background:#5D8A6B; color:#fff; }
 .room-info-name { font-size:18px; font-weight:700; display:block; }
 .room-info-time { font-size:12px; opacity:.9; }
 .countdown { font-size:20px; font-weight:700; }
 .room-info-end { font-size:11px; opacity:.7; }
-.action-btns { display:flex; gap:12px; padding:16px; background:#fff; margin-bottom:12px; }
+.action-btns { display:flex; gap:12px; padding:16px; background:#f5f5f5; margin-bottom:12px; }
 .action-btn { flex:1; padding:20px; border-radius:16px; text-align:center; }
-.action-btn.renew { background:linear-gradient(135deg,#5D8A6B,#7BA88E); }
-.action-btn.tea { background:linear-gradient(135deg,#9C27B0,#CE93D8); }
+.action-btn.renew { background:#5D8A6B; }
+.action-btn.tea { background:#7B1FA2; }
 .action-icon { font-size:28px; display:block; margin-bottom:4px; }
 .action-text { font-size:16px; font-weight:700; color:#fff; }
 .music-section { background:#fff; padding:16px; margin-bottom:12px; }
@@ -33,12 +33,12 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .source-tag { padding:4px 12px; border-radius:12px; font-size:11px; background:#f0f0f0; color:#666; }
 .source-tag.active { background:#5D8A6B; color:#fff; }
 .device-list { padding:0 16px; }
-.device-item { display:flex; align-items:center; padding:14px; background:#fff; border-radius:16px; margin-bottom:8px; flex-wrap:wrap; }
+.device-item { display:flex; align-items:center; padding:14px; background:#fff; border-radius:16px; margin-bottom:8px; flex-wrap:wrap; box-shadow:0 1px 4px rgba(0,0,0,.06); }
 .device-icon { font-size:22px; margin-right:12px; }
 .device-info { flex:1; min-width:60px; }
 .device-name { font-size:14px; font-weight:500; display:block; }
 .device-status { font-size:11px; display:block; }
 .device-status.online { color:#00A870; }
 .device-status.offline { color:#e53935; }
-.ac-ring { display:flex; align-items:center; gap:8px; }
+.ac-ring { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .ac-temp { font-size:18px; font-weight:700; color:#333; min-width:32px; text-align:center; }
