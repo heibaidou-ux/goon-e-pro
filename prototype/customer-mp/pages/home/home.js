@@ -23,9 +23,8 @@ Page({
     teaProducts: [],
     // 购物车
     cartCount: 0,
-    // 会员余额
+    // 会员余额（直接显示金额，不添加图标）
     balance: 0,
-    balanceIcon: '💰',
     balanceDisplay: '',
     // QR扫码状态
     qrRoomId: '',
@@ -56,6 +55,11 @@ Page({
 
   onLoad: function() {
     this.initPage()
+    // 从全局读取余额显隐设置
+    try {
+      var v = wx.getStorageSync('balance_visible')
+      if (v !== '') this.setData({ balanceVisible: v })
+    } catch(e) {}
   },
 
   onShow: function() {

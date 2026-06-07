@@ -1,57 +1,76 @@
 <view class="phone">
-  <view class="profile-header">
-    <view class="avatar">👤</view>
-    <view class="profile-info">
-      <text class="profile-name">{{userName}}</text>
-      <text class="profile-level">{{levelLabel}}</text>
+  <view class="page">
+    <!-- 首充特惠横幅 -->
+    <view class="promo-banner" bindtap="showTopup">
+      <view>
+        <text class="promo-text"><text class="promo-em">🎉 首充特惠</text> · 首次充值享7折 + 赠优惠券包</text>
+      </view>
+      <text class="promo-tag">立即参与 →</text>
     </view>
+
+    <!-- 蓝色会员卡片 -->
+    <view class="member-card">
+      <view class="member-avatar">👤</view>
+      <view style="text-align:center;">
+        <text class="member-name">{{userName}}</text>
+        <text class="member-level"><text class="level-badge gold">🥇 {{levelLabel}}</text></text>
+      </view>
+      <view class="member-balance">
+        <view style="display:flex;align-items:center;justify-content:center;gap:6px;">
+          <text class="balance-icon-text">{{balanceIcon}}</text>
+          <text class="balance-label-text">余额</text>
+          <text class="balance-amount-text">{{balanceDisplay}}</text>
+          <text class="eye-icon" bindtap="toggleBalance">{{balanceVisible?'👁':'👁‍🗨'}}</text>
+        </view>
+      </view>
+      <view class="member-stats">
+        <view class="stat-item"><text class="stat-num">{{visitCount}}</text><text class="stat-label">预订次数</text></view>
+        <view class="stat-item"><text class="stat-num">¥{{totalSpent}}</text><text class="stat-label">累计消费</text></view>
+        <view class="stat-item"><text class="stat-num">{{points}}</text><text class="stat-label">会员积分</text></view>
+      </view>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="actions-card">
+      <view class="action-row" bindtap="goOrders"><text>📋 我的订单</text><text class="arrow">›</text></view>
+      <view class="action-row" bindtap="goCoupons"><text>🎫 我的优惠券</text><text class="arrow">›</text></view>
+      <view class="action-row" bindtap="toastComing"><text>🎁 积分商城</text><text class="arrow">›</text></view>
+      <view class="action-row" bindtap="showTopup"><text>💳 余额充值</text><text class="arrow">›</text></view>
+      <view class="action-row" bindtap="toastComing"><text>⚙ 账户设置</text><text class="arrow">›</text></view>
+    </view>
+
+    <!-- 会员权益 -->
+    <view class="benefits-card">
+      <text class="benefits-title">🏅 会员权益</text>
+      <view class="benefit-row"><text class="benefit-icon">💰</text><text>包间消费享 9 折优惠</text></view>
+      <view class="benefit-row"><text class="benefit-icon">🎂</text><text>生日当月免费赠送茶点一份</text></view>
+      <view class="benefit-row"><text class="benefit-icon">🎫</text><text>每月获赠 2 张满减优惠券</text></view>
+      <view class="benefit-row"><text class="benefit-icon">⭐</text><text>消费 1 元累计 1 积分，积分可兑换商品</text></view>
+      <view class="benefit-row"><text class="benefit-icon">📅</text><text>优先预约权 · 可提前 7 天预约</text></view>
+    </view>
+
+    <!-- 退出登录 -->
+    <view class="logout-wrap"><button class="logout-btn" bindtap="handleLogout">退出登录</button></view>
   </view>
 
-  <view class="balance-card">
-    <view class="balance-item">
-      <text class="balance-label">
-        余额
-        <text class="eye-icon" bindtap="toggleBalance">{{balanceVisible ? '👁' : '👁‍🗨'}}</text>
-      </text>
-      <text class="balance-value">{{balanceDisplay}}</text>
-    </view>
-    <view class="balance-divider"></view>
-    <view class="balance-item"><text class="balance-label">累计消费</text><text class="balance-value">¥{{totalSpent}}</text></view>
-    <view class="balance-divider"></view>
-    <view class="balance-item"><text class="balance-label">到店次数</text><text class="balance-value">{{visitCount}}次</text></view>
-  </view>
-
-  <view class="menu-list">
-    <view class="menu-item" bindtap="goOrders"><text>📋 我的订单</text><text class="arrow">›</text></view>
-    <view class="menu-item" bindtap="goCoupons"><text>🎫 我的优惠券</text><text class="arrow">›</text></view>
-  </view>
-
-  <!-- 第8条：充值中心不隐藏，一直显示 -->
-  <view class="recharge-section">
-    <view class="recharge-header">
-      <text class="recharge-title">💰 充值中心</text>
-      <text class="recharge-bonus">首充赠送30%</text>
-    </view>
-    <view class="amount-grid">
-      <view class="amount-btn {{selectedAmount==100 ? 'active' : ''}}" bindtap="selectAmount" data-amount="100">¥100</view>
-      <view class="amount-btn {{selectedAmount==200 ? 'active' : ''}}" bindtap="selectAmount" data-amount="200">¥200</view>
-      <view class="amount-btn {{selectedAmount==500 ? 'active' : ''}}" bindtap="selectAmount" data-amount="500">¥500</view>
-      <view class="amount-btn {{selectedAmount==1000 ? 'active' : ''}}" bindtap="selectAmount" data-amount="1000">¥1000</view>
-    </view>
-    <text class="recharge-bonus-detail">充值 {{selectedAmount}} 可得 ¥{{selectedAmount * 1.3}}</text>
-    <button class="recharge-btn" bindtap="doRecharge">立即充值</button>
-  </view>
-
-  <!-- 第9条：支付方式选择弹窗 -->
-  <view class="modal-overlay" wx:if="{{showPaymentModal}}" bindtap="cancelPayment">
+  <!-- 充值弹窗 -->
+  <view class="modal-overlay" wx:if="{{showRechargeModal}}" bindtap="hideRecharge">
     <view class="modal" catchtap="">
-      <text class="modal-title">选择支付方式</text>
+      <text class="modal-h3">💳 充值</text>
+      <text class="modal-promo">首充享7折优惠，最高减¥300</text>
+      <view class="amount-grid">
+        <view class="amount-btn {{selectedAmount==100?'active':''}}" bindtap="selectAmount" data-amount="100">¥100</view>
+        <view class="amount-btn {{selectedAmount==200?'active':''}}" bindtap="selectAmount" data-amount="200">¥200</view>
+        <view class="amount-btn {{selectedAmount==500?'active':''}}" bindtap="selectAmount" data-amount="500">¥500</view>
+        <view class="amount-btn {{selectedAmount==1000?'active':''}}" bindtap="selectAmount" data-amount="1000">¥1000</view>
+      </view>
+      <text class="recharge-bonus-text">充值 {{selectedAmount}} 可得 ¥{{selectedAmount * 1.3}}</text>
+      <text class="modal-label">选择支付方式</text>
       <view class="payment-option {{selectedPayment=='WeChat'?'active':''}}" bindtap="selectPayment" data-payment="WeChat">💚 微信支付</view>
       <view class="payment-option {{selectedPayment=='AliPay'?'active':''}}" bindtap="selectPayment" data-payment="AliPay">💙 支付宝</view>
-      <view class="payment-option {{selectedPayment=='Balance'?'active':''}}" bindtap="selectPayment" data-payment="Balance">💰 余额支付</view>
-      <view class="payment-confirm-btns">
-        <button class="payment-btn cancel" bindtap="cancelPayment">取消</button>
-        <button class="payment-btn confirm" bindtap="confirmRecharge">确认充值 ¥{{selectedAmount}}</button>
+      <view class="modal-buttons">
+        <button class="modal-btn cancel" bindtap="hideRecharge">取消</button>
+        <button class="modal-btn confirm" bindtap="confirmRecharge">确认充值</button>
       </view>
     </view>
   </view>

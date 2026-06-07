@@ -10,7 +10,7 @@
       </view>
       <view class="coupon-right">
         <text class="coupon-desc">{{item.desc}}</text>
-        <text class="coupon-platform">{{item.platform == 'System' ? '系统发放' : item.platform}}</text>
+        <text class="coupon-platform">{{item.type == 'discount' ? '满减券' : '代金券'}}</text>
         <text class="coupon-status {{item.used ? 'used' : 'available'}}">{{item.used ? '已使用' : '可使用'}}</text>
       </view>
     </view>

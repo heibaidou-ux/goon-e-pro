@@ -1,5 +1,5 @@
 <view class="page">
-  <!-- 15.3 sticky顶部导航 -->
+  <!-- sticky顶部导航 -->
   <view class="nav-top">
     <view class="store-header">
       <text class="store-name">高岸茶室</text>
@@ -7,28 +7,11 @@
     </view>
   </view>
 
-  <!-- QR扫码上下文卡片（房间码场景） -->
-  <view class="qr-context-card" wx:if="{{qrRoomId}}">
-    <view class="qr-context-row">
-      <text class="qr-context-icon">📍</text>
-      <view class="qr-context-body">
-        <text class="qr-context-title">您正在 <text class="qr-context-bold">{{qrRoomName}}</text></text>
-        <text class="qr-context-desc">桌号: {{qrTableId}}号桌 · 已自动识别位置</text>
-      </view>
-      <button class="qr-context-btn" bindtap="goCartWithRoom">点茶品 →</button>
-    </view>
-    <view class="qr-context-actions">
-      <button class="qr-context-action" bindtap="showRoomBill">🧾 查看挂账</button>
-      <button class="qr-context-action" bindtap="goOrders">📋 查看订单</button>
-      <button class="qr-context-close" bindtap="closeQrContext">✕</button>
-    </view>
-  </view>
-
-  <!-- 15.5 carousel-wrap包裹结构 -->
+  <!-- 轮播图 -->
   <view class="carousel-wrap">
     <swiper class="carousel-swiper" current="{{currentSlide}}" bindchange="onSwiperChange" autoplay interval="3500" circular>
       <swiper-item wx:for="{{carousels}}" wx:key="index">
-        <view class="carousel-slide" bindtap="onCarouselTap" data-index="{{index}}" data-url="{{item.url}}" style="background:url('{{item.img}}') center/cover no-repeat;">
+        <view class="carousel-slide" bindtap="onCarouselTap" data-index="{{index}}" style="background:url('{{item.img}}') center/cover no-repeat;">
           <text class="slide-title">{{item.title}}</text>
           <text class="slide-desc">{{item.desc}}</text>
         </view>
@@ -42,7 +25,7 @@
     </view>
   </view>
 
-  <!-- 门店信息栏 -->
+  <!-- 门店信息栏(导航/电话/营业时间) -->
   <view class="store-info-bar">
     <view class="store-info-row">
       <text>📍 广州市天河区珠江新城华夏路28号盈隆大厦16层</text>
@@ -55,7 +38,7 @@
     </view>
   </view>
 
-  <!-- 当前消费动作板块 -->
+  <!-- 当前消费（绿色底色） -->
   <view class="active-order-banner {{hasActiveOrder ? 'show' : ''}}" bindtap="goMyOrders">
     <view class="active-order-header">
       <text class="active-order-title">⏱ 当前消费</text>
@@ -72,25 +55,22 @@
     </view>
   </view>
 
-  <!-- 四个快捷入口 -->
+  <!-- 四个快捷入口（加底色） -->
   <view class="quick-grid">
     <button class="quick-item" bindtap="goCouponVerify">
-      <view class="quick-icon brand"><text class="icon-font">🎫</text></view>
+      <view class="quick-icon brand">🎫</view>
       <text class="quick-label">验券</text>
     </button>
-    <button class="quick-item" bindtap="handleBalanceClick" style="position:relative;">
-      <view class="quick-icon balance" style="position:relative;">
-        <text class="icon-font">{{balanceIcon}}</text>
-        <text class="balance-on-icon">{{balanceDisplay}}</text>
-      </view>
+    <button class="quick-item" bindtap="handleBalanceClick">
+      <view class="quick-icon balance">¥{{balanceDisplay}}</view>
       <text class="quick-label">会员余额</text>
     </button>
     <button class="quick-item" bindtap="handleCouponClick">
-      <view class="quick-icon coupon"><text class="icon-font">🏷️</text></view>
+      <view class="quick-icon coupon">🏷️</view>
       <text class="quick-label">优惠券</text>
     </button>
     <button class="quick-item" bindtap="goProfile">
-      <view class="quick-icon profile"><text class="icon-font">👤</text></view>
+      <view class="quick-icon profile">👤</view>
       <text class="quick-label">我的</text>
     </button>
   </view>
@@ -99,16 +79,13 @@
   <view class="section">
     <view class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
       <text>可预约包间</text>
-      <!-- 15.4 查看全部入口 -->
       <text class="section-more" bindtap="goRoomList">查看全部 ›</text>
     </view>
-    <!-- 15.1 水平滑动房间卡片 -->
     <scroll-view class="room-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="room-card" wx:for="{{rooms}}" wx:key="roomId" bindtap="goRoom" data-roomid="{{item.roomId}}">
         <view class="room-card-img" style="background:{{item.bgColor}}">{{item.icon}}</view>
         <view class="room-card-body">
           <text class="room-card-name">{{item.name}}</text>
-          <!-- 15.2 房间标签Tag -->
           <view class="room-card-tags">
             <text class="room-tag">{{item.capacity}}人</text>
             <text class="room-tag">{{item.area}}㎡</text>
@@ -119,26 +96,33 @@
     </scroll-view>
   </view>
 
-  <!-- 精选茶品 -->
+  <!-- 精选茶品（消除左右边距） -->
   <view class="section">
-    <view class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+    <view class="section-title" style="display:flex;justify-content:space-between;align-items:center;padding:16px 0 0 16px;">
       <text>🍵 精选茶品</text>
       <text class="cart-link" bindtap="goCartPage">🛒 购物车<text class="cart-badge" wx:if="{{cartCount>0}}">{{cartCount}}</text></text>
     </view>
     <view class="tea-grid">
-      <view class="tea-card" wx:for="{{teaProducts}}" wx:key="productId" bindtap="showProductDetail" data-pid="{{item.productId}}" data-name="{{item.name}}" data-desc="{{item.desc}}" data-price="{{item.price}}">
-        <view class="tea-card-img" style="background:{{item.bg}}">{{item.icon}}</view>
+      <view class="tea-card" wx:for="{{teaProducts}}" wx:key="productId">
+        <view class="tea-card-img" style="background:{{item.bg}}" bindtap="showProductDetail" data-pid="{{item.productId}}" data-name="{{item.name}}" data-desc="{{item.desc}}" data-price="{{item.price}}">{{item.icon}}</view>
         <view class="tea-card-body">
           <text class="tea-card-name">{{item.name}}</text>
           <text class="tea-card-desc">{{item.desc}}</text>
           <view class="tea-card-footer">
             <text class="tea-card-price">¥{{item.price}}</text>
-            <button class="tea-card-btn" catchtap="addToCart" data-pid="{{item.productId}}" data-name="{{item.name}}" data-price="{{item.price}}">{{item._qty>0?'+ 已选 '+item._qty:'+ 加购'}}</button>
+            <view class="tea-card-qty">
+              <text class="qty-btn-sm" wx:if="{{item._qty>0}}" bindtap="decQty" data-pid="{{item.productId}}">−</text>
+              <text class="qty-num-sm" wx:if="{{item._qty>0}}">{{item._qty}}</text>
+              <text class="tea-card-btn" catchtap="incQty" data-pid="{{item.productId}}" data-name="{{item.name}}" data-price="{{item.price}}">{{item._qty>0?'+':'+ 加购'}}</text>
+            </view>
           </view>
         </view>
       </view>
     </view>
   </view>
+
+  <!-- 店员端入口 -->
+  <view class="staff-entrance" bindtap="goStaffLogin"><text>🔒 员工通道</text></view>
 
   <!-- 底部导航 -->
   <view class="bottom-nav">
@@ -154,7 +138,7 @@
 <view class="modal-overlay" hidden="{{!showStoreModal}}" bindtap="hideStoreSelector">
   <view class="modal" catchtap="">
     <text class="modal-title">选择门店</text>
-    <view class="store-option active"><text>📍 盈隆店</text><text style="color:#0052D9;">✓ 当前</text></view>
+    <view class="store-option active"><text>📍 盈隆店</text><text style="color:#5D8A6B;">✓ 当前</text></view>
     <view class="store-option coming" bindtap="toastComing"><text>📍 珠江新城店</text><text class="store-coming-tag">即将上线</text></view>
     <view class="store-option coming" bindtap="toastComing"><text>📍 琶洲店</text><text class="store-coming-tag">即将上线</text></view>
     <button class="modal-close" bindtap="hideStoreSelector">关闭</button>
@@ -175,7 +159,7 @@
   </view>
 </view>
 
-<!-- 14.7 全屏品牌风格登录 -->
+<!-- 登录弹窗 -->
 <view class="login-fullscreen" wx:if="{{showLoginModal}}">
   <view class="login-bg">
     <view class="login-card">
@@ -203,13 +187,13 @@
   </view>
 </view>
 
-<!-- 14.4 加载状态 -->
+<!-- 加载状态 -->
 <view class="loading-overlay" wx:if="{{loading}}">
   <view class="loading-spinner"></view>
   <text class="loading-text">加载中...</text>
 </view>
 
-<!-- 14.5 错误提示 -->
+<!-- 错误提示 -->
 <view class="error-toast" wx:if="{{errorMsg}}" bindtap="clearError">
   <text class="error-toast-text">{{errorMsg}}</text>
 </view>

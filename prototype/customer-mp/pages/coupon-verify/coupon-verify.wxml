@@ -1,7 +1,7 @@
 <view class="phone">
   <view class="nav-bar">
     <text class="back-btn" bindtap="goBack">←</text>
-    <text class="nav-title">验券预约</text>
+    <text class="nav-title">验券</text>
   </view>
   <view class="page">
     <!-- Step indicator -->

@@ -1,4 +1,4 @@
-/* 14.1 品牌色 #0052D9 + 14.8 统一圆角16px */
+﻿/* 14.1 品牌色 #5D8A6B + 14.8 统一圆角16px */
 page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
 .page { overflow-y:auto; padding-bottom:60px; }
 
@@ -8,7 +8,7 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 /* 门店头部 */
 .store-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#fff; border-bottom:1px solid #f0f0f0; }
 .store-name { font-size:18px; font-weight:700; color:#1a1a1a; }
-.store-select { font-size:13px; color:#0052D9; display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; background:#f0f5ff; }
+.store-select { font-size:13px; color:#5D8A6B; display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; background:#f0f5ff; }
 
 /* QR上下文卡片 */
 .qr-context-card { margin:12px 16px; background:#f0f5ff; padding:14px; border:1.5px solid #d6e4ff; border-radius:16px; }
@@ -18,7 +18,7 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .qr-context-title { font-size:14px; font-weight:600; color:#333; }
 .qr-context-bold { font-weight:600; }
 .qr-context-desc { font-size:12px; color:#666; margin-top:2px; }
-.qr-context-btn { padding:8px 16px; border-radius:16px; background:#0052D9; color:#fff; border:none; font-size:12px; font-weight:600; white-space:nowrap; }
+.qr-context-btn { padding:8px 16px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:12px; font-weight:600; white-space:nowrap; }
 .qr-context-actions { display:flex; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid #d6e4ff; align-items:center; }
 .qr-context-action { flex:1; padding:6px; border-radius:16px; background:#fff; border:1px solid #d6e4ff; font-size:12px; color:#666; text-align:center; }
 .qr-context-close { padding:6px 8px; border-radius:16px; background:#fff; border:1px solid #d6e4ff; font-size:12px; color:#999; }
@@ -36,10 +36,10 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 /* 门店信息栏 */
 .store-info-bar { padding:8px 0; font-size:12px; color:#333; line-height:1.8; background:#f5f7ff; }
 .store-info-row { padding:0 16px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.store-info-link { color:#0052D9; font-weight:600; }
+.store-info-link { color:#5D8A6B; font-weight:600; }
 
 /* 当前消费 */
-.active-order-banner { display:none; margin:0; padding:14px 16px; background:linear-gradient(135deg,#0052D9,#1a73e8); color:#fff; }
+.active-order-banner { display:none; margin:0; padding:14px 16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; }
 .active-order-banner.show { display:block; }
 .active-order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .active-order-title { font-size:13px; font-weight:600; opacity:.9; }
@@ -49,26 +49,24 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .active-order-time { font-size:12px; opacity:.8; margin-top:2px; }
 .active-order-btns { display:flex; gap:8px; margin-top:10px; }
 .active-order-btn { flex:1; padding:10px 8px; border-radius:16px; border:none; font-size:13px; font-weight:600; text-align:center; white-space:nowrap; }
-.active-order-btn.primary { background:#fff; color:#0052D9; }
+.active-order-btn.primary { background:#fff; color:#5D8A6B; }
 .active-order-btn.outline { background:rgba(255,255,255,.2); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
 
-/* 快捷入口 */
+/* 快捷入口 — 所有按钮加底色 */
 .quick-grid { display:grid; grid-template-columns:repeat(4,1fr); padding:16px 0; background:#fff; margin-bottom:12px; }
 .quick-item { display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 4px; background:none; border:none; }
 .quick-item:active { opacity:.7; }
 .quick-icon { width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff; }
-.icon-font { font-size:22px; }
-.quick-icon.brand { background:linear-gradient(135deg,#0052D9,#1a73e8); }
-.quick-icon.balance { background:linear-gradient(135deg,#7A8B8B,#A3B5B5); }
+.quick-icon.brand { background:linear-gradient(135deg,#5D8A6B,#7BA88E); }
+.quick-icon.balance { background:linear-gradient(135deg,#7A8B8B,#A3B5B5); font-size:12px; font-weight:700; }
 .quick-icon.coupon { background:linear-gradient(135deg,#B8860B,#D4A84B); }
 .quick-icon.profile { background:linear-gradient(135deg,#8B7D6B,#B5A896); }
 .quick-label { font-size:11px; color:#333; font-weight:500; }
-.balance-on-icon { position:absolute; bottom:-2px; right:-2px; font-size:9px; font-weight:700; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); background:rgba(0,0,0,.3); padding:1px 4px; border-radius:6px; }
 
 /* 可预约包间 */
 .section { padding:0 0 12px; margin-bottom:12px; background:#fff; }
 .section-title { font-size:15px; font-weight:600; margin-bottom:12px; color:#1a1a1a; padding:16px 16px 0; }
-.section-more { font-size:12px; color:#0052D9; font-weight:500; }
+.section-more { font-size:12px; color:#5D8A6B; font-weight:500; }
 /* 15.1 水平滑动 */
 .room-scroll { display:flex; padding-left:16px; white-space:nowrap; overflow-x:auto; }
 /* 15.6 卡片圆角12px + 14.2 卡片阴影 */
@@ -83,8 +81,8 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .room-card-price { font-size:16px; font-weight:700; color:#B8860B; margin-top:6px; display:block; }
 .room-card-price .unit { font-size:11px; font-weight:400; color:#999; }
 
-/* 茶品 */
-.tea-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 16px; }
+/* 茶品 — 左右紧贴屏幕边框，无padding */
+.tea-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 10px; }
 .tea-card { background:#fff; border:1px solid #f0f0f0; border-radius:16px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.04); }
 .tea-card:active { background:#fafafa; }
 .tea-card-img { height:100px; display:flex; align-items:center; justify-content:center; font-size:40px; }
@@ -93,14 +91,14 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .tea-card-desc { font-size:11px; color:#999; margin-top:2px; display:block; }
 .tea-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
 .tea-card-price { font-size:15px; font-weight:700; color:#B8860B; }
-.tea-card-btn { padding:4px 12px; border-radius:16px; background:#0052D9; color:#fff; border:none; font-size:11px; }
-.cart-link { font-size:12px; font-weight:400; color:#0052D9; display:flex; align-items:center; gap:4px; }
+.tea-card-btn { padding:4px 12px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:11px; }
+.cart-link { font-size:12px; font-weight:400; color:#5D8A6B; display:flex; align-items:center; gap:4px; }
 .cart-badge { background:#B8860B; color:#fff; border-radius:10px; padding:1px 7px; font-size:10px; margin-left:4px; }
 
 /* 底部导航 */
 .bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; position:fixed; bottom:0; left:0; right:0; z-index:50; }
 .nav-item { flex:1; text-align:center; padding:10px 0 6px; color:#999; }
-.nav-item.active { color:#0052D9; }
+.nav-item.active { color:#5D8A6B; }
 .nav-icon { font-size:20px; display:block; }
 .nav-label { font-size:10px; margin-top:2px; }
 
@@ -112,11 +110,11 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
 .modal { background:#fff;border-radius:16px;padding:24px;width:320px;text-align:center;max-height:90vh;overflow-y:auto; }
 .modal-title { font-size:16px;margin-bottom:8px;color:#333; }
-.modal-close { margin-top:16px;padding:10px 24px;border-radius:16px;border:none;background:#0052D9;color:#fff;font-size:14px;width:100%;text-align:center; }
+.modal-close { margin-top:16px;padding:10px 24px;border-radius:16px;border:none;background:#5D8A6B;color:#fff;font-size:14px;width:100%;text-align:center; }
 
 /* 门店选择 */
 .store-option { display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid #f0f0f0;font-size:14px; }
-.store-option.active { color:#0052D9;font-weight:600; }
+.store-option.active { color:#5D8A6B;font-weight:600; }
 .store-option.coming { color:#999; }
 .store-coming-tag { font-size:10px;padding:2px 6px;border-radius:8px;background:#fff3e0;color:#B8860B; }
 
@@ -132,28 +130,29 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 
 /* 14.7 全屏登录 */
 .login-fullscreen { position:fixed;top:0;left:0;right:0;bottom:0;z-index:200; }
-.login-bg { width:100%;height:100%;background:linear-gradient(135deg,#0052D9,#1a73e8);display:flex;align-items:center;justify-content:center; }
+.login-bg { width:100%;height:100%;background:linear-gradient(135deg,#5D8A6B,#7BA88E);display:flex;align-items:center;justify-content:center; }
 .login-card { background:#fff;border-radius:16px;padding:32px 24px;width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.15); }
 .login-card-title { font-size:22px;font-weight:700;color:#1a1a1a;display:block;margin-bottom:4px; }
 .login-card-sub { font-size:12px;color:#999;display:block;margin-bottom:16px; }
 .login-tabs { display:flex;margin-bottom:16px;border-radius:16px;overflow:hidden;border:1px solid #e5e5e5; }
 .login-tab { flex:1;padding:10px;font-size:13px;background:#f5f5f5;color:#999;border:none;text-align:center; }
-.login-tab.active { background:#0052D9;color:#fff; }
+.login-tab.active { background:#5D8A6B;color:#fff; }
 .form-item { margin-bottom:12px;text-align:left; }
 .form-label { font-size:12px;color:#999;margin-bottom:4px;display:block; }
 .form-input { width:100%;padding:10px 12px;border:1.5px solid #e5e5e5;border-radius:16px;font-size:14px;box-sizing:border-box; }
 .code-row { display:flex;gap:8px;align-items:center; }
 .code-row .form-input { flex:1; }
-.code-btn { white-space:nowrap;padding:10px 12px;border-radius:16px;border:1px solid #0052D9;background:#fff;color:#0052D9;font-size:12px; }
-.form-btn { width:100%;padding:12px;border-radius:16px;border:none;background:#0052D9;color:#fff;font-size:15px;font-weight:600;margin-top:8px;text-align:center; }
-.form-switch { font-size:12px;color:#0052D9;margin-top:12px;display:block;text-align:center; }
+.code-btn { white-space:nowrap;padding:10px 12px;border-radius:16px;border:1px solid #5D8A6B;background:#fff;color:#5D8A6B;font-size:12px; }
+.form-btn { width:100%;padding:12px;border-radius:16px;border:none;background:#5D8A6B;color:#fff;font-size:15px;font-weight:600;margin-top:8px;text-align:center; }
+.form-switch { font-size:12px;color:#5D8A6B;margin-top:12px;display:block;text-align:center; }
 .login-hint { font-size:11px;color:#bbb;margin-top:12px;display:block;text-align:center; }
 
 /* 14.4 加载状态 */
 .loading-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.9);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center; }
-.loading-spinner { width:36px;height:36px;border:3px solid #e0e0e0;border-top-color:#0052D9;border-radius:50%;animation:spin .8s linear infinite; }
+.loading-spinner { width:36px;height:36px;border:3px solid #e0e0e0;border-top-color:#5D8A6B;border-radius:50%;animation:spin .8s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .loading-text { font-size:14px;color:#999;margin-top:12px; }
 
 /* 14.5 错误提示 */
 .error-toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.85);color:#fff;padding:14px 24px;border-radius:16px;font-size:14px;z-index:400;max-width:300px;text-align:center; }
+

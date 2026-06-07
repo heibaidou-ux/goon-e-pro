@@ -2,11 +2,11 @@ var API = require('../../utils/api')
 
 Page({
   data: {
-    userName: '会员', levelLabel: '普通会员',
+    userName: '会员', levelLabel: '金牌会员', balanceIcon: '💎',
     balance: 0, balanceDisplay: '¥0', balanceVisible: true,
-    totalSpent: 0, visitCount: 0,
+    totalSpent: 0, visitCount: 0, points: 0,
+    showRechargeModal: false,
     selectedAmount: 100,
-    showPaymentModal: false,
     selectedPayment: 'WeChat'
   },
 
@@ -14,14 +14,15 @@ Page({
     var self = this
     var user = API.getCurrentUser()
     if (user) {
-      var levels = { Normal:'普通会员', Silver:'银卡会员', Gold:'金卡会员', Diamond:'钻石会员' }
-      // 第10条：显示真实姓名
-      var displayName = user.name || user.nickname || user.phone || '会员'
+      var levels = { Normal: { label:'普通会员', icon:'👛' }, Silver: { label:'银卡会员', icon:'💰' }, Gold: { label:'金牌会员', icon:'💎' }, Diamond: { label:'钻石会员', icon:'💳' } }
+      var lv = levels[user.memberLevel] || levels.Gold
       self.setData({
-        userName: displayName,
-        levelLabel: levels[user.memberLevel] || '普通会员',
+        userName: user.name || user.nickname || user.phone || '会员',
+        levelLabel: lv.label,
+        balanceIcon: lv.icon,
         totalSpent: user.totalSpent || 0,
-        visitCount: user.visitCount || 0
+        visitCount: user.visitCount || 0,
+        points: user.totalSpent || 0
       })
     }
     API.getBalance().then(function(b) {
@@ -38,47 +39,62 @@ Page({
     }
   },
 
-  // 第33条/第4条：隐藏/显示余额
   toggleBalance: function() {
-    this.setData({ balanceVisible: !this.data.balanceVisible })
+    var visible = !this.data.balanceVisible
+    this.setData({ balanceVisible: visible })
     this.updateBalanceDisplay()
+    // 存到全局，首页也读取这个设置
+    try { wx.setStorageSync('balance_visible', visible) } catch(e) {}
   },
 
   goOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },
   goCoupons: function() { wx.navigateTo({ url: '/pages/my-coupons/my-coupons' }) },
+  toastComing: function() { wx.showToast({ title: '开发中', icon: 'none' }) },
+
+  showTopup: function() {
+    this.setData({ showRechargeModal: true, selectedAmount: 100, selectedPayment: 'WeChat' })
+  },
+
+  hideRecharge: function() { this.setData({ showRechargeModal: false }) },
 
   selectAmount: function(e) {
     this.setData({ selectedAmount: parseInt(e.currentTarget.dataset.amount) })
-  },
-
-  // 第9条：支付方式选择
-  doRecharge: function() {
-    this.setData({ showPaymentModal: true, selectedPayment: 'WeChat' })
   },
 
   selectPayment: function(e) {
     this.setData({ selectedPayment: e.currentTarget.dataset.payment })
   },
 
-  cancelPayment: function() {
-    this.setData({ showPaymentModal: false })
-  },
-
   confirmRecharge: function() {
     var self = this
-    this.setData({ showPaymentModal: false })
+    var method = self.data.selectedPayment
+    if (method === 'Balance') {
+      wx.showToast({ title: '余额充值不支持余额支付', icon: 'none' })
+      return
+    }
+    this.setData({ showRechargeModal: false })
     wx.showLoading({ title: '充值中...' })
-    API.topUp(self.data.selectedAmount, self.data.selectedPayment).then(function(r) {
+    API.topUp(self.data.selectedAmount, method).then(function(r) {
       wx.hideLoading()
-      wx.showToast({
-        title: '✅ 充值成功！¥' + r.amount + (r.bonus > 0 ? ' (赠送¥' + r.bonus + ')' : ''),
-        icon: 'none', duration: 2000
-      })
+      wx.showToast({ title: '✅ 充值成功！+¥' + r.amount + (r.bonus > 0 ? ' (赠送¥' + r.bonus + ')' : ''), icon: 'success' })
       self.setData({ balance: r.newBalance })
       self.updateBalanceDisplay()
     }).catch(function(err) {
       wx.hideLoading()
       wx.showToast({ title: err.message || '充值失败', icon: 'none' })
+    })
+  },
+
+  handleLogout: function() {
+    wx.showModal({
+      title: '退出登录',
+      content: '确定要退出当前账号吗？',
+      success: function(res) {
+        if (res.confirm) {
+          API.logout()
+          wx.reLaunch({ url: '/pages/home/home' })
+        }
+      }
     })
   }
 })
