@@ -1,55 +1,111 @@
-/** 首页样式 */
-page { background: #f5f5f5; }
-.page { padding-bottom: 20px; }
+page { background: #f5f5f5; margin: 0 !important; padding: 0 !important; }
+.page { overflow-y: auto; padding-bottom: 60px; margin: 0; }
 
-/* 顶部 */
-.nav-top { position: sticky; top: 0; z-index: 100; }
+/* 状态栏 */
+.status-bar { width: 100%; }
+
+/* 门店头部 */
 .store-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #f0f0f0; }
 .store-name { font-size: 18px; font-weight: 700; color: #1a1a1a; }
 .store-select { font-size: 13px; color: #5D8A6B; display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; background: #f0f5ff; }
 
-/* 进行中订单 */
-.active-order-banner { display: none; margin: 0; padding: 14px 16px; background: linear-gradient(135deg,#5D8A6B,#00a854); color: #fff; }
-.active-order-banner.show { display: block; }
+/* 门店信息栏 */
+.store-info-bar { padding: 8px 0; font-size: 12px; color: #558b2f; line-height: 1.8; background: #f0fdf4; }
+.store-info-row { padding: 0 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.store-info-link { color: #2e7d32; font-weight: 600; }
+
+/* 当前消费横幅 */
+.active-order-banner { margin: 0; padding: 14px 16px; background: linear-gradient(135deg,#5D8A6B,#00a854); color: #fff; }
 .active-order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .active-order-title { font-size: 13px; font-weight: 600; opacity: .9; }
+.active-order-room-row { display: flex; align-items: center; gap: 4px; }
 .active-order-room { font-size: 16px; font-weight: 700; }
-.active-order-time { font-size: 12px; opacity: .8; margin-top: 2px; }
-.active-order-btns { display: flex; gap: 10px; margin-top: 10px; }
-.active-order-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; text-align: center; }
+.active-order-arrow { font-size: 16px; opacity: .6; }
+.active-order-time { font-size: 12px; opacity: .8; margin-top: 2px; display: block; }
+.active-order-btns { display: flex; gap: 8px; margin-top: 10px; }
+.active-order-btn { flex: 1; padding: 10px 6px; border-radius: 10px; border: none; font-size: 13px; font-weight: 600; text-align: center; white-space:nowrap; }
 .active-order-btn.primary { background: #fff; color: #5D8A6B; }
 .active-order-btn.outline { background: rgba(255,255,255,.2); color: #fff; border: 1.5px solid rgba(255,255,255,.4); }
 
 /* 轮播 */
-.carousel-wrap { margin: 0; }
 .carousel-swiper { height: 200px; }
-.carousel-slide { width: 100%; height: 200px; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px 20px; color: #fff; }
-.slide-title { font-size: 20px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
-.slide-desc { font-size: 13px; margin-top: 4px; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+.carousel-slide { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px 20px; color: #fff; position: relative; overflow: hidden; }
+.carousel-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.carousel-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg,rgba(93,138,107,.3),rgba(0,0,0,.2)); }
+.slide-title { font-size: 20px; font-weight: 700; position: relative; z-index: 1; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+.slide-desc { font-size: 13px; margin-top: 4px; position: relative; z-index: 1; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
 
 /* 快捷入口 */
 .quick-grid { display: grid; grid-template-columns: repeat(4,1fr); padding: 16px 0; background: #fff; margin-bottom: 12px; }
-.quick-item { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; position: relative; }
+.quick-item { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; position: relative; background: none; border: none; }
 .quick-item:active { opacity: .7; }
 .quick-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; }
 .quick-icon.brand { background: linear-gradient(135deg,#5D8A6B,#7BA88E); }
-.quick-icon.balance { background: linear-gradient(135deg,#7A8B8B,#A3B5B5); }
+.quick-icon.balance { background: linear-gradient(135deg,#7A8B8B,#A3B5B5); font-size: 11px; font-weight: 700; position:relative; }
+.eye-icon { position:absolute; bottom:-2px; right:-2px; font-size:9px; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); background:rgba(0,0,0,.3); padding:1px 4px; border-radius:6px; }
 .quick-icon.coupon { background: linear-gradient(135deg,#B8860B,#D4A84B); }
 .quick-icon.profile { background: linear-gradient(135deg,#8B7D6B,#B5A896); }
 .quick-label { font-size: 11px; color: #333; font-weight: 500; }
-.balance-on-icon { position: absolute; bottom: 2px; right: 2px; font-size: 9px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.balance-on-icon { position: absolute; bottom: -2px; right: -2px; font-size: 9px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.5); background: rgba(0,0,0,.3); padding: 1px 4px; border-radius: 6px; }
 
-/* 推荐房间 */
-.section { margin-bottom: 16px; background: #fff; padding: 16px 0; }
-.section-title { font-size: 15px; font-weight: 600; color: #1a1a1a; padding: 0 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-.section-more { font-size: 12px; color: #999; }
-.room-scroll { display: flex; padding-left: 16px; white-space: nowrap; }
-.room-card { display: inline-flex; flex-direction: column; width: 180px; margin-right: 12px; border-radius: 12px; background: #fafafa; overflow: hidden; }
-.room-card:active { opacity: .8; }
-.room-card-img { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 40px; background: #f0f0f0; }
-.room-card-body { padding: 10px 12px; }
-.room-card-name { font-size: 14px; font-weight: 600; color: #333; }
-.room-card-tags { margin-top: 4px; }
-.room-tag { font-size: 10px; color: #999; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
-.room-card-price { font-size: 16px; font-weight: 700; color: #B8860B; margin-top: 6px; }
-.room-card-price .unit { font-size: 11px; font-weight: 400; color: #999; }
+/* 房间列表 */
+.section { padding: 0 0 12px; margin-bottom: 12px; background: #fff; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a; padding: 16px 16px 0; }
+.section-title-row { display: flex; justify-content: space-between; align-items: center; }
+.cart-link { font-size: 12px; font-weight: 400; color: #5D8A6B; display: flex; align-items: center; gap: 4px; padding-right: 16px; }
+.cart-badge { background: #B8860B; color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; }
+.room-card { display: flex; padding: 14px 16px; background: #f9fafb; border-bottom: 1px solid #f0f0f0; margin: 0; }
+.room-card:active { background: #f0f0f0; }
+.room-card-img { width: 80px; height: 80px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.room-card-body { margin-left: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.room-card-name { font-size: 15px; font-weight: 600; }
+.room-card-meta { font-size: 12px; color: #999; margin-top: 2px; display: block; }
+.room-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+.room-card-price { font-size: 16px; font-weight: 700; color: #B8860B; }
+.room-card-book-btn { padding: 6px 14px; border-radius: 16px; background: #5D8A6B; color: #fff; border: none; font-size: 12px; font-weight: 600; }
+
+/* 茶品网格 */
+.tea-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; }
+.tea-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 12px; overflow: hidden; }
+.tea-card-img { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.tea-card-body { padding: 10px; }
+.tea-card-name { font-size: 13px; font-weight: 600; display: block; }
+.tea-card-desc { font-size: 11px; color: #999; margin-top: 2px; display: block; }
+.tea-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.tea-card-price { font-size: 15px; font-weight: 700; color: #B8860B; }
+.tea-card-qty { display: flex; align-items: center; gap: 4px; }
+.qty-btn-sm { width: 20px; height: 20px; border-radius: 50%; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #333; text-align: center; }
+.qty-num-sm { font-size: 12px; font-weight: 600; min-width: 14px; text-align: center; color: #333; }
+.tea-card-btn { padding: 4px 10px; border-radius: 16px; background: #5D8A6B; color: #fff; border: none; font-size: 11px; text-align: center; }
+
+/* 底部导航 */
+.bottom-nav { display: flex; border-top: 1px solid #eee; background: #fff; position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; }
+.nav-item { flex: 1; text-align: center; padding: 10px 0 6px; color: #999; }
+.nav-item.active { color: #5D8A6B; }
+.nav-icon { font-size: 20px; display: block; }
+.nav-label { font-size: 10px; margin-top: 2px; }
+
+/* 员工入口 */
+.staff-entrance { text-align: center; padding: 16px 0 80px; }
+.staff-entrance text { font-size: 11px; color: #ccc; }
+
+/* 弹窗通用 */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.5); z-index: 99; display: flex; align-items: center; justify-content: center; }
+.modal { background: #fff; border-radius: 14px; padding: 24px; width: 320px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-size: 16px; margin-bottom: 8px; color: #333; display: block; }
+.modal-close { margin-top: 16px; padding: 10px 24px; border-radius: 8px; border: none; background: #5D8A6B; color: #fff; font-size: 14px; width: 100%; text-align: center; }
+.store-option { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+.store-option.active { color: #5D8A6B; font-weight: 600; }
+.store-option.coming { color: #999; }
+.store-coming-tag { font-size: 10px; padding: 2px 6px; border-radius: 8px; background: #fff3e0; color: #B8860B; display: inline-block; }
+.parking-modal { width: 340px; text-align: left; }
+.parking-section { margin-bottom: 14px; }
+.ps-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; display: block; }
+.ps-text { font-size: 13px; color: #666; line-height: 1.6; display: block; }
+.ps-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 6px; margin: 2px 4px 2px 0; }
+.ps-tag.free { background: #e8f5e9; color: #00a870; }
+.ps-tag.paid { background: #fff3e0; color: #B8860B; }
+
+/* 商品详情弹窗 */
+.product-detail-desc { display:block; font-size:14px; color:#666; margin:8px 0; line-height:1.5; }
+.product-detail-price { display:block; font-size:24px; font-weight:700; color:#B8860B; margin:8px 0; text-align:center; }
