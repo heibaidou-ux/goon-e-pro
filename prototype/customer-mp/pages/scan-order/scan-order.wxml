@@ -1,23 +1,23 @@
 <view class="page">
-  <view class="banner">🏠 扫码点单加购</view>
-  <scroll-view class="tabs" scroll-x>
-    <view class="tab {{tabAll}}" bindtap="setCat" data-cat="">全部</view>
-    <view class="tab {{tabTea}}" bindtap="setCat" data-cat="Tea">茶叶</view>
-    <view class="tab {{tabSnack}}" bindtap="setCat" data-cat="Snack">茶点</view>
-  </scroll-view>
-  <view class="list">
-    <view class="item" wx:for="{{items}}" wx:key="productId">
-      <text>{{item.name}}</text>
-      <text class="price">¥{{item.price}}</text>
-      <view class="qty">
-        <text bindtap="dec" data-id="{{item.productId}}">-</text>
+  <view class="room-banner">🏠 {{roomName}} · 扫码加购</view>
+  <view class="cat-tabs">
+    <view class="cat-tab {{currentCat == '' ? 'active' : ''}}" bindtap="switchCat" data-cat="">全部</view>
+    <view class="cat-tab {{currentCat == 'Tea' ? 'active' : ''}}" bindtap="switchCat" data-cat="Tea">茶叶</view>
+    <view class="cat-tab {{currentCat == 'Snack' ? 'active' : ''}}" bindtap="switchCat" data-cat="Snack">茶点</view>
+  </view>
+  <view class="product-list">
+    <view class="product-card" wx:for="{{filteredProducts}}" wx:key="productId">
+      <text class="product-name">{{item.name}}</text>
+      <text class="product-price">¥{{item.price}}</text>
+      <view class="qty-ctrl">
+        <view class="qty-btn" bindtap="decQty" data-id="{{item.productId}}">-</view>
         <text>{{item._qty || 0}}</text>
-        <text bindtap="inc" data-id="{{item.productId}}">+</text>
+        <view class="qty-btn" bindtap="incQty" data-id="{{item.productId}}">+</view>
       </view>
     </view>
   </view>
-  <view class="bar" wx:if="{{total > 0}}">
-    <text>¥{{total}}</text>
-    <button bindtap="submit">挂账</button>
+  <view class="bottom-bar" wx:if="{{total > 0}}">
+    <text class="bar-total">¥{{total}}</text>
+    <button class="bar-btn" bindtap="submitOrder">加入账单</button>
   </view>
 </view>

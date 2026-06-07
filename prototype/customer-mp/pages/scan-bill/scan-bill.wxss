@@ -1,1 +1,67 @@
-.header{padding:16px;background:linear-gradient(135deg,#5D8A6B,#7BA88E);color:#fff;font-size:18px;font-weight:700}.summary{margin:12px 16px;background:#fff;border-radius:12px;padding:16px}.summary text{display:flex;justify-content:space-between;padding:6px 0;font-size:14px}.summary .total{border-top:1px solid #e8e8e8;padding-top:10px;margin-top:4px;font-weight:700;color:#B8860B}.orders{padding:0 16px}.order{display:flex;align-items:center;padding:12px;background:#fff;border-radius:10px;margin-bottom:8px}.order text{flex:1}.order button{font-size:12px;color:#e53935;background:none;border:none;padding:4px}.bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #f0f0f0;padding:10px 16px;display:flex;align-items:center;gap:12px;z-index:20}.bar text{flex:1;font-size:20px;font-weight:700;color:#B8860B}.bar button{padding:12px 24px;background:#5D8A6B;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600}
+﻿page { background:#f5f5f5; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.phone { width:100%; max-width:100%; min-height:100vh; background:#fff; display:flex; flex-direction:column; position:relative; }
+.page { flex:1; overflow-y:auto;  padding-bottom:80px; }
+.page
+.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:10; }
+.header-back { font-size:20px; cursor:pointer; padding:4px; color:#333; text-decoration:none; }
+.header-title { font-size:17px; font-weight:700; color:#1a1a1a; flex:1; }
+/* Room info */
+.room-header { padding:16px; background:linear-gradient(135deg,#0052D9,#7BA88E); color:#fff; }
+.room-header-name { font-size:20px; font-weight:700; margin-bottom:4px; }
+.room-header-order { font-size:12px; opacity:.8; }
+/* Summary card */
+.summary-card { margin:12px 16px; background:#fff; border-radius:16px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.summary-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:14px; }
+.summary-row .label { color:#666; }
+.summary-row .value { font-weight:600; color:#333; }
+.summary-row.room-charge .value { color:#333; }
+.summary-row.scan-total .value { color:#B8860B; }
+.summary-divider { height:1px; background:#f0f0f0; margin:4px 0; }
+.summary-row.total { border-top:1px solid #e8e8e8; margin-top:4px; padding-top:12px; font-size:16px; }
+.summary-row.total .value { color:#B8860B; font-size:20px; }
+/* Order list */
+.section-title { padding:16px 16px 8px; font-size:14px; font-weight:600; color:#666; }
+.order-card { margin:0 16px 10px; background:#fff; border-radius:16px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.order-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.order-card-time { font-size:12px; color:#999; }
+.order-card-status { font-size:11px; padding:2px 8px; border-radius:16px; background:#f0fdf4; color:#2e7d32; }
+.order-card-status.cancelled { background:#fce4e4; color:#e53935; }
+.order-card-items { margin-bottom:8px; }
+.order-card-item { display:flex; justify-content:space-between; font-size:13px; color:#666; padding:2px 0; }
+.order-card-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f5f5f5; padding-top:8px; }
+.order-card-total { font-weight:600; color:#B8860B; }
+.order-card-cancel { font-size:12px; color:#e53935; cursor:pointer; border:none; background:none; padding:4px; }
+.order-card-cancel:disabled { color:#ccc; cursor:not-allowed; }
+.order-card-cancel:active { opacity:.7; }
+/* Empty state */
+.empty-state { text-align:center; padding:60px 20px; }
+.empty-icon { font-size:48px; margin-bottom:12px; }
+.empty-text { font-size:14px; color:#ccc; }
+/* Bottom bar */
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f0f0f0; padding:10px 16px; display:flex; align-items:center; gap:12px; z-index:20; max-width:430px; margin:0 auto; }
+.bottom-info { flex:1; }
+.bottom-label { font-size:12px; color:#999; }
+.bottom-total { font-size:18px; font-weight:700; color:#B8860B; }
+.bottom-btn { padding:12px 24px; background:linear-gradient(135deg,#0052D9,#7BA88E); color:#fff; border:none; border-radius:16px; font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.bottom-btn:active { opacity:.85; }
+.bottom-btn.disabled { opacity:.4; pointer-events:none; }
+/* Settle dialog */
+.settle-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.5); display:none; align-items:flex-end; justify-content:center; z-index:30; }
+.settle-sheet { background:#fff; border-radius:16px 16px 0 0; width:100%; max-width:430px; padding:24px 20px; padding-bottom:30px; }
+.settle-title { font-size:16px; font-weight:600; text-align:center; margin-bottom:16px; }
+.settle-amount { text-align:center; margin-bottom:20px; }
+.settle-amount-label { font-size:13px; color:#999; }
+.settle-amount-value { font-size:32px; font-weight:700; color:#B8860B; margin-top:4px; }
+.settle-option { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid #f5f5f5; }
+.settle-option-label { font-size:14px; color:#333; }
+.settle-select { padding:8px 12px; border:1px solid #ddd; border-radius:8px; font-size:14px; background:#fff; }
+.settle-btns { display:flex; gap:10px; margin-top:20px; }
+.settle-btn-cancel { flex:1; padding:14px; border-radius:16px; border:1px solid #ddd; background:#fff; font-size:15px; cursor:pointer; }
+.settle-btn-ok { flex:2; padding:14px; border-radius:16px; border:none; background:linear-gradient(135deg,#0052D9,#7BA88E); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+.settle-btn-ok:active { opacity:.85; }
+/* Loading / Error */
+.loading-state { text-align:center; padding:80px 20px; }
+.loading-spinner { width:32px; height:32px; border:3px solid #e8e8e8; border-top-color:#0052D9; border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 12px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-text { color:#999; font-size:14px; }
+

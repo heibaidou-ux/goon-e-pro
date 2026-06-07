@@ -1,1 +1,170 @@
-<view class="page"><view class="header"><view class="header-title">🌿 茶品雅集</view><view class="cart-badge" bindtap="goCart">🛒<view class="badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view></view></view><scroll-view class="cat-tabs" scroll-x enhanced show-scrollbar="{{false}}"><view class="cat-tab {{currentCat == '' ? 'active' : ''}}" bindtap="switchCat" data-cat="">全部</view><view class="cat-tab {{currentCat == 'Tea' ? 'active' : ''}}" bindtap="switchCat" data-cat="Tea">🍵 茶叶</view><view class="cat-tab {{currentCat == 'Snack' ? 'active' : ''}}" bindtap="switchCat" data-cat="Snack">🍪 茶点</view><view class="cat-tab {{currentCat == 'Ware' ? 'active' : ''}}" bindtap="switchCat" data-cat="Ware">🏺 茶具</view></scroll-view><view class="product-list"><view class="product-card" wx:for="{{filteredProducts}}" wx:key="productId"><view class="product-img">{{item.image || '📦'}}</view><view class="product-body"><text class="product-name">{{item.name}}</text><text class="product-desc">{{item.desc}}</text><view class="product-footer"><text class="product-price">¥{{item.price}} <text class="unit">/份</text></text><view class="qty-ctrl"><view class="qty-btn {{item._qty > 0 ? '' : 'disabled'}}" bindtap="decQty" data-id="{{item.productId}}">−</view><text class="qty-num">{{item._qty || 0}}</text><view class="qty-btn" bindtap="incQty" data-id="{{item.productId}}">+</view></view></view></view></view></view><view class="bottom-bar" wx:if="{{cartCount > 0}}"><view class="bottom-info"><text class="bottom-count">已选 {{cartCount}} 件</text><text class="bottom-total">¥{{cartTotal}}</text></view><view class="bottom-btn" bindtap="checkout">去结算</view></view></view>
+<view class="phone">
+  <!-- Product List View -->
+  <view class="page" id="productView" wx:if="{{showProductView}}">
+    <view class="header">
+      <text class="header-title">茶品雅集</text>
+      <view class="cart-badge" bindtap="showCart">
+        🛒<text class="badge" wx:if="{{cartTotal>0}}">{{cartTotal}}</text>
+      </view>
+    </view>
+
+    <!-- Room context banner -->
+    <view class="room-banner" wx:if="{{roomBannerVisible}}">
+      <text class="room-banner-icon">📍</text>
+      <text class="room-banner-text">{{roomBannerText}}</text>
+      <text class="room-banner-close" bindtap="closeRoomBanner">✕</text>
+    </view>
+
+    <!-- Category tabs -->
+    <view class="cat-tabs">
+      <button class="cat-tab {{currentCat=='snack'?'active':''}}" bindtap="switchCat" data-cat="snack">🍪 茶点</button>
+      <button class="cat-tab {{currentCat=='tea'?'active':''}}" bindtap="switchCat" data-cat="tea">🍃 茶叶</button>
+      <button class="cat-tab {{currentCat=='ware'?'active':''}}" bindtap="switchCat" data-cat="ware">🫖 茶具</button>
+    </view>
+
+    <view class="product-list">
+      <view class="product-card" wx:for="{{products[currentCat]}}" wx:key="id" bindtap="showProductDetail" data-id="{{item.id}}" data-cat="{{currentCat}}">
+        <view class="product-img-placeholder" style="background:{{item.bg}}">{{item.icon}}</view>
+        <view class="product-body">
+          <text class="product-name">{{item.name}}</text>
+          <text class="product-spec" wx:if="{{item.spec}}">{{item.spec}}</text>
+          <text class="product-desc">{{item.desc}}</text>
+          <view class="product-footer">
+            <text class="product-price">¥{{item.price}}<text class="unit">/件</text></text>
+            <view wx:if="{{item._qty>0}}" class="qty-ctrl">
+              <button class="qty-btn" catchtap="decQty" data-id="{{item.id}}">−</button>
+              <text class="qty-num">{{item._qty}}</text>
+              <button class="qty-btn" catchtap="incQty" data-id="{{item.id}}">+</button>
+            </view>
+            <button wx:else class="add-btn" catchtap="incQty" data-id="{{item.id}}">+ 加购</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Cart View -->
+  <view class="page cart-view" wx:else>
+    <view class="cart-header">
+      <button class="back-btn" bindtap="showProducts">← 返回</button>
+      <text class="cart-title">购物车</text>
+      <button class="clear-btn" bindtap="clearCart">清空</button>
+    </view>
+    <view class="cart-items" wx:if="{{cart.length>0}}">
+      <view class="cart-item" wx:for="{{cart}}" wx:key="id">
+        <text class="cart-item-icon">{{item.icon || '🛒'}}</text>
+        <text class="cart-item-name">{{item.name}}</text>
+        <view class="qty-ctrl">
+          <button class="qty-btn" bindtap="cartQtyDec" data-id="{{item.id}}">−</button>
+          <text class="qty-num">{{item.qty}}</text>
+          <button class="qty-btn" bindtap="cartQtyInc" data-id="{{item.id}}">+</button>
+        </view>
+        <text class="cart-item-price">¥{{item.price * item.qty}}</text>
+      </view>
+    </view>
+    <view class="cart-empty" wx:else>
+      <text>🛒</text>
+      <text>购物车是空的</text>
+      <text class="cart-empty-hint">快去选些好茶吧</text>
+    </view>
+    <view class="cart-total">
+      <text class="total-label">合计：</text>
+      <text class="total-price">¥{{cartTotalPrice}}</text>
+    </view>
+    <button class="checkout-btn" bindtap="checkout">去结算</button>
+  </view>
+
+  <!-- Bottom nav -->
+  <view class="bottom-nav">
+    <view class="nav-item" bindtap="goHome"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
+    <view class="nav-item" bindtap="goRoomList"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
+    <view class="nav-item active"><text class="nav-icon">🍵</text><text class="nav-label">茶品</text></view>
+    <view class="nav-item" bindtap="goOrders"><text class="nav-icon">📋</text><text class="nav-label">订单</text></view>
+    <view class="nav-item" bindtap="goMember"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
+  </view>
+</view>
+
+<!-- Product Detail Modal -->
+<view class="pay-modal-overlay" wx:if="{{showDetail}}" bindtap="hideDetail">
+  <view class="pay-modal" style="text-align:left;" catchtap="">
+    <view class="detail-img-area" style="background:{{detailProduct.bg}}">
+      <text style="font-size:56px;">{{detailProduct.icon}}</text>
+    </view>
+    <text class="detail-name">{{detailProduct.name}}</text>
+    <text class="detail-spec" wx:if="{{detailProduct.spec}}">{{detailProduct.spec}}</text>
+    <text class="detail-desc">{{detailProduct.desc}}</text>
+    <view class="story-section" wx:if="{{detailProduct.story}}">
+      <text class="story-title">📖 产品故事</text>
+      <text class="story-text">{{detailProduct.story}}</text>
+      <text class="story-origin">📍 {{detailProduct.origin}}</text>
+      <view class="tips-row" wx:if="{{detailProduct.brewingTips}}">
+        <text class="tip-tag" wx:for="{{detailProduct._tips}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+    <view class="detail-price-row">
+      <text class="detail-price-label">单价</text>
+      <text class="detail-price">¥{{detailProduct.price}}</text>
+    </view>
+    <view class="detail-qty-row">
+      <text class="detail-qty-label">数量</text>
+      <view class="qty-ctrl" style="justify-content:center;">
+        <button class="qty-btn" bindtap="detailQtyDec">−</button>
+        <text class="qty-num" style="font-size:18px;min-width:28px;">{{detailQty}}</text>
+        <button class="qty-btn" bindtap="detailQtyInc">+</button>
+      </view>
+    </view>
+    <view class="pay-modal-btns">
+      <button class="pay-btn-cancel" bindtap="hideDetail">关闭</button>
+      <button class="pay-btn-confirm" bindtap="detailAddToCart">加入购物车</button>
+    </view>
+  </view>
+</view>
+
+<!-- Insufficient Balance Modal -->
+<view class="pay-modal-overlay" wx:if="{{showInsufficient}}" bindtap="hideInsufficient">
+  <view class="pay-modal" catchtap="">
+    <text class="modal-h3">⚠️ 余额不足</text>
+    <text class="insufficient-msg">{{insufficientMsg}}</text>
+    <view class="pay-modal-btns">
+      <button class="pay-btn-cancel" bindtap="hideInsufficient">取消支付</button>
+      <button class="pay-btn-confirm" bindtap="switchPayMethod">选择其他方式</button>
+    </view>
+  </view>
+</view>
+
+<!-- Payment Modal -->
+<view class="pay-modal-overlay" wx:if="{{showPayModal}}" bindtap="cancelPay">
+  <view class="pay-modal" catchtap="">
+    <text class="modal-h3">确认支付</text>
+    <view class="pay-items">
+      <view class="pay-item-row" wx:for="{{cart}}" wx:key="id"><text>{{item.name}} ×{{item.qty}}</text><text>¥{{item.price * item.qty}}</text></view>
+    </view>
+    <text class="pay-total">¥{{cartTotalPrice}}</text>
+    <view class="pay-methods">
+      <view class="pay-method {{payMethod=='balance'?'selected':''}}" bindtap="selectPayMethod" data-method="balance">
+        <text class="pay-method-icon">💰</text>
+        <text class="pay-method-name">余额支付</text>
+        <text class="pay-method-check" wx:if="{{payMethod=='balance'}}">✓</text>
+      </view>
+      <view class="pay-method {{payMethod=='wechat'?'selected':''}}" bindtap="selectPayMethod" data-method="wechat">
+        <text class="pay-method-icon">💚</text>
+        <text class="pay-method-name">微信支付</text>
+        <text class="pay-method-check" wx:if="{{payMethod=='wechat'}}">✓</text>
+      </view>
+      <view class="pay-method {{payMethod=='alipay'?'selected':''}}" bindtap="selectPayMethod" data-method="alipay">
+        <text class="pay-method-icon">💙</text>
+        <text class="pay-method-name">支付宝</text>
+        <text class="pay-method-check" wx:if="{{payMethod=='alipay'}}">✓</text>
+      </view>
+      <view class="pay-method {{payMethod=='room'?'selected':''}}" bindtap="selectPayMethod" data-method="room" wx:if="{{roomBannerVisible}}">
+        <text class="pay-method-icon">🏠</text>
+        <text class="pay-method-name">挂账到{{roomBannerRoomName}}</text>
+        <text class="pay-method-check" wx:if="{{payMethod=='room'}}">✓</text>
+      </view>
+    </view>
+    <view class="pay-modal-btns">
+      <button class="pay-btn-cancel" bindtap="cancelPay">取消</button>
+      <button class="pay-btn-confirm" bindtap="confirmPay">确认支付</button>
+    </view>
+  </view>
+</view>

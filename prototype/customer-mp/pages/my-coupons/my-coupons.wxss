@@ -1,8 +1,8 @@
-page { background:#f5f5f5; margin:0; padding:0; }
+﻿page { background:#f5f5f5; margin:0; padding:0; }
 .header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
 .header-title { font-size:17px; font-weight:700; }
 .coupon-list { padding:12px 16px; }
-.coupon-card { display:flex; background:#fff; border-radius:10px; margin-bottom:10px; overflow:hidden; border:1px solid #f0f0f0; }
+.coupon-card { display:flex; background:#fff; border-radius:16px; margin-bottom:10px; overflow:hidden; border:1px solid #f0f0f0; }
 .coupon-left { width:80px; background:linear-gradient(135deg,#B8860B,#D4A84B); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px; }
 .coupon-value { font-size:22px; font-weight:700; }
 .coupon-type { font-size:10px; opacity:.8; margin-top:2px; }
@@ -13,3 +13,5 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .coupon-status.available { background:#f0fdf4; color:#2e7d32; }
 .coupon-status.used { background:#f5f5f5; color:#999; }
 .empty { text-align:center; padding:60px; color:#ccc; font-size:14px; }
+
+

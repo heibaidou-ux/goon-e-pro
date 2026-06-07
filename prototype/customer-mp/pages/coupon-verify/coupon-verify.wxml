@@ -1,1 +1,117 @@
-<view class="page"><view class="verify-card"><text class="verify-title">验券</text><input class="verify-input" placeholder="输入券码" value="{{code}}" bindinput="onCode" /><button class="verify-btn" bindtap="doVerify" disabled="{{!code}}">核 销</button><view class="verify-result" wx:if="{{result}}"><text wx:if="{{result.success}}" style="color:#00A870">✅ {{result.desc}} — ¥{{result.value}}</text><text wx:else style="color:#e53935">❌ {{result.error}}</text></view><text class="verify-hint">支持平台券（美团/抖音）和系统券核销</text></view></view>
+<view class="phone">
+  <view class="nav-bar">
+    <text class="back-btn" bindtap="goBack">←</text>
+    <text class="nav-title">验券预约</text>
+  </view>
+  <view class="page">
+    <!-- Step indicator -->
+    <view class="steps">
+      <view class="step {{step>=1?'active':''}} {{step>1?'step-done':''}}"><text class="step-num">1</text> 选券</view>
+      <text class="step-line"></text>
+      <view class="step {{step>=2?'active':''}} {{step>2?'step-done':''}}"><text class="step-num">2</text> 选房</view>
+      <text class="step-line"></text>
+      <view class="step {{step>=3?'active':''}} {{step>3?'step-done':''}}"><text class="step-num">3</text> 时段</view>
+    </view>
+
+    <!-- Step 1: Select platform and enter coupon -->
+    <view class="coupon-input-section" wx:if="{{step==1}}">
+      <text class="h3">选择券平台</text>
+      <view class="platform-grid">
+        <view class="platform-chip {{selectedPlatform=='meituan'?'selected':''}}" bindtap="selectPlatform" data-platform="meituan"><text class="plat-icon">🟡</text>美团</view>
+        <view class="platform-chip {{selectedPlatform=='douyin'?'selected':''}}" bindtap="selectPlatform" data-platform="douyin"><text class="plat-icon">🎵</text>抖音</view>
+        <view class="platform-chip {{selectedPlatform=='dianping'?'selected':''}}" bindtap="selectPlatform" data-platform="dianping"><text class="plat-icon">⭐</text>大众点评</view>
+        <view class="platform-chip {{selectedPlatform=='gaode'?'selected':''}}" bindtap="selectPlatform" data-platform="gaode"><text class="plat-icon">🗺️</text>高德</view>
+      </view>
+
+      <text class="h3">输入券码</text>
+      <view class="coupon-field-row">
+        <input class="coupon-field" placeholder="请输入券码" value="{{couponCode}}" bindinput="onCouponInput" maxlength="12" />
+        <button class="coupon-verify-btn" bindtap="verifyCoupon">验券</button>
+      </view>
+      <text class="format-hint">{{platformHint}}</text>
+
+      <view class="demo-coupon-list">
+        <text class="section-subtitle">可用的券</text>
+        <view class="ticket-card" bindtap="selectDemoCoupon" data-code="MT001298">
+          <view class="ticket-card-header"><text class="ticket-source">🟡 美团</text></view>
+          <text class="ticket-title">茶室双人体验套餐</text>
+          <text class="ticket-desc">适用大茶室C/中茶室A · 含2小时+茶饮</text>
+          <text class="ticket-expiry">有效期至 2026-06-30</text>
+        </view>
+        <view class="ticket-card" bindtap="selectDemoCoupon" data-code="DY003456">
+          <view class="ticket-card-header"><text class="ticket-source">🎵 抖音</text></view>
+          <text class="ticket-title">商务会议3小时套餐</text>
+          <text class="ticket-desc">适用大会议室 · 含投影+茶歇</text>
+          <text class="ticket-expiry">有效期至 2026-06-15</text>
+        </view>
+        <view class="ticket-card" bindtap="selectDemoCoupon" data-code="DP007891">
+          <view class="ticket-card-header"><text class="ticket-source">⭐ 大众点评</text></view>
+          <text class="ticket-title">中茶室休闲体验</text>
+          <text class="ticket-desc">适用中茶室A/中茶室B · 含1壶茶</text>
+          <text class="ticket-expiry">有效期至 2026-07-01</text>
+        </view>
+        <view class="ticket-card" bindtap="selectDemoCoupon" data-code="GD009876">
+          <view class="ticket-card-header"><text class="ticket-source">🗺️ 高德</text></view>
+          <text class="ticket-title">茶室双人体验套餐</text>
+          <text class="ticket-desc">适用大茶室C/中茶室A · 含2小时+茶饮</text>
+          <text class="ticket-expiry">有效期至 2026-12-31</text>
+        </view>
+      </view>
+
+      <view class="my-coupon-section">
+        <text class="section-subtitle">🎫 我的优惠券</text>
+        <view wx:if="{{myCoupons.length==0}}" style="font-size:12px;color:#999;text-align:center;padding:12px;">暂无优惠券，首次充值可获赠</view>
+        <view class="ticket-card" wx:for="{{myCoupons}}" wx:key="id" bindtap="useMyCoupon" data-id="{{item.id}}" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+          <view class="ticket-card-header"><text class="ticket-source" style="color:#5D8A6B;">🏷️ 系统券</text><text style="font-size:18px;font-weight:800;color:#5D8A6B;">¥{{item.value}}</text></view>
+          <text class="ticket-title" style="font-size:13px;">{{item.source}} · 全场通用</text>
+          <text class="ticket-expiry">有效期至 {{item.expiry}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Step 2: Room match -->
+    <view class="room-match-section" wx:elif="{{step==2}}">
+      <view class="match-result"><text class="match-icon">✅</text><text class="match-title">券已核验通过</text><text class="match-sub">{{matchedCouponInfo}}</text></view>
+      <view class="room-card-fixed" wx:for="{{availableRooms}}" wx:key="*this" wx:if="{{availableRooms.length==1}}">
+        <text class="room-icon">{{item.icon||'🏠'}}</text>
+        <view class="room-info"><text class="room-name">{{item.name}}</text><text class="room-meta">可容纳{{item.capacity}}人 · 系统匹配</text></view>
+        <text class="room-tag">已锁定</text>
+      </view>
+      <view class="room-option {{selectedRoom==item.id?'selected':''}}" wx:for="{{availableRooms}}" wx:key="id" wx:if="{{availableRooms.length>1}}" bindtap="selectCouponRoom" data-id="{{item.id}}">
+        <text class="room-option-icon">{{item.icon||'🏠'}}</text>
+        <view class="room-option-info"><text class="room-option-name">{{item.name}}</text><text class="room-option-meta">可容纳{{item.capacity}}人</text></view>
+        <text style="font-size:12px;color:#5D8A6B;font-weight:600;">{{selectedRoom==item.id?'✓ 已选':'请选择 →'}}</text>
+      </view>
+      <view class="bottom-action"><button class="book-btn" bindtap="goToTimeSelect">选择时段</button></view>
+    </view>
+
+    <!-- Step 3: Time select -->
+    <view class="time-select-section" wx:elif="{{step==3}}">
+      <view class="time-header"><text class="time-header-label">选择开始时段</text><button class="now-btn" bindtap="pickNow">⚡ 现在开始</button></view>
+      <view class="time-grid">
+        <view class="time-cell {{selectedTime==item?'selected':''}}" wx:for="{{timeSlots}}" wx:key="*this" bindtap="selectTime" data-time="{{item}}"><text class="t-label">{{item}}</text></view>
+      </view>
+      <view class="bottom-action"><button class="book-btn" disabled="{{!selectedTime}}" bindtap="confirmBooking">确认预约</button></view>
+    </view>
+  </view>
+
+  <!-- Confirm modal -->
+  <view class="confirm-overlay" wx:if="{{showConfirmModal}}">
+    <view class="confirm-modal">
+      <text class="confirm-h3">确认使用此券</text>
+      <view class="coupon-preview">{{confirmPreview}}</view>
+      <view class="confirm-modal-buttons">
+        <button class="confirm-modal-btn cancel" bindtap="hideConfirmModal">取消</button>
+        <button class="confirm-modal-btn confirm" bindtap="confirmCouponUse">确认使用</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-nav">
+    <view class="nav-item active" bindtap="goHome"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
+    <view class="nav-item" bindtap="goRoomList"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
+    <view class="nav-item" bindtap="goTeaShop"><text class="nav-icon">🍵</text><text class="nav-label">茶品</text></view>
+    <view class="nav-item" bindtap="goOrders"><text class="nav-icon">📋</text><text class="nav-label">订单</text></view>
+    <view class="nav-item" bindtap="goMember"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
+  </view>
+</view>

@@ -1,1 +1,28 @@
-<view class="page"><view class="filter-bar"><view class="filter-tab {{filterType === '' ? 'active' : ''}}" bindtap="setFilter" data-type="">全部</view><view class="filter-tab {{filterType === 'TeaRoom' ? 'active' : ''}}" bindtap="setFilter" data-type="TeaRoom">茶室</view><view class="filter-tab {{filterType === 'MeetingRoom' ? 'active' : ''}}" bindtap="setFilter" data-type="MeetingRoom">会议室</view><view class="filter-tab {{filterType === 'Exhibition' ? 'active' : ''}}" bindtap="setFilter" data-type="Exhibition">展厅</view></view><view class="room-grid"><view class="room-card" wx:for="{{filteredRooms}}" wx:key="roomId" bindtap="goDetail" data-id="{{item.roomId}}"><view class="room-img">{{item.type === 'TeaRoom' ? '🍵' : item.type === 'MeetingRoom' ? '💼' : '🏠'}}</view><view class="room-info"><text class="room-name">{{item.name}}</text><text class="room-meta">{{item.capacity}}人 · {{item.area}}㎡</text><text class="room-price">¥{{item.pricePerHour}}<text class="unit">/时</text></text></view><text class="room-arrow">›</text></view></view><view class="empty" wx:if="{{filteredRooms.length === 0}}">暂无符合条件的房间</view></view>
+<view class="phone">
+  <view class="page">
+    <view class="page-header">
+      <text class="title">可预约包间</text>
+      <text class="sub">选择包间，即刻预订</text>
+    </view>
+    <view class="room-section">
+      <view class="room-card" wx:for="{{rooms}}" wx:key="roomId" bindtap="goRoom" data-roomid="{{item.roomId}}">
+        <view class="room-card-img" style="background:{{item.bgColor}}">{{item.icon}}</view>
+        <view class="room-card-body">
+          <text class="room-card-name">{{item.name}}</text>
+          <text class="room-card-meta">{{item.metaLine}}</text>
+          <view class="room-card-footer">
+            <text class="room-card-price">¥{{item.pricePerHour}}/时</text>
+            <button class="room-card-book-btn" catchtap="goRoom" data-roomid="{{item.roomId}}">立即预约</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="bottom-nav">
+    <view class="nav-item" bindtap="goHome"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
+    <view class="nav-item active"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
+    <view class="nav-item" bindtap="goTeaShop"><text class="nav-icon">🍵</text><text class="nav-label">茶品</text></view>
+    <view class="nav-item" bindtap="goOrders"><text class="nav-icon">📋</text><text class="nav-label">订单</text></view>
+    <view class="nav-item" bindtap="goMember"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
+  </view>
+</view>
