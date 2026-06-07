@@ -1,1 +1,149 @@
-<view class="page"><view class="confirm-card"><text class="confirm-title">确认预约信息</text><view class="confirm-row"><text class="label">房间</text><text>{{roomName || '大茶室C'}}</text></view><view class="confirm-row"><text class="label">日期</text><text>{{dateStr}}</text></view><view class="confirm-row"><text class="label">时段</text><text>{{startTime}}-{{endTime}}</text></view><view class="confirm-row"><text class="label">时长</text><text>{{duration}}小时</text></view><view class="confirm-row total"><text class="label">费用</text><text class="price">¥{{totalAmount}}</text></view></view><view class="payment-card"><text class="payment-title">支付方式</text><view class="payment-option {{paymentMethod === 'WeChat' ? 'active' : ''}}" bindtap="setPayment" data-method="WeChat">💳 微信支付</view><view class="payment-option {{paymentMethod === 'Balance' ? 'active' : ''}}" bindtap="setPayment" data-method="Balance">💰 余额支付 (¥{{balance}})</view><view class="payment-option {{paymentMethod === 'AliPay' ? 'active' : ''}}" bindtap="setPayment" data-method="AliPay">📱 支付宝</view></view><view class="bottom-bar"><button class="submit-btn" bindtap="submitBooking">确认预约 · ¥{{totalAmount}}</button></view></view>
+<view class="phone">
+  <view class="nav-bar">
+    <view class="back-btn" bindtap="goBack">←</view>
+    <text class="nav-title">确认预约</text>
+  </view>
+  <view class="page">
+    <!-- 确认页 -->
+    <view wx:if="{{!showSuccess}}">
+      <text class="section-title">📋 预约详情</text>
+      <view class="order-summary">
+        <view class="summary-row"><text class="label">包间</text><text class="value">{{roomName}}</text></view>
+        <view class="summary-row"><text class="label">日期</text><text class="value">{{dateStr}}</text></view>
+        <view class="summary-row"><text class="label">时段</text><text class="value">{{slot}}</text></view>
+        <view class="summary-row"><text class="label">金额</text><text class="price">¥{{price}}</text></view>
+      </view>
+
+      <!-- 第14-15条：客户来源仅店员可见 -->
+      <view class="customer-source-section" wx:if="{{isStaff}}">
+        <text class="section-title">👤 客户来源</text>
+        <picker mode="selector" range="{{sourceOptions}}" bindchange="onSourceChange">
+          <view class="source-trigger">
+            <text wx:if="{{selectedSource}}" class="source-value">{{selectedSource}}</text>
+            <text wx:else class="source-placeholder">请选择客户来源</text>
+            <text class="arrow">▾</text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- Payment section -->
+      <view class="payment-section">
+        <text class="section-title">💳 支付方式</text>
+        <view class="payment-methods">
+          <view class="pay-method {{selectedPay=='wechat'?'selected':''}}" bindtap="selectPay" data-pay="wechat">
+            <text class="pay-method-icon">💚</text>
+            <view class="pay-method-info"><text class="pay-method-name">微信支付</text><text class="pay-method-desc">微信零钱/银行卡</text></view>
+            <text class="pay-method-check" wx:if="{{selectedPay=='wechat'}}">✓</text>
+          </view>
+          <view class="pay-method {{selectedPay=='alipay'?'selected':''}}" bindtap="selectPay" data-pay="alipay">
+            <text class="pay-method-icon">💙</text>
+            <view class="pay-method-info"><text class="pay-method-name">支付宝</text><text class="pay-method-desc">支付宝余额/花呗</text></view>
+            <text class="pay-method-check" wx:if="{{selectedPay=='alipay'}}">✓</text>
+          </view>
+          <view class="pay-method {{selectedPay=='balance'?'selected':''}}" bindtap="selectPay" data-pay="balance">
+            <text class="pay-method-icon">💰</text>
+            <view class="pay-method-info"><text class="pay-method-name">会员余额</text><text class="pay-method-desc">当前余额 ¥{{balance}}</text></view>
+            <text class="pay-method-check" wx:if="{{selectedPay=='balance'}}">✓</text>
+          </view>
+          <view class="pay-method {{selectedPay=='coupon'?'selected':''}}" bindtap="selectPay" data-pay="coupon">
+            <text class="pay-method-icon">🎫</text>
+            <view class="pay-method-info"><text class="pay-method-name">验券</text><text class="pay-method-desc">美团/大众点评/抖音团购券</text></view>
+            <text class="pay-method-check" wx:if="{{selectedPay=='coupon'}}">✓</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 第16条：只有点验券才弹券码输入，微信/支付宝不弹 -->
+      <view class="coupon-box" wx:if="{{selectedPay=='coupon'}}">
+        <view class="coupon-platform-row" wx:for="{{couponPlatforms}}" wx:key="key">
+          <text class="cp-label">{{item.label}}</text>
+          <input class="coupon-field" placeholder="输入券码" bindinput="onCouponInput" data-key="{{item.key}}" />
+          <!-- 第17条：扫码输入券码 -->
+          <text class="scan-coupon" bindtap="scanCouponCode" data-key="{{item.key}}">📷</text>
+          <button class="coupon-verify-btn" bindtap="verifyCoupon" data-key="{{item.key}}">验券</button>
+          <text class="cp-status {{item.status}}">{{item.msg}}</text>
+        </view>
+        <text class="coupon-total">已核验 {{verifiedCount}} 张券，共抵扣 ¥{{totalDiscount}}</text>
+      </view>
+
+      <!-- Balance warning -->
+      <view class="balance-warning" wx:if="{{showBalanceWarning}}">
+        <text class="balance-warning-text">{{balanceWarningText}}</text>
+        <view class="balance-warning-btns">
+          <button class="balance-btn" bindtap="goTopup">立即充值</button>
+          <button class="balance-btn" wx:if="{{showCombinedPay}}" bindtap="selectCombinedPay">组合支付</button>
+        </view>
+        <text class="combined-pay-info" wx:if="{{isCombinedPay}}">组合支付：余额抵扣 ¥{{balance}} + 微信补差额 ¥{{Math.max(0, price - balance)}}</text>
+      </view>
+
+      <view class="total-section">
+        <view class="total-row"><text class="total-label">应付</text><text class="total-amount">¥{{finalPrice}}</text></view>
+        <view class="discount-row" wx:if="{{discountText}}"><text>{{discountText}}</text></view>
+      </view>
+
+      <view class="tips">
+        <text class="tips-title">温馨提示</text>
+        <text class="tips-item">包间将于预约时间前5分钟预开空调</text>
+        <text class="tips-item">开始前2小时以上可免费取消；2小时内取消收取定金的50%作为违约金</text>
+        <text class="tips-item">到店后通过订单页门禁密码或"开门"按钮进入</text>
+        <text class="tips-item">门店24小时营业</text>
+      </view>
+
+      <view class="actions">
+        <button class="action-btn ghost" bindtap="goBack">返回修改</button>
+        <button class="action-btn primary" bindtap="confirmPay">确认支付</button>
+      </view>
+    </view>
+
+    <!-- 第18-19条：地图放在支付成功页，方便客人导航到店 -->
+    <view wx:else class="success-view">
+      <text class="success-icon">✅</text>
+      <text class="success-title">支付成功！</text>
+      <text class="success-sub">订单已确认，祝您愉快</text>
+
+      <view class="order-summary" style="text-align:left;">
+        <view class="summary-row"><text class="label">包间</text><text class="value">{{roomName}}</text></view>
+        <view class="summary-row"><text class="label">日期</text><text class="value">{{dateStr}}</text></view>
+        <view class="summary-row"><text class="label">时段</text><text class="value">{{slot}}</text></view>
+        <view class="summary-row"><text class="label">金额</text><text class="price">¥{{price}}</text></view>
+        <view class="summary-row"><text class="label">支付方式</text><text class="value">{{payMethodLabel}}</text></view>
+      </view>
+
+      <view class="success-actions">
+        <button class="open-door-btn" bindtap="openDoor">
+          <text class="door-icon">🚪</text>
+          <text>开门</text>
+        </button>
+        <view class="pass-area">
+          <view class="pass-row">
+            <text class="pass-label">备用密码</text>
+            <text class="pass-text" bindtap="copyCode">{{doorCode}}</text>
+            <text class="pass-copy" bindtap="copyCode">复制</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 地图导航（第19条） -->
+      <view class="address-section">
+        <view class="address-card">
+          <text class="address-title">📍 盈隆店</text>
+          <text class="address-detail">广州市天河区盈隆广场3楼 · 富力盈隆大厦</text>
+          <button class="nav-btn" bindtap="openNav">🗺 查看导航</button>
+        </view>
+      </view>
+
+      <view class="actions" style="flex-wrap:wrap;">
+        <button class="action-btn ghost" bindtap="goHome">返回首页</button>
+        <button class="action-btn ghost" bindtap="goOrders">查看订单</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-nav">
+    <view class="nav-item" bindtap="goHome"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
+    <view class="nav-item active"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
+    <view class="nav-item" bindtap="goTeaShop"><text class="nav-icon">🍵</text><text class="nav-label">茶品</text></view>
+    <view class="nav-item" bindtap="goMyOrders"><text class="nav-icon">📋</text><text class="nav-label">订单</text></view>
+    <view class="nav-item" bindtap="goMember"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
+  </view>
+</view>
