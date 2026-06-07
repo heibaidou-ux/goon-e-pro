@@ -1,3 +1,4 @@
+page { background:#f5f5f5; margin:0; padding:0; }
 .header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
 .header-title { font-size:17px; font-weight:700; }
 .coupon-list { padding:12px 16px; }
@@ -9,6 +10,6 @@
 .coupon-desc { font-size:13px; color:#333; display:block; }
 .coupon-platform { font-size:11px; color:#999; margin-top:2px; display:block; }
 .coupon-status { font-size:11px; margin-top:6px; display:inline-block; padding:2px 8px; border-radius:4px; }
-.coupon-status.active { background:#f0fdf4; color:#2e7d32; }
+.coupon-status.available { background:#f0fdf4; color:#2e7d32; }
 .coupon-status.used { background:#f5f5f5; color:#999; }
 .empty { text-align:center; padding:60px; color:#ccc; font-size:14px; }
