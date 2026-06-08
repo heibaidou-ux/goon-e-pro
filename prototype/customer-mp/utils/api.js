@@ -305,7 +305,7 @@ const API = {
   getUserCoupons() {
     return delay().then(() => {
       return Object.entries(MOCK.couponDB).map(([code, c]) => ({
-        code, value: c.value, type: c.type, desc: c.desc, platform: c.platform, used: c.used
+        code, value: c.value, type: c.type, desc: c.desc, platform: c.platform, used: c.used, expiry: c.expiry
       }))
     })
   },

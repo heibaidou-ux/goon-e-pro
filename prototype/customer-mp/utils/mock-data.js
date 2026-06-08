@@ -126,12 +126,12 @@ const products = [
 
 // 优惠券
 const couponDB = {
-  "MT20260601": { platform: "Meituan", value: 30, type: "discount", used: false, desc: "美团点评 满200减30" },
-  "DY20260601": { platform: "Douyin", value: 50, type: "discount", used: false, desc: "抖音团购 满200减50" },
-  "DP20260601": { platform: "Dianping", value: 25, type: "discount", used: false, desc: "大众点评 满150减25" },
-  "GD20260601": { platform: "Gaode", value: 30, type: "discount", used: false, desc: "高德地图 满200减30" },
-  "SY20260601": { platform: "System", value: 50, type: "voucher", used: false, desc: "首充赠送 50元代金券" },
-  "SY20260602": { platform: "System", value: 50, type: "voucher", used: false, desc: "首充赠送 50元代金券" }
+  "MT20260601": { platform: "Meituan", value: 30, type: "discount", used: false, desc: "美团点评 满200减30", expiry: "2026-07-15" },
+  "DY20260601": { platform: "Douyin", value: 50, type: "discount", used: false, desc: "抖音团购 满200减50", expiry: "2026-07-20" },
+  "DP20260601": { platform: "Dianping", value: 25, type: "discount", used: true, desc: "大众点评 满150减25", expiry: "2026-06-01" },
+  "GD20260601": { platform: "Gaode", value: 30, type: "discount", used: false, desc: "高德地图 满200减30", expiry: "2026-07-31" },
+  "SY20260601": { platform: "System", value: 50, type: "voucher", used: true, desc: "首充赠送 50元代金券", expiry: "2026-05-01" },
+  "SY20260602": { platform: "System", value: 50, type: "voucher", used: false, desc: "首充赠送 50元代金券", expiry: "2026-08-01" }
 }
 
 module.exports = {
