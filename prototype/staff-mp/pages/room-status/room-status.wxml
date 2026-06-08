@@ -1,1 +1,25 @@
-<view class="page"><view class="header"><text class="header-title">🏠 房态管理</text></view><view class="room-grid"><view class="room-card" wx:for="{{rooms}}" wx:key="roomId"><view class="room-status-dot" style="background:{{item.statusColor}}"></view><view class="room-info"><text class="room-name">{{item.name}}</text><text class="room-type">{{item.type === 'TeaRoom' ? '茶室' : item.type === 'MeetingRoom' ? '会议室' : '其他'}} · {{item.capacity}}人</text></view><view class="room-right"><text class="room-status-label" style="color:{{item.statusColor}}">{{item.statusLabel}}</text><text class="room-order-info" wx:if="{{item.currentOrder}}">{{item.currentOrder.customerName}} {{item.currentOrder.start}}-{{item.currentOrder.end}}</text></view></view></view></view>
+<view class="page">
+  <view class="header">
+    <text class="header-title">🏠 房态管理</text>
+  </view>
+
+  <view class="room-grid">
+    <view class="room-card" wx:for="{{rooms}}" wx:key="roomId">
+      <view class="room-status-dot" style="background:{{item.statusColor}}"></view>
+      <view class="room-info">
+        <text class="room-name">{{item.name}}</text>
+        <text class="room-type">
+          {{item.type === 'TeaRoom' ? '茶室' : item.type === 'MeetingRoom' ? '会议室' : '其他'}} · {{item.capacity}}人
+        </text>
+      </view>
+      <view class="room-right">
+        <text class="room-status-label" style="color:{{item.statusColor}}">{{item.statusLabel}}</text>
+        <text class="room-order-info" wx:if="{{item.currentOrder}}">
+          {{item.currentOrder.customerName}} {{item.currentOrder.start}}-{{item.currentOrder.end}}
+        </text>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{rooms.length === 0}}">暂无房间数据</view>
+  </view>
+</view>

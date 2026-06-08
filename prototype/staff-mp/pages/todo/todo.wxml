@@ -1,1 +1,17 @@
-<view class="page"><view class="header"><text class="header-title">✅ 待办任务</text></view><view class="todo-list"><view class="todo-item {{item.priority === 'high' ? 'high' : ''}}" wx:for="{{todos}}" wx:key="id"><view class="todo-body"><text class="todo-title">{{item.title}}</text><text class="todo-meta">{{item.type}} · 截止 {{item.deadline}}</text></view><text class="todo-arrow">›</text></view></view></view>
+<view class="page">
+  <view class="header">
+    <text class="header-title">✅ 待办任务</text>
+  </view>
+
+  <view class="todo-list">
+    <view class="todo-item {{item.priority === 'high' ? 'high' : ''}}" wx:for="{{todos}}" wx:key="id">
+      <view class="todo-body">
+        <text class="todo-title">{{item.title}}</text>
+        <text class="todo-meta">{{item.type}} · 截止 {{item.deadline}}</text>
+      </view>
+      <text class="todo-arrow">›</text>
+    </view>
+
+    <view class="empty" wx:if="{{todos.length === 0}}">暂无待办任务</view>
+  </view>
+</view>

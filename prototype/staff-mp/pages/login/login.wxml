@@ -1,1 +1,20 @@
-<view class="page"><view class="logo"><view class="logo-icon">🏢</view><view class="logo-name">高岸ERP</view><view class="logo-sub">店员工作台</view></view><view class="form"><view class="form-group"><text class="form-label">用户名</text><input class="form-input" placeholder="请输入用户名" value="{{username}}" bindinput="onUsername" /></view><view class="form-group"><text class="form-label">密码</text><input class="form-input" password="{{true}}" placeholder="请输入密码" value="{{password}}" bindinput="onPassword" /></view><button class="login-btn" disabled="{{!username || !password}}" bindtap="doLogin" loading="{{loading}}">登 录</button><view class="error-msg" hidden="{{!error}}">{{error}}</view><view class="hint">演示账号：任意用户名 + 密码 8888</view></view></view>
+<view class="page">
+  <view class="logo">
+    <view class="logo-icon">🏪</view>
+    <text class="logo-name">高岸ERP</text>
+    <text class="logo-sub">店员端管理系统</text>
+  </view>
+
+  <view class="form-group">
+    <text class="form-label">工号</text>
+    <input class="form-input" placeholder="请输入工号" value="{{username}}" bindinput="onUsername" />
+  </view>
+  <view class="form-group">
+    <text class="form-label">密码</text>
+    <input class="form-input" type="password" placeholder="请输入密码" value="{{password}}" bindinput="onPassword" />
+  </view>
+
+  <button class="login-btn" loading="{{loading}}" disabled="{{loading}}" bindtap="doLogin">登录</button>
+  <text class="error-msg" wx:if="{{error}}">{{error}}</text>
+  <text class="hint">默认密码: 8888</text>
+</view>

@@ -1,1 +1,25 @@
-<view class="page"><view class="header"><text class="header-title">📡 设备监控</text><text class="header-stats">在线 {{stats.online}}/{{stats.total}} · {{stats.rate}}</text></view><picker mode="selector" range="{{roomOptions}}" bindchange="onRoomChange"><view class="picker-bar">当前：{{selectedRoomName}} ▼</view></picker><view class="device-list"><view class="device-item" wx:for="{{devices}}" wx:key="deviceId"><text class="device-icon">{{item.typeIcon}}</text><view class="device-info"><text class="device-name">{{item.typeLabel}}</text><text class="device-id">{{item.deviceId}}</text></view><view class="device-status {{item.status === 'Online' ? 'online' : 'offline'}}">{{item.status === 'Online' ? '在线' : '离线'}}</view></view></view></view>
+<view class="page">
+  <view class="header">
+    <text class="header-title">📡 设备监控</text>
+    <text class="header-stats">在线 {{stats.online}}/{{stats.total}} · {{stats.rate}}</text>
+  </view>
+
+  <picker mode="selector" range="{{roomOptions}}" bindchange="onRoomChange">
+    <view class="picker-bar">当前：{{selectedRoomName}} ▼</view>
+  </picker>
+
+  <view class="device-list">
+    <view class="device-item" wx:for="{{devices}}" wx:key="deviceId">
+      <text class="device-icon">{{item.typeIcon}}</text>
+      <view class="device-info">
+        <text class="device-name">{{item.typeLabel}}</text>
+        <text class="device-id">{{item.deviceId}}</text>
+      </view>
+      <view class="device-status {{item.status === 'Online' ? 'online' : 'offline'}}">
+        {{item.status === 'Online' ? '在线' : '离线'}}
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{devices.length === 0}}">暂无设备数据</view>
+  </view>
+</view>
