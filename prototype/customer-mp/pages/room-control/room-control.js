@@ -4,9 +4,10 @@ Page({
   data: {
     roomId: '', roomName: '房间',
     countdown: '--:--', endTime: '--:--',
-    // 音乐
+    // 蓝牙音乐
+    bluetoothConnected: false,
     currentTrack: '高山流水', trackArtist: '古筝独奏',
-    isPlaying: true, volume: 70, source: 'bgm',
+    isPlaying: true, volume: 70,
     // 设备
     devices: []
   },
@@ -56,12 +57,12 @@ Page({
   goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
   renewOrder: function() { wx.showToast({ title: '续订功能开发中', icon: 'none' }) },
 
-  // 音乐控制
+  // 蓝牙音乐控制
+  toggleBluetooth: function() { this.setData({ bluetoothConnected: !this.data.bluetoothConnected }) },
   togglePlay: function() { this.setData({ isPlaying: !this.data.isPlaying }) },
   prevTrack: function() { this.setData({ currentTrack: '平湖秋月', trackArtist: '琵琶独奏' }) },
   nextTrack: function() { this.setData({ currentTrack: '十面埋伏', trackArtist: '琵琶古曲' }) },
   onVolumeChange: function(e) { this.setData({ volume: e.detail.value }) },
-  switchSource: function(e) { this.setData({ source: e.currentTarget.dataset.source }) },
 
   // 设备控制
   onLockToggle: function(e) { API.controlDevice(e.currentTarget.dataset.id, { locked: !e.detail.value }).catch(function(){}) },

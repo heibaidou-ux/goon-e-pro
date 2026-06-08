@@ -15,7 +15,6 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .action-btn.tea { background:#7B1FA2; }
 .action-icon { font-size:28px; display:block; margin-bottom:4px; }
 .action-text { font-size:16px; font-weight:700; color:#fff; }
-.music-section { background:#fff; padding:16px; margin-bottom:12px; }
 .section-title { font-size:14px; font-weight:600; color:#333; padding:12px 16px 8px; display:block; }
 .music-info { text-align:center; margin-bottom:12px; }
 .music-name { font-size:16px; font-weight:600; color:#333; display:block; }
@@ -27,11 +26,19 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .vol-label { font-size:12px; color:#999; width:32px; }
 .music-volume slider { flex:1; }
 .vol-num { font-size:12px; color:#999; min-width:32px; text-align:right; }
-.music-source { display:flex; align-items:center; gap:8px; }
-.source-label { font-size:12px; color:#999; }
-.source-options { display:flex; gap:6px; }
-.source-tag { padding:4px 12px; border-radius:12px; font-size:11px; background:#f0f0f0; color:#666; }
-.source-tag.active { background:#5D8A6B; color:#fff; }
+
+/* 蓝牙连接区域 */
+.bluetooth-section { background:#fff; padding:16px; margin-bottom:12px; }
+.bluetooth-connect { display:flex; flex-direction:column; align-items:center; padding:12px 0; }
+.bluetooth-icon-big { width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,#5D8A6B,#7BBF8F); display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
+.bluetooth-icon-symbol { font-size:50px; color:#fff; font-weight:700; }
+.bluetooth-prompt { font-size:15px; font-weight:600; color:#333; margin-bottom:12px; }
+.bluetooth-status-btn { padding:8px 28px; border-radius:20px; background:#f0f0f0; color:#666; font-size:13px; }
+.bluetooth-status-btn.connected { background:#e8f5e9; color:#00A870; }
+.bluetooth-player { border-top:1px solid #f0f0f0; padding-top:12px; margin-top:8px; }
+.bluetooth-tips { background:#f9f9f9; border-radius:12px; padding:12px; margin-top:8px; }
+.tips-title { font-size:12px; font-weight:600; color:#666; display:block; margin-bottom:4px; }
+.tips-line { font-size:11px; color:#999; display:block; line-height:1.9; }
 .device-list { padding:0 16px; }
 .device-item { display:flex; align-items:center; padding:14px; background:#fff; border-radius:16px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
 .device-icon { font-size:22px; margin-right:12px; flex-shrink:0; width:30px; text-align:center; }
