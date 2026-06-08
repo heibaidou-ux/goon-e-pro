@@ -47,7 +47,7 @@
           </view>
           <view class="pay-method {{selectedPay=='coupon'?'selected':''}}" bindtap="selectPay" data-pay="coupon">
             <text class="pay-method-icon">🎫</text>
-            <view class="pay-method-info"><text class="pay-method-name">验券</text><text class="pay-method-desc">美团/大众点评/抖音团购券</text></view>
+            <view class="pay-method-info"><text class="pay-method-name">验券</text><text class="pay-method-desc">美团/大众点评/抖音/高德团购券</text></view>
             <text class="pay-method-check" wx:if="{{selectedPay=='coupon'}}">✓</text>
           </view>
         </view>

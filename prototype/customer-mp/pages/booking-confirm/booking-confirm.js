@@ -12,7 +12,8 @@ Page({
     couponPlatforms: [
       { key: 'meituan', label: '🟡 美团', code: '', status: '', msg: '' },
       { key: 'dianping', label: '⭐ 大众点评', code: '', status: '', msg: '' },
-      { key: 'douyin', label: '🎵 抖音', code: '', status: '', msg: '' }
+      { key: 'douyin', label: '🎵 抖音', code: '', status: '', msg: '' },
+      { key: 'gaode', label: '🗺️ 高德', code: '', status: '', msg: '' }
     ],
     verifiedCoupons: {}, verifiedCount: 0, totalDiscount: 0,
     finalPrice: 0, discountText: '',
