@@ -2,7 +2,7 @@ var API = require('../../utils/api')
 
 Page({
   data: {
-    roomId: '', roomName: '', dateStr: '', slot: '', price: 0, duration: 90,
+    roomId: '', roomName: '', dateStr: '', slot: '', price: 0, duration: 120,
     noPayment: false, showSuccess: false,
     isStaff: false,
     balance: 280,
@@ -18,23 +18,152 @@ Page({
     verifiedCoupons: {}, verifiedCount: 0, totalDiscount: 0,
     finalPrice: 0, discountText: '',
     showBalanceWarning: false, showCombinedPay: false, balanceWarningText: '',
-    isCombinedPay: false, doorCode: '0000', payMethodLabel: ''
+    isCombinedPay: false, doorCode: '0000', payMethodLabel: '',
+    // P0-4: 时间编辑区域
+    showTimeEdit: false,
+    editableStart: '',
+    editableEnd: '',
+    editableDuration: 120,
+    timeOptions: [],
+    selectedTimeLabel: '',
+    durationOptions: [
+      { label: '2小时', value: 120 },
+      { label: '4小时', value: 240 },
+      { label: '6小时', value: 360 },
+      { label: '8小时', value: 480 }
+    ]
+  },
+
+  // 工具：当前时间+N分钟，向上取整到30分钟
+  calcRoundedTime: function(addMin) {
+    var now = new Date()
+    var totalMin = now.getHours() * 60 + now.getMinutes() + (addMin || 0)
+    totalMin = Math.ceil(totalMin / 30) * 30
+    return totalMin
+  },
+
+  // 工具：分钟数 → "HH:MM"
+  minToStr: function(m) {
+    var h = Math.floor(m / 60) % 24, min = m % 60
+    return String(h).padStart(2, '0') + ':' + String(min).padStart(2, '0')
   },
 
   onLoad: function(e) {
     var price = parseInt(e.total || e.price || '180')
     var user = API.getCurrentUser()
+    var duration = parseInt(e.duration || 120)
+    var startStr = e.start || ''
+    var endStr = e.end || ''
+    var dateStr = e.date || e.dateStr || ''
+
+    // 默认当前时间+1小时（取整到半点）
+    if (!startStr) {
+      var curMin = this.calcRoundedTime(60)
+      startStr = this.minToStr(curMin)
+      endStr = this.minToStr(curMin + duration)
+      // 如果没传日期，用今天的日期
+      if (!dateStr) {
+        var d = new Date()
+        dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0')
+      }
+    }
+
     this.setData({
-      roomId: e.roomId || '', roomName: decodeURIComponent(e.roomName || ''),
-      dateStr: e.date || e.dateStr || '', slot: (e.start || '') + '-' + (e.end || ''),
-      price: price, duration: parseInt(e.duration || 90), finalPrice: price,
+      roomId: e.roomId || '',
+      roomName: decodeURIComponent(e.roomName || ''),
+      dateStr: dateStr,
+      slot: startStr + '-' + endStr,
+      price: price,
+      duration: duration,
+      finalPrice: price,
       isStaff: user && user.role === 'staff',
-      noPayment: parseInt(e.duration) == 0 || false
+      noPayment: parseInt(e.duration) == 0 || false,
+      editableStart: startStr,
+      editableEnd: endStr,
+      editableDuration: duration,
+      selectedTimeLabel: startStr
     })
+
+    this.populateTimeOptions()
+
     var self = this
     API.getBalance().then(function(b) { self.setData({ balance: b || 0 }) })
   },
 
+  // ----- 时间编辑 -----
+  toggleTimeEdit: function() {
+    this.setData({ showTimeEdit: !this.data.showTimeEdit })
+    if (this.data.showTimeEdit) this.populateTimeOptions()
+  },
+
+  populateTimeOptions: function() {
+    var now = new Date()
+    var curMin = now.getHours() * 60 + now.getMinutes()
+    var startMin = Math.ceil(curMin / 30) * 30
+    var options = []
+    for (var m = startMin; m < 24 * 60 + 6 * 60; m += 30) {
+      options.push(this.minToStr(m % (24 * 60)))
+    }
+    this.setData({ timeOptions: options })
+  },
+
+  selectNow: function() {
+    var curMin = this.calcRoundedTime(0)
+    var dur = this.data.editableDuration
+    var startStr = this.minToStr(curMin)
+    var endStr = this.minToStr(curMin + dur)
+    this.setData({
+      editableStart: startStr,
+      editableEnd: endStr,
+      slot: startStr + '-' + endStr,
+      selectedTimeLabel: '⚡ 现在开始',
+      showTimeEdit: false
+    })
+    this.recalcPrice()
+  },
+
+  pickTime: function(e) {
+    var idx = e.detail.value
+    var timeStr = this.data.timeOptions[idx]
+    if (!timeStr) return
+    var sp = timeStr.split(':')
+    var sMin = parseInt(sp[0]) * 60 + parseInt(sp[1])
+    var endStr = this.minToStr(sMin + this.data.editableDuration)
+    this.setData({
+      editableStart: timeStr,
+      editableEnd: endStr,
+      slot: timeStr + '-' + endStr,
+      selectedTimeLabel: timeStr,
+      showTimeEdit: false
+    })
+    this.recalcPrice()
+  },
+
+  pickDuration: function(e) {
+    var dur = parseInt(e.currentTarget.dataset.dur)
+    this.setData({ editableDuration: dur })
+    this.populateTimeOptions()
+    if (this.data.editableStart) {
+      var sp = this.data.editableStart.split(':')
+      var sMin = parseInt(sp[0]) * 60 + parseInt(sp[1])
+      this.setData({
+        editableEnd: this.minToStr(sMin + dur),
+        slot: this.data.editableStart + '-' + this.minToStr(sMin + dur)
+      })
+    }
+    this.recalcPrice()
+  },
+
+  recalcPrice: function() {
+    var origDuration = this.data.duration || 120
+    var newDuration = this.data.editableDuration || 120
+    var origPrice = parseInt(this.data.price) || 0
+    var newPrice = Math.round(origPrice * newDuration / origDuration)
+    this.setData({ price: newPrice })
+    this.updateFinalPrice()
+  },
+
+  // ----- 客户来源 -----
   onSourceChange: function(e) {
     var idx = e.detail.value, options = this.data.sourceOptions
     if (idx == options.length - 1 && options[idx] == 'CAPSS') { this.setData({ showOtherSource: true, selectedSource: '' }) }
@@ -42,6 +171,7 @@ Page({
   },
   onOtherSourceInput: function(e) { this.setData({ selectedSource: e.detail.value || '其他' }) },
 
+  // ----- 支付方式 -----
   selectPay: function(e) {
     var pay = e.currentTarget.dataset.pay
     this.setData({ selectedPay: pay })
@@ -56,6 +186,7 @@ Page({
     this.setData({ isCombinedPay: true, showBalanceWarning: false, discountText: '余额抵扣 ¥' + this.data.balance + ' + 微信支付 ¥' + (this.data.price - this.data.balance) })
   },
 
+  // ----- 券验 -----
   onCouponInput: function(e) {
     var key = e.currentTarget.dataset.key, val = e.detail.value, platforms = this.data.couponPlatforms
     for (var i = 0; i < platforms.length; i++) { if (platforms[i].key === key) { platforms[i].code = val; platforms[i].status = ''; platforms[i].msg = ''; break } }
@@ -86,7 +217,7 @@ Page({
     var self = this, doorCode = String(Math.floor(Math.random() * 9000 + 1000))
     var payLabels = { wechat: '微信支付', alipay: '支付宝', balance: '会员余额', coupon: '验券' }
     var payLabel = self.data.isCombinedPay ? '余额+微信支付' : (self.data.selectedPay == 'coupon' ? '验券' : payLabels[self.data.selectedPay] || '微信支付')
-    API.createBooking({ roomId: self.data.roomId, roomName: self.data.roomName, date: self.data.dateStr, time: self.data.slot, duration: self.data.duration, amount: self.data.price, paymentMethod: payLabel, customerSource: self.data.selectedSource }).then(function(result) {
+    API.createBooking({ roomId: self.data.roomId, roomName: self.data.roomName, date: self.data.dateStr, time: self.data.slot, duration: self.data.editableDuration, amount: self.data.price, paymentMethod: payLabel, customerSource: self.data.selectedSource }).then(function(result) {
       self.setData({ showSuccess: true, doorCode: result.doorCode || doorCode, payMethodLabel: payLabel })
     }).catch(function(err) { wx.showToast({ title: err.message || '预订失败', icon: 'none' }) })
   },
@@ -94,7 +225,7 @@ Page({
   // 原型 openDoor 逻辑：检查后续订单→更新状态→跳转智控
   openDoor: function() {
     var now = new Date()
-    var durationMin = this.data.duration || 90
+    var durationMin = this.data.editableDuration || this.data.duration || 90
     var slotParts = (this.data.slot || '').split('-')
     var originalEndStr = slotParts.length >= 2 ? slotParts[1].trim() : ''
     var roomId = this.data.roomId
@@ -116,13 +247,6 @@ Page({
     }
 
     // 将订单状态更新为InUse，并跳转到智控页
-    var newEndDate
-    if (originalEndStr && dateStr) {
-      newEndDate = new Date(now.getTime() + durationMin * 60000)
-    } else {
-      newEndDate = new Date(now.getTime() + durationMin * 60000)
-    }
-
     wx.showToast({ title: '🚪 门已开', icon: 'success', duration: 1000 })
     setTimeout(function() {
       wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) })

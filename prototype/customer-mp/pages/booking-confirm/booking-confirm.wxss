@@ -1,4 +1,4 @@
-﻿page { background:#f5f5f5; margin:0; padding:0; }
+page { background:#f5f5f5; margin:0; padding:0; }
 .phone { width:100%; min-height:100vh; background:#fff; display:flex; flex-direction:column; }
 .nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #e8e4de; background:#fff; }
 .back-btn { font-size:20px; padding:4px; margin-right:8px; }
@@ -11,6 +11,26 @@
 .summary-row .label { color:#999; }
 .summary-row .value { font-weight:500; color:#333; }
 .summary-row .price { font-weight:700; color:#B8860B; font-size:16px; }
+
+/* P0-4: 可编辑时段行 */
+.editable-row { cursor:pointer; }
+.editable-row .edit-hint { font-size:12px; color:#5D8A6B; font-weight:600; margin-left:8px; }
+
+/* P0-4: 时间编辑区域 */
+.time-edit-section { background:#F2F6F0; padding:16px; margin-bottom:16px; border-radius:12px; border:1.5px solid #e0d8d0; }
+.duration-grid { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
+.duration-chip { flex:1; min-width:64px; padding:10px 4px; border-radius:16px; text-align:center; border:1.5px solid #d0d0d0; background:#fff; font-size:13px; font-weight:600; }
+.duration-chip.selected { border-color:#5D8A6B; background:#5D8A6B; color:#fff; }
+.time-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.now-btn { padding:10px 16px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:13px; font-weight:600; white-space:nowrap; }
+.time-or { font-size:11px; color:#ccc; }
+.time-select-trigger { flex:1; padding:10px 12px; border-radius:12px; border:1.5px solid #d0d0d0; background:#fff; font-size:13px; display:flex; align-items:center; justify-content:space-between; min-width:120px; }
+.time-value { color:#333; font-weight:500; }
+.time-placeholder { color:#ccc; }
+.arrow { color:#999; font-size:10px; }
+.selected-preview { margin-top:8px; padding:6px 10px; background:#fff; border-radius:8px; text-align:center; }
+.preview-text { font-size:12px; color:#5D8A6B; font-weight:600; }
+
 .customer-source-section { margin-bottom:16px; }
 .source-trigger { width:100%; padding:12px; border:1.5px solid #e0d8d0; border-radius:8px; font-size:14px; display:flex; justify-content:space-between; }
 .source-placeholder { color:#ccc; }
@@ -75,5 +95,3 @@
 .nav-item .nav-icon { font-size:20px; display:block; }
 .nav-item .nav-label { font-size:10px; margin-top:2px; display:block; }
 .nav-item.active { color:#5D8A6B; }
-
-
