@@ -36,8 +36,8 @@ Page({
 
         // 状态标签
         var statusClass = 'status-completed', statusLabel = '已完成'
-        if (status === 'InUse' || status === 'in_use') { statusClass = 'status-inuse'; statusLabel = '使用中' }
-        else if (status === 'Booked') { statusClass = 'status-booked'; statusLabel = '已预定' }
+        if (status === 'InUse' || status === 'in_use') { statusClass = 'status-inuse'; statusLabel = '进行中' }
+        else if (status === 'Booked') { statusClass = 'status-booked'; statusLabel = '待使用' }
 
         // 剩余时间（进行中订单）
         var remaining = null
@@ -119,9 +119,9 @@ Page({
   },
 
   goRoomControl: function(e) {
-    var order = this.findOrder(e.currentTarget.dataset.id)
-    if (!order) return
-    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+(order.roomId||'')+'&roomName='+encodeURIComponent(order.roomName||'') })
+    var roomId = e.currentTarget.dataset.roomId || ''
+    var roomName = e.currentTarget.dataset.roomName || ''
+    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) })
   },
 
   callService: function(e) {
@@ -168,25 +168,6 @@ Page({
   },
 
   hideExtendModal: function() { this.setData({ showExtendModal: false }) },
-
-  endOrder: function(e) {
-    var self = this
-    var id = e.currentTarget.dataset.id
-    wx.showModal({
-      title: '退房确认', content: '确定要结束此订单并退房吗？',
-      success: function(res) {
-        if (res.confirm) {
-          var orders = self.data.orders
-          for (var i = 0; i < orders.length; i++) {
-            if (orders[i].orderId === id) { orders[i].status = 'Completed'; orders[i].statusClass = 'status-completed'; orders[i].statusLabel = '已完成'; break }
-          }
-          self.setData({ orders: orders })
-          self.filterOrders()
-          wx.showToast({ title: '已退房', icon: 'success' })
-        }
-      }
-    })
-  },
 
   // ── 待使用操作 ──
 

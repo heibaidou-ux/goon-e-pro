@@ -9,7 +9,10 @@
     <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{item.status=='InUse' || item.status=='in_use'}}">
       <view class="order-header">
         <text class="order-room">{{item.roomName}}</text>
-        <text class="order-status {{item.statusClass}}">{{item.statusLabel}}</text>
+        <view class="order-header-right">
+          <text class="order-status {{item.statusClass}}">{{item.statusLabel}}</text>
+          <text class="order-arrow">›</text>
+        </view>
       </view>
       <text class="order-time">{{item.timeStr}}</text>
       <text class="order-price">¥{{item.amount}}</text>
@@ -23,31 +26,31 @@
       </view>
       <!-- 设备快捷控制 -->
       <view class="device-grid">
-        <view class="device-item" bindtap="goRoomControl" data-id="{{item.orderId}}">
+        <view class="device-item" bindtap="goRoomControl" data-room-id="{{item.roomId}}" data-room-name="{{item.roomName}}">
           <text class="device-icon">💡</text>
           <text class="device-label">灯光</text>
         </view>
-        <view class="device-item" bindtap="goRoomControl" data-id="{{item.orderId}}">
+        <view class="device-item" bindtap="goRoomControl" data-room-id="{{item.roomId}}" data-room-name="{{item.roomName}}">
           <text class="device-icon">🪟</text>
           <text class="device-label">窗帘</text>
         </view>
-        <view class="device-item" bindtap="goRoomControl" data-id="{{item.orderId}}">
+        <view class="device-item" bindtap="goRoomControl" data-room-id="{{item.roomId}}" data-room-name="{{item.roomName}}">
           <text class="device-icon">❄️</text>
           <text class="device-label">空调</text>
         </view>
-        <view class="device-item" bindtap="goRoomControl" data-id="{{item.orderId}}">
+        <view class="device-item" bindtap="goRoomControl" data-room-id="{{item.roomId}}" data-room-name="{{item.roomName}}">
           <text class="device-icon">🎵</text>
           <text class="device-label">音乐</text>
         </view>
-        <view class="device-item" bindtap="goRoomControl" data-id="{{item.orderId}}">
+        <view class="device-item" bindtap="goRoomControl" data-room-id="{{item.roomId}}" data-room-name="{{item.roomName}}">
           <text class="device-icon">📱</text>
           <text class="device-label">蓝牙</text>
         </view>
       </view>
       <view class="big-actions">
-        <view class="big-action-btn primary" bindtap="openDoor" data-id="{{item.orderId}}">开门</view>
-        <view class="big-action-btn outline" bindtap="showExtend" data-id="{{item.orderId}}">续订</view>
-        <view class="big-action-btn ghost" bindtap="endOrder" data-id="{{item.orderId}}">退房</view>
+        <view class="big-action-btn primary" bindtap="openDoor" data-id="{{item.orderId}}">🚪 开门</view>
+        <view class="big-action-btn outline" bindtap="showExtend" data-id="{{item.orderId}}">⏱ 续订</view>
+        <view class="big-action-btn ghost" bindtap="callService" data-id="{{item.orderId}}">📞 客服</view>
       </view>
     </view>
 
@@ -55,7 +58,10 @@
     <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{item.status=='Booked'}}">
       <view class="order-header">
         <text class="order-room">{{item.roomName}}</text>
-        <text class="order-status {{item.statusClass}}">{{item.statusLabel}}</text>
+        <view class="order-header-right">
+          <text class="order-status {{item.statusClass}}">{{item.statusLabel}}</text>
+          <text class="order-arrow">›</text>
+        </view>
       </view>
       <text class="order-time">{{item.timeStr}}</text>
       <text class="order-price">¥{{item.amount}}</text>
@@ -73,7 +79,10 @@
     <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{item.status=='Completed'}}">
       <view class="order-header">
         <text class="order-room">{{item.roomName}}</text>
-        <text class="order-status {{item.statusClass}}">{{item.statusLabel}}</text>
+        <view class="order-header-right">
+          <text class="order-status {{item.statusClass}}">{{item.statusLabel}}</text>
+          <text class="order-arrow">›</text>
+        </view>
       </view>
       <text class="order-time">{{item.timeStr}}</text>
       <text class="order-price">¥{{item.amount}}</text>

@@ -12,6 +12,8 @@ page { background:#f5f7fa; margin:0; padding:0; }
 .order-card { background:#fff; padding:16px; margin:0 0 10px; }
 .order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .order-room { font-size:16px; font-weight:600; }
+.order-header-right { display:flex; align-items:center; gap:4px; }
+.order-arrow { font-size:16px; color:#ccc; font-weight:600; }
 .order-status { font-size:12px; font-weight:600; padding:4px 10px; border-radius:16px; display:inline-block; }
 .status-inuse { background:#e8f5e9; color:#00a870; }
 .status-booked { background:#f3e5f5; color:#9c27b0; }
