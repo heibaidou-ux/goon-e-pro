@@ -5,7 +5,7 @@
 .nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; margin-right:28px; }
 .page { flex:1; overflow-y:auto; padding-bottom:60px; }
 
-/* Room header */
+/* Room header (non-bookable fallback) */
 .room-header-card { padding:16px; color:#fff; }
 .gradient-tea { background:linear-gradient(135deg,#5D8A6B,#7BA88E); }
 .gradient-meeting { background:linear-gradient(135deg,#7A8B8B,#A3B5B5); }
@@ -16,14 +16,31 @@
 .room-header-name { font-size:17px; font-weight:700; display:block; }
 .room-header-meta { font-size:12px; opacity:.85; margin-top:2px; display:block; }
 .room-header-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
-.facility-tag { background:rgba(255,255,255,.2); color:#fff; padding:2px 10px; border-radius:16px; font-size:11px; }
-
+.room-header-tags .facility-tag { background:rgba(255,255,255,.2); color:#fff; padding:2px 10px; border-radius:16px; font-size:11px; }
 /* No booking */
 .no-booking { text-align:center; padding:40px 20px; color:#999; }
 .nb-icon { font-size:48px; display:block; margin-bottom:12px; }
 .nb-title { font-size:16px; font-weight:600; color:#333; display:block; }
 .nb-desc { font-size:13px; margin-top:8px; display:block; line-height:1.6; }
 .nb-btn { margin-top:16px; padding:10px 24px; border-radius:8px; background:#5D8A6B; color:#fff; border:none; font-size:14px; }
+
+/* Room gallery — 实景图替代占位图标 */
+.room-gallery { position:relative; width:100%; height:200px; overflow:hidden; }
+.gallery-swiper { width:100%; height:100%; }
+.gallery-img { width:100%; height:200px; display:block; }
+.gallery-placeholder { width:100%; height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; }
+.gallery-placeholder-icon { font-size:48px; margin-bottom:8px; }
+.gallery-placeholder-text { font-size:16px; font-weight:600; }
+.gallery-badge { position:absolute; bottom:10px; left:10px; background:rgba(0,0,0,.55); color:#fff; font-size:12px; padding:3px 10px; border-radius:12px; z-index:2; }
+
+/* Room info section */
+.room-info-section { padding:14px 12px; border-bottom:1px solid #f0ece6; }
+.room-info-main { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.room-info-name { font-size:17px; font-weight:700; color:#1a1a1a; }
+.room-info-price { font-size:18px; font-weight:700; color:#B8860B; }
+.room-info-price .unit { font-size:12px; font-weight:400; color:#999; }
+.room-facility-tags { display:flex; flex-wrap:wrap; gap:4px; }
+.facility-tag { background:#f0ece6; color:#666; padding:2px 10px; border-radius:16px; font-size:11px; }
 
 /* Date bar — 填满整个页面宽度 */
 .date-bar { display:flex; padding:10px 12px; gap:4px; width:100%; box-sizing:border-box; }
@@ -60,6 +77,20 @@
 /* Conflict */
 .conflict-alert { margin:4px 12px; padding:10px 14px; border-radius:8px; background:#FDF6EC; border:1px solid #F0E0C0; font-size:12px; color:#8B7D6B; }
 .suggest-time { color:#5D8A6B; font-weight:600; }
+
+/* Billing notice */
+.billing-notice { margin:4px 12px; padding:10px 14px; border-radius:8px; background:#F2F6F0; border:1px solid #d8e6dc; display:flex; align-items:flex-start; gap:6px; }
+.billing-notice-icon { font-size:13px; flex-shrink:0; margin-top:1px; }
+.billing-notice-text { font-size:11px; color:#5D8A6B; line-height:1.5; }
+
+/* Location section */
+.location-section { padding:12px 12px 4px; }
+.location-section .section-label { margin-bottom:6px; }
+.location-card { display:flex; align-items:center; justify-content:space-between; padding:12px; background:#FAF8F5; border:1px solid #e8e4de; border-radius:12px; }
+.location-info { flex:1; }
+.location-address { font-size:13px; color:#333; font-weight:500; display:block; line-height:1.4; }
+.location-hours { font-size:11px; color:#999; margin-top:3px; display:block; }
+.location-nav-btn { flex-shrink:0; padding:8px 16px; border-radius:20px; background:#fff; border:1.5px solid #5D8A6B; color:#5D8A6B; font-size:12px; font-weight:600; margin-left:8px; }
 
 /* Bottom */
 .inpage-bottom { padding:16px 12px; border-top:1px solid #e8e4de; margin-top:8px; }

@@ -12,6 +12,23 @@ var ROOMS_DATA = [
 var GRAD_MAP = { '茶室':'gradient-tea', '会议室':'gradient-meeting', '展厅':'gradient-exhibition', '工作间':'gradient-workshop' }
 var HERO_MAP = { '茶室':'🍵', '会议室':'💼', '展厅':'🏛️', '工作间':'🔧' }
 
+var ROOM_IMAGES = {
+  'RM004': ['../../images/茶荟头图-空间-诗梳风大茶室.jpg'],
+  'RM001': ['../../images/金德大诗梳风004.jpg'],
+  'RM002': ['../../images/茶荟头图-空间-诗梳风大茶室.jpg'],
+  'RM003': ['../../images/茶荟头图-空间-诗梳风大茶室.jpg'],
+  'RM005': ['../../images/头图四-店面招牌.jpg'],
+  'RM006': ['../../images/头图四-店面招牌.jpg']
+}
+
+var STORE_INFO = {
+  address: '广州市天河区珠江新城华夏路28号盈隆大厦16层',
+  phone: '020-8888-8888',
+  hours: '09:00-23:00',
+  lat: 23.1291,
+  lng: 113.3220
+}
+
 Page({
   data: {
     room: {}, roomId: '', hourRate: 0, heroIcon: '🏠', gradClass: 'gradient-tea', bookable: true,
@@ -37,7 +54,9 @@ Page({
       room: room, roomId: room.roomId, hourRate: room.pricePerHour || 120,
       heroIcon: HERO_MAP[room.type] || '🏠', gradClass: GRAD_MAP[room.type] || 'gradient-tea',
       bookable: room.bookable !== false, today: now, selectedDate: todayStart,
-      calYear: now.getFullYear(), calMonth: now.getMonth()
+      calYear: now.getFullYear(), calMonth: now.getMonth(),
+      roomImages: ROOM_IMAGES[room.roomId] || [],
+      storeInfo: STORE_INFO
     })
     this.renderDateBar()
 
@@ -211,5 +230,7 @@ Page({
     var d = this.data
     var dateStr = d.selectedDate.getFullYear() + '-' + String(d.selectedDate.getMonth()+1).padStart(2,'0') + '-' + String(d.selectedDate.getDate()).padStart(2,'0')
     wx.navigateTo({ url: '/pages/booking-confirm/booking-confirm?roomId=' + d.roomId + '&roomName=' + encodeURIComponent(d.room.name) + '&date=' + dateStr + '&start=' + d.selectedStart + '&end=' + d.selectedEnd + '&total=' + d.totalPrice + '&duration=' + (parseFloat(d.selectedDuration) || 120) })
-  }
+  },
+
+  openNavigation: function() { wx.showToast({ title: '🗺 导航中...', icon: 'none' }) }
 })

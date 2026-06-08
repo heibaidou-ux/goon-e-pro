@@ -4,6 +4,8 @@
     <text class="nav-title">{{room.name}}</text>
   </view>
   <view class="page">
+
+    <!-- 不可预约空间 -->
     <view wx:if="{{!room.bookable}}">
       <view class="room-header-card {{gradClass}}">
         <view class="room-header-top">
@@ -22,17 +24,35 @@
         <button class="nb-btn" bindtap="goHome">查看可预约包间</button>
       </view>
     </view>
+
+    <!-- 可预约空间 -->
     <view wx:else>
-      <view class="room-header-card {{gradClass}}">
-        <view class="room-header-top">
-          <view class="room-header-icon">{{heroIcon}}</view>
-          <view>
-            <text class="room-header-name">{{room.name}}</text>
-            <text class="room-header-meta">容纳 {{room.capacity}}人 · {{room.area}}㎡ · ¥{{hourRate}}/小时</text>
-          </view>
-        </view>
-        <view class="room-header-tags"><text class="facility-tag" wx:for="{{room.facilities}}" wx:key="*this">{{item}}</text></view>
+
+      <!-- 实景图区 -->
+      <view class="room-gallery">
+        <swiper class="gallery-swiper" indicator-dots autoplay interval="4000" circular>
+          <swiper-item wx:for="{{roomImages}}" wx:key="*this">
+            <image class="gallery-img" src="{{item}}" mode="aspectFill" />
+          </swiper-item>
+          <swiper-item wx:if="{{roomImages.length==0}}">
+            <view class="gallery-placeholder {{gradClass}}">
+              <text class="gallery-placeholder-icon">{{heroIcon}}</text>
+              <text class="gallery-placeholder-text">{{room.name}}</text>
+            </view>
+          </swiper-item>
+        </swiper>
+        <view class="gallery-badge">{{room.capacity}}人 · {{room.area}}㎡</view>
       </view>
+
+      <!-- 房间信息 -->
+      <view class="room-info-section">
+        <view class="room-info-main">
+          <text class="room-info-name">{{room.name}}</text>
+          <text class="room-info-price">¥{{hourRate}}<text class="unit">/小时</text></text>
+        </view>
+        <view class="room-facility-tags"><text class="facility-tag" wx:for="{{room.facilities}}" wx:key="*this">{{item}}</text></view>
+      </view>
+
       <!-- 日期：一行横向排列，5天+更多按钮 -->
       <view class="date-bar">
         <view class="date-chip {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}}" wx:for="{{dateChips}}" wx:key="index" bindtap="pickDate" data-index="{{index}}">
@@ -42,6 +62,7 @@
         </view>
         <view class="date-more" bindtap="showCalModal">更多▾</view>
       </view>
+
       <view class="duration-section">
         <text class="section-label">选择时长</text>
         <view class="duration-grid">
@@ -57,6 +78,7 @@
           <text class="ch-label">小时</text>
         </view>
       </view>
+
       <view class="form-row" wx:if="{{showTimeRow}}">
         <text class="form-label">开始时间</text>
         <button class="now-btn" bindtap="pickNow">⚡ 现在开始</button>
@@ -69,22 +91,44 @@
           </view>
         </picker>
       </view>
+
       <view class="info-bar"><text>🧹 保洁准备(15min)</text><text>📅 约满时段不显示</text></view>
+
       <view class="conflict-alert" wx:if="{{conflictMsg}}">
         <text wx:if="{{suggestTime}}">⚠️ 该时段已被预约。</text>
         <text class="suggest-time" wx:if="{{suggestTime}}" bindtap="applySuggested">建议从 {{suggestTime}} 开始 ›</text>
         <text wx:else>⚠️ 该时段已被预约，请选择其他日期。</text>
       </view>
+
+      <!-- 计费说明：预约仅为预定，实际以扫码进门为准 -->
+      <view class="billing-notice">
+        <text class="billing-notice-icon">📌</text>
+        <text class="billing-notice-text">预约时间为预留时段，实际计费时间以扫码进门开始计算，提前到或延后走不额外扣费</text>
+      </view>
+
+      <!-- 门店位置 -->
+      <view class="location-section">
+        <text class="section-label">📍 门店位置</text>
+        <view class="location-card" bindtap="openNavigation">
+          <view class="location-info">
+            <text class="location-address">{{storeInfo.address}}</text>
+            <text class="location-hours">营业时间 {{storeInfo.hours}}</text>
+          </view>
+          <button class="location-nav-btn">🗺 导航</button>
+        </view>
+      </view>
+
       <view class="inpage-bottom">
         <view class="inpage-total">
           <text class="total-label">小计</text>
           <text class="total-price">¥{{totalPrice}}</text>
           <text class="total-detail {{canBook ? 'active' : ''}}">{{totalDetail}}</text>
         </view>
-        <button class="inpage-book-btn {{canBook ? '' : 'disabled'}}" disabled="{{!canBook}}" bindtap="goPay">确认预约</button>
+        <button class="inpage-book-btn {{canBook ? '' : 'disabled'}}" disabled="{{!canBook}}" bindtap="goPay">立即预约</button>
       </view>
     </view>
   </view>
+
   <view class="bottom-nav">
     <view class="nav-item" bindtap="goHome"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
     <view class="nav-item active"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
@@ -93,6 +137,7 @@
     <view class="nav-item" bindtap="goMember"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
   </view>
 </view>
+
 <view class="cal-modal-overlay" wx:if="{{showCalModal}}" bindtap="hideCalModal">
   <view class="cal-modal-content" catchtap="">
     <view class="cal-header">
