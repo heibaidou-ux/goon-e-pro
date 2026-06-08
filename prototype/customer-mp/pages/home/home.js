@@ -13,7 +13,7 @@ Page({
       { title: '优惠券大放送', desc: '领取专属优惠券，到店享更多折扣', img: '../../images/金德大诗梳风004.jpg', url: '../coupon-verify/index.html' }
     ],
     rooms: [], teaProducts: [], cartCount: 0,
-    balance: 0, balanceDisplay: '', balanceIcon: '💰', balanceVisible: true,
+    balance: 0, balanceDisplay: '', balanceVisible: true,
     qrRoomId: '', qrRoomName: '', qrTableId: '',
     showStoreModal: false, showParkingModal: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
@@ -49,7 +49,6 @@ Page({
       var teas = []
       for (var i = 0; i < productsData.length; i++) { var t = productsData[i], vis = visualMap[t.productId] || { icon: '🍵', bg: '#f0f0f0' }; teas.push({ productId: t.productId, name: t.name, desc: t.desc || '', price: t.price, icon: vis.icon, bg: vis.bg, _qty: 0 }) }
       self.setData({ rooms: rooms, teaProducts: teas, balance: balance, isLoggedIn: !!user })
-      if (user) { self.setData({ balanceIcon: {Gold:'💎',Silver:'💰',Bronze:'👛',Diamond:'💳'}[user.memberLevel] || '💰' }) }
       self.setData({ balanceDisplay: self.data.balanceVisible ? '¥' + balance : '****' })
       self.setData({ loading: false })
     }).catch(function() { self.setData({ loading: false, errorMsg: '加载失败' }) })
@@ -75,6 +74,7 @@ Page({
   onCarouselTap: function(e) { var urls = ['', '/pages/member-center/member-center?action=topup', '/pages/room-list/room-list', '/pages/coupon-verify/coupon-verify']; var idx = e.currentTarget.dataset.index; if (idx >= 0 && idx < urls.length && urls[idx]) wx.navigateTo({ url: urls[idx] }) },
 
   handleBalanceClick: function() { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'profile', showLoginModal: true }); return } wx.navigateTo({ url: '/pages/member-center/member-center' }) },
+  toggleBalanceVis: function() { var nv=!this.data.balanceVisible;this.setData({balanceVisible:nv,balanceDisplay:nv?"¥"+this.data.balance:"****"});try{wx.setStorageSync("balance_visible",nv)}catch(e){} },
   handleCouponClick: function() { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'coupon', showLoginModal: true }); return } wx.navigateTo({ url: '/pages/my-coupons/my-coupons' }) },
   goProfile: function() { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'profile', showLoginModal: true }); return } wx.navigateTo({ url: '/pages/member-center/member-center' }) },
   goRoom: function(e) { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'room-'+e.currentTarget.dataset.roomid, showLoginModal: true }); return } wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId='+e.currentTarget.dataset.roomid }) },
