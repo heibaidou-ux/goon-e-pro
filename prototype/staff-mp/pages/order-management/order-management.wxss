@@ -1,4 +1,272 @@
-.placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
-.ph-icon { font-size:48px; margin-bottom:12px; }
-.ph-text { font-size:18px; color:#333; font-weight:600; }
-.ph-desc { font-size:13px; color:#999; margin-top:4px; }
+/* ===== 搜索栏 ===== */
+.search-bar {
+  padding: 10px 0;
+  background: #fff;
+}
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 16px;
+  padding: 8px 14px;
+}
+.search-icon {
+  font-size: 15px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.search-input {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  height: 22px;
+  line-height: 22px;
+}
+.search-clear {
+  font-size: 14px;
+  color: #999;
+  padding: 0 0 0 8px;
+  flex-shrink: 0;
+}
+
+/* ===== 筛选标签 ===== */
+.tabs {
+  display: flex;
+  padding: 0 0 10px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  position: relative;
+}
+.tab-text {
+  font-size: 14px;
+  color: #666;
+}
+.tab-active .tab-text {
+  color: #5D8A6B;
+  font-weight: 600;
+}
+.tab-underline {
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background: #5D8A6B;
+  border-radius: 2px;
+}
+
+/* ===== 加载态 ===== */
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+.loading-text {
+  font-size: 14px;
+  color: #999;
+}
+
+/* ===== 订单列表 ===== */
+.order-list {
+  padding: 12px 0;
+}
+
+/* ===== 订单卡片 ===== */
+.order-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.order-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.order-customer {
+  flex: 1;
+}
+.customer-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  line-height: 1.4;
+}
+.room-name {
+  font-size: 13px;
+  color: #888;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ===== 状态徽章 ===== */
+.order-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+.badge-inuse {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+.badge-booked {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+.badge-completed {
+  background: #F5F5F5;
+  color: #999;
+}
+
+/* ===== 底部信息行 ===== */
+.order-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.order-time {
+  display: flex;
+  align-items: center;
+}
+.time-label {
+  font-size: 12px;
+  color: #bbb;
+  margin-right: 6px;
+}
+.time-value {
+  font-size: 13px;
+  color: #666;
+}
+.order-amount {
+  display: flex;
+  align-items: baseline;
+}
+.amount-symbol {
+  font-size: 12px;
+  color: #5D8A6B;
+  font-weight: 600;
+}
+.amount-value {
+  font-size: 18px;
+  color: #5D8A6B;
+  font-weight: 700;
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0;
+}
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+.empty-text {
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* ===== 详情弹窗遮罩 ===== */
+.detail-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 100;
+}
+
+/* ===== 详情弹窗面板 ===== */
+.detail-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  z-index: 101;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.detail-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #333;
+}
+.detail-close {
+  font-size: 18px;
+  color: #999;
+  padding: 4px;
+}
+
+/* ===== 详情内容 ===== */
+.detail-body {
+  padding: 12px 20px;
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f8f8f8;
+}
+.detail-row:last-child {
+  border-bottom: none;
+}
+.detail-label {
+  font-size: 14px;
+  color: #888;
+  flex-shrink: 0;
+}
+.detail-value {
+  font-size: 14px;
+  color: #333;
+  text-align: right;
+  max-width: 60%;
+}
+.amount-highlight {
+  font-size: 18px;
+  font-weight: 700;
+  color: #5D8A6B;
+}
+.detail-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+/* ===== 详情底部按钮 ===== */
+.detail-footer {
+  padding: 12px 20px 24px;
+}
+.detail-btn {
+  text-align: center;
+  background: #5D8A6B;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 0;
+  border-radius: 16px;
+}

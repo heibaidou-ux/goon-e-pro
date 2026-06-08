@@ -1,4 +1,36 @@
-.placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
-.ph-icon { font-size:48px; margin-bottom:12px; }
-.ph-text { font-size:18px; color:#333; font-weight:600; }
-.ph-desc { font-size:13px; color:#999; margin-top:4px; }
+.page { min-height:100vh; background:#f5f5f5; }
+
+.header { padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; }
+.header-title { font-size:18px; font-weight:700; }
+
+.picker-bar { padding:10px 0; background:#f9f9f9; font-size:14px; color:#333; }
+
+.hint { display:flex; align-items:center; justify-content:center; padding:60px 20px; font-size:14px; color:#999; }
+
+.device-list { padding:12px 0; }
+
+.device-card { background:#fff; border-radius:16px; padding:14px; margin-bottom:10px; }
+
+.card-top { display:flex; align-items:center; }
+.device-icon { font-size:24px; width:36px; text-align:center; }
+.device-meta { flex:1; }
+.device-name { font-size:15px; font-weight:500; display:block; }
+.device-id { font-size:11px; color:#999; display:block; margin-top:2px; }
+.device-tag { font-size:11px; padding:2px 8px; border-radius:4px; }
+.device-tag.online { background:#f0fdf4; color:#00A870; }
+.device-tag.offline { background:#fce4e4; color:#e53935; }
+
+.card-body { display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:1px solid #f0f0f0; }
+
+.temp-row { display:flex; align-items:center; gap:6px; }
+.temp-btn { width:32px; height:32px; border-radius:50%; background:#f0f0f0; font-size:18px; display:flex; align-items:center; justify-content:center; padding:0; line-height:1; color:#333; }
+.temp-btn::after { border:none; }
+.temp-val { font-size:18px; font-weight:600; color:#333; min-width:50px; text-align:center; }
+
+.ctrl-btn { padding:8px 18px; border-radius:16px; background:#f5f5f5; font-size:13px; color:#666; border:none; line-height:1.4; }
+.ctrl-btn::after { border:none; }
+.ctrl-btn.on { background:#5D8A6B; color:#fff; }
+
+.ctrl-btn-wide { width:100%; text-align:center; }
+
+.btn-hover { opacity:0.7; }

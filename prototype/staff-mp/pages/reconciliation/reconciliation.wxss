@@ -1,4 +1,68 @@
-.placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
-.ph-icon { font-size:48px; margin-bottom:12px; }
-.ph-text { font-size:18px; color:#333; font-weight:600; }
-.ph-desc { font-size:13px; color:#999; margin-top:4px; }
+.page { padding:0; min-height:100vh; background:#f5f7fa; }
+.loading { text-align:center; padding:60px 0; color:#999; font-size:14px; }
+
+/* 收入卡片 — 品牌绿渐变 */
+.revenue-card {
+  background:linear-gradient(135deg,#5D8A6B,#7BB58B);
+  border-radius:16px;
+  padding:24px 20px;
+  margin-bottom:12px;
+  text-align:center;
+}
+.revenue-label { font-size:13px; color:rgba(255,255,255,0.8); display:block; }
+.revenue-amount { font-size:36px; font-weight:700; color:#fff; display:block; margin:8px 0; }
+.revenue-date { font-size:12px; color:rgba(255,255,255,0.7); display:block; }
+
+/* 统计行 */
+.stats-row { display:flex; gap:10px; margin-bottom:12px; }
+.stat-item {
+  flex:1; background:#fff; border-radius:16px;
+  padding:16px 8px; text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,0.04);
+}
+.stat-num { font-size:22px; font-weight:700; color:#5D8A6B; display:block; }
+.stat-label { font-size:11px; color:#999; display:block; margin-top:4px; }
+
+/* 通用卡片 */
+.section-card {
+  background:#fff; border-radius:16px; padding:16px;
+  margin-bottom:12px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.04);
+}
+.section-title { font-size:15px; font-weight:600; margin-bottom:12px; display:block; }
+
+/* 支付方式列表 */
+.pay-item { margin-bottom:14px; }
+.pay-item:last-child { margin-bottom:0; }
+.pay-row {
+  display:flex; justify-content:space-between;
+  align-items:center; margin-bottom:6px;
+}
+.pay-method { font-size:13px; color:#333; }
+.pay-amount { font-size:13px; color:#333; font-weight:500; }
+.pay-percent { font-size:11px; color:#999; }
+
+/* 进度条 */
+.pay-bar { height:6px; background:#f0f0f0; border-radius:3px; overflow:hidden; }
+.pay-bar-fill {
+  height:100%;
+  background:linear-gradient(90deg,#5D8A6B,#7BB58B);
+  border-radius:3px;
+}
+
+/* 交易明细 */
+.tx-item {
+  padding:12px 0;
+  border-bottom:1px solid #f5f5f5;
+}
+.tx-item:last-child { border-bottom:none; }
+.tx-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+.tx-customer { font-size:14px; font-weight:500; color:#333; }
+.tx-amount { font-size:14px; font-weight:600; color:#5D8A6B; }
+.tx-bottom { display:flex; gap:12px; align-items:center; }
+.tx-room { font-size:12px; color:#666; }
+.tx-method { font-size:12px; color:#999; }
+.tx-time { font-size:12px; color:#999; }
+
+/* 空状态 */
+.empty { text-align:center; padding:20px 0; color:#999; font-size:13px; }

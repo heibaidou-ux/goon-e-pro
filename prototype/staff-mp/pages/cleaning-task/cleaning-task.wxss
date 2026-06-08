@@ -1,15 +1,15 @@
-.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.header { padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; }
 .header-title { font-size:18px; font-weight:700; }
-.task-section { padding:12px 16px; }
+.task-section { padding:12px 0; }
 .task-section-title { font-size:14px; font-weight:600; color:#666; display:block; margin-bottom:8px; }
-.task-card { background:#fff; border-radius:10px; padding:14px; margin-bottom:8px; }
+.task-card { background:#fff; border-radius:16px; padding:14px; margin-bottom:8px; }
 .task-card.urgent { border-left:3px solid #e53935; }
 .task-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
 .task-room { font-size:15px; font-weight:600; }
 .task-priority { font-size:11px; color:#e53935; }
 .task-meta { font-size:12px; color:#999; display:block; margin-bottom:8px; }
 .task-btns { display:flex; gap:8px; }
-.task-btn { flex:1; padding:10px; border-radius:8px; border:none; font-size:14px; font-weight:600; }
-.task-btn.accept { background:#0052d9; color:#fff; }
-.task-btn.complete { background:#00A870; color:#fff; }
+.task-btn { flex:1; padding:10px; border-radius:16px; border:none; font-size:14px; font-weight:600; }
+.task-btn.accept { background:#5D8A6B; color:#fff; }
+.task-btn.complete { background:#5D8A6B; color:#fff; }
 .empty { text-align:center; padding:30px; color:#ccc; font-size:13px; }

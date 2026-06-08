@@ -1,13 +1,13 @@
-page { background:#f5f5f5; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+page { background:#f5f5f5; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; margin:0; padding:0; }
 .page { flex:1; overflow-y:auto; padding-bottom:80px; }
 
 /* Room info */
-.room-header { padding:16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; }
+.room-header { padding:16px 0; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; }
 .room-name-text { font-size:20px; font-weight:700; display:block; }
 .room-order-id { font-size:12px; opacity:.8; margin-top:4px; display:block; }
 
 /* Summary card */
-.summary-card { margin:12px 16px; background:#fff; border-radius:16px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.summary-card { margin:12px 0; background:#fff; border-radius:16px; padding:16px 0; box-shadow:0 1px 4px rgba(0,0,0,.06); }
 .summary-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:14px; }
 .summary-row .label { color:#666; }
 .summary-row .value { font-weight:600; color:#333; }
@@ -17,8 +17,8 @@ page { background:#f5f5f5; font-family:-apple-system,BlinkMacSystemFont,"Segoe U
 .summary-row.total .value { color:#B8860B; font-size:20px; }
 
 /* Order list */
-.section-title { padding:16px 16px 8px; font-size:14px; font-weight:600; color:#666; display:block; }
-.order-card { margin:0 16px 10px; background:#fff; border-radius:16px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.section-title { padding:16px 0 8px; font-size:14px; font-weight:600; color:#666; display:block; }
+.order-card { margin:0 0 10px; background:#fff; border-radius:16px; padding:14px 0; box-shadow:0 1px 4px rgba(0,0,0,.04); }
 .order-time { font-size:12px; color:#999; display:block; margin-bottom:4px; }
 .order-status { font-size:11px; padding:2px 8px; border-radius:16px; background:#f0fdf4; color:#2e7d32; display:inline-block; margin-bottom:8px; }
 .order-status.cancelled { background:#fce4e4; color:#e53935; }
@@ -33,7 +33,7 @@ page { background:#f5f5f5; font-family:-apple-system,BlinkMacSystemFont,"Segoe U
 .empty-text { font-size:14px; color:#ccc; display:block; }
 
 /* Bottom bar */
-.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f0f0f0; padding:10px 16px; display:flex; align-items:center; gap:12px; z-index:20; }
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f0f0f0; padding:10px 0; display:flex; align-items:center; gap:12px; z-index:20; }
 .bar-total { flex:1; font-size:18px; font-weight:700; color:#B8860B; }
 .bar-btn { padding:12px 24px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; border-radius:16px; font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap; }
 .bar-btn:active { opacity:.85; }

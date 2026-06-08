@@ -1,4 +1,39 @@
-.placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
-.ph-icon { font-size:48px; margin-bottom:12px; }
-.ph-text { font-size:18px; color:#333; font-weight:600; }
-.ph-desc { font-size:13px; color:#999; margin-top:4px; }
+.header { padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; }
+.header-title { font-size:18px; font-weight:700; }
+
+/* ── 分类标签 ── */
+.tabs { display:flex; background:#fff; padding:8px 0; border-bottom:1px solid #f0f0f0; }
+.tab-item { flex:1; text-align:center; padding:8px 0; font-size:14px; color:#666; border-radius:16px; margin:0 4px; transition:all .2s; }
+.tab-item.active { background:#5D8A6B; color:#fff; font-weight:600; }
+
+/* ── 商品列表 ── */
+.product-list { padding:12px 0; }
+
+/* ── 商品卡片 ── */
+.product-card { display:flex; align-items:flex-start; padding:14px; background:#fff; border-radius:16px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.product-icon { font-size:32px; width:48px; height:48px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-right:12px; }
+.product-body { flex:1; min-width:0; }
+.product-top { display:flex; align-items:center; margin-bottom:4px; }
+.product-name { font-size:15px; font-weight:600; color:#333; margin-right:8px; }
+.product-category { font-size:10px; color:#5D8A6B; background:#f0f7f2; padding:2px 8px; border-radius:8px; }
+.product-price { font-size:13px; color:#e53935; font-weight:600; display:block; margin-bottom:8px; }
+.product-bottom { display:flex; align-items:center; justify-content:space-between; }
+
+/* ── 库存调整区 ── */
+.stock-area { display:flex; align-items:center; gap:6px; }
+.stock-btn { width:24px; height:24px; border-radius:12px; background:#f5f5f5; border:1px solid #e0e0e0; font-size:16px; line-height:22px; text-align:center; color:#333; }
+.stock-btn:active { background:#e8e8e8; }
+.stock-num { font-size:12px; color:#666; min-width:50px; text-align:center; }
+
+/* ── 上下架开关 ── */
+.switch { position:relative; width:44px; height:24px; border-radius:12px; transition:background .2s; flex-shrink:0; }
+.switch.on { background:#5D8A6B; }
+.switch.off { background:#ddd; }
+.switch-knob { position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:10px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.2); transition:transform .2s; }
+.switch.on .switch-knob { transform:translateX(20px); }
+.switch.off .switch-knob { transform:translateX(0); }
+
+/* ── 空状态 ── */
+.empty { display:flex; flex-direction:column; align-items:center; padding:60px 0; }
+.empty-icon { font-size:40px; margin-bottom:8px; }
+.empty-text { font-size:13px; color:#ccc; }

@@ -9,7 +9,7 @@ page { background:#f5f7fa; margin:0; padding:0; }
 .tab.active::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:24px; height:3px; background:#5D8A6B; border-radius:2px; }
 
 /* ── Order Card ── */
-.order-card { background:#fff; padding:16px; margin:0 0 10px; }
+.order-card { background:#fff; padding:16px 0; margin:0 0 10px; }
 .order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .order-room { font-size:16px; font-weight:600; }
 .order-header-right { display:flex; align-items:center; gap:4px; }
@@ -66,6 +66,14 @@ page { background:#f5f7fa; margin:0; padding:0; }
 .ls-line.active { background:#5D8A6B; }
 .ls-estimated { font-size:11px; color:#999; margin-top:4px; display:block; }
 .logistics-btn { font-size:12px; color:#5D8A6B; background:none; border:none; font-weight:500; padding:2px 6px; }
+
+/* ── Shop Items ── */
+.shop-items { border-top:1px solid #f0f0f0; padding-top:8px; margin-bottom:8px; }
+.shop-item { display:flex; align-items:center; padding:6px 0; }
+.si-name { flex:1; font-size:13px; color:#333; }
+.si-qty { font-size:12px; color:#999; margin:0 8px; }
+.si-price { font-size:13px; color:#B8860B; font-weight:500; }
+.order-payment { font-size:12px; color:#999; margin-top:4px; display:block; }
 
 /* ── Empty ── */
 .empty { text-align:center; padding:60px 20px; color:#999; }

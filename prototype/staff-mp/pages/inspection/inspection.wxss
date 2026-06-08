@@ -1,4 +1,24 @@
-.placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
-.ph-icon { font-size:48px; margin-bottom:12px; }
-.ph-text { font-size:18px; color:#333; font-weight:600; }
-.ph-desc { font-size:13px; color:#999; margin-top:4px; }
+.header { padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; }
+.header-title { font-size:18px; font-weight:700; }
+.header-meta { margin-top:2px; }
+.header-date { font-size:12px; color:#999; }
+
+.progress-bar-wrap { padding:12px 0; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; align-items:center; gap:10px; }
+.progress-bar { flex:1; height:6px; background:#e8e8e8; border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; background:#5D8A6B; border-radius:3px; transition:width .2s; }
+.progress-text { font-size:12px; color:#5D8A6B; white-space:nowrap; }
+
+.inspect-section { padding:12px 0; }
+.inspect-section-title { font-size:14px; font-weight:600; color:#666; display:block; margin-bottom:8px; padding-left:2px; }
+.inspect-card { background:#fff; border-radius:16px; padding:4px 0; margin-bottom:8px; }
+.inspect-item { display:flex; align-items:center; padding:10px 14px; gap:12px; }
+.check-circle { width:22px; height:22px; border-radius:50%; border:2px solid #ccc; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.check-circle.checked { background:#5D8A6B; border-color:#5D8A6B; }
+.check-mark { color:#fff; font-size:13px; font-weight:700; }
+.inspect-info { flex:1; display:flex; align-items:center; justify-content:space-between; }
+.inspect-name { font-size:15px; }
+.inspect-status { font-size:12px; color:#999; }
+
+.submit-wrap { padding:16px 0; }
+.submit-btn { width:100%; padding:14px; border-radius:16px; border:none; background:#5D8A6B; color:#fff; font-size:16px; font-weight:600; text-align:center; }
+.submit-btn::after { border:none; }

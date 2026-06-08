@@ -1,4 +1,27 @@
-.placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
-.ph-icon { font-size:48px; margin-bottom:12px; }
-.ph-text { font-size:18px; color:#333; font-weight:600; }
-.ph-desc { font-size:13px; color:#999; margin-top:4px; }
+.page { min-height:100vh; background:#f5f7fa; padding-bottom:20px; }
+
+/* ── Week Selector ── */
+.week-card { margin:16px 0; padding:20px 16px; background:#fff; border-radius:16px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.week-label { font-size:12px; color:#999; display:block; }
+.week-range { font-size:16px; font-weight:600; color:#333; margin-top:4px; display:block; }
+
+/* ── Table Header ── */
+.table-header { display:flex; align-items:center; padding:0; margin-bottom:8px; }
+.table-header text { font-size:12px; color:#999; font-weight:500; }
+.col-date { width:100px; flex-shrink:0; }
+.col-shift { width:56px; flex-shrink:0; }
+.col-time { flex:1; min-width:0; }
+.col-staff { width:64px; flex-shrink:0; text-align:right; }
+
+/* ── Schedule List ── */
+.schedule-list { padding:0; }
+.schedule-item { display:flex; align-items:center; padding:14px 16px; background:#fff; border-radius:16px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.schedule-item .col-date,
+.schedule-item .col-shift,
+.schedule-item .col-time,
+.schedule-item .col-staff { font-size:14px; color:#333; }
+.schedule-item .col-staff { font-weight:500; color:#5D8A6B; }
+
+/* ── States ── */
+.loading, .empty { text-align:center; padding:48px 0; }
+.loading-text, .empty-text { font-size:13px; color:#ccc; }

@@ -1,6 +1,6 @@
-.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.header { padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; }
 .header-title { font-size:18px; font-weight:700; }
-.task-section { padding:12px 16px; }
+.task-section { padding:12px 0; }
 .task-section-title { font-size:14px; font-weight:600; color:#666; display:block; margin-bottom:8px; }
 .task-card { background:#fff; border-radius:16px; padding:14px; margin-bottom:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
 .task-card.urgent { border-left:3px solid #e53935; }

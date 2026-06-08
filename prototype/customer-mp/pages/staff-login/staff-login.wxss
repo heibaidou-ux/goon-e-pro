@@ -1,4 +1,4 @@
-.page { padding: 40px 28px; min-height: 100vh; }
+.page { padding: 40px 0; min-height: 100vh; }
 .logo { text-align: center; margin-bottom: 32px; }
 .logo-icon { font-size: 48px; }
 .logo-name { font-size: 20px; font-weight: 700; color: #1a365d; margin-top: 8px; }

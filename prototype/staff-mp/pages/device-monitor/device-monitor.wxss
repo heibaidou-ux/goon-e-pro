@@ -1,9 +1,9 @@
-.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+.header { padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
 .header-title { font-size:18px; font-weight:700; }
 .header-stats { font-size:12px; color:#666; }
-.picker-bar { padding:10px 16px; background:#f9f9f9; font-size:14px; }
-.device-list { padding:12px 16px; }
-.device-item { display:flex; align-items:center; padding:12px; background:#fff; border-radius:8px; margin-bottom:6px; }
+.picker-bar { padding:10px 0; background:#f9f9f9; font-size:14px; }
+.device-list { padding:12px 0; }
+.device-item { display:flex; align-items:center; padding:12px; background:#fff; border-radius:16px; margin-bottom:6px; }
 .device-icon { font-size:20px; width:32px; }
 .device-info { flex:1; }
 .device-name { font-size:14px; font-weight:500; display:block; }
