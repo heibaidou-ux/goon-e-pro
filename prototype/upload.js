@@ -75,7 +75,7 @@ async function main() {
       const result = await ci.preview({
         project,
         desc: config.desc,
-        setting: { es6: true, minify: true },
+        setting: { es6: true, es7: true, minify: true },
         qrcodeFormat: 'image',
         qrcodeOutputDest: path.join(projectRoot, `preview-${projectName}.jpg`),
       })
@@ -88,7 +88,7 @@ async function main() {
         project,
         version,
         desc: config.desc,
-        setting: { es6: true, minify: true },
+        setting: { es6: true, es7: true, minify: true },
         onProgressUpdate: console.log,
       })
 

@@ -14,25 +14,25 @@ Page({
     // 第一条：从storage恢复余额显隐状态
     try {
       var v = wx.getStorageSync('balance_visible')
-      if (v !== '') this.data.balanceVisible = v
+      if (v !== '') { this.data.balanceVisible = v; this.setData({ balanceVisible: v }) }
     } catch(e) {}
 
     var self = this
-    var user = API.getCurrentUser()
-    if (user) {
-      var levels = { Normal: { label:'普通会员', icon:'👛' }, Silver: { label:'银卡会员', icon:'💰' }, Gold: { label:'金牌会员', icon:'💎' }, Diamond: { label:'钻石会员', icon:'💳' } }
-      var lv = levels[user.memberLevel] || levels.Gold
-      self.setData({
-        userName: user.name || user.nickname || user.phone || '会员',
-        levelLabel: lv.label,
-        balanceIcon: lv.icon,
-        totalSpent: user.totalSpent || 0,
-        visitCount: user.visitCount || 0,
-        points: user.totalSpent || 0
-      })
-    }
-    API.getBalance().then(function(b) {
-      self.setData({ balance: b || 0 })
+    Promise.all([API.getCurrentUser(), API.getBalance()]).then(function(results) {
+      var user = results[0], balance = results[1] || 0
+      if (user) {
+        var levels = { Normal: { label:'普通会员', icon:'👛' }, Silver: { label:'银卡会员', icon:'💰' }, Gold: { label:'金牌会员', icon:'💎' }, Diamond: { label:'钻石会员', icon:'💳' } }
+        var lv = levels[user.memberLevel] || levels.Gold
+        self.setData({
+          userName: user.name || user.nickname || user.phone || '会员',
+          levelLabel: lv.label,
+          balanceIcon: lv.icon,
+          totalSpent: user.totalSpent || 0,
+          visitCount: user.visitCount || 0,
+          points: user.totalSpent || 0
+        })
+      }
+      self.setData({ balance: balance })
       self.updateBalanceDisplay()
     })
   },
