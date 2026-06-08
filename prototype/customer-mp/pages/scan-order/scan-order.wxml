@@ -1,23 +1,78 @@
 <view class="page">
-  <view class="room-banner">🏠 {{roomName}} · 扫码加购</view>
+  <!-- Room banner -->
+  <view class="room-banner">🏠 {{roomName}} · 扫码加购 挂入房间账单</view>
+
+  <!-- Category tabs -->
   <view class="cat-tabs">
     <view class="cat-tab {{currentCat == '' ? 'active' : ''}}" bindtap="switchCat" data-cat="">全部</view>
-    <view class="cat-tab {{currentCat == 'Tea' ? 'active' : ''}}" bindtap="switchCat" data-cat="Tea">茶叶</view>
-    <view class="cat-tab {{currentCat == 'Snack' ? 'active' : ''}}" bindtap="switchCat" data-cat="Snack">茶点</view>
+    <view class="cat-tab {{currentCat == 'Tea' ? 'active' : ''}}" bindtap="switchCat" data-cat="Tea">🍵 茶叶</view>
+    <view class="cat-tab {{currentCat == 'Snack' ? 'active' : ''}}" bindtap="switchCat" data-cat="Snack">🍪 茶点</view>
+    <view class="cat-tab {{currentCat == 'Ware' ? 'active' : ''}}" bindtap="switchCat" data-cat="Ware">🏺 茶具</view>
   </view>
+
+  <!-- Product list -->
   <view class="product-list">
-    <view class="product-card" wx:for="{{filteredProducts}}" wx:key="productId">
-      <text class="product-name">{{item.name}}</text>
-      <text class="product-price">¥{{item.price}}</text>
-      <view class="qty-ctrl">
-        <view class="qty-btn" bindtap="decQty" data-id="{{item.productId}}">-</view>
-        <text>{{item._qty || 0}}</text>
-        <view class="qty-btn" bindtap="incQty" data-id="{{item.productId}}">+</view>
+    <view class="product-card" wx:for="{{filteredProducts}}" wx:key="productId" wx:for-item="item">
+      <view class="product-img">{{item.image || '📦'}}</view>
+      <view class="product-body">
+        <text class="product-name">{{item.name}}</text>
+        <text class="product-desc" wx:if="{{item.desc}}">{{item.desc}}</text>
+        <view class="product-footer">
+          <text class="product-price">¥{{item.price}} <text class="unit">/份</text></text>
+          <view class="qty-ctrl">
+            <view class="qty-btn {{item._qty == 0 ? 'disabled' : ''}}" bindtap="decQty" data-id="{{item.productId}}">−</view>
+            <text class="qty-num">{{item._qty || 0}}</text>
+            <view class="qty-btn" bindtap="incQty" data-id="{{item.productId}}">+</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- Empty state -->
+    <view class="empty-state" wx:if="{{filteredProducts.length == 0}}">
+      <text class="empty-text">暂无商品</text>
+    </view>
+  </view>
+
+  <!-- Bottom bar -->
+  <view class="bottom-bar" wx:if="{{total > 0}}">
+    <view class="bar-info">
+      <text class="bar-count">已选 {{cartCount}} 件</text>
+      <text class="bar-total">¥{{total}}</text>
+    </view>
+    <button class="bar-btn" bindtap="showConfirm">加入账单</button>
+  </view>
+
+  <!-- Confirm dialog -->
+  <view class="overlay {{showConfirm ? '' : 'hidden'}}" bindtap="hideConfirm" data-overlay="1">
+    <view class="action-sheet" catchtap="preventBubble">
+      <text class="sheet-title">确认加入房间账单</text>
+      <view class="sheet-items">
+        <view class="sheet-item" wx:for="{{cartItems}}" wx:key="productId">
+          <text class="sheet-item-name">{{item.name}}</text>
+          <text class="sheet-item-qty">×{{item._qty}}</text>
+          <text class="sheet-item-price">¥{{(item._qty * item.price).toFixed(2)}}</text>
+        </view>
+      </view>
+      <view class="sheet-total">
+        <text class="sheet-total-label">合计（挂账）</text>
+        <text class="sheet-total-value">¥{{total}}</text>
+      </view>
+      <text class="sheet-hint">💡 订单金额将挂入房间账单，离店时统一结算</text>
+      <view class="sheet-btns">
+        <button class="sheet-btn-cancel" bindtap="hideConfirm">取消</button>
+        <button class="sheet-btn-ok" bindtap="submitOrder">✅ 确认加入账单</button>
       </view>
     </view>
   </view>
-  <view class="bottom-bar" wx:if="{{total > 0}}">
-    <text class="bar-total">¥{{total}}</text>
-    <button class="bar-btn" bindtap="submitOrder">加入账单</button>
+
+  <!-- Success overlay -->
+  <view class="overlay {{showSuccess ? '' : 'hidden'}}" bindtap="hideSuccess" data-overlay="1">
+    <view class="success-box" catchtap="preventBubble">
+      <text class="success-icon">✅</text>
+      <text class="success-title">点单成功！</text>
+      <text class="success-desc">{{successMsg}}</text>
+      <button class="success-btn" bindtap="continueOrder">继续点单</button>
+      <button class="success-btn outline" bindtap="goToBill">查看房间账单</button>
+    </view>
   </view>
 </view>

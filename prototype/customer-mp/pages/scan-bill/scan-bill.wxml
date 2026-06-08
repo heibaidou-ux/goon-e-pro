@@ -1,29 +1,77 @@
 <view class="page">
-  <view class="room-header">
-    <text class="room-name-text">🏠 {{billData.roomName}}</text>
-  </view>
-  <view class="summary-card">
-    <view class="summary-row"><text class="label">房费</text><text class="value">¥{{billData.roomCharge}}</text></view>
-    <view class="summary-row"><text class="label">加购</text><text class="value scan">¥{{billData.scanTotal}}</text></view>
-    <view class="summary-divider"></view>
-    <view class="summary-row total"><text class="label">待结算</text><text class="value">¥{{billData.pendingPayment}}</text></view>
+  <!-- Loading -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载账单中...</text>
   </view>
 
-  <text class="section-title">加购明细</text>
-  <view class="order-card" wx:for="{{billData.orders}}" wx:key="orderId">
-    <view class="order-time">{{item.time}}</view>
-    <view class="order-status {{item.statusClass}}">{{item.status}}</view>
-    <view class="order-items">
-      <view class="order-item" wx:for="{{item.items}}" wx:key="*this">
-        <text>{{item.name}} ×{{item.qty}}</text>
-        <text>¥{{item.subtotal}}</text>
+  <!-- Error -->
+  <view class="empty-state" wx:elif="{{error}}">
+    <text class="empty-icon">⚠️</text>
+    <text class="empty-text">{{errorMsg}}</text>
+    <button class="bar-btn" style="margin-top:16px;" bindtap="loadBill">重试</button>
+  </view>
+
+  <!-- Content -->
+  <block wx:else>
+    <!-- Room header -->
+    <view class="room-header">
+      <text class="room-name-text">🏠 {{billData.roomName}}</text>
+      <text class="room-order-id" wx:if="{{billData.activeOrderId}}">房间订单：{{billData.activeOrderId}}</text>
+    </view>
+
+    <!-- Summary card -->
+    <view class="summary-card">
+      <view class="summary-row"><text class="label">🏠 房费</text><text class="value">¥{{billData.roomCharge}}</text></view>
+      <view class="summary-row"><text class="label">🛒 扫码加购</text><text class="value scan">¥{{billData.scanTotal}}</text></view>
+      <view class="summary-divider"></view>
+      <view class="summary-row total"><text class="label">待结算</text><text class="value">¥{{billData.pendingPayment}}</text></view>
+    </view>
+
+    <!-- Order list -->
+    <text class="section-title">加购明细</text>
+    <view class="order-card" wx:for="{{billData.orders}}" wx:key="orderId" wx:for-item="item">
+      <text class="order-time">{{item.time}}</text>
+      <text class="order-status {{item.statusClass}}">{{item.status}}</text>
+      <view class="order-items">
+        <view class="order-item" wx:for="{{item.items}}" wx:for-item="sub">
+          <text>{{sub.name}} ×{{sub.qty}}</text>
+          <text>¥{{sub.subtotal}}</text>
+        </view>
+      </view>
+      <text class="order-total">¥{{item.totalAmount}}</text>
+      <button class="order-cancel" wx:if="{{item.canCancel}}" bindtap="cancelOrder" data-id="{{item.orderId}}">撤销</button>
+    </view>
+    <view class="empty-state" wx:if="{{billData.orders.length == 0}}">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无加购记录</text>
+    </view>
+  </block>
+
+  <!-- Bottom bar -->
+  <view class="bottom-bar" wx:if="{{!loading && !error && billData.orders.length > 0}}">
+    <text class="bar-total">¥{{billData.pendingPayment}}</text>
+    <button class="bar-btn" bindtap="showSettle">🧹 结算</button>
+  </view>
+
+  <!-- Settle dialog -->
+  <view class="settle-overlay {{showSettleSheet ? '' : 'hidden'}}" bindtap="hideSettle" data-overlay="1">
+    <view class="settle-sheet" catchtap="preventBubble">
+      <text class="settle-title">挂账结算</text>
+      <view class="settle-amount">
+        <text class="settle-amount-label">待结算金额</text>
+        <text class="settle-amount-value">¥{{billData.pendingPayment}}</text>
+      </view>
+      <view class="settle-option">
+        <text class="settle-option-label">支付方式</text>
+        <picker class="settle-select" value="{{settlePaymentIndex}}" range="{{settlePaymentList}}" bindchange="onSettlePaymentChange">
+          <text>{{settlePaymentList[settlePaymentIndex]}}</text>
+        </picker>
+      </view>
+      <view class="settle-btns">
+        <button class="settle-btn-cancel" bindtap="hideSettle">取消</button>
+        <button class="settle-btn-ok" bindtap="doSettle">✅ 确认结算</button>
       </view>
     </view>
-    <view class="order-total">¥{{item.totalAmount}}</view>
-    <view class="order-cancel" wx:if="{{item.canCancel}}" bindtap="cancelOrder" data-id="{{item.orderId}}">撤销</view>
-  </view>
-  <view class="bottom-bar">
-    <text class="bar-total">¥{{billData.pendingPayment}}</text>
-    <button class="bar-btn" bindtap="settleBill">结算</button>
   </view>
 </view>
