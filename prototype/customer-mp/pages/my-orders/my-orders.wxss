@@ -1,10 +1,14 @@
-﻿page { background:#f5f7fa; margin:0; padding:0; }
+page { background:#f5f7fa; margin:0; padding:0; }
 .phone { width:100%; min-height:100vh; background:#f5f7fa; display:flex; flex-direction:column; }
-.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+.page { flex:1; overflow-y:auto; padding-bottom:20px; }
+
+/* ── Tabs ── */
 .tab-bar { display:flex; background:#fff; border-bottom:1px solid #eee; position:sticky; top:0; z-index:10; }
 .tab { flex:1; text-align:center; padding:14px 0; font-size:14px; color:#999; position:relative; }
 .tab.active { color:#5D8A6B; font-weight:600; }
 .tab.active::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:24px; height:3px; background:#5D8A6B; border-radius:2px; }
+
+/* ── Order Card ── */
 .order-card { background:#fff; padding:16px; margin:0 0 10px; }
 .order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .order-room { font-size:16px; font-weight:600; }
@@ -13,20 +17,35 @@
 .status-booked { background:#f3e5f5; color:#9c27b0; }
 .status-completed { background:#f5f5f5; color:#999; }
 .order-time { font-size:13px; color:#666; margin-bottom:4px; display:block; }
-.order-price { font-size:14px; font-weight:600; color:#B8860B; margin-bottom:8px; display:block; }
+.order-price { font-size:14px; font-weight:600; color:#B8860B; margin-bottom:4px; display:block; }
+.order-remaining { font-size:12px; color:#00a870; font-weight:500; display:block; margin-bottom:8px; }
+
+/* ── Door Section ── */
 .door-section { background:#fffbf0; padding:12px; display:flex; align-items:center; justify-content:space-between; margin:10px 0; border-radius:8px; }
 .door-label { font-size:12px; color:#999; display:block; }
 .door-code { font-size:20px; font-weight:800; color:#333; letter-spacing:6px; display:block; }
 .door-hint { font-size:12px; color:#B8860B; }
+
+/* ── Device Grid ── */
+.device-grid { display:flex; gap:6px; padding:12px 0 0; border-top:1px solid #f0f0f0; margin-top:12px; }
+.device-item { flex:1; text-align:center; padding:8px 4px; border-radius:8px; background:#f9fafb; }
+.device-item:active { background:#e8f5e9; }
+.device-icon { font-size:20px; display:block; margin-bottom:2px; }
+.device-label { font-size:10px; color:#666; }
+
+/* ── Action Buttons ── */
 .big-actions { display:flex; gap:10px; margin-top:10px; }
 .big-action-btn { flex:1; padding:14px; border-radius:16px; font-size:15px; font-weight:600; text-align:center; }
 .big-action-btn.primary { background:#5D8A6B; color:#fff; border:none; }
 .big-action-btn.outline { background:#fff; color:#5D8A6B; border:1.5px solid #5D8A6B; }
 .big-action-btn.ghost { background:#f5f5f5; color:#666; border:none; }
+.big-action-btn.danger { background:#fff; color:#d54941; border:1.5px solid #d54941; }
+.cancel-note { font-size:11px; color:#999; margin-top:8px; display:block; }
+
+/* ── Logistics ── */
 .logistics-card { background:#f8f9fa; border-radius:16px; padding:12px; margin:10px 0; }
 .logistics-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
 .logistics-carrier { font-size:13px; font-weight:600; color:#333; }
-.carrier-icon { font-size:16px; margin-right:4px; }
 .logistics-tracking { font-size:12px; color:#666; display:block; }
 .tracking-num { color:#5D8A6B; }
 .logistics-status-row { display:flex; align-items:center; gap:6px; margin-top:6px; padding-top:6px; border-top:1px solid #eee; }
@@ -38,20 +57,19 @@
 .ls-step { flex:1; text-align:center; position:relative; }
 .ls-step-dot { width:8px; height:8px; border-radius:50%; display:inline-block; background:#ddd; }
 .ls-step-dot.active { background:#5D8A6B; }
-.ls-step-dot.current { background:#5D8A6B; box-shadow:0 0 0 3px rgba(0,82,217,.2); }
+.ls-step-dot.current { background:#5D8A6B; box-shadow:0 0 0 3px rgba(93,138,107,.2); }
 .ls-step-label { font-size:9px; color:#bbb; margin-top:2px; display:block; }
 .ls-step-label.active { color:#5D8A6B; font-weight:600; }
 .ls-line { position:absolute; top:4px; right:-50%; width:100%; height:2px; background:#ddd; }
 .ls-line.active { background:#5D8A6B; }
 .ls-estimated { font-size:11px; color:#999; margin-top:4px; display:block; }
 .logistics-btn { font-size:12px; color:#5D8A6B; background:none; border:none; font-weight:500; padding:2px 6px; }
+
+/* ── Empty ── */
 .empty { text-align:center; padding:60px 20px; color:#999; }
 .empty-icon { font-size:48px; display:block; margin-bottom:12px; }
-.bottom-nav { display:flex; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
-.nav-item { flex:1; text-align:center; padding:10px 0 6px; color:#999; }
-.nav-item .nav-icon { font-size:20px; display:block; }
-.nav-item .nav-label { font-size:10px; margin-top:2px; display:block; }
-.nav-item.active { color:#5D8A6B; }
+
+/* ── Logistics Modal ── */
 .lg-modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
 .lg-modal { background:#fff;border-radius:16px;width:340px;max-height:85vh;overflow-y:auto; }
 .lg-modal-header { display:flex;justify-content:space-between;align-items:center;padding:16px 16px 0; }
@@ -65,7 +83,7 @@
 .lg-tl-item:last-child { padding-bottom:0; }
 .lg-tl-dot { width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:2px;position:relative;z-index:1; }
 .lg-tl-dot.done { background:#5D8A6B; }
-.lg-tl-dot.current { background:#5D8A6B;box-shadow:0 0 0 4px rgba(0,82,217,.2); }
+.lg-tl-dot.current { background:#5D8A6B;box-shadow:0 0 0 4px rgba(93,138,107,.2); }
 .lg-tl-dot.pending { background:#ddd; }
 .lg-tl-line { position:absolute;left:5px;top:16px;width:2px;height:calc(100% - 4px);background:#eee; }
 .lg-tl-line.done { background:#5D8A6B; }
@@ -73,4 +91,25 @@
 .lg-tl-title { font-size:14px;color:#333;display:block; }
 .lg-tl-time { font-size:11px;color:#999;margin-top:2px;display:block; }
 
+/* ── Confirm/Cancel Modal ── */
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:16px;padding:24px;width:320px;text-align:center; }
+.modal-extend { width:340px; }
+.modal-title { font-size:16px;font-weight:600;margin-bottom:8px;color:#333; }
+.modal-desc { font-size:13px;color:#666;margin-bottom:16px;line-height:1.5; }
+.modal-buttons { display:flex;gap:10px;margin-top:16px; }
+.modal-btn { flex:1;padding:10px;border-radius:16px;font-size:14px;font-weight:600;text-align:center; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:#5D8A6B;color:#fff; }
+.modal-btn.danger { background:#d54941;color:#fff; }
+.modal-btn.disabled { opacity:.4; }
+.modal-btn:active { opacity:.8; }
 
+/* ── Extend Grid ── */
+.extend-grid { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px; }
+.extend-option { padding:10px 6px;border-radius:12px;border:1.5px solid #e5e5e5;background:#fff;text-align:center; }
+.extend-option.selected { background:#5D8A6B;color:#fff;border-color:#5D8A6B; }
+.extend-option:active { border-color:#5D8A6B; }
+.ext-time { font-size:12px;font-weight:600;display:block; }
+.ext-price { font-size:10px;display:block;margin-top:2px;opacity:.8; }
+.extend-option.selected .ext-price { color:#fff; }
