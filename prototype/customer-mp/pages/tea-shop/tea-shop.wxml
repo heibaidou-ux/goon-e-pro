@@ -74,14 +74,6 @@
     <button class="checkout-btn" bindtap="checkout">去结算</button>
   </view>
 
-  <!-- Bottom nav -->
-  <view class="bottom-nav">
-    <view class="nav-item" bindtap="goHome"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
-    <view class="nav-item" bindtap="goRoomList"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
-    <view class="nav-item active"><text class="nav-icon">🍵</text><text class="nav-label">茶品</text></view>
-    <view class="nav-item" bindtap="goOrders"><text class="nav-icon">📋</text><text class="nav-label">订单</text></view>
-    <view class="nav-item" bindtap="goMember"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
-  </view>
 </view>
 
 <!-- Product Detail Modal -->
