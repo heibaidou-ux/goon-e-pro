@@ -53,7 +53,7 @@ Page({
       if (pr._qty > 0) {
         t += pr._qty * pr.price
         count += pr._qty
-        items.push({ productId: pr.productId, name: pr.name, price: pr.price, _qty: pr._qty })
+        items.push({ productId: pr.productId, name: pr.name, price: pr.price, _qty: pr._qty, _subtotal: (pr._qty * pr.price).toFixed(2) })
       }
     }
     this.setData({ total: t.toFixed(2), cartCount: count, cartItems: items })

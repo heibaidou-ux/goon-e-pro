@@ -50,7 +50,7 @@
         <view class="sheet-item" wx:for="{{cartItems}}" wx:key="productId">
           <text class="sheet-item-name">{{item.name}}</text>
           <text class="sheet-item-qty">×{{item._qty}}</text>
-          <text class="sheet-item-price">¥{{(item._qty * item.price).toFixed(2)}}</text>
+          <text class="sheet-item-price">¥{{item._subtotal}}</text>
         </view>
       </view>
       <view class="sheet-total">

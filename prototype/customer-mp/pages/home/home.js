@@ -19,12 +19,15 @@ Page({
     showBillModal: false, showQrWarning: false, qrWarningText: '',
     loginMode: 'login', loginPhone: '138****8888', loginCode: '8888',
     regPhone: '', regName: '', regCode: '',
-    billItems: [], billTotal: 0,
-    pendingAction: null, isLoggedIn: false
+    billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false
   },
 
   onLoad: function() {
     var self = this
+    // 角色重定向
+    var role = API.getUserRole()
+    if (role === 'staff') { wx.reLaunch({ url: '/pages/staff-dashboard/staff-dashboard' }); return }
+    if (role === 'shareholder') { wx.reLaunch({ url: '/pages/investor-workbench/investor-workbench' }); return }
     try { var sys = wx.getSystemInfoSync(); self.setData({ topPadding: (sys.statusBarHeight || 44) + 44 }) } catch(e) {}
     self.loadData(); self.checkActiveOrder()
   },
@@ -36,12 +39,7 @@ Page({
     self.setData({ loading: true, errorMsg: '' })
     var colors = { MeetingRoom: '#e3f2fd', TeaRoom: '#e8f5e9', Exhibition: '#fff3e0', Workspace: '#f5f5f5' }
     var icons = { MeetingRoom: '💼', TeaRoom: '🍵', Exhibition: '🏛️', Workspace: '🔧' }
-    var visualMap = {
-      'T001': { icon: '🍃', bg: '#e8f5e9' }, 'T002': { icon: '🪵', bg: '#fce4ec' },
-      'T003': { icon: '🏔️', bg: '#fff3e0' }, 'T004': { icon: '🌿', bg: '#efebe9' },
-      'T005': { icon: '🏵️', bg: '#f1f8e9' }, 'T006': { icon: '🏔️', bg: '#efebe9' },
-      'T007': { icon: '🏺', bg: '#f3e5f5' }, 'T008': { icon: '🥃', bg: '#e0f7fa' }
-    }
+    var visualMap = { 'T001': { icon: '🍃', bg: '#e8f5e9' }, 'T002': { icon: '🪵', bg: '#fce4ec' }, 'T003': { icon: '🏔️', bg: '#fff3e0' }, 'T004': { icon: '🌿', bg: '#efebe9' }, 'T005': { icon: '🏵️', bg: '#f1f8e9' }, 'T006': { icon: '🏔️', bg: '#efebe9' }, 'T007': { icon: '🏺', bg: '#f3e5f5' }, 'T008': { icon: '🥃', bg: '#e0f7fa' } }
     Promise.all([API.getRooms(true), API.getProducts(), API.getCurrentUser(), API.getBalance()]).then(function(results) {
       var roomsData = results[0] || [], productsData = results[1] || [], user = results[2], balance = results[3] || 0
       var rooms = []
@@ -56,16 +54,11 @@ Page({
 
   checkActiveOrder: function() {
     var self = this
-    var rooms = self.data.rooms
     API.getUserOrders().then(function(orders) {
       var active = null
       for (var i = 0; i < orders.length; i++) { if (orders[i].status === 'InUse' || orders[i].status === 'Booked') { active = orders[i]; break } }
-      if (active) {
-        var roomId = active.roomId || ''
-        var roomName = active.roomName || '大茶室C'
-        if (!roomId && roomName && rooms.length > 0) { for (var j = 0; j < rooms.length; j++) { if (rooms[j].name === roomName) { roomId = rooms[j].roomId; break } } }
-        self.setData({ hasActiveOrder: true, activeOrder: { roomName: roomName, roomId: roomId, timeStr: (active.date||'')+' '+(active.time||'') } })
-      } else { self.setData({ hasActiveOrder: false }) }
+      if (active) { self.setData({ hasActiveOrder: true, activeOrder: { roomName: active.roomName || '大茶室C', roomId: active.roomId || '', timeStr: (active.date||'')+' '+(active.time||'') } }) }
+      else { self.setData({ hasActiveOrder: false }) }
     })
   },
 
@@ -74,11 +67,9 @@ Page({
   onCarouselTap: function(e) { var urls = ['', '/pages/member-center/member-center?action=topup', '/pages/room-list/room-list', '/pages/coupon-verify/coupon-verify']; var idx = e.currentTarget.dataset.index; if (idx >= 0 && idx < urls.length && urls[idx]) wx.navigateTo({ url: urls[idx] }) },
 
   handleBalanceClick: function() { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'profile', showLoginModal: true }); return } wx.navigateTo({ url: '/pages/member-center/member-center' }) },
-  toggleBalanceVis: function() { var nv=!this.data.balanceVisible;this.setData({balanceVisible:nv,balanceDisplay:nv?"¥"+this.data.balance:"****"});try{wx.setStorageSync("balance_visible",nv)}catch(e){} },
   handleCouponClick: function() { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'coupon', showLoginModal: true }); return } wx.navigateTo({ url: '/pages/my-coupons/my-coupons' }) },
   goProfile: function() { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'profile', showLoginModal: true }); return } wx.navigateTo({ url: '/pages/member-center/member-center' }) },
   goRoom: function(e) { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'room-'+e.currentTarget.dataset.roomid, showLoginModal: true }); return } wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId='+e.currentTarget.dataset.roomid }) },
-  showProductDetail: function(e) { wx.showModal({ title: e.currentTarget.dataset.name, content: e.currentTarget.dataset.desc+'\n¥'+e.currentTarget.dataset.price }) },
   incQty: function(e) { var pid = e.currentTarget.dataset.pid, name = e.currentTarget.dataset.name, price = parseFloat(e.currentTarget.dataset.price), p = this.data.teaProducts; for (var i = 0; i < p.length; i++) { if (p[i].productId === pid) { p[i]._qty = (p[i]._qty||0)+1; break } } this.setData({ teaProducts: p }); API.addToCart({ productId: pid, name: name, price: price }).then(this.loadCartCount.bind(this)) },
   decQty: function(e) { var pid = e.currentTarget.dataset.pid, p = this.data.teaProducts; for (var i = 0; i < p.length; i++) { if (p[i].productId === pid && p[i]._qty > 0) { p[i]._qty--; break } } this.setData({ teaProducts: p }); API.removeFromCart(pid).then(this.loadCartCount.bind(this)) },
   loadCartCount: function() { var self = this; API.getCart().then(function(cart) { var c = 0; for (var i = 0; i < cart.length; i++) { c += cart[i].qty||1 } self.setData({ cartCount: c }) }) },
@@ -91,31 +82,14 @@ Page({
   goStaffLogin: function() { wx.navigateTo({ url: '/pages/staff-login/staff-login' }) },
   goCartPage: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?tab=cart' }) },
 
-  goSmartControl: function() {
-    var order = this.data.activeOrder
-    var roomId = order.roomId || '', roomName = order.roomName || ''
-    var rooms = this.data.rooms
-    if (!roomId && roomName && rooms.length > 0) { for (var i = 0; i < rooms.length; i++) { if (rooms[i].name === roomName) { roomId = rooms[i].roomId; break } } }
-    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) })
-  },
-
-  // 开门：根据当前订单验证时间并跳转智控（原型逻辑）
-  openDoor: function() {
-    var order = this.data.activeOrder
-    if (!order.roomId && !order.roomName) { wx.showToast({ title: '没有进行中的订单', icon: 'none' }); return }
-    var roomId = order.roomId || '', roomName = order.roomName || ''
-    var rooms = this.data.rooms
-    if (!roomId && roomName && rooms.length > 0) { for (var i = 0; i < rooms.length; i++) { if (rooms[i].name === roomName) { roomId = rooms[i].roomId; break } } }
-    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) })
-  },
-
-  callService: function() { wx.showToast({ title: '📞 已通知店员，请稍候', icon: 'success' })   },
+  goSmartControl: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) }) },
+  openDoor: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) }) },
+  callService: function() { wx.showToast({ title: '📞 已通知店员', icon: 'none' }) },
   callPhone: function() { wx.makePhoneCall({ phoneNumber: '020-8888-8888' }) },
   openNavigation: function() { wx.showToast({ title: '🗺 导航中...', icon: 'none' }) },
   showStoreSelector: function() { this.setData({ showStoreModal: true }) }, hideStoreSelector: function() { this.setData({ showStoreModal: false }) },
   showParkingInfo: function() { this.setData({ showParkingModal: true }) }, hideParkingInfo: function() { this.setData({ showParkingModal: false }) },
   toastComing: function() { wx.showToast({ title: '即将上线', icon: 'none' }) },
-  showRoomBill: function() { this.setData({ showBillModal: true }) }, hideRoomBill: function() { this.setData({ showBillModal: false }) },
   closeQrContext: function() { this.setData({ qrRoomId: '', qrRoomName: '', qrTableId: '' }) },
   goCartWithRoom: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?room_id='+this.data.qrRoomId }) },
   switchLoginTab: function(e) { this.setData({ loginMode: e.currentTarget.dataset.mode }) },
@@ -124,6 +98,6 @@ Page({
   getVerifyCode: function() { wx.showToast({ title: '验证码已发送: 8888', icon: 'none' }) },
   doLogin: function() { var self = this; wx.showLoading({ title: '登录中...' }); API.login(self.data.loginPhone, self.data.loginCode).then(function(u) { wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false }); wx.showToast({ title: '登录成功', icon: 'none' }); self.handlePendingAction() }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'登录失败', icon: 'none' }) }) },
   doRegister: function() { var self = this; wx.showLoading({ title: '注册中...' }); API.login(self.data.regPhone||'130****0000', '8888').then(function(u) { wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false }); wx.showToast({ title: '注册成功', icon: 'none' }); self.handlePendingAction() }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'注册失败', icon: 'none' }) }) },
-  handlePendingAction: function() { var a = this.data.pendingAction; if (!a) return; this.setData({ pendingAction: null }); if (a.indexOf('room-')===0) { wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId='+a.replace('room-','') }) } else if (a==='profile') { wx.navigateTo({ url: '/pages/member-center/member-center' }) } },
+  handlePendingAction: function() { var a = this.data.pendingAction; if (!a) return; this.setData({ pendingAction: null }); if (a.indexOf('room-')===0) { wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId='+a.replace('room-','') }) } },
   clearError: function() { this.setData({ errorMsg: '' }) }
 })

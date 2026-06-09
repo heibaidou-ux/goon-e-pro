@@ -1,1 +1,33 @@
-<view class="page"><view class="logo"><view class="logo-icon">🏢</view><view class="logo-name">高岸ERP</view><view class="logo-sub">店员工作台</view></view><view class="form"><view class="form-group"><text class="form-label">用户名</text><input class="form-input" placeholder="请输入用户名" value="{{username}}" bindinput="onUsername" /></view><view class="form-group"><text class="form-label">密码</text><input class="form-input" password="{{true}}" placeholder="请输入密码" value="{{password}}" bindinput="onPassword" /></view><button class="login-btn" disabled="{{!username || !password}}" bindtap="doLogin" loading="{{loading}}">登 录</button><view class="error-msg" hidden="{{!error}}">{{error}}</view><view class="hint">演示账号：任意用户名 + 密码 8888</view></view></view>
+<view class="login-fullscreen">
+  <view class="login-bg">
+    <view class="login-card">
+      <text class="login-card-title">高岸ERP</text>
+      <text class="login-card-sub">统一工作平台</text>
+
+      <!-- 角色切换 Tab -->
+      <view class="role-tabs">
+        <text class="role-tab {{selectedRole=='staff'?'active':''}}" bindtap="switchRole" data-role="staff">👤 店员</text>
+        <text class="role-tab {{selectedRole=='shareholder'?'active':''}}" bindtap="switchRole" data-role="shareholder">💰 股东</text>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">{{selectedRole=='staff'?'员工账号':'股东账号'}}</text>
+        <input class="form-input" placeholder="请输入账号" value="{{account}}" bindinput="onAccount" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">密码</text>
+        <input class="form-input" password="{{true}}" placeholder="请输入密码" value="{{password}}" bindinput="onPassword" />
+      </view>
+
+      <view class="form-btn" bindtap="doLogin" loading="{{loading}}">登 录</view>
+      <text class="error-text" wx:if="{{error}}">{{error}}</text>
+
+      <view class="login-hint">
+        <text wx:if="{{selectedRole=='staff'}}">演示：admin / 8888</text>
+        <text wx:else>演示：shareholder / 8888</text>
+      </view>
+
+      <text class="back-link" bindtap="goHome">← 返回客人首页</text>
+    </view>
+  </view>
+</view>
