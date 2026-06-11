@@ -29,7 +29,7 @@ Page({
     roomId: '', roomName: '房间',
     countdown: '--:--', endTime: '--:--', orderSlot: '', orderStart: '',
     balance: 0,
-    devKeys: [],
+    devKeys: [], acModeLabel: '',
     acDevice: null, curtainDevices: [], bgmDevice: null,
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
@@ -85,7 +85,7 @@ Page({
 
       self.setData({
         devKeys: devKeys,
-        acDevice: ac, curtainDevices: curtains, bgmDevice: bgm
+        acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '', curtainDevices: curtains, bgmDevice: bgm
       })
     })
   },
@@ -138,11 +138,19 @@ Page({
     API.controlDevice(deviceId, cmd).catch(function() {})
   },
 
-  // ── 空调 ──
+  // ── 空调（制冷/制热/送风/关闭） ──
   toggleAC: function(e) {
     var id = e.currentTarget.dataset.id, ac = this.data.acDevice
-    if (!ac) return; ac.mode = ac.mode === 'cool' ? 'off' : 'cool'
-    this.setData({ acDevice: ac }); API.controlDevice(id, { mode: ac.mode }).catch(function(){})
+    if (!ac) return
+    ac.mode = ac.mode === 'off' ? 'cool' : 'off'
+    this.setData({ acDevice: ac, acModeLabel: this._acModeLabel(ac.mode) })
+    API.controlDevice(id, { mode: ac.mode }).catch(function(){})
+  },
+  setACMode: function(e) {
+    var id = e.currentTarget.dataset.id, mode = e.currentTarget.dataset.mode, ac = this.data.acDevice
+    if (!ac) return; ac.mode = mode
+    this.setData({ acDevice: ac, acModeLabel: this._acModeLabel(mode) })
+    API.controlDevice(id, { mode: mode }).catch(function(){})
   },
   acTempUp: function(e) {
     var id = e.currentTarget.dataset.id, ac = this.data.acDevice
@@ -153,6 +161,12 @@ Page({
     var id = e.currentTarget.dataset.id, ac = this.data.acDevice
     if (!ac) return; ac.temperature = Math.max(16, (ac.temperature || 24) - 1)
     this.setData({ acDevice: ac }); API.controlDevice(id, { temperature: ac.temperature }).catch(function(){})
+  },
+  _acModeLabel: function(mode) {
+    if (mode === 'cool') return '❄️ 制冷中'
+    if (mode === 'heat') return '🔥 制热中'
+    if (mode === 'fan') return '🌀 送风中'
+    return '已关闭'
   },
 
   // ── 窗帘 ──

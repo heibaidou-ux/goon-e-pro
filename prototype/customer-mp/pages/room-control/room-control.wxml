@@ -34,7 +34,7 @@
         <view class="ac-main">
           <view class="ac-temp-area">
             <text class="ac-temp-num">{{acDevice.temperature}}°</text>
-            <text class="ac-temp-status">{{acDevice.mode === 'cool' ? '制冷中' : '已关闭'}}</text>
+            <text class="ac-temp-status">{{acModeLabel}}</text>
           </view>
           <view class="ac-ctrl-area">
             <view class="ac-temp-ctrl">
@@ -42,8 +42,13 @@
               <text class="ac-val">{{acDevice.temperature}}°</text>
               <text class="ac-btn" bindtap="acTempUp" data-id="{{acDevice.deviceId}}">+</text>
             </view>
-            <view class="ac-power-btn {{acDevice.mode === 'cool' ? 'on' : ''}}" bindtap="toggleAC" data-id="{{acDevice.deviceId}}">
-              {{acDevice.mode === 'cool' ? '❄️ 关闭' : '❄️ 开启'}}
+            <view class="ac-mode-row">
+              <view class="ac-mode-btn {{acDevice.mode == 'cool' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="cool">❄️ 制冷</view>
+              <view class="ac-mode-btn {{acDevice.mode == 'heat' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="heat">🔥 制热</view>
+              <view class="ac-mode-btn {{acDevice.mode == 'fan' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="fan">🌀 送风</view>
+            </view>
+            <view class="ac-power-btn {{acDevice.mode != 'off' ? 'on' : ''}}" bindtap="toggleAC" data-id="{{acDevice.deviceId}}">
+              {{acDevice.mode != 'off' ? '⏻ 关闭空调' : '⏻ 开启空调'}}
             </view>
           </view>
         </view>
