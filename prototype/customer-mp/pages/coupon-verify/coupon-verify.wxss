@@ -79,10 +79,11 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .confirm-row .price.past { color:#ddd; }
 
 /* 底部确认条 */
-.booking-confirm-info { margin:12px 0; text-align:left; }
-.bci-row { display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid #f0f0f0; }
-.bci-label { color:#999; }
-.bci-value { font-weight:600; color:#333; text-align:right; max-width:60%; }
+.booking-confirm-info { margin:16px 0; text-align:left; }
+.bci-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; font-size:14px; border-bottom:1px solid #f0f0f0; gap:16px; }
+.bci-row:last-child { border-bottom:none; }
+.bci-label { color:#999; flex-shrink:0; font-size:13px; }
+.bci-value { font-weight:600; color:#333; text-align:right; font-size:14px; }
 
 /* 确认弹窗 */
 .confirm-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
