@@ -34,9 +34,8 @@
     <view class="actions-card">
       <view class="action-row" bindtap="goOrders"><text>📋 我的订单</text><text class="arrow">›</text></view>
       <view class="action-row" bindtap="goCoupons"><text>🎫 我的优惠券</text><text class="arrow">›</text></view>
-      <view class="action-row" bindtap="toastComing"><text>🎁 积分商城</text><text class="arrow">›</text></view>
       <view class="action-row" bindtap="showTopup"><text>💳 余额充值</text><text class="arrow">›</text></view>
-      <view class="action-row" bindtap="toastComing"><text>⚙ 账户设置</text><text class="arrow">›</text></view>
+      <view class="action-row" bindtap="showAccountSettings"><text>⚙ 账户设置</text><text class="arrow">›</text></view>
     </view>
 
     <!-- 会员权益 -->
@@ -68,9 +67,32 @@
       <text class="modal-label">选择支付方式</text>
       <view class="payment-option {{selectedPayment=='WeChat'?'active':''}}" bindtap="selectPayment" data-payment="WeChat">💚 微信支付</view>
       <view class="payment-option {{selectedPayment=='AliPay'?'active':''}}" bindtap="selectPayment" data-payment="AliPay">💙 支付宝</view>
+      <view class="payment-option {{selectedPayment=='BankCard'?'active':''}}" bindtap="selectPayment" data-payment="BankCard">🏦 银行卡</view>
+      <view class="payment-option {{selectedPayment=='Cash'?'active':''}}" bindtap="selectPayment" data-payment="Cash">💵 现金（到店付）</view>
       <view class="modal-buttons">
         <button class="modal-btn cancel" bindtap="hideRecharge">取消</button>
         <button class="modal-btn confirm" bindtap="confirmRecharge">确认充值</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 账户设置弹窗 -->
+  <view class="modal-overlay" wx:if="{{showSettingsModal}}" bindtap="hideAccountSettings">
+    <view class="modal settings-modal" catchtap="preventBubble">
+      <text class="modal-h3">⚙ 账户设置</text>
+      <view class="settings-section">
+        <text class="settings-section-title">个人信息</text>
+        <view class="settings-row"><text class="settings-label">昵称</text><input class="settings-input" value="{{userName}}" bindinput="onNameInput" placeholder="请输入昵称" /></view>
+        <view class="settings-row"><text class="settings-label">手机号</text><text class="settings-value">{{userPhone}}</text></view>
+      </view>
+      <view class="settings-section">
+        <text class="settings-section-title">安全设置</text>
+        <view class="settings-row" bindtap="changePassword"><text class="settings-label">修改密码</text><text class="arrow">›</text></view>
+        <view class="settings-row" bindtap="clearAccount"><text class="settings-label danger-text">清除本地数据</text><text class="arrow">›</text></view>
+      </view>
+      <view class="modal-buttons">
+        <button class="modal-btn cancel" bindtap="hideAccountSettings">取消</button>
+        <button class="modal-btn confirm" bindtap="saveAccountSettings">保存设置</button>
       </view>
     </view>
   </view>

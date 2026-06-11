@@ -116,6 +116,7 @@
         <text class="form-switch" bindtap="switchLoginTab" data-mode="login">已有账号？立即登录 →</text>
       </view>
       <text class="login-hint">演示环境，任意手机号即可登录</text>
+      <text class="form-switch staff-login-link" bindtap="goStaffLogin">🔐 员工/管理员登录 →</text>
     </view>
   </view>
 </view>

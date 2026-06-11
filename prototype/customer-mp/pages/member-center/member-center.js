@@ -5,9 +5,11 @@ Page({
     userName: '会员', levelLabel: '金牌会员', balanceIcon: '💎',
     balance: 0, balanceDisplay: '¥0', balanceVisible: true,
     totalSpent: 0, visitCount: 0, points: 0,
-    showRechargeModal: false,
+    showRechargeModal: false, showSettingsModal: false,
     selectedAmount: 100,
-    selectedPayment: 'WeChat'
+    selectedPayment: 'WeChat',
+    userPhone: '',
+    editName: ''
   },
 
   onShow: function() {
@@ -15,6 +17,14 @@ Page({
     try {
       var v = wx.getStorageSync('balance_visible')
       if (v !== '') { this.data.balanceVisible = v; this.setData({ balanceVisible: v }) }
+    } catch(e) {}
+    // 同步读取用户信息，避免异步延迟导致显示"会员"
+    try {
+      var cachedUser = wx.getStorageSync('mp_user')
+      if (cachedUser) {
+        var name = cachedUser.name || cachedUser.nickname || cachedUser.phone || '会员'
+        this.setData({ userName: name, userPhone: cachedUser.phone || '—', editName: name })
+      }
     } catch(e) {}
 
     var self = this
@@ -64,6 +74,49 @@ Page({
     this.setData({ balanceVisible: visible })
     this.updateBalanceDisplay()
     try { wx.setStorageSync('balance_visible', visible) } catch(e) {}
+  },
+
+  // ── 账户设置 ──
+  showAccountSettings: function() {
+    this.setData({ showSettingsModal: true, editName: this.data.userName })
+  },
+  hideAccountSettings: function() { this.setData({ showSettingsModal: false }) },
+  onNameInput: function(e) { this.setData({ editName: e.detail.value }) },
+
+  saveAccountSettings: function() {
+    var self = this
+    var newName = self.data.editName || self.data.userName
+    try {
+      var user = wx.getStorageSync('mp_user') || {}
+      user.name = newName
+      user.nickname = newName
+      wx.setStorageSync('mp_user', user)
+      self.setData({ userName: newName, showSettingsModal: false })
+      wx.showToast({ title: '已保存', icon: 'success' })
+    } catch(e) {
+      wx.showToast({ title: '保存失败', icon: 'none' })
+    }
+  },
+
+  changePassword: function() {
+    wx.showToast({ title: '请联系管理员重置密码', icon: 'none' })
+  },
+
+  clearAccount: function() {
+    var self = this
+    wx.showModal({
+      title: '清除本地数据',
+      content: '将清除本地缓存的订单、用户信息等数据，确认？',
+      success: function(res) {
+        if (res.confirm) {
+          try {
+            wx.clearStorageSync()
+            wx.showToast({ title: '已清除，请重新登录', icon: 'success' })
+            setTimeout(function() { API.logout(); wx.reLaunch({ url: '/pages/home/home' }) }, 1000)
+          } catch(e) { wx.showToast({ title: '清除失败', icon: 'none' }) }
+        }
+      }
+    })
   },
 
   goOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },

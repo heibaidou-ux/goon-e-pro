@@ -130,6 +130,7 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .form-btn { width:100%;padding:14px;border-radius:16px;border:none;background:linear-gradient(135deg,#5D8A6B,#7BA88E);color:#fff;font-size:16px;font-weight:600;text-align:center;margin-top:4px; }
 .form-switch { font-size:12px;color:#5D8A6B;text-align:center;display:block;margin-top:12px; }
 .login-hint { font-size:11px;color:#ccc;text-align:center;margin-top:12px;display:block; }
+.staff-login-link { margin-top:8px !important; font-size:12px !important; }
 
 /* 加载/错误 */
 .loading-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.8);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center; }
