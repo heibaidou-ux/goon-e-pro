@@ -29,7 +29,7 @@ Page({
     roomId: '', roomName: '房间',
     countdown: '--:--', endTime: '--:--', orderSlot: '', orderStart: '',
     balance: 0,
-    lightKeys: [], fanKeys: [],
+    devKeys: [],
     acDevice: null, curtainDevices: [], bgmDevice: null,
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
@@ -64,33 +64,27 @@ Page({
         else if (d.type === 'BGM') { bgm = d; stateMap[d.deviceId] = d.playing }
       }
 
-      // 构建灯光按键：灯全开 + 灯全关 + 各灯光设备
+      // 合并灯光和风扇按键，田字格排列（严格2列）
       var roomId = self.data.roomId
       var lightIds = LIGHT_DEVICE_IDS[roomId] || []
       var allLightsOn = lightIds.length > 0
       for (var j = 0; j < lightIds.length; j++) {
         if (!stateMap[lightIds[j]]) { allLightsOn = false; break }
       }
-      var lightKeys = [
+      var devKeys = [
         { key: 'light_all_on',  label: '灯全开', icon: '💡', type: 'virtual', active: allLightsOn },
         { key: 'light_all_off', label: '灯全关', icon: '🔌', type: 'virtual', active: false },
       ]
       for (var j = 0; j < lightIds.length; j++) {
-        lightKeys.push({ key: lightIds[j], label: LIGHT_LABELS[lightIds[j]] || lightIds[j], icon: LIGHT_ICONS[lightIds[j]] || '💡', type: 'Light', active: stateMap[lightIds[j]] || false })
+        devKeys.push({ key: lightIds[j], label: LIGHT_LABELS[lightIds[j]] || lightIds[j], icon: LIGHT_ICONS[lightIds[j]] || '💡', type: 'Light', active: stateMap[lightIds[j]] || false })
       }
-      // 奇数项时最后一项占整行
-      if (lightKeys.length % 2 === 1) lightKeys[lightKeys.length - 1].fullRow = true
-
-      // 构建风扇按键
       var fanIds = FAN_DEVICE_IDS[roomId] || []
-      var fanKeys = []
       for (var j = 0; j < fanIds.length; j++) {
-        fanKeys.push({ key: fanIds[j], label: FAN_LABELS[fanIds[j]] || fanIds[j], icon: FAN_ICONS[fanIds[j]] || '🌀', type: fanIds[j] === 'DEV011' ? 'ExhaustFan' : 'Fan', active: stateMap[fanIds[j]] || false })
+        devKeys.push({ key: fanIds[j], label: FAN_LABELS[fanIds[j]] || fanIds[j], icon: FAN_ICONS[fanIds[j]] || '🌀', type: fanIds[j] === 'DEV011' ? 'ExhaustFan' : 'Fan', active: stateMap[fanIds[j]] || false })
       }
-      if (fanKeys.length % 2 === 1) fanKeys[fanKeys.length - 1].fullRow = true
 
       self.setData({
-        lightKeys: lightKeys, fanKeys: fanKeys,
+        devKeys: devKeys,
         acDevice: ac, curtainDevices: curtains, bgmDevice: bgm
       })
     })
@@ -105,10 +99,8 @@ Page({
 
     // 设备开关
     var currentOn = false
-    var lights = this.data.lightKeys
-    for (var i = 0; i < lights.length; i++) { if (lights[i].key === key) { currentOn = lights[i].active; break } }
-    var fans = this.data.fanKeys
-    for (var i = 0; i < fans.length; i++) { if (fans[i].key === key) { currentOn = fans[i].active; break } }
+    var keys = this.data.devKeys
+    for (var i = 0; i < keys.length; i++) { if (keys[i].key === key) { currentOn = keys[i].active; break } }
     this._toggleDevice(key, type, !currentOn)
   },
 
@@ -116,13 +108,13 @@ Page({
     var self = this
     var lightIds = LIGHT_DEVICE_IDS[self.data.roomId] || []
     // UI立即更新
-    var keys = self.data.lightKeys
+    var keys = self.data.devKeys
     for (var i = 0; i < keys.length; i++) {
       if (keys[i].key === 'light_all_on') keys[i].active = on
       else if (keys[i].key === 'light_all_off') keys[i].active = false
       else if (keys[i].type === 'Light') keys[i].active = on
     }
-    self.setData({ lightKeys: keys })
+    self.setData({ devKeys: keys })
     wx.showLoading({ title: on ? '全开中...' : '全关中...' })
     var done = 0
     for (var i = 0; i < lightIds.length; i++) {
@@ -137,12 +129,9 @@ Page({
 
   _toggleDevice: function(deviceId, type, newState) {
     var self = this
-    // 更新UI
-    var lights = self.data.lightKeys
-    for (var i = 0; i < lights.length; i++) { if (lights[i].key === deviceId) { lights[i].active = newState; break } }
-    var fans = self.data.fanKeys
-    for (var i = 0; i < fans.length; i++) { if (fans[i].key === deviceId) { fans[i].active = newState; break } }
-    self.setData({ lightKeys: lights, fanKeys: fans })
+    var keys = self.data.devKeys
+    for (var i = 0; i < keys.length; i++) { if (keys[i].key === deviceId) { keys[i].active = newState; break } }
+    self.setData({ devKeys: keys })
     var cmd = {}
     if (type === 'Light') cmd = { brightness: newState ? 80 : 0 }
     else if (type === 'Fan' || type === 'ExhaustFan') cmd = { speed: newState ? 3 : 0 }

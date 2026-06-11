@@ -50,23 +50,10 @@
       </view>
     </view>
 
-    <!-- 灯光 -->
-    <view class="device-section" wx:if="{{lightKeys.length>0}}">
-      <text class="section-label">💡 灯光</text>
+    <!-- 设备按键（灯光+风扇） -->
+    <view class="device-section" wx:if="{{devKeys.length>0}}">
       <view class="dev-grid">
-        <view class="switch-key {{item.active ? 'on' : ''}} {{item.fullRow ? 'full-row' : ''}}" wx:for="{{lightKeys}}" wx:key="key" bindtap="onKeyTap" data-key="{{item.key}}" data-type="{{item.type}}">
-          <text class="key-icon">{{item.icon}}</text>
-          <text class="key-label">{{item.label}}</text>
-          <view class="key-indicator {{item.active ? 'on' : ''}}"></view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 风扇/换气扇 -->
-    <view class="device-section" wx:if="{{fanKeys.length>0}}">
-      <text class="section-label">🌀 风扇</text>
-      <view class="dev-grid">
-        <view class="switch-key {{item.active ? 'on' : ''}} {{item.fullRow ? 'full-row' : ''}}" wx:for="{{fanKeys}}" wx:key="key" bindtap="onKeyTap" data-key="{{item.key}}" data-type="{{item.type}}">
+        <view class="switch-key {{item.active ? 'on' : ''}}" wx:for="{{devKeys}}" wx:key="key" bindtap="onKeyTap" data-key="{{item.key}}" data-type="{{item.type}}">
           <text class="key-icon">{{item.icon}}</text>
           <text class="key-label">{{item.label}}</text>
           <view class="key-indicator {{item.active ? 'on' : ''}}"></view>
