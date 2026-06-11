@@ -27,15 +27,14 @@ page { background:#f0f2ef; margin:0; padding:0; }
 
 /* 2列网格 — 深灰按键+简笔画图标 */
 .dev-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.switch-key { background:#2a2a2a; border-radius:14px; padding:20px 10px; text-align:center; border:1.5px solid #3a3a3a; display:flex; flex-direction:column; align-items:center; gap:8px; transition:all .15s; }
+.switch-key { background:#2a2a2a; border-radius:14px; padding:16px 14px; border:1.5px solid #3a3a3a; display:flex; align-items:center; gap:12px; transition:all .15s; }
 .switch-key:active { transform:scale(.95); }
 .switch-key.on { border-color:#5D8A6B; background:#1a2a1a; }
-.key-icon { font-size:30px; display:block; color:#ddd; font-weight:300; line-height:1.2; }
+.key-icon { font-size:28px; display:block; color:#ddd; font-weight:300; line-height:1; flex-shrink:0; width:32px; text-align:center; }
 .switch-key.on .key-icon { color:#5D8A6B; }
-.key-label { font-size:13px; font-weight:500; color:#aaa; display:block; letter-spacing:1px; }
+.key-label { font-size:14px; font-weight:500; color:#aaa; display:block; letter-spacing:1px; flex:1; text-align:left; }
 .switch-key.on .key-label { color:#5D8A6B; }
-.key-indicator { width:6px; height:6px; border-radius:50%; background:#555; display:inline-block; flex-shrink:0; }
-.key-indicator.on { background:#5D8A6B; box-shadow:0 0 4px rgba(93,138,107,.4); }
+.key-indicator { width:6px; height:6px; border-radius:50%; background:#555; display:inline-block; flex-shrink:0; margin-left:auto; }
 
 /* 空调 — 与灯光按键统一深灰色 */
 .ac-card { background:#2a2a2a; border-radius:14px; padding:20px; border:1.5px solid #3a3a3a; }
@@ -64,7 +63,7 @@ page { background:#f0f2ef; margin:0; padding:0; }
 .curtain-end { font-size:10px; color:#666; white-space:nowrap; }
 
 /* 背景音乐 */
-.bgm-card { background:#1a1a1a; border-radius:14px; padding:14px; border:1px solid #333; }
+.bgm-card { background:#2a2a2a; border-radius:14px; padding:16px; border:1.5px solid #3a3a3a; }
 .bgm-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
 .bgm-icon { font-size:22px; }
 .bgm-status { flex:1; font-size:12px; font-weight:500; color:#aaa; letter-spacing:1px; }
