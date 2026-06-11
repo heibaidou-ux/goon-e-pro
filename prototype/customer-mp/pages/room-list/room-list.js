@@ -5,6 +5,8 @@ Page({
 
   onLoad: function() {
     var self = this
+    // 强制重置滚动位置，防止前页残影
+    wx.pageScrollTo({ scrollTop: 0, duration: 0 })
     // 原型内置4间房，优先展示
     var embedded = [
       { roomId:'RM001', name:'大会议室', type:'MeetingRoom', capacity:10, area:30, facilities:['投影','会议桌','K歌设备','落地窗'], pricePerHour:200 },

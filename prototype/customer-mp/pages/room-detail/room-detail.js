@@ -43,6 +43,7 @@ Page({
   },
 
   onLoad: function(e) {
+    wx.pageScrollTo({ scrollTop: 0, duration: 0 })
     var roomId = e.roomId || e.id || 'RM004'
     var room = null
     for (var i = 0; i < ROOMS_DATA.length; i++) { if (ROOMS_DATA[i].roomId === roomId) { room = ROOMS_DATA[i]; break } }
