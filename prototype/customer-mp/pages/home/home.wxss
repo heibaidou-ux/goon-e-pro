@@ -32,17 +32,17 @@ button::after { border:none; }
 .active-order-btn .btn-label { font-size:20px; line-height:1; display:block; }
 .active-order-btn.primary { background:#fff; color:#5D8A6B; }
 .active-order-btn.outline { background:rgba(255,255,255,.15); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
-.quick-grid { display:grid; grid-template-columns:repeat(4,1fr); padding:16px 0; background:#fff; margin-bottom:12px; }
-.quick-item { display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 2px; }
+.quick-grid { display:grid; grid-template-columns:repeat(4,1fr); padding:20px 0; background:#fff; margin-bottom:12px; }
+.quick-item { display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px 2px; }
 .quick-item:active { opacity:.7; }
-.quick-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff; position:relative; }
-.quick-icon.brand { background:linear-gradient(135deg,#1f5c2e,#4a7a56); }
-.quick-icon.balance { background:linear-gradient(135deg,#4d6666,#6d8282); width:auto; min-width:48px; flex-direction:row; gap:2px; padding:0 6px; height:48px; }
-.quick-icon.coupon { background:linear-gradient(135deg,#8a6500,#b8860b); }
-.quick-icon.profile { background:linear-gradient(135deg,#655a4a,#8B7D6B); }
-.balance-amt { font-size:16px; font-weight:700; }
-.balance-eye { font-size:10px; line-height:1; opacity:.8; padding:1px; }
-.quick-label { font-size:12px; color:#333; font-weight:500; }
+.quick-icon { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px; color:#fff; position:relative; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+.quick-icon.brand { background:linear-gradient(135deg,#1f5c2e,#5D8A6B); }
+.quick-icon.balance { background:linear-gradient(135deg,#4d6666,#7b9a9a); width:auto; min-width:56px; flex-direction:row; gap:2px; padding:0 8px; height:56px; }
+.quick-icon.coupon { background:linear-gradient(135deg,#8a6500,#c4941c); }
+.quick-icon.profile { background:linear-gradient(135deg,#655a4a,#9b8b7b); }
+.balance-amt { font-size:18px; font-weight:700; }
+.balance-eye { font-size:12px; line-height:1; opacity:.8; padding:1px; }
+.quick-label { font-size:13px; color:#333; font-weight:500; }
 .section { padding:0 0 12px; margin-bottom:12px; background:#fff; }
 .section-title { font-size:15px; font-weight:600; margin-bottom:12px; color:#1a1a1a; padding:16px 0 0; display:flex; justify-content:space-between; }
 .section-more { font-size:12px; color:#5D8A6B; }
