@@ -69,11 +69,11 @@
           <view class="duration-chip {{!isCustomMode && selectedDuration==240 ? 'selected' : ''}}" bindtap="pickDuration" data-dur="240">4小时</view>
           <view class="duration-chip {{!isCustomMode && selectedDuration==360 ? 'selected' : ''}}" bindtap="pickDuration" data-dur="360">6小时</view>
           <view class="duration-chip {{!isCustomMode && selectedDuration==480 ? 'selected' : ''}}" bindtap="pickDuration" data-dur="480">8小时</view>
-          <view class="duration-chip {{isCustomMode ? 'selected' : ''}}" bindtap="pickCustomDuration">自定义</view>
-        </view>
-        <view class="custom-hours-row" wx:if="{{isCustomMode}}">
-          <text class="ch-label">自定义</text>
-          <input class="custom-hours-input" type="text" value="{{customHours}}" bindinput="onCustomHoursInput" placeholder="输入小时数" />
+          <view class="duration-chip {{isCustomMode ? 'selected custom-input-chip' : ''}}" wx:if="{{!isCustomMode}}" bindtap="pickCustomDuration">自定义</view>
+          <view class="duration-chip selected custom-input-chip" wx:else>
+            <input class="custom-inline-input" type="text" value="{{customHours}}" bindinput="onCustomHoursInput" placeholder="" />
+            <text class="ch-inline-unit">小时</text>
+          </view>
         </view>
       </view>
 

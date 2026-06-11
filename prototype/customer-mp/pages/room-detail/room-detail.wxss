@@ -59,9 +59,9 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .duration-grid { display:flex; gap:6px; flex-wrap:wrap; }
 .duration-chip { flex:1; min-width:60px; padding:10px 4px; border-radius:16px; text-align:center; border:1.5px solid #e0d8d0; background:#fff; font-size:12px; font-weight:600; }
 .duration-chip.selected { border-color:#5D8A6B; background:#F2F6F0; color:#5D8A6B; }
-.custom-hours-row { padding:6px 0; display:flex; align-items:center; gap:8px; }
-.ch-label { font-size:12px; color:#666; }
-.custom-hours-input { width:72px; padding:8px 10px; border:1.5px solid #5D8A6B; border-radius:8px; font-size:15px; font-weight:600; color:#5D8A6B; text-align:center; background:#F2F6F0; }
+.duration-chip.custom-input-chip { display:flex; align-items:center; justify-content:center; gap:2px; padding:6px 4px; }
+.custom-inline-input { width:36px; padding:4px 2px; border:none; font-size:14px; font-weight:600; color:#5D8A6B; text-align:center; background:transparent; outline:none; }
+.ch-inline-unit { font-size:11px; color:#5D8A6B; white-space:nowrap; }
 
 /* Time row */
 .form-row { padding:6px 0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
