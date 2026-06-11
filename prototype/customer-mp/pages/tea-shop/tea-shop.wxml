@@ -74,6 +74,8 @@
     <button class="checkout-btn" bindtap="checkout">去结算</button>
   </view>
 
+  <!-- 底部导航 -->
+  <bottom-nav active="tea" />
 </view>
 
 <!-- Product Detail Modal -->
@@ -159,10 +161,4 @@
       <button class="pay-btn-confirm" bindtap="confirmPay">确认支付</button>
     </view>
   </view>
-
-</view>
-
-<!-- 底部导航 -->
-  <bottom-nav active="tea" />
-</view>
 </view>
