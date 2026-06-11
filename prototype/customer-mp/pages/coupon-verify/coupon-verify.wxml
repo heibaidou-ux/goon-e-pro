@@ -16,10 +16,18 @@
     <view class="coupon-input-section" wx:if="{{step==1}}">
       <text class="h3">选择券平台</text>
       <view class="platform-grid">
-        <view class="platform-chip {{selectedPlatform=='meituan'?'selected':''}}" bindtap="selectPlatform" data-platform="meituan"><text class="plat-icon">🟡</text>美团</view>
-        <view class="platform-chip {{selectedPlatform=='douyin'?'selected':''}}" bindtap="selectPlatform" data-platform="douyin"><text class="plat-icon">🎵</text>抖音</view>
-        <view class="platform-chip {{selectedPlatform=='dianping'?'selected':''}}" bindtap="selectPlatform" data-platform="dianping"><text class="plat-icon">⭐</text>大众点评</view>
-        <view class="platform-chip {{selectedPlatform=='gaode'?'selected':''}}" bindtap="selectPlatform" data-platform="gaode"><text class="plat-icon">🗺️</text>高德</view>
+        <view class="platform-chip platform-meituan {{selectedPlatform=='meituan'?'selected':''}}" bindtap="selectPlatform" data-platform="meituan">
+          <text class="plat-logo">美</text><text class="plat-name">美团</text>
+        </view>
+        <view class="platform-chip platform-douyin {{selectedPlatform=='douyin'?'selected':''}}" bindtap="selectPlatform" data-platform="douyin">
+          <text class="plat-logo">抖</text><text class="plat-name">抖音</text>
+        </view>
+        <view class="platform-chip platform-dianping {{selectedPlatform=='dianping'?'selected':''}}" bindtap="selectPlatform" data-platform="dianping">
+          <text class="plat-logo">点</text><text class="plat-name">大众点评</text>
+        </view>
+        <view class="platform-chip platform-gaode {{selectedPlatform=='gaode'?'selected':''}}" bindtap="selectPlatform" data-platform="gaode">
+          <text class="plat-logo">高</text><text class="plat-name">高德</text>
+        </view>
       </view>
 
       <text class="h3">输入券码</text>

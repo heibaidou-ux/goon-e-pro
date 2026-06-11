@@ -30,8 +30,17 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .ticket-title { font-size:15px; font-weight:700; margin-top:4px; display:block; }
 .ticket-desc { font-size:12px; color:#666; margin-top:2px; display:block; }
 .platform-grid { display:flex; gap:10px; margin-bottom:16px; }
-.platform-chip { flex:1; padding:14px; border-radius:16px; text-align:center; border:2px solid #e5e5e5; background:#fff; font-size:13px; }
-.platform-chip.selected { border-color:#5D8A6B; background:#f0fdf4; color:#5D8A6B; }
+.platform-chip { flex:1; padding:12px 6px; border-radius:16px; text-align:center; border:2px solid transparent; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.plat-logo { font-size:22px; font-weight:700; display:block; line-height:1.2; }
+.plat-name { font-size:11px; font-weight:500; display:block; }
+.platform-meituan { background:#FFF8E1; color:#B8860B; border-color:#FFD54F; }
+.platform-meituan.selected { background:#FFB300; color:#fff; border-color:#FF8F00; box-shadow:0 2px 8px rgba(255,179,0,.3); }
+.platform-douyin { background:#F5F5F5; color:#333; border-color:#ddd; }
+.platform-douyin.selected { background:#1A1A1A; color:#fff; border-color:#1A1A1A; box-shadow:0 2px 8px rgba(0,0,0,.2); }
+.platform-dianping { background:#FFEBEE; color:#C62828; border-color:#EF9A9A; }
+.platform-dianping.selected { background:#E53935; color:#fff; border-color:#C62828; box-shadow:0 2px 8px rgba(229,57,53,.3); }
+.platform-gaode { background:#E3F2FD; color:#0D47A1; border-color:#90CAF9; }
+.platform-gaode.selected { background:#1E88E5; color:#fff; border-color:#0D47A1; box-shadow:0 2px 8px rgba(30,136,229,.3); }
 .match-result { text-align:center; padding:16px; background:#f0fdf4; border-radius:16px; margin-bottom:16px; }
 .match-icon { font-size:32px; display:block; margin-bottom:8px; }
 .match-title { font-size:16px; font-weight:600; color:#333; display:block; }
