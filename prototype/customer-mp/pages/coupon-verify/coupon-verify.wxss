@@ -10,9 +10,9 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .step.active .step-num { background:#5D8A6B; }
 .step-line { width:24px; height:1px; background:#e5e5e5; }
 .section-title { font-size:15px; font-weight:600; margin-bottom:12px; display:block; }
-.coupon-field-row { display:flex; gap:8px; margin-bottom:16px; align-items:center; }
-.coupon-field-wrap { position:relative; flex:1; display:flex; align-items:center; }
-.coupon-field { width:100%; padding:12px 48px 12px 14px; border:2px solid #e5e5e5; border-radius:16px; font-size:16px; text-align:center; box-sizing:border-box; }
+.coupon-field-row { display:flex; gap:8px; margin-bottom:16px; }
+.coupon-field-wrap { position:relative; flex:1; }
+.coupon-field { width:100%; height:50px; line-height:50px; padding:0 48px 0 16px; border:2px solid #e5e5e5; border-radius:16px; font-size:16px; text-align:center; box-sizing:border-box; }
 .coupon-field:focus { border-color:#5D8A6B; }
 .coupon-verify-btn { padding:14px 24px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:15px; font-weight:600; white-space:nowrap; }
 .scan-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); width:28px; height:28px; padding:4px; cursor:pointer; }
@@ -31,7 +31,7 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .ticket-desc { font-size:12px; color:#666; margin-top:2px; display:block; }
 .platform-grid { display:flex; gap:10px; margin-bottom:16px; }
 .platform-chip { flex:1; padding:12px 6px; border-radius:16px; text-align:center; border:2px solid transparent; display:flex; flex-direction:column; align-items:center; gap:4px; }
-.plat-logo { font-size:22px; font-weight:700; display:block; line-height:1.2; }
+.plat-logo { display:block; font-size:22px; line-height:1.3; }
 .plat-name { font-size:11px; font-weight:500; display:block; }
 .platform-meituan { background:#FFF8E1; color:#B8860B; border-color:#FFD54F; }
 .platform-meituan.selected { background:#FFB300; color:#fff; border-color:#FF8F00; box-shadow:0 2px 8px rgba(255,179,0,.3); }

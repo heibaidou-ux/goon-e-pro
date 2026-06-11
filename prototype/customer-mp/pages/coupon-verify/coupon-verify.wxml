@@ -17,16 +17,20 @@
       <text class="h3">选择券平台</text>
       <view class="platform-grid">
         <view class="platform-chip platform-meituan {{selectedPlatform=='meituan'?'selected':''}}" bindtap="selectPlatform" data-platform="meituan">
-          <text class="plat-logo">美</text><text class="plat-name">美团</text>
+          <text class="plat-logo">◉</text>
+          <text class="plat-name">美团</text>
         </view>
         <view class="platform-chip platform-douyin {{selectedPlatform=='douyin'?'selected':''}}" bindtap="selectPlatform" data-platform="douyin">
-          <text class="plat-logo">抖</text><text class="plat-name">抖音</text>
+          <text class="plat-logo">♫</text>
+          <text class="plat-name">抖音</text>
         </view>
         <view class="platform-chip platform-dianping {{selectedPlatform=='dianping'?'selected':''}}" bindtap="selectPlatform" data-platform="dianping">
-          <text class="plat-logo">点</text><text class="plat-name">大众点评</text>
+          <text class="plat-logo">★</text>
+          <text class="plat-name">大众点评</text>
         </view>
         <view class="platform-chip platform-gaode {{selectedPlatform=='gaode'?'selected':''}}" bindtap="selectPlatform" data-platform="gaode">
-          <text class="plat-logo">高</text><text class="plat-name">高德</text>
+          <text class="plat-logo">⬦</text>
+          <text class="plat-name">高德</text>
         </view>
       </view>
 
