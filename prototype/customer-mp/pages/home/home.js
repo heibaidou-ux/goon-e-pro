@@ -77,7 +77,7 @@ Page({
     API.getUserOrders().then(function(orders) {
       var active = null
       for (var i = 0; i < orders.length; i++) { if (orders[i].status === 'InUse' || (orders[i].status === 'Booked' && self.isOrderActiveNow(orders[i]))) { active = orders[i]; break } }
-      if (active) { self.setData({ hasActiveOrder: true, activeOrder: { roomName: active.roomName || '大茶室C', roomId: active.roomId || '', timeStr: (active.date||'')+' '+(active.time||'') } }) }
+      if (active) { self.setData({ hasActiveOrder: true, activeOrder: { roomName: active.roomName || active.roomId || '', roomId: active.roomId || '', timeStr: (active.date||'')+' '+(active.time||'') } }) }
       else { self.setData({ hasActiveOrder: false }) }
     })
   },
