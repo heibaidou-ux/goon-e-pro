@@ -29,3 +29,23 @@ page { background:#f0f2ef; margin:0; padding:0; }
 .ac-ring switch { margin-left:auto; }
 .ac-ring slider { flex:1; min-width:60px; }
 .ac-temp { font-size:18px; font-weight:700; color:#333; min-width:32px; text-align:center; flex-shrink:0; }
+
+/* 续订弹窗 */
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:16px;padding:24px;width:320px;max-width:90vw;text-align:center; }
+.modal-title { font-size:16px;font-weight:600;display:block;margin-bottom:8px; }
+.modal-desc { font-size:13px;color:#666;margin-bottom:16px;display:block;line-height:1.5; }
+.modal-buttons { display:flex;gap:10px;margin-top:16px; }
+.modal-btn { flex:1;padding:12px;border-radius:16px;font-size:14px;font-weight:600;text-align:center; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.primary { background:#5D8A6B;color:#fff; }
+.modal-btn.disabled { opacity:.4; }
+.extend-grid { display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px; }
+.extend-option { padding:12px 6px;border-radius:12px;border:1.5px solid #e5e5e5;background:#fff;text-align:center; }
+.extend-option.selected { background:#5D8A6B;color:#fff;border-color:#5D8A6B; }
+.extend-option:active { border-color:#5D8A6B; }
+.ext-time { font-size:12px;font-weight:600;display:block; }
+.ext-price { font-size:10px;display:block;margin-top:2px;opacity:.8; }
+.extend-option.selected .ext-price { color:#fff; }
+.extend-pay-amount { font-size:28px;font-weight:800;color:#B8860B;display:block;margin:8px 0; }
+.extend-pay-hint { font-size:12px;color:#999;display:block; }

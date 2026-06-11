@@ -5,7 +5,11 @@ Page({
     roomId: '', roomName: '房间',
     countdown: '--:--', endTime: '--:--',
     // 设备
-    devices: []
+    devices: [],
+    // 续订
+    showExtendModal: false, showExtendPayModal: false,
+    extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
+    extendPayInfo: '', extendPayAmount: 0
   },
 
   onLoad: function(e) {
@@ -44,12 +48,16 @@ Page({
       if (ep.length >= 2) {
         var eh = parseInt(ep[0]), em = parseInt(ep[1])
         var endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eh, em)
+        // 如果结束时间已过，可能是次日
+        if (endDate <= now) endDate.setDate(endDate.getDate() + 1)
         var totalSec = Math.max(0, Math.round((endDate - now) / 1000))
         self.setData({ endTime: endStr })
         self._countdownTotal = totalSec
+        self._endDate = endDate
         if (totalSec <= 0) { self.setData({ countdown: '00:00' }); return }
         self.setData({ countdown: self._fmtCountdown(totalSec) })
-        setInterval(function() {
+        if (self._countdownTimer) clearInterval(self._countdownTimer)
+        self._countdownTimer = setInterval(function() {
           self._countdownTotal = Math.max(0, self._countdownTotal - 1)
           self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
         }, 1000)
@@ -60,13 +68,16 @@ Page({
     // fallback: 用当前时间+duration
     var endH = (now.getHours() + Math.floor((now.getMinutes() + durationMin) / 60)) % 24
     var endM = (now.getMinutes() + durationMin) % 60
+    self._endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endH, endM)
     self.setData({ endTime: String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0') })
     var totalSec = durationMin * 60
+    self._countdownTotal = totalSec
     if (totalSec <= 0) { self.setData({ countdown: '00:00' }); return }
     self.setData({ countdown: self._fmtCountdown(totalSec) })
-    setInterval(function() {
-      totalSec = Math.max(0, totalSec - 1)
-      self.setData({ countdown: self._fmtCountdown(totalSec) })
+    if (self._countdownTimer) clearInterval(self._countdownTimer)
+    self._countdownTimer = setInterval(function() {
+      self._countdownTotal = Math.max(0, self._countdownTotal - 1)
+      self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
     }, 1000)
   },
 
@@ -78,7 +89,111 @@ Page({
 
   goBack: function() { wx.navigateBack() },
   goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
-  renewOrder: function() { wx.showToast({ title: '续订功能开发中', icon: 'none' }) },
+
+  // ── 续订 ──
+  showExtend: function() {
+    var self = this
+    var now = new Date()
+    var curEndMin = now.getHours() * 60 + now.getMinutes() + Math.ceil((self._countdownTotal || 0) / 60)
+    var roundedEndMin = Math.ceil(curEndMin / 30) * 30
+    var h = Math.floor(roundedEndMin / 60) % 24
+    var m = roundedEndMin % 60
+    var curEndStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')
+
+    self.setData({
+      extendInfo: '当前将于 ' + curEndStr + ' 结束。请选择续订时长：',
+      selectedExtendIdx: -1
+    })
+
+    var options = []
+    for (var i = 1; i <= 8; i++) {
+      var totalMin = roundedEndMin + i * 30
+      var oh = Math.floor(totalMin / 60) % 24
+      var om = totalMin % 60
+      var extMin = i * 30
+      var price = Math.round(120 * extMin / 60)
+      options.push({
+        label: '至 ' + String(oh).padStart(2,'0') + ':' + String(om).padStart(2,'0'),
+        minutes: extMin,
+        price: price
+      })
+    }
+    self.setData({ extendOptions: options, showExtendModal: true })
+  },
+
+  selectExtend: function(e) {
+    this.setData({ selectedExtendIdx: parseInt(e.currentTarget.dataset.index) })
+  },
+
+  confirmExtend: function() {
+    var idx = this.data.selectedExtendIdx
+    if (idx < 0 || idx >= this.data.extendOptions.length) return
+    var opt = this.data.extendOptions[idx]
+    this.setData({
+      extendPayInfo: '续订' + opt.minutes + '分钟至 ' + opt.label.replace('至 ','') + '，+¥' + opt.price,
+      extendPayAmount: opt.price,
+      showExtendModal: false,
+      showExtendPayModal: true
+    })
+  },
+
+  doExtendPayment: function() {
+    var self = this
+    var idx = this.data.selectedExtendIdx
+    if (idx < 0 || idx >= this.data.extendOptions.length) return
+    var opt = this.data.extendOptions[idx]
+
+    API.getBalance().then(function(balance) {
+      if (balance < opt.price) {
+        wx.showToast({ title: '余额不足，请充值', icon: 'none' })
+        self.setData({ showExtendPayModal: false })
+        return
+      }
+      // 扣余额
+      var newBalance = balance - opt.price
+      var user = wx.getStorageSync('mp_user') || {}
+      user.balance = newBalance
+      wx.setStorageSync('mp_user', user)
+
+      // 更新倒计时
+      self._countdownTotal = (self._countdownTotal || 0) + opt.minutes * 60
+      self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
+
+      // 更新结束时间
+      if (self._endDate) {
+        self._endDate = new Date(self._endDate.getTime() + opt.minutes * 60000)
+        var nh = self._endDate.getHours()
+        var nm = self._endDate.getMinutes()
+        self.setData({ endTime: String(nh).padStart(2,'0') + ':' + String(nm).padStart(2,'0') })
+      }
+
+      // 持久化到booking
+      try {
+        var bookings = wx.getStorageSync('mp_bookings') || []
+        for (var i = 0; i < bookings.length; i++) {
+          if (bookings[i].roomId === self.data.roomId && bookings[i].status === 'InUse') {
+            var nh = self._endDate ? self._endDate.getHours() : 0
+            var nm = self._endDate ? self._endDate.getMinutes() : 0
+            bookings[i].endTime = String(nh).padStart(2,'0') + ':' + String(nm).padStart(2,'0')
+            break
+          }
+        }
+        wx.setStorageSync('mp_bookings', bookings)
+      } catch(e) {}
+
+      self.setData({ showExtendPayModal: false })
+      wx.showToast({ title: '续订成功！已扣除 ¥' + opt.price, icon: 'success' })
+    })
+  },
+
+  hideExtend: function() {
+    this.setData({ showExtendModal: false })
+  },
+
+  cancelExtendPay: function() {
+    this.setData({ showExtendPayModal: false })
+    wx.showToast({ title: '已取消续订', icon: 'none' })
+  },
 
   // 设备控制
   onLockToggle: function(e) { API.controlDevice(e.currentTarget.dataset.id, { locked: !e.detail.value }).catch(function(){}) },
