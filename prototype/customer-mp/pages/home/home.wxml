@@ -1,4 +1,4 @@
-<view class="page" style="padding-top:{{topPadding}}px;">
+<scroll-view class="page" scroll-y show-scrollbar="{{false}}" style="padding-top:{{topPadding}}px;">
 
   <!-- 门店头部 -->
   <view class="store-header">
@@ -86,7 +86,7 @@
 
   <!-- 底部导航 -->
   <bottom-nav active="home" />
-</view>
+</scroll-view>
 
 <!-- 门店选择弹窗 -->
 <view class="modal-overlay" hidden="{{!showStoreModal}}" bindtap="hideStoreSelector">
