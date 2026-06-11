@@ -77,7 +77,17 @@ Page({
     API.getUserOrders().then(function(orders) {
       var active = null
       for (var i = 0; i < orders.length; i++) { if (orders[i].status === 'InUse' || (orders[i].status === 'Booked' && self.isOrderActiveNow(orders[i]))) { active = orders[i]; break } }
-      if (active) { self.setData({ hasActiveOrder: true, activeOrder: { roomName: active.roomName || active.roomId || '', roomId: active.roomId || '', timeStr: (active.date||'')+' '+(active.time||'') } }) }
+      if (active) {
+        var timeParts = (active.time || '').split('-')
+        var endStr = timeParts.length >= 2 ? timeParts[1].trim() : ''
+        self.setData({ hasActiveOrder: true, activeOrder: {
+          roomName: active.roomName || active.roomId || '',
+          roomId: active.roomId || '',
+          timeStr: (active.date||'')+' '+(active.time||''),
+          end: endStr,
+          duration: active.duration || 120
+        } })
+      }
       else { self.setData({ hasActiveOrder: false }) }
     })
   },
@@ -117,8 +127,8 @@ Page({
   goStaffLogin: function() { wx.navigateTo({ url: '/pages/staff-login/staff-login' }) },
   goCartPage: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?tab=cart' }) },
 
-  goSmartControl: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) }) },
-  openDoor: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) }) },
+  goSmartControl: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', end = order.end || '', dur = order.duration || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&end='+end+'&duration='+dur }) },
+  openDoor: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', end = order.end || '', dur = order.duration || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&end='+end+'&duration='+dur }) },
   callService: function() { wx.showToast({ title: '📞 已通知店员', icon: 'none' }) },
   callPhone: function() {
     var self = this

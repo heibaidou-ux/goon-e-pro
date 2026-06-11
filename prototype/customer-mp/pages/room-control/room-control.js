@@ -11,9 +11,11 @@ Page({
   onLoad: function(e) {
     var roomId = e.roomId || 'RM004'
     var roomName = e.roomName ? decodeURIComponent(e.roomName) : '大茶室C'
+    var duration = parseInt(e.duration) || 120
+    var endStr = e.end || ''
     this.setData({ roomId: roomId, roomName: roomName })
     this.loadDevices()
-    this.startCountdown()
+    this.startCountdown(duration, endStr)
   },
 
   loadDevices: function() {
@@ -32,21 +34,46 @@ Page({
     })
   },
 
-  startCountdown: function() {
+  startCountdown: function(durationMin, endStr) {
     var self = this
-    // 假设结束时间为当前时间+2小时（演示用）
+    durationMin = durationMin || 120
     var now = new Date()
-    var endH = now.getHours() + 2
-    var endM = now.getMinutes()
-    self.setData({ endTime: String(endH%24).padStart(2,'0') + ':' + String(endM).padStart(2,'0') })
 
+    if (endStr) {
+      var ep = endStr.split(':')
+      if (ep.length >= 2) {
+        var eh = parseInt(ep[0]), em = parseInt(ep[1])
+        var endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eh, em)
+        var totalSec = Math.max(0, Math.round((endDate - now) / 1000))
+        self.setData({ endTime: endStr })
+        self._countdownTotal = totalSec
+        if (totalSec <= 0) { self.setData({ countdown: '00:00' }); return }
+        self.setData({ countdown: self._fmtCountdown(totalSec) })
+        setInterval(function() {
+          self._countdownTotal = Math.max(0, self._countdownTotal - 1)
+          self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
+        }, 1000)
+        return
+      }
+    }
+
+    // fallback: 用当前时间+duration
+    var endH = (now.getHours() + Math.floor((now.getMinutes() + durationMin) / 60)) % 24
+    var endM = (now.getMinutes() + durationMin) % 60
+    self.setData({ endTime: String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0') })
+    var totalSec = durationMin * 60
+    if (totalSec <= 0) { self.setData({ countdown: '00:00' }); return }
+    self.setData({ countdown: self._fmtCountdown(totalSec) })
     setInterval(function() {
-      var n = new Date()
-      var remaining = 2*3600 - (n.getHours()*3600 + n.getMinutes()*60 + n.getSeconds() - (now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds()))
-      if (remaining <= 0) { self.setData({ countdown: '00:00' }); return }
-      var h = Math.floor(remaining/3600), m = Math.floor((remaining%3600)/60), s = remaining%60
-      self.setData({ countdown: String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0') })
+      totalSec = Math.max(0, totalSec - 1)
+      self.setData({ countdown: self._fmtCountdown(totalSec) })
     }, 1000)
+  },
+
+  _fmtCountdown: function(s) {
+    if (s <= 0) return '00:00'
+    var m = Math.floor(s / 60), sec = s % 60
+    return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0')
   },
 
   goBack: function() { wx.navigateBack() },

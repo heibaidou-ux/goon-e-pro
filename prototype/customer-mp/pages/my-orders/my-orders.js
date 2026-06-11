@@ -166,12 +166,13 @@ Page({
   openDoor: function(e) {
     var order = this.findOrder(e.currentTarget.dataset.id)
     if (!order) return
-    // 待使用订单：校验开门条件
     if (order.status === 'Booked' && !order.doorCanOpen) {
       wx.showToast({ title: order.doorHint || '暂不能开门', icon: 'none' })
       return
     }
-    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+(order.roomId||'')+'&roomName='+encodeURIComponent(order.roomName||'') })
+    var timeParts = (order.timeStr || '').split(' ').pop().split('-')
+    var endStr = timeParts.length >= 2 ? timeParts[1].trim() : ''
+    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+(order.roomId||'')+'&roomName='+encodeURIComponent(order.roomName||'')+'&end='+endStr+'&duration='+(order.remaining ? Math.ceil(order.remaining/60) : 120) })
   },
 
   goRoomControl: function(e) {
