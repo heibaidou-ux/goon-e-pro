@@ -47,7 +47,7 @@
   <!-- 四个快捷入口 -->
   <view class="quick-grid">
     <view class="quick-item" bindtap="goCouponVerify"><view class="quick-icon brand">🎫</view><text class="quick-label">验券</text></view>
-    <view class="quick-item" bindtap="handleBalanceClick"><view class="quick-icon balance">💰</view><text class="quick-label">会员余额</text></view>
+    <view class="quick-item" bindtap="handleBalanceClick"><view class="quick-icon balance"><text class="balance-icon">💰</text><text class="balance-amt">{{balanceDisplay}}</text></view><text class="quick-label">会员余额</text></view>
     <view class="quick-item" bindtap="handleCouponClick"><view class="quick-icon coupon">🏷️</view><text class="quick-label">优惠券</text></view>
     <view class="quick-item" bindtap="goProfile"><view class="quick-icon profile">👤</view><text class="quick-label">我的</text></view>
   </view>
