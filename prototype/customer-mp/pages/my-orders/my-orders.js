@@ -67,15 +67,15 @@ Page({
                 roomOccupied = true; break
               }
             }
-            // 条件1: 在开始前30分钟内(>= -30)
+            // 条件1: 在开始前15分钟内
             // 条件2: 房间未被占用
-            doorCanOpen = (minUntilStart <= 30) && !roomOccupied
-            if (minUntilStart > 30) {
-              doorHint = '提前30分钟可开门，还需' + Math.ceil(minUntilStart - 30) + '分钟'
+            doorCanOpen = (minUntilStart <= 15) && !roomOccupied
+            if (minUntilStart > 15) {
+              doorHint = '密码暂不可用'
             } else if (roomOccupied) {
               doorHint = '房间正在使用中'
             } else {
-              doorHint = '可开门'
+              doorHint = '密码可用'
             }
           }
         }
