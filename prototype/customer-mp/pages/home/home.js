@@ -29,7 +29,7 @@ Page({
     var role = API.getUserRole()
     if (role === 'staff') { wx.reLaunch({ url: '/pages/staff-dashboard/staff-dashboard' }); return }
     if (role === 'shareholder') { wx.reLaunch({ url: '/pages/investor-workbench/investor-workbench' }); return }
-    try { var sys = wx.getSystemInfoSync(); self.setData({ topPadding: sys.statusBarHeight + 4 }) } catch(e) {}
+    try { var sys = wx.getSystemInfoSync(); self.setData({ topPadding: (sys.statusBarHeight || 44) + 44 }) } catch(e) {}
     self.loadData(); self.checkActiveOrder()
   },
   onShow: function() { this.loadData(); this.checkActiveOrder() },
