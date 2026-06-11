@@ -81,9 +81,6 @@
     </view>
   </view>
 
-  <!-- 员工入口 -->
-  <view class="staff-entrance" bindtap="goStaffLogin"><text>🔒 员工通道</text></view>
-
   <!-- 底部导航 -->
   <bottom-nav active="home" />
 </scroll-view>

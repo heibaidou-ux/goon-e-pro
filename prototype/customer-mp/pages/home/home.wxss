@@ -86,9 +86,6 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .qty-btn { width:24px; height:24px; border-radius:50%; border:1.5px solid #5D8A6B; background:#fff; color:#5D8A6B; font-size:16px; display:flex; align-items:center; justify-content:center; padding:0; }
 .qty-num { min-width:20px; text-align:center; font-size:14px; font-weight:600; }
 
-/* 员工入口 */
-.staff-entrance { text-align:center; padding:16px 0; font-size:12px; color:#ccc; }
-
 /* 底部导航由组件提供 */
 .cart-link { font-size:12px; color:#5D8A6B; }
 .cart-badge { display:inline-block; background:#e53935; color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; margin-left:2px; vertical-align:top; }
