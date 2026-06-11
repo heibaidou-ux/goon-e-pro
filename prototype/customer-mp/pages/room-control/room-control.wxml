@@ -27,33 +27,6 @@
       </view>
     </view>
 
-    <!-- 墙面开关面板 -->
-    <view class="panel-section" wx:if="{{panel1.length>0}}">
-      <text class="section-label">开关面板</text>
-      <view class="panel-row">
-        <view class="switch-panel">
-          <text class="panel-title">面板1</text>
-          <view class="panel-grid">
-            <view class="switch-key {{item.active ? 'on' : ''}} {{item.type=='blank' ? 'blank' : ''}}" wx:for="{{panel1}}" wx:key="key" bindtap="onPanelKeyTap" data-key="{{item.key}}" data-type="{{item.type}}" data-roomid="{{roomId}}">
-              <text class="key-icon">{{item.icon}}</text>
-              <text class="key-label">{{item.label}}</text>
-              <view class="key-indicator {{item.active ? 'on' : ''}}"></view>
-            </view>
-          </view>
-        </view>
-        <view class="switch-panel" wx:if="{{panel2.length>0}}">
-          <text class="panel-title">面板2</text>
-          <view class="panel-grid">
-            <view class="switch-key {{item.active ? 'on' : ''}} {{item.type=='blank' ? 'blank' : ''}}" wx:for="{{panel2}}" wx:key="key" bindtap="onPanelKeyTap" data-key="{{item.key}}" data-type="{{item.type}}" data-roomid="{{roomId}}">
-              <text class="key-icon">{{item.icon}}</text>
-              <text class="key-label">{{item.label}}</text>
-              <view class="key-indicator {{item.active ? 'on' : ''}}"></view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-
     <!-- 空调 -->
     <view class="device-section" wx:if="{{acDevice}}">
       <text class="section-label">❄️ 空调</text>
@@ -73,6 +46,30 @@
               {{acDevice.mode === 'cool' ? '❄️ 关闭' : '❄️ 开启'}}
             </view>
           </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 灯光 -->
+    <view class="device-section" wx:if="{{lightKeys.length>0}}">
+      <text class="section-label">💡 灯光</text>
+      <view class="dev-grid">
+        <view class="switch-key {{item.active ? 'on' : ''}} {{item.fullRow ? 'full-row' : ''}}" wx:for="{{lightKeys}}" wx:key="key" bindtap="onKeyTap" data-key="{{item.key}}" data-type="{{item.type}}">
+          <text class="key-icon">{{item.icon}}</text>
+          <text class="key-label">{{item.label}}</text>
+          <view class="key-indicator {{item.active ? 'on' : ''}}"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 风扇/换气扇 -->
+    <view class="device-section" wx:if="{{fanKeys.length>0}}">
+      <text class="section-label">🌀 风扇</text>
+      <view class="dev-grid">
+        <view class="switch-key {{item.active ? 'on' : ''}} {{item.fullRow ? 'full-row' : ''}}" wx:for="{{fanKeys}}" wx:key="key" bindtap="onKeyTap" data-key="{{item.key}}" data-type="{{item.type}}">
+          <text class="key-icon">{{item.icon}}</text>
+          <text class="key-label">{{item.label}}</text>
+          <view class="key-indicator {{item.active ? 'on' : ''}}"></view>
         </view>
       </view>
     </view>

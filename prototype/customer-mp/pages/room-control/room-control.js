@@ -1,75 +1,6 @@
 var API = require('../../utils/api')
 
-// 每个房间的面板布局，与墙面物理开关一一对应
-var PANEL_LAYOUTS = {
-  // 会议室: 面板1(灯全开/灯全关/筒灯1/筒灯2) 面板2(吊灯/风扇1/风扇2/风扇3)
-  RM001: {
-    panel1: [
-      { key: 'light_all_on',  label: '灯全开', icon: '💡', type: 'virtual', virtualAction: 'all_on' },
-      { key: 'light_all_off', label: '灯全关', icon: '🔌', type: 'virtual', virtualAction: 'all_off' },
-      { key: 'DEV001', label: '筒灯1', icon: '◯', type: 'Light' },
-      { key: 'DEV002', label: '筒灯2', icon: '◯', type: 'Light' },
-    ],
-    panel2: [
-      { key: 'DEV003', label: '吊灯', icon: '💡', type: 'Light' },
-      { key: 'DEV004', label: '风扇1', icon: '🌀', type: 'Fan' },
-      { key: 'DEV005', label: '风扇2', icon: '🌀', type: 'Fan' },
-      { key: 'DEV006', label: '风扇3', icon: '🌀', type: 'Fan' },
-    ]
-  },
-  // 小茶室: 面板1(灯全开/灯全关/吊灯/筒灯) 面板2(换气扇/风扇/窗帘开/窗帘关)
-  RM002: {
-    panel1: [
-      { key: 'light_all_on',  label: '灯全开', icon: '💡', type: 'virtual', virtualAction: 'all_on' },
-      { key: 'light_all_off', label: '灯全关', icon: '🔌', type: 'virtual', virtualAction: 'all_off' },
-      { key: 'DEV009', label: '吊灯', icon: '💡', type: 'Light' },
-      { key: 'DEV010', label: '筒灯', icon: '◯', type: 'Light' },
-    ],
-    panel2: [
-      { key: 'DEV011', label: '换气扇', icon: '🌬️', type: 'ExhaustFan' },
-      { key: 'DEV012', label: '风扇',   icon: '🌀', type: 'Fan' },
-      { key: 'curtain_ctrl', label: '窗帘', icon: '🪟', type: 'virtual', virtualAction: 'scroll_curtain' },
-      { key: 'dev_null', label: '', icon: '', type: 'blank' },
-    ]
-  },
-  // 中茶室B: 面板1(灯全开/灯全关/吊灯/筒灯) 面板2(背景灯/风扇/窗帘开/窗帘关)
-  RM003: {
-    panel1: [
-      { key: 'light_all_on',  label: '灯全开', icon: '💡', type: 'virtual', virtualAction: 'all_on' },
-      { key: 'light_all_off', label: '灯全关', icon: '🔌', type: 'virtual', virtualAction: 'all_off' },
-      { key: 'DEV016', label: '吊灯', icon: '💡', type: 'Light' },
-      { key: 'DEV017', label: '筒灯', icon: '◯', type: 'Light' },
-    ],
-    panel2: [
-      { key: 'DEV018', label: '背景灯', icon: '✨', type: 'Light' },
-      { key: 'DEV019', label: '风扇',   icon: '🌀', type: 'Fan' },
-      { key: 'curtain_ctrl', label: '窗帘', icon: '🪟', type: 'virtual', virtualAction: 'scroll_curtain' },
-      { key: 'dev_null', label: '', icon: '', type: 'blank' },
-    ]
-  },
-  // 大茶室C: 面板1(灯全开/灯全关/吊灯/筒灯) 面板2(背景灯/风扇/窗帘开/窗帘关)
-  RM004: {
-    panel1: [
-      { key: 'light_all_on',  label: '灯全开', icon: '💡', type: 'virtual', virtualAction: 'all_on' },
-      { key: 'light_all_off', label: '灯全关', icon: '🔌', type: 'virtual', virtualAction: 'all_off' },
-      { key: 'DEV025', label: '吊灯', icon: '💡', type: 'Light' },
-      { key: 'DEV026', label: '筒灯', icon: '◯', type: 'Light' },
-    ],
-    panel2: [
-      { key: 'DEV027', label: '背景灯', icon: '✨', type: 'Light' },
-      { key: 'DEV028', label: '风扇',   icon: '🌀', type: 'Fan' },
-      { key: 'curtain_ctrl', label: '窗帘', icon: '🪟', type: 'virtual', virtualAction: 'scroll_curtain' },
-      { key: 'dev_null', label: '', icon: '', type: 'blank' },
-    ]
-  },
-  // 展厅: 仅背景音乐
-  RM005: {
-    panel1: [],
-    panel2: []
-  }
-}
-
-// 哪些key是灯光设备（用于全开/全关）
+// 每个房间的灯光设备ID（用于灯全开/全关）
 var LIGHT_DEVICE_IDS = {
   RM001: ['DEV001','DEV002','DEV003'],
   RM002: ['DEV009','DEV010'],
@@ -78,12 +9,27 @@ var LIGHT_DEVICE_IDS = {
   RM005: []
 }
 
+// 每个房间的风扇/换气扇设备
+var FAN_DEVICE_IDS = {
+  RM001: ['DEV004','DEV005','DEV006'],
+  RM002: ['DEV011','DEV012'],
+  RM003: ['DEV019'],
+  RM004: ['DEV028'],
+  RM005: []
+}
+
+// 灯光图标映射
+var LIGHT_ICONS = { 'DEV001':'◯','DEV002':'◯','DEV003':'💡','DEV009':'💡','DEV010':'◯','DEV016':'💡','DEV017':'◯','DEV018':'✨','DEV025':'💡','DEV026':'◯','DEV027':'✨' }
+var LIGHT_LABELS = { 'DEV001':'筒灯1','DEV002':'筒灯2','DEV003':'吊灯','DEV009':'吊灯','DEV010':'筒灯','DEV016':'吊灯','DEV017':'筒灯','DEV018':'背景灯','DEV025':'吊灯','DEV026':'筒灯','DEV027':'背景灯' }
+var FAN_ICONS = { 'DEV004':'🌀','DEV005':'🌀','DEV006':'🌀','DEV011':'🌬️','DEV012':'🌀','DEV019':'🌀','DEV028':'🌀' }
+var FAN_LABELS = { 'DEV004':'风扇1','DEV005':'风扇2','DEV006':'风扇3','DEV011':'换气扇','DEV012':'风扇','DEV019':'风扇','DEV028':'风扇' }
+
 Page({
   data: {
     roomId: '', roomName: '房间',
     countdown: '--:--', endTime: '--:--', orderSlot: '', orderStart: '',
     balance: 0,
-    panel1: [], panel2: [],
+    lightKeys: [], fanKeys: [],
     acDevice: null, curtainDevices: [], bgmDevice: null,
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
@@ -106,7 +52,6 @@ Page({
   loadDevices: function() {
     var self = this
     API.getRoomDevices(this.data.roomId).then(function(devices) {
-      // 建立 deviceId → on状态映射
       var stateMap = {}
       var ac = null, curtains = [], bgm = null
       for (var i = 0; i < devices.length; i++) {
@@ -119,120 +64,85 @@ Page({
         else if (d.type === 'BGM') { bgm = d; stateMap[d.deviceId] = d.playing }
       }
 
-      // 构建面板
-      var layout = PANEL_LAYOUTS[self.data.roomId]
-      if (!layout) layout = { panel1: [], panel2: [] }
-
-      var panel1 = []
-      var allLightsOn = true
-      var lightIds = LIGHT_DEVICE_IDS[self.data.roomId] || []
+      // 构建灯光按键：灯全开 + 灯全关 + 各灯光设备
+      var roomId = self.data.roomId
+      var lightIds = LIGHT_DEVICE_IDS[roomId] || []
+      var allLightsOn = lightIds.length > 0
       for (var j = 0; j < lightIds.length; j++) {
         if (!stateMap[lightIds[j]]) { allLightsOn = false; break }
       }
-
-      for (var j = 0; j < layout.panel1.length; j++) {
-        var k = layout.panel1[j]
-        if (k.type === 'virtual') {
-          if (k.virtualAction === 'all_on') panel1.push({ key: k.key, label: k.label, icon: k.icon, type: 'virtual', active: allLightsOn })
-          else if (k.virtualAction === 'all_off') panel1.push({ key: k.key, label: k.label, icon: k.icon, type: 'virtual', active: false })
-          else panel1.push({ key: k.key, label: k.label, icon: k.icon, type: 'virtual', active: false })
-        } else if (k.type === 'blank') {
-          panel1.push({ key: 'blank', label: '', icon: '', type: 'blank', active: false })
-        } else {
-          panel1.push({ key: k.key, label: k.label, icon: k.icon, type: k.type, active: stateMap[k.key] || false })
-        }
+      var lightKeys = [
+        { key: 'light_all_on',  label: '灯全开', icon: '💡', type: 'virtual', active: allLightsOn },
+        { key: 'light_all_off', label: '灯全关', icon: '🔌', type: 'virtual', active: false },
+      ]
+      for (var j = 0; j < lightIds.length; j++) {
+        lightKeys.push({ key: lightIds[j], label: LIGHT_LABELS[lightIds[j]] || lightIds[j], icon: LIGHT_ICONS[lightIds[j]] || '💡', type: 'Light', active: stateMap[lightIds[j]] || false })
       }
+      // 奇数项时最后一项占整行
+      if (lightKeys.length % 2 === 1) lightKeys[lightKeys.length - 1].fullRow = true
 
-      var panel2 = []
-      for (var j = 0; j < layout.panel2.length; j++) {
-        var k = layout.panel2[j]
-        if (k.type === 'virtual') {
-          panel2.push({ key: k.key, label: k.label, icon: k.icon, type: 'virtual', active: false })
-        } else if (k.type === 'blank') {
-          panel2.push({ key: 'blank', label: '', icon: '', type: 'blank', active: false })
-        } else {
-          panel2.push({ key: k.key, label: k.label, icon: k.icon, type: k.type, active: stateMap[k.key] || false })
-        }
+      // 构建风扇按键
+      var fanIds = FAN_DEVICE_IDS[roomId] || []
+      var fanKeys = []
+      for (var j = 0; j < fanIds.length; j++) {
+        fanKeys.push({ key: fanIds[j], label: FAN_LABELS[fanIds[j]] || fanIds[j], icon: FAN_ICONS[fanIds[j]] || '🌀', type: fanIds[j] === 'DEV011' ? 'ExhaustFan' : 'Fan', active: stateMap[fanIds[j]] || false })
       }
+      if (fanKeys.length % 2 === 1) fanKeys[fanKeys.length - 1].fullRow = true
 
       self.setData({
-        panel1: panel1, panel2: panel2,
+        lightKeys: lightKeys, fanKeys: fanKeys,
         acDevice: ac, curtainDevices: curtains, bgmDevice: bgm
       })
     })
   },
 
-  onPanelKeyTap: function(e) {
+  onKeyTap: function(e) {
     var key = e.currentTarget.dataset.key
     var type = e.currentTarget.dataset.type
-    var roomId = this.data.roomId
 
-    // 灯全开
-    if (key === 'light_all_on') {
-      this._setAllLights(true)
-      return
-    }
-    // 灯全关
-    if (key === 'light_all_off') {
-      this._setAllLights(false)
-      return
-    }
-    // 窗帘（滚动到窗帘区域）
-    if (key === 'curtain_ctrl') {
-      wx.showToast({ title: '请在下方窗帘区域调节', icon: 'none' })
-      return
-    }
-    if (key === 'blank' || key === 'dev_null') return
+    if (key === 'light_all_on') { this._setAllLights(true); return }
+    if (key === 'light_all_off') { this._setAllLights(false); return }
 
     // 设备开关
-    this._toggleDevice(key, type)
+    var currentOn = false
+    var lights = this.data.lightKeys
+    for (var i = 0; i < lights.length; i++) { if (lights[i].key === key) { currentOn = lights[i].active; break } }
+    var fans = this.data.fanKeys
+    for (var i = 0; i < fans.length; i++) { if (fans[i].key === key) { currentOn = fans[i].active; break } }
+    this._toggleDevice(key, type, !currentOn)
   },
 
   _setAllLights: function(on) {
     var self = this
     var lightIds = LIGHT_DEVICE_IDS[self.data.roomId] || []
-    // 更新面板UI
-    var panel1 = self.data.panel1
-    for (var i = 0; i < panel1.length; i++) {
-      if (panel1[i].type === 'virtual' && panel1[i].virtualAction === 'all_on') panel1[i].active = on
+    // UI立即更新
+    var keys = self.data.lightKeys
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i].key === 'light_all_on') keys[i].active = on
+      else if (keys[i].key === 'light_all_off') keys[i].active = false
+      else if (keys[i].type === 'Light') keys[i].active = on
     }
-    self.setData({ panel1: panel1 })
+    self.setData({ lightKeys: keys })
     wx.showLoading({ title: on ? '全开中...' : '全关中...' })
-    // 逐个控制灯光设备
     var done = 0
     for (var i = 0; i < lightIds.length; i++) {
       API.controlDevice(lightIds[i], { brightness: on ? 80 : 0 }).then(function() {
-        done++
-        if (done >= lightIds.length) {
-          wx.hideLoading()
-          self.loadDevices()
-        }
+        done++; if (done >= lightIds.length) { wx.hideLoading(); self.loadDevices() }
       }).catch(function() {
-        done++
-        if (done >= lightIds.length) { wx.hideLoading(); self.loadDevices() }
+        done++; if (done >= lightIds.length) { wx.hideLoading(); self.loadDevices() }
       })
     }
     if (lightIds.length === 0) { wx.hideLoading(); self.loadDevices() }
   },
 
-  _toggleDevice: function(deviceId, type) {
+  _toggleDevice: function(deviceId, type, newState) {
     var self = this
-    // 先取当前状态
-    var currentOn = false
-    for (var i = 0; i < self.data.panel1.length; i++) {
-      if (self.data.panel1[i].key === deviceId) { currentOn = self.data.panel1[i].active; break }
-    }
-    for (var i = 0; i < self.data.panel2.length; i++) {
-      if (self.data.panel2[i].key === deviceId) { currentOn = self.data.panel2[i].active; break }
-    }
-    var newState = !currentOn
-
-    // 立即更新UI
-    var p1 = self.data.panel1, p2 = self.data.panel2
-    for (var i = 0; i < p1.length; i++) { if (p1[i].key === deviceId) { p1[i].active = newState; break } }
-    for (var i = 0; i < p2.length; i++) { if (p2[i].key === deviceId) { p2[i].active = newState; break } }
-    self.setData({ panel1: p1, panel2: p2 })
-
+    // 更新UI
+    var lights = self.data.lightKeys
+    for (var i = 0; i < lights.length; i++) { if (lights[i].key === deviceId) { lights[i].active = newState; break } }
+    var fans = self.data.fanKeys
+    for (var i = 0; i < fans.length; i++) { if (fans[i].key === deviceId) { fans[i].active = newState; break } }
+    self.setData({ lightKeys: lights, fanKeys: fans })
     var cmd = {}
     if (type === 'Light') cmd = { brightness: newState ? 80 : 0 }
     else if (type === 'Fan' || type === 'ExhaustFan') cmd = { speed: newState ? 3 : 0 }
@@ -241,12 +151,9 @@ Page({
 
   // ── 空调 ──
   toggleAC: function(e) {
-    var id = e.currentTarget.dataset.id
-    var ac = this.data.acDevice
-    if (!ac) return
-    ac.mode = ac.mode === 'cool' ? 'off' : 'cool'
-    this.setData({ acDevice: ac })
-    API.controlDevice(id, { mode: ac.mode }).catch(function(){})
+    var id = e.currentTarget.dataset.id, ac = this.data.acDevice
+    if (!ac) return; ac.mode = ac.mode === 'cool' ? 'off' : 'cool'
+    this.setData({ acDevice: ac }); API.controlDevice(id, { mode: ac.mode }).catch(function(){})
   },
   acTempUp: function(e) {
     var id = e.currentTarget.dataset.id, ac = this.data.acDevice
@@ -325,13 +232,11 @@ Page({
   showExtend: function() {
     var self = this
     var endDate = self._endDate ? new Date(self._endDate) : new Date()
-    var curEndStr = String(endDate.getHours()).padStart(2,'0') + ':' + String(endDate.getMinutes()).padStart(2,'0')
-    self.setData({ extendInfo: '当前将于 ' + curEndStr + ' 结束。请选择续订时长：', selectedExtendIdx: -1 })
+    self.setData({ extendInfo: '当前将于 ' + String(endDate.getHours()).padStart(2,'0') + ':' + String(endDate.getMinutes()).padStart(2,'0') + ' 结束。请选择续订时长：', selectedExtendIdx: -1 })
     var options = []
     for (var i = 1; i <= 24; i++) {
-      var newDate = new Date(endDate.getTime() + i * 30 * 60000)
-      var oh = newDate.getHours(), om = newDate.getMinutes()
-      options.push({ label: '至 ' + String(oh).padStart(2,'0') + ':' + String(om).padStart(2,'0'), minutes: i * 30, price: Math.round(120 * i * 30 / 60) })
+      var nd = new Date(endDate.getTime() + i * 30 * 60000)
+      options.push({ label: '至 ' + String(nd.getHours()).padStart(2,'0') + ':' + String(nd.getMinutes()).padStart(2,'0'), minutes: i * 30, price: Math.round(120 * i * 30 / 60) })
     }
     self.setData({ extendOptions: options, showExtendModal: true })
   },
@@ -339,11 +244,8 @@ Page({
   confirmExtend: function() {
     var idx = this.data.selectedExtendIdx
     if (idx < 0 || idx >= this.data.extendOptions.length) return
-    var opt = this.data.extendOptions[idx]
-    var self = this
-    API.getBalance().then(function(b) {
-      self.setData({ balance: b || 0, extendPayInfo: '续订' + opt.minutes + '分钟至 ' + opt.label.replace('至 ',''), extendPayAmount: opt.price, extendPayMethod: 'balance', showExtendModal: false, showExtendPayModal: true })
-    })
+    var opt = this.data.extendOptions[idx], self = this
+    API.getBalance().then(function(b) { self.setData({ balance: b || 0, extendPayInfo: '续订' + opt.minutes + '分钟至 ' + opt.label.replace('至 ',''), extendPayAmount: opt.price, extendPayMethod: 'balance', showExtendModal: false, showExtendPayModal: true }) })
   },
   selectExtendPay: function(e) { this.setData({ extendPayMethod: e.currentTarget.dataset.pay }) },
   doExtendPayment: function() {
@@ -353,29 +255,12 @@ Page({
     var p = function() {
       self._countdownTotal = (self._countdownTotal || 0) + opt.minutes * 60
       self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
-      if (self._endDate) {
-        self._endDate = new Date(self._endDate.getTime() + opt.minutes * 60000)
-        self.setData({ endTime: String(self._endDate.getHours()).padStart(2,'0') + ':' + String(self._endDate.getMinutes()).padStart(2,'0') })
-      }
-      try {
-        var bookings = wx.getStorageSync('mp_bookings') || []
-        for (var i = 0; i < bookings.length; i++) {
-          if (bookings[i].roomId === self.data.roomId && bookings[i].status === 'InUse') {
-            bookings[i].endTime = String(self._endDate.getHours()).padStart(2,'0') + ':' + String(self._endDate.getMinutes()).padStart(2,'0')
-            break
-          }
-        }
-        wx.setStorageSync('mp_bookings', bookings)
-      } catch(e) {}
-      self._updateSlot(); self.setData({ showExtendPayModal: false })
-      wx.showToast({ title: '续订成功！已支付 ¥' + opt.price, icon: 'success' })
+      if (self._endDate) { self._endDate = new Date(self._endDate.getTime() + opt.minutes * 60000); self.setData({ endTime: String(self._endDate.getHours()).padStart(2,'0') + ':' + String(self._endDate.getMinutes()).padStart(2,'0') }) }
+      try { var bk = wx.getStorageSync('mp_bookings') || []; for (var i = 0; i < bk.length; i++) { if (bk[i].roomId === self.data.roomId && bk[i].status === 'InUse') { bk[i].endTime = String(self._endDate.getHours()).padStart(2,'0') + ':' + String(self._endDate.getMinutes()).padStart(2,'0'); break } }; wx.setStorageSync('mp_bookings', bk) } catch(e) {}
+      self._updateSlot(); self.setData({ showExtendPayModal: false }); wx.showToast({ title: '续订成功！已支付 ¥' + opt.price, icon: 'success' })
     }
     if (method === 'balance') {
-      API.getBalance().then(function(balance) {
-        if (balance < opt.price) { wx.showToast({ title: '余额不足，请选择其他方式', icon: 'none' }); return }
-        var user = wx.getStorageSync('mp_user') || {}; user.balance = balance - opt.price
-        wx.setStorageSync('mp_user', user); self.setData({ balance: user.balance }); p()
-      })
+      API.getBalance().then(function(bal) { if (bal < opt.price) { wx.showToast({ title: '余额不足，请选择其他方式', icon: 'none' }); return }; var u = wx.getStorageSync('mp_user') || {}; u.balance = bal - opt.price; wx.setStorageSync('mp_user', u); self.setData({ balance: u.balance }); p() })
     } else { wx.showLoading({ title: '支付中...' }); setTimeout(function() { wx.hideLoading(); p() }, 800) }
   },
   hideExtend: function() { this.setData({ showExtendModal: false }) },
