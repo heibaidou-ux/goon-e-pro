@@ -97,13 +97,23 @@ Page({
       var cart = cartData || []
       var totalAmt = 0
       var totalQty = 0
+      // 给购物车商品附上图标
+      var products = self.data.products
       for (var i = 0; i < cart.length; i++) {
         totalAmt += (cart[i].qty || 1) * (cart[i].price || 0)
         totalQty += (cart[i].qty || 1)
+        // 从商品数据中查找图标
+        for (var cat in products) {
+          for (var j = 0; j < products[cat].length; j++) {
+            if (products[cat][j].id === cart[i].productId) {
+              cart[i].icon = products[cat][j].icon
+              break
+            }
+          }
+        }
       }
       self.setData({ cart: cart, cartTotal: totalQty, cartTotalPrice: totalAmt.toFixed(2) })
-      // Sync _qty with products —— cart存的是productId，产品列表是id
-      var products = self.data.products
+      // Sync _qty with products
       for (var cat in products) {
         for (var j = 0; j < products[cat].length; j++) {
           products[cat][j]._qty = 0
