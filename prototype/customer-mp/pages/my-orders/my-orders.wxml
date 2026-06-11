@@ -129,7 +129,7 @@
         </view>
       </view>
       <view class="big-actions">
-        <view class="big-action-btn outline" bindtap="reBook" data-id="{{item.orderId}}">再次预约</view>
+        <view class="big-action-btn outline" bindtap="reBook" data-id="{{item.orderId}}">{{item.isTeaOrder ? '再次购买' : '再次预约'}}</view>
         <view class="big-action-btn ghost" bindtap="goRoomDetail" data-id="{{item.orderId}}">查看详情</view>
       </view>
     </view>
