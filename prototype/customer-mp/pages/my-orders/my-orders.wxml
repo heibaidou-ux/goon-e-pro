@@ -50,10 +50,6 @@
             <text class="device-icon">🎵</text>
             <text class="device-label">音乐</text>
           </view>
-          <view class="device-item" bindtap="goRoomControl" data-room-id="{{item.roomId}}" data-room-name="{{item.roomName}}">
-            <text class="device-icon">📱</text>
-            <text class="device-label">蓝牙</text>
-          </view>
         </view>
       </view>
       <view class="big-actions">

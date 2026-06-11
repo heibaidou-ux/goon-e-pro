@@ -24,41 +24,6 @@
       </view>
     </view>
 
-    <!-- 蓝牙音乐 -->
-    <view class="bluetooth-section">
-      <text class="section-title">蓝牙音乐</text>
-      <view class="bluetooth-connect">
-        <view class="bluetooth-icon-big">
-          <text class="bluetooth-icon-symbol">♪</text>
-        </view>
-        <text class="bluetooth-prompt">请搜索蓝牙：{{roomName}}</text>
-        <view class="bluetooth-status-btn {{bluetoothConnected?'connected':''}}" bindtap="toggleBluetooth">
-          <text>{{bluetoothConnected ? '已连接' : '连接设备'}}</text>
-        </view>
-      </view>
-      <view wx:if="{{bluetoothConnected}}" class="bluetooth-player">
-        <view class="music-info">
-          <text class="music-name">{{currentTrack}}</text>
-          <text class="music-artist">{{trackArtist}}</text>
-        </view>
-        <view class="music-controls">
-          <text class="music-btn" bindtap="prevTrack">⏮</text>
-          <text class="music-btn play-btn" bindtap="togglePlay">{{isPlaying?'⏸':'▶️'}}</text>
-          <text class="music-btn" bindtap="nextTrack">⏭</text>
-        </view>
-        <view class="music-volume">
-          <text class="vol-label">音量</text>
-          <slider value="{{volume}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" bindchanging="onVolumeChange" />
-          <text class="vol-num">{{volume}}%</text>
-        </view>
-      </view>
-      <view class="bluetooth-tips">
-        <text class="tips-title">连接方式：</text>
-        <text class="tips-line">1. 打开手机蓝牙设置</text>
-        <text class="tips-line">2. 搜索蓝牙信号"{{roomName}}"</text>
-        <text class="tips-line">3. 点击配对即可播放手机音乐</text>
-      </view>
-    </view>
 
     <!-- 设备控制 -->
     <text class="section-title">设备控制</text>
