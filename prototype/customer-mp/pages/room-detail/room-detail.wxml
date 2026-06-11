@@ -60,7 +60,7 @@
           <text class="d-day">{{item.day}}</text>
           <text class="d-month">{{item.month}}月</text>
         </view>
-        <view class="date-more" bindtap="showCalModal">更多▾</view>
+        <view class="date-more" bindtap="showCalModal">更多<text style="display:block;font-size:8px;">▾</text></view>
       </view>
 
       <view class="duration-section">
