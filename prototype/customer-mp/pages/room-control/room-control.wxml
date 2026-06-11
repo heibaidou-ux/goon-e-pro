@@ -7,7 +7,7 @@
     <view class="room-info-bar">
       <view class="room-info-left">
         <text class="room-info-name">{{roomName}}</text>
-        <text class="room-info-slot">{{orderSlot}}</text>
+        <text class="room-info-slot">当前预订时段 {{orderSlot}}</text>
       </view>
       <view class="room-info-right">
         <text class="countdown">{{countdown}}</text>
