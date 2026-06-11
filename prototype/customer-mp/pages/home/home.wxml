@@ -62,7 +62,7 @@
   <!-- 可预约包间 -->
   <view class="section">
     <view class="section-title"><text>可预约包间</text><text class="section-more" bindtap="goRoomList">查看全部 ›</text></view>
-    <scroll-view class="room-scroll" scroll-x enhanced show-scrollbar="{{false}}" enable-flex>
+    <scroll-view class="room-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="room-card" wx:for="{{rooms}}" wx:key="roomId" bindtap="goRoom" data-roomid="{{item.roomId}}">
         <view class="room-card-img" style="background:{{item.bgColor}}">{{item.icon}}</view>
         <view class="room-card-body"><text class="room-card-name">{{item.name}}</text><view class="room-card-tags"><text class="room-tag">{{item.capacity}}人</text><text class="room-tag">{{item.area}}㎡</text></view><text class="room-card-price">¥{{item.pricePerHour}}<text class="unit">/时</text></text></view>
