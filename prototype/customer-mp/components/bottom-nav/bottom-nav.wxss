@@ -1,0 +1,28 @@
+.bottom-nav {
+  display: flex;
+  border-top: 1px solid #eee;
+  background: #fff;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+.nav-item {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0 6px;
+  color: #999;
+}
+.nav-item.active {
+  color: #5D8A6B;
+}
+.nav-icon {
+  font-size: 20px;
+  display: block;
+}
+.nav-label {
+  font-size: 10px;
+  margin-top: 2px;
+  display: block;
+}

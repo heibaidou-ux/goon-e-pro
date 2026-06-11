@@ -170,4 +170,7 @@
       </view>
     </view>
   </view>
+
+  <!-- 底部导航 -->
+  <bottom-nav active="orders" />
 </view>

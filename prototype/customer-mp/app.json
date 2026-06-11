@@ -24,40 +24,11 @@
     "navigationBarBackgroundColor": "#ffffff",
     "backgroundColor": "#f5f5f5"
   },
-  "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#5D8A6B",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "black",
-    "list": [
-      {
-        "pagePath": "pages/home/home",
-        "text": "首页",
-        "iconPath": "images/tab-home.png",
-        "selectedIconPath": "images/tab-home-active.png"
-      },
-      {
-        "pagePath": "pages/tea-shop/tea-shop",
-        "text": "茶品",
-        "iconPath": "images/tab-shop.png",
-        "selectedIconPath": "images/tab-shop-active.png"
-      },
-      {
-        "pagePath": "pages/my-orders/my-orders",
-        "text": "订单",
-        "iconPath": "images/tab-orders.png",
-        "selectedIconPath": "images/tab-orders-active.png"
-      },
-      {
-        "pagePath": "pages/member-center/member-center",
-        "text": "我的",
-        "iconPath": "images/tab-me.png",
-        "selectedIconPath": "images/tab-me-active.png"
-      }
-    ]
-  },
   "networkTimeout": {
     "request": 10000
   },
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "usingComponents": {
+    "bottom-nav": "/components/bottom-nav/bottom-nav"
+  }
 }

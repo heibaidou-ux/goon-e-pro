@@ -82,5 +82,11 @@ Page({
       title: '退出登录', content: '确定要退出当前账号吗？',
       success: function(res) { if (res.confirm) { API.logout(); wx.reLaunch({ url: '/pages/home/home' }) } }
     })
-  }
+  },
+
+  // ── 底部导航 ──
+  goHome: function() { wx.navigateTo({ url: '/pages/home/home' }) },
+  goRoomList: function() { wx.navigateTo({ url: '/pages/room-list/room-list' }) },
+  goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
+  goMyOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) }
 })

@@ -238,5 +238,11 @@ Page({
 
   hideLogistics: function() { this.setData({ showLogisticsModal: false }) },
 
-  copyTracking: function(e) { wx.setClipboardData({ data: e.currentTarget.dataset.code }) }
+  copyTracking: function(e) { wx.setClipboardData({ data: e.currentTarget.dataset.code }) },
+
+  // ── 底部导航 ──
+  goHome: function() { wx.navigateTo({ url: '/pages/home/home' }) },
+  goRoomList: function() { wx.navigateTo({ url: '/pages/room-list/room-list' }) },
+  goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
+  goMemberCenter: function() { wx.navigateTo({ url: '/pages/member-center/member-center' }) }
 })

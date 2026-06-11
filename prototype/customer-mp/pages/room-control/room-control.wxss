@@ -40,13 +40,16 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .tips-title { font-size:12px; font-weight:600; color:#666; display:block; margin-bottom:4px; }
 .tips-line { font-size:11px; color:#999; display:block; line-height:1.9; }
 .device-list { padding:0; }
-.device-item { display:flex; align-items:center; padding:14px; background:#fff; border-radius:16px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
-.device-icon { font-size:22px; margin-right:12px; flex-shrink:0; width:30px; text-align:center; }
-.device-info { width:80px; flex-shrink:0; }
+.device-item { display:flex; align-items:center; padding:14px 12px; background:#fafafa; border-radius:14px; margin-bottom:8px; border:1px solid #e8e8e8; }
+.device-icon { font-size:22px; margin-right:10px; flex-shrink:0; width:30px; text-align:center; }
+.device-info { flex-shrink:0; min-width:60px; }
 .device-name { font-size:14px; font-weight:500; display:block; }
 .device-status { font-size:11px; display:block; }
 .device-status.online { color:#00A870; }
 .device-status.offline { color:#e53935; }
-.device-item slider { flex:1; min-width:60px; }
+.device-item switch { margin-left:auto; }
+.device-item slider { flex:1; min-width:70px; margin-left:10px; }
 .ac-ring { display:flex; align-items:center; gap:6px; flex:1; min-width:0; }
+.ac-ring switch { margin-left:auto; }
+.ac-ring slider { flex:1; min-width:60px; }
 .ac-temp { font-size:18px; font-weight:700; color:#333; min-width:32px; text-align:center; flex-shrink:0; }

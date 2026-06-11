@@ -8,19 +8,19 @@
 
   <!-- 轮播图 -->
   <view class="carousel-wrap">
-    <swiper class="carousel-swiper" current="{{currentSlide}}" bindchange="onSwiperChange" autoplay interval="3500" circular>
+    <swiper class="carousel-swiper" current="{{currentSlide}}" bindchange="onSwiperChange" autoplay interval="3500" circular duration="400">
       <swiper-item wx:for="{{carousels}}" wx:key="index">
-        <view class="carousel-slide" bindtap="onCarouselTap" data-index="{{index}}" style="background:url('{{item.img}}') center/cover no-repeat;">
-          <text class="slide-title">{{item.title}}</text>
-          <text class="slide-desc">{{item.desc}}</text>
+        <view class="carousel-slide" bindtap="onCarouselTap" data-index="{{index}}">
+          <image class="carousel-img" src="{{item.img}}" mode="aspectFill"></image>
+          <view class="slide-text">
+            <text class="slide-title">{{item.title}}</text>
+            <text class="slide-desc">{{item.desc}}</text>
+          </view>
         </view>
       </swiper-item>
     </swiper>
     <view class="carousel-dots">
-      <text class="carousel-dot {{currentSlide==0?'active':''}}" bindtap="goSlide" data-idx="0"></text>
-      <text class="carousel-dot {{currentSlide==1?'active':''}}" bindtap="goSlide" data-idx="1"></text>
-      <text class="carousel-dot {{currentSlide==2?'active':''}}" bindtap="goSlide" data-idx="2"></text>
-      <text class="carousel-dot {{currentSlide==3?'active':''}}" bindtap="goSlide" data-idx="3"></text>
+      <text class="carousel-dot {{index==currentSlide?'active':''}}" wx:for="{{carousels}}" wx:for-index="index" wx:key="index" bindtap="goSlide" data-idx="{{index}}"></text>
     </view>
   </view>
 
@@ -38,9 +38,9 @@
     </view>
     <text class="active-order-time">{{activeOrder.timeStr}}</text>
     <view class="active-order-btns">
-      <view class="active-order-btn outline" catchtap="openDoor">🚪 开门</view>
-      <view class="active-order-btn outline" catchtap="goSmartControl">🔧 智控</view>
-      <view class="active-order-btn outline" catchtap="callService">📞 客服</view>
+      <view class="active-order-btn outline" catchtap="openDoor"><text class="btn-icon">🚪</text><text class="btn-label">开门</text></view>
+      <view class="active-order-btn outline" catchtap="goSmartControl"><text class="btn-icon">🔧</text><text class="btn-label">智控</text></view>
+      <view class="active-order-btn outline" catchtap="callService"><text class="btn-icon">📞</text><text class="btn-label">客服</text></view>
     </view>
   </view>
 
@@ -78,13 +78,7 @@
   <view class="staff-entrance" bindtap="goStaffLogin"><text>🔒 员工通道</text></view>
 
   <!-- 底部导航 -->
-  <view class="bottom-nav">
-    <view class="nav-item active"><text class="nav-icon">🏠</text><text class="nav-label">主页</text></view>
-    <view class="nav-item" bindtap="goRoomList"><text class="nav-icon">📅</text><text class="nav-label">预订</text></view>
-    <view class="nav-item" bindtap="goTeaShop"><text class="nav-icon">🍵</text><text class="nav-label">茶品</text></view>
-    <view class="nav-item" bindtap="goMyOrders"><text class="nav-icon">📋</text><text class="nav-label">订单</text></view>
-    <view class="nav-item" bindtap="goMemberCenter"><text class="nav-icon">👤</text><text class="nav-label">我的</text></view>
-  </view>
+  <bottom-nav active="home" />
 </view>
 
 <!-- 门店选择弹窗 -->
@@ -131,6 +125,25 @@
         <text class="form-switch" bindtap="switchLoginTab" data-mode="login">已有账号？立即登录 →</text>
       </view>
       <text class="login-hint">演示环境，任意手机号即可登录</text>
+    </view>
+  </view>
+</view>
+
+<!-- 茶品详情弹窗 -->
+<view class="pay-modal-overlay" wx:if="{{showDetail}}" bindtap="hideDetail">
+  <view class="pay-modal" style="text-align:left;" catchtap="">
+    <view class="detail-img-area" style="background:{{detailProduct.bg}}">
+      <text style="font-size:56px;">{{detailProduct.icon}}</text>
+    </view>
+    <text class="detail-name">{{detailProduct.name}}</text>
+    <text class="detail-desc" style="margin-top:6px;">{{detailProduct.desc}}</text>
+    <view class="detail-price-row">
+      <text class="detail-price-label">单价</text>
+      <text class="detail-price">¥{{detailProduct.price}}</text>
+    </view>
+    <view class="pay-modal-btns">
+      <button class="pay-btn-cancel" bindtap="hideDetail">关闭</button>
+      <button class="pay-btn-confirm" bindtap="addFromDetail">加入购物车</button>
     </view>
   </view>
 </view>

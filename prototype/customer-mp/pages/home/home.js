@@ -2,7 +2,8 @@ var API = require('../../utils/api')
 
 Page({
   data: {
-    topPadding: 88, loading: true, errorMsg: '',
+    topPadding: 88, loading: false, errorMsg: '',
+    showDetail: false, detailProduct: {},
     hasActiveOrder: false,
     activeOrder: { roomName: '', timeStr: '', roomId: '' },
     currentSlide: 0,
@@ -28,7 +29,7 @@ Page({
     var role = API.getUserRole()
     if (role === 'staff') { wx.reLaunch({ url: '/pages/staff-dashboard/staff-dashboard' }); return }
     if (role === 'shareholder') { wx.reLaunch({ url: '/pages/investor-workbench/investor-workbench' }); return }
-    try { var sys = wx.getSystemInfoSync(); self.setData({ topPadding: (sys.statusBarHeight || 44) + 44 }) } catch(e) {}
+    try { var sys = wx.getSystemInfoSync(); self.setData({ topPadding: sys.statusBarHeight + 4 }) } catch(e) {}
     self.loadData(); self.checkActiveOrder()
   },
   onShow: function() { this.loadData(); this.checkActiveOrder() },
@@ -74,6 +75,21 @@ Page({
   decQty: function(e) { var pid = e.currentTarget.dataset.pid, p = this.data.teaProducts; for (var i = 0; i < p.length; i++) { if (p[i].productId === pid && p[i]._qty > 0) { p[i]._qty--; break } } this.setData({ teaProducts: p }); API.removeFromCart(pid).then(this.loadCartCount.bind(this)) },
   loadCartCount: function() { var self = this; API.getCart().then(function(cart) { var c = 0; for (var i = 0; i < cart.length; i++) { c += cart[i].qty||1 } self.setData({ cartCount: c }) }) },
 
+  showProductDetail: function(e) {
+    var pid = e.currentTarget.dataset.pid, name = e.currentTarget.dataset.name || '', desc = e.currentTarget.dataset.desc || '', price = e.currentTarget.dataset.price || 0
+    var p = this.data.teaProducts, product = null
+    for (var i = 0; i < p.length; i++) { if (p[i].productId === pid) { product = p[i]; break } }
+    if (!product) return
+    this.setData({ detailProduct: product, showDetail: true })
+  },
+  hideDetail: function() { this.setData({ showDetail: false }) },
+  addFromDetail: function() {
+    var p = this.data.detailProduct
+    if (!p) return
+    this.incQty({ currentTarget: { dataset: { pid: p.productId, name: p.name, price: p.price } } })
+    this.hideDetail()
+  },
+
   goRoomList: function() { wx.navigateTo({ url: '/pages/room-list/room-list' }) },
   goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
   goMyOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },
@@ -98,6 +114,17 @@ Page({
   getVerifyCode: function() { wx.showToast({ title: '验证码已发送: 8888', icon: 'none' }) },
   doLogin: function() { var self = this; wx.showLoading({ title: '登录中...' }); API.login(self.data.loginPhone, self.data.loginCode).then(function(u) { wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false }); wx.showToast({ title: '登录成功', icon: 'none' }); self.handlePendingAction() }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'登录失败', icon: 'none' }) }) },
   doRegister: function() { var self = this; wx.showLoading({ title: '注册中...' }); API.login(self.data.regPhone||'130****0000', '8888').then(function(u) { wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false }); wx.showToast({ title: '注册成功', icon: 'none' }); self.handlePendingAction() }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'注册失败', icon: 'none' }) }) },
-  handlePendingAction: function() { var a = this.data.pendingAction; if (!a) return; this.setData({ pendingAction: null }); if (a.indexOf('room-')===0) { wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId='+a.replace('room-','') }) } },
-  clearError: function() { this.setData({ errorMsg: '' }) }
+  handlePendingAction: function() {
+    var a = this.data.pendingAction; if (!a) return; this.setData({ pendingAction: null })
+    if (a.indexOf('room-')===0) { wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId='+a.replace('room-','') }); return }
+    if (a === 'profile') { wx.navigateTo({ url: '/pages/member-center/member-center' }); return }
+    if (a === 'coupon') { wx.navigateTo({ url: '/pages/my-coupons/my-coupons' }); return }
+  },
+  clearError: function() { this.setData({ errorMsg: '' }) },
+
+  toggleBalanceVis: function() {
+    var visible = !this.data.balanceVisible
+    this.setData({ balanceVisible: visible, balanceDisplay: visible ? '¥' + this.data.balance : '****' })
+    try { wx.setStorageSync('balance_visible', visible) } catch(e) {}
+  }
 })
