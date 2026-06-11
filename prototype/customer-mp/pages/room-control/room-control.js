@@ -109,18 +109,17 @@ Page({
 
   showExtend: function() {
     var self = this
-    var now = new Date()
-    var curEndMin = now.getHours() * 60 + now.getMinutes() + Math.ceil((self._countdownTotal || 0) / 60)
-    var roundedEndMin = Math.ceil(curEndMin / 30) * 30
-    var h = Math.floor(roundedEndMin / 60) % 24
-    var m = roundedEndMin % 60
-    var curEndStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')
+    // 直接用_endDate计算当前结束时间，与页面顶部显示一致
+    var endDate = self._endDate ? new Date(self._endDate) : new Date()
+    var eh = endDate.getHours()
+    var em = endDate.getMinutes()
+    var curEndStr = String(eh).padStart(2,'0') + ':' + String(em).padStart(2,'0')
     self.setData({ extendInfo: '当前将于 ' + curEndStr + ' 结束。请选择续订时长：', selectedExtendIdx: -1 })
     var options = []
-    for (var i = 1; i <= 8; i++) {
-      var totalMin = roundedEndMin + i * 30
-      var oh = Math.floor(totalMin / 60) % 24
-      var om = totalMin % 60
+    for (var i = 1; i <= 24; i++) {
+      var newDate = new Date(endDate.getTime() + i * 30 * 60000)
+      var oh = newDate.getHours()
+      var om = newDate.getMinutes()
       var extMin = i * 30
       var price = Math.round(120 * extMin / 60)
       options.push({ label: '至 ' + String(oh).padStart(2,'0') + ':' + String(om).padStart(2,'0'), minutes: extMin, price: price })
