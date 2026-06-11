@@ -3,7 +3,8 @@ var API = require('../../utils/api')
 Page({
   data: {
     tabIndex: 0, orders: [], filteredOrders: [],
-    showLogisticsModal: false, showCancelModal: false, showExtendModal: false,
+    showLogisticsModal: false, showCancelModal: false, showExtendModal: false, showDetailModal: false,
+    detailOrder: null,
     logisticsData: { carrier: '', trackingNum: '', timeline: [] },
     cancelOrderId: null, cancelMsg: '',
     extendOrderId: null, extendOptions: [], selectedExtendIdx: -1, extendInfo: ''
@@ -277,12 +278,14 @@ Page({
     var id = e.currentTarget.dataset.id
     var order = this.findOrder(id)
     if (!order) return
-    if (order.isTeaOrder) {
-      wx.navigateTo({ url: '/pages/tea-shop/tea-shop' })
-    } else {
-      wx.navigateTo({ url: '/pages/room-detail/room-detail' })
-    }
+    // 显示订单详情弹窗
+    this.setData({
+      detailOrder: order,
+      showDetailModal: true
+    })
   },
+
+  hideDetailModal: function() { this.setData({ showDetailModal: false }) },
 
   // ── 物流 ──
 

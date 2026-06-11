@@ -192,5 +192,30 @@
   </view>
 
   <!-- 底部导航 -->
+  <!-- 订单详情弹窗 -->
+  <view class="modal-overlay" wx:if="{{showDetailModal}}" bindtap="hideDetailModal">
+    <view class="modal detail-modal" catchtap>
+      <text class="modal-title">📋 订单详情</text>
+      <view class="detail-info" wx:if="{{detailOrder}}">
+        <view class="detail-row"><text class="dl">订单编号</text><text class="dv">{{detailOrder.orderId}}</text></view>
+        <view class="detail-row"><text class="dl">状态</text><text class="dv">{{detailOrder.statusLabel}}</text></view>
+        <view class="detail-row"><text class="dl">时间</text><text class="dv">{{detailOrder.timeStr}}</text></view>
+        <view class="detail-row"><text class="dl">金额</text><text class="dv">¥{{detailOrder.amount}}</text></view>
+        <view class="detail-row" wx:if="{{detailOrder.payment}}"><text class="dl">支付方式</text><text class="dv">{{detailOrder.payment}}</text></view>
+        <view wx:if="{{detailOrder.isTeaOrder && detailOrder.items.length>0}}" class="detail-items">
+          <text class="detail-items-title">商品明细</text>
+          <view class="detail-item" wx:for="{{detailOrder.items}}" wx:key="name">
+            <text class="di-name">{{item.name}}</text>
+            <text class="di-qty">×{{item.qty || 1}}</text>
+            <text class="di-price">¥{{item.price || 0}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="modal-buttons">
+        <view class="modal-btn cancel detail-close" bindtap="hideDetailModal">关闭</view>
+      </view>
+    </view>
+  </view>
+
   <bottom-nav active="orders" />
 </view>
