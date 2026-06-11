@@ -14,7 +14,7 @@ Page({
       { title: '优惠券大放送', desc: '领取专属优惠券，到店享更多折扣', img: '/images/金德大诗梳风004.jpg', url: '../coupon-verify/index.html' }
     ],
     rooms: [], teaProducts: [], cartCount: 0,
-    balance: 0, balanceDisplay: '',
+    balance: 0, balanceDisplay: '', balanceVisible: true,
     qrRoomId: '', qrRoomName: '', qrTableId: '',
     showStoreModal: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
@@ -37,6 +37,8 @@ Page({
   loadData: function() {
     var self = this
     self.setData({ loading: true, errorMsg: '' })
+    // 同步会员中心的余额显隐设置
+    try { var v = wx.getStorageSync('balance_visible'); if (v !== '') self.data.balanceVisible = v } catch(e) {}
     var colors = { MeetingRoom: '#e3f2fd', TeaRoom: '#e8f5e9', Exhibition: '#fff3e0', Workspace: '#f5f5f5' }
     var icons = { MeetingRoom: '💼', TeaRoom: '🍵', Exhibition: '🏛️', Workspace: '🔧' }
     var visualMap = { 'T001': { icon: '🍃', bg: '#e8f5e9' }, 'T002': { icon: '🪵', bg: '#fce4ec' }, 'T003': { icon: '🏔️', bg: '#fff3e0' }, 'T004': { icon: '🌿', bg: '#efebe9' }, 'T005': { icon: '🏵️', bg: '#f1f8e9' }, 'T006': { icon: '🏔️', bg: '#efebe9' }, 'T007': { icon: '🏺', bg: '#f3e5f5' }, 'T008': { icon: '🥃', bg: '#e0f7fa' } }
@@ -49,7 +51,7 @@ Page({
       var teas = []
       for (var i = 0; i < productsData.length; i++) { var t = productsData[i], vis = visualMap[t.productId] || { icon: '🍵', bg: '#f0f0f0' }; teas.push({ productId: t.productId, name: t.name, desc: t.desc || '', price: t.price, icon: vis.icon, bg: vis.bg, _qty: qtyMap[t.productId] || 0 }) }
       self.setData({ rooms: rooms, teaProducts: teas, balance: balance, isLoggedIn: !!user })
-      self.setData({ balanceDisplay: '¥' + balance })
+      self.setData({ balanceDisplay: self.data.balanceVisible ? '¥' + balance : '****' })
       self.loadCartCount()
       self.setData({ loading: false })
     }).catch(function() { self.setData({ loading: false, errorMsg: '加载失败' }) })
