@@ -74,7 +74,7 @@ Page({
 
   renderDateBar: function() {
     var chips = [], selected = this.data.selectedDate, today = this.data.today, weekNames = ['日','一','二','三','四','五','六']
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 4; i++) {
       var d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i)
       chips.push({ week: '周' + weekNames[d.getDay()], day: d.getDate(), month: d.getMonth() + 1, date: d, isToday: d.toDateString() === today.toDateString(), isSelected: d.toDateString() === selected.toDateString(), ts: d.getTime() })
     }
