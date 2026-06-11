@@ -93,19 +93,30 @@
       <view class="bottom-action"><button class="book-btn" bindtap="goToTimeSelect">选择时段</button></view>
     </view>
 
-    <!-- 6.1 Step 3: Time select — 按booking-confirm风格复刻 -->
+    <!-- 6.1 Step 3: 选时段 — 选完后弹窗确认 -->
     <view class="time-select-section" wx:elif="{{step==3}}">
-      <!-- 6.2 时间段限制：当前时间之后的才可选 -->
       <button class="now-btn" bindtap="pickNow">⚡ 现在开始</button>
       <view class="confirm-card">
-        <view class="confirm-row" wx:for="{{timeSlots}}" wx:key="*this" bindtap="selectTime" data-time="{{item.time}}">
+        <view class="confirm-row" wx:for="{{timeSlots}}" wx:key="*this" bindtap="selectTime" data-time="{{item.time}}" data-available="{{item.available}}">
           <text class="label">{{item.label}}</text>
-          <text class="price" wx:if="{{item.available}}">{{item.time}}</text>
-          <text class="price" wx:else style="color:#ccc;">已过时段</text>
+          <text class="price {{item.available?'':'past'}}">{{item.available ? item.time : '已过时段'}}</text>
         </view>
       </view>
-      <view class="bottom-bar">
-        <button class="submit-btn" disabled="{{!selectedTime}}" bindtap="confirmBooking">确认预约</button>
+    </view>
+
+    <!-- 预约确认弹窗（替代原底部确认栏） -->
+    <view class="confirm-overlay" wx:if="{{showBookingConfirm}}" bindtap="hideBookingConfirm">
+      <view class="confirm-modal" catchtap>
+        <text class="confirm-h3">确认预约</text>
+        <view class="booking-confirm-info">
+          <text class="bci-row"><text class="bci-label">券</text><text class="bci-value">{{matchedCouponInfo}}</text></text>
+          <text class="bci-row"><text class="bci-label">房间</text><text class="bci-value">{{selectedRoomName}}</text></text>
+          <text class="bci-row"><text class="bci-label">时间</text><text class="bci-value">{{selectedTime}}</text></text>
+        </view>
+        <view class="confirm-modal-buttons">
+          <button class="confirm-modal-btn cancel" bindtap="hideBookingConfirm">取消</button>
+          <button class="confirm-modal-btn confirm" bindtap="confirmBooking">确认预约</button>
+        </view>
       </view>
     </view>
   </view>
