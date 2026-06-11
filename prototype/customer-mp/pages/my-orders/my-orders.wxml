@@ -20,8 +20,8 @@
       <!-- 茶品订单：显示商品明细 -->
       <view wx:if="{{item.isTeaOrder}}" class="tea-order-items">
         <view wx:for="{{item.items}}" wx:key="name" class="tea-order-item">
-          <text class="toi-name">{{item.name}} x{{item.qty or 1}}</text>
-          <text class="toi-price">Y{{item.price or 0}}</text>
+          <text class="toi-name">{{item.name}} x{{item.qty ? item.qty : 1}}</text>
+          <text class="toi-price">¥{{item.price ? item.price : 0}}</text>
         </view>
       </view>
       <!-- 房间订单：门禁+设备 -->
@@ -77,8 +77,8 @@
       <!-- 茶品订单：显示商品明细 -->
       <view wx:if="{{item.isTeaOrder}}" class="tea-order-items">
         <view wx:for="{{item.items}}" wx:key="name" class="tea-order-item">
-          <text class="toi-name">{{item.name}} x{{item.qty or 1}}</text>
-          <text class="toi-price">Y{{item.price or 0}}</text>
+          <text class="toi-name">{{item.name}} x{{item.qty ? item.qty : 1}}</text>
+          <text class="toi-price">¥{{item.price ? item.price : 0}}</text>
         </view>
       </view>
       <view wx:else class="door-section">
@@ -105,8 +105,8 @@
       <!-- 茶品订单：显示商品明细 -->
       <view wx:if="{{item.isTeaOrder}}" class="tea-order-items">
         <view wx:for="{{item.items}}" wx:key="name" class="tea-order-item">
-          <text class="toi-name">{{item.name}} x{{item.qty or 1}}</text>
-          <text class="toi-price">Y{{item.price or 0}}</text>
+          <text class="toi-name">{{item.name}} x{{item.qty ? item.qty : 1}}</text>
+          <text class="toi-price">¥{{item.price ? item.price : 0}}</text>
         </view>
       </view>
       <!-- 物流 -->
