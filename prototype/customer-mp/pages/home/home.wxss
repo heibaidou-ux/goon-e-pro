@@ -44,7 +44,7 @@ button::after { border:none; }
 .balance-eye { font-size:12px; line-height:1; opacity:.8; padding:1px; }
 .quick-label { font-size:13px; color:#333; font-weight:500; }
 .section { padding:0 0 12px; margin-bottom:12px; background:#fff; }
-.section-title { font-size:15px; font-weight:600; margin-bottom:12px; color:#1a1a1a; padding:16px 0 0; display:flex; justify-content:space-between; }
+.section-title { font-size:15px; font-weight:600; margin-bottom:12px; color:#1a1a1a; padding:16px 16px 0; display:flex; justify-content:space-between; }
 .section-more { font-size:12px; color:#5D8A6B; }
 .room-scroll { display:flex; padding-left:0; white-space:nowrap; overflow-x:auto; }
 .room-card { display:inline-flex; flex-direction:column; width:180px; margin-right:12px; border-radius:16px; background:#fafafa; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,.06); }
@@ -55,19 +55,22 @@ button::after { border:none; }
 .room-tag { font-size:10px; color:#999; background:#f0f0f0; padding:2px 6px; border-radius:4px; margin-right:4px; }
 .room-card-price { font-size:16px; font-weight:700; color:#B8860B; margin-top:6px; }
 .room-card-price .unit { font-size:11px; font-weight:400; color:#999; }
-.tea-title { padding:16px 0 0; }
-.tea-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0; }
-.tea-card { background:#fff; border:1px solid #f0f0f0; border-radius:16px; overflow:hidden; }
+.tea-title { padding:16px 16px 0; }
+.tea-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0; }
+.tea-card { background:#fff; border:1px solid #f0f0f0; border-radius:12px; overflow:hidden; }
+.tea-card:active { background:#fafafa; }
 .tea-card-img { height:100px; display:flex; align-items:center; justify-content:center; font-size:40px; }
 .tea-card-body { padding:10px; }
 .tea-card-name { font-size:13px; font-weight:600; }
 .tea-card-desc { font-size:11px; color:#999; margin-top:2px; }
 .tea-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
 .tea-card-price { font-size:15px; font-weight:700; color:#B8860B; }
-.qty-ctrl { display:flex; align-items:center; gap:4px; }
-.qty-btn-sm { width:20px; height:20px; border-radius:50%; border:1px solid #ddd; display:flex; align-items:center; justify-content:center; font-size:14px; color:#333; }
-.qty-num-sm { font-size:12px; font-weight:600; min-width:14px; text-align:center; }
-.tea-card-btn { padding:4px 10px; border-radius:16px; background:#5D8A6B; color:#fff; font-size:11px; }
+.qty-ctrl { display:flex; align-items:center; gap:6px; }
+.qty-btn-sm { width:22px; height:22px; border-radius:50%; border:1.5px solid #5D8A6B; display:flex; align-items:center; justify-content:center; font-size:14px; color:#5D8A6B; background:#fff; }
+.qty-btn-sm:active { background:#e8f5e9; }
+.qty-num-sm { font-size:13px; font-weight:700; min-width:16px; text-align:center; color:#333; }
+.tea-card-btn { padding:5px 12px; border-radius:16px; background:#5D8A6B; color:#fff; font-size:11px; font-weight:600; }
+.tea-card-btn:active { opacity:.8; }
 .cart-link { font-size:12px; font-weight:400; color:#5D8A6B; display:flex; align-items:center; gap:4px; }
 .cart-badge { background:#B8860B; color:#fff; border-radius:10px; padding:1px 7px; font-size:10px; }
 .staff-entrance { text-align:center; padding:16px 0 80px; }

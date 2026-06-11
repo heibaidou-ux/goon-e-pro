@@ -67,9 +67,9 @@
   <view class="section">
     <view class="section-title tea-title"><text>🍵 精选茶品</text><text class="cart-link" bindtap="goCartPage">🛒 购物车<text class="cart-badge" wx:if="{{cartCount>0}}">{{cartCount}}</text></text></view>
     <view class="tea-grid">
-      <view class="tea-card" wx:for="{{teaProducts}}" wx:key="productId">
-        <view class="tea-card-img" style="background:{{item.bg}}" bindtap="showProductDetail" data-pid="{{item.productId}}" data-name="{{item.name}}" data-desc="{{item.desc}}" data-price="{{item.price}}">{{item.icon}}</view>
-        <view class="tea-card-body"><text class="tea-card-name">{{item.name}}</text><text class="tea-card-desc">{{item.desc}}</text><view class="tea-card-footer"><text class="tea-card-price">¥{{item.price}}</text><view class="qty-ctrl"><text class="qty-btn-sm" wx:if="{{item._qty>0}}" bindtap="decQty" data-pid="{{item.productId}}">−</text><text class="qty-num-sm" wx:if="{{item._qty>0}}">{{item._qty}}</text><text class="tea-card-btn" catchtap="incQty" data-pid="{{item.productId}}" data-name="{{item.name}}" data-price="{{item.price}}">{{item._qty>0?'+':'+ 加购'}}</text></view></view></view>
+      <view class="tea-card" wx:for="{{teaProducts}}" wx:key="productId" bindtap="goTeaShop">
+        <view class="tea-card-img" style="background:{{item.bg}}" catchtap="showProductDetail" data-pid="{{item.productId}}">{{item.icon}}</view>
+        <view class="tea-card-body"><text class="tea-card-name">{{item.name}}</text><text class="tea-card-desc">{{item.desc}}</text><view class="tea-card-footer"><text class="tea-card-price">¥{{item.price}}</text><view class="qty-ctrl"><text class="qty-btn-sm" wx:if="{{item._qty>0}}" catchtap="decQty" data-pid="{{item.productId}}">−</text><text class="qty-num-sm" wx:if="{{item._qty>0}}">{{item._qty}}</text><text class="tea-card-btn" catchtap="incQty" data-pid="{{item.productId}}" data-name="{{item.name}}" data-price="{{item.price}}">{{item._qty>0?'+':'+ 加购'}}</text></view></view></view>
       </view>
     </view>
   </view>

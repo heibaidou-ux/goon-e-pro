@@ -579,7 +579,12 @@
 
   API.removeFromCart = function(productId) {
     var cart = lsGet('tea_cart', []);
-    cart = cart.filter(function(item) { return item.productId !== productId; });
+    for (var i = 0; i < cart.length; i++) {
+      if (cart[i].productId === productId) {
+        if (cart[i].qty > 1) { cart[i].qty--; } else { cart.splice(i, 1); }
+        break;
+      }
+    }
     lsSet('tea_cart', cart);
     return Promise.resolve(cart);
   };
