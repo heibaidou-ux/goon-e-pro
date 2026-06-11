@@ -104,8 +104,17 @@ Page({
   openDoor: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) }) },
   callService: function() { wx.showToast({ title: '📞 已通知店员', icon: 'none' }) },
   callPhone: function() {
-    wx.setClipboardData({ data: '18011821388', success: function() { wx.showToast({ title: '号码已复制', icon: 'none' }) } })
-    wx.makePhoneCall({ phoneNumber: '18011821388' })
+    var self = this
+    wx.showActionSheet({
+      itemList: ['拨打 18011821388', '复制号码'],
+      success: function(res) {
+        if (res.tapIndex === 0) {
+          wx.makePhoneCall({ phoneNumber: '18011821388' })
+        } else {
+          wx.setClipboardData({ data: '18011821388', success: function() { wx.showToast({ title: '号码已复制', icon: 'none' }) } })
+        }
+      }
+    })
   },
   copyAddress: function() {
     wx.setClipboardData({ data: '广州市天河区珠江新城富力盈隆广场3801', success: function() { wx.showToast({ title: '地址已复制', icon: 'none' }) } })
