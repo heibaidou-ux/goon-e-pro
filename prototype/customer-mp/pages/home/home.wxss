@@ -2,7 +2,7 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .page { flex:1; overflow-x:hidden; padding-bottom:60px; }
 
 /* 门店头部 */
-.store-header { display:flex; justify-content:space-between; align-items:center; padding:12px 0; background:#fff; }
+.store-header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#fff; }
 .store-name { font-size:20px; font-weight:700; color:#5D8A6B; }
 .store-select { font-size:12px; color:#666; padding:4px 8px; border-radius:8px; background:#f5f5f5; }
 
@@ -19,7 +19,7 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .carousel-dot.active { width:16px; border-radius:4px; background:#fff; }
 
 /* 门店信息栏 */
-.store-info-bar { padding:0; background:#fff; }
+.store-info-bar { padding:0 16px; background:#fff; }
 .info-row { display:flex; align-items:center; font-size:12px; color:#666; border-bottom:1px solid #f0f0f0; padding:8px 0; }
 .info-row.info-row-split { justify-content:space-between; }
 .info-addr { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -44,7 +44,7 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .active-order-btn.outline { background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3); }
 
 /* 快捷入口 — 四宫格 */
-.quick-grid { display:grid; grid-template-columns:repeat(4,1fr); padding:20px 0; background:#fff; margin-bottom:12px; }
+.quick-grid { display:grid; grid-template-columns:repeat(4,1fr); padding:20px 16px; background:#fff; margin-bottom:12px; }
 .quick-item { display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px 2px; }
 .quick-item:active { opacity:.7; }
 .quick-icon { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:34px; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.1); }
