@@ -9,8 +9,8 @@
   <!-- 轮播图 -->
   <view class="carousel-wrap">
     <swiper class="carousel-swiper" current="{{currentSlide}}" bindchange="onSwiperChange" autoplay interval="3500" circular duration="300" easing-function="easeInOutCubic">
-      <swiper-item wx:for="{{carousels}}" wx:key="index" bindtap="onCarouselTap" data-index="{{index}}">
-        <view class="carousel-slide">
+      <swiper-item wx:for="{{carousels}}" wx:key="index">
+        <view class="carousel-slide" bindtap="onCarouselTap" data-index="{{index}}">
           <image class="carousel-img" src="{{item.img}}" mode="aspectFill" binderror="onImageError" data-index="{{index}}"></image>
           <view class="slide-text">
             <text class="slide-title">{{item.title}}</text>
