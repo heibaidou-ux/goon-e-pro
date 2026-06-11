@@ -16,7 +16,7 @@ Page({
     rooms: [], teaProducts: [], cartCount: 0,
     balance: 0, balanceDisplay: '', balanceVisible: true,
     qrRoomId: '', qrRoomName: '', qrTableId: '',
-    showStoreModal: false, showLoginModal: false,
+    currentStore: 'yilong', storeName: '盈隆店', showStoreModal: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
     loginMode: 'login', loginType: 'code', loginPhone: '138****8888', loginCode: '8888', loginPassword: '',
     regPhone: '', regCode: '',
@@ -122,6 +122,20 @@ Page({
 
   goRoomList: function() { wx.navigateTo({ url: '/pages/room-list/room-list' }) },
   goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
+  // ── 门店选择 ──
+  showStoreSelector: function() { this.setData({ showStoreModal: true }) },
+  hideStoreSelector: function() { this.setData({ showStoreModal: false }) },
+  selectStore: function(e) {
+    var store = e.currentTarget.dataset.store
+    var name = e.currentTarget.dataset.name
+    this.setData({ currentStore: store, storeName: name, showStoreModal: false })
+    if (store !== 'yilong') {
+      wx.showToast({ title: name + ' 即将上线，敬请期待', icon: 'none' })
+    } else {
+      wx.showToast({ title: '已切换至 ' + name, icon: 'success' })
+    }
+  },
+
   goMyOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },
   goMemberCenter: function() { wx.navigateTo({ url: '/pages/member-center/member-center' }) },
   goCouponVerify: function() { wx.navigateTo({ url: '/pages/coupon-verify/coupon-verify' }) },

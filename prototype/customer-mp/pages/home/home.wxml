@@ -3,7 +3,7 @@
   <!-- 门店头部 -->
   <view class="store-header">
     <text class="store-name">高岸茶室</text>
-    <text class="store-select" bindtap="showStoreSelector">盈隆店 ▾</text>
+    <text class="store-select" bindtap="showStoreSelector">{{storeName}} ▾</text>
   </view>
 
   <!-- 轮播图 -->
@@ -88,9 +88,9 @@
 <!-- 门店选择弹窗 -->
 <view class="modal-overlay" wx:if="{{showStoreModal}}" bindtap="hideStoreSelector">
   <view class="modal" catchtap><text class="modal-title">选择门店</text>
-    <view class="store-option active"><text>📍 盈隆店</text><text style="color:#5D8A6B;">✓ 当前</text></view>
-    <view class="store-option coming" bindtap="toastComing"><text>📍 珠江新城店</text><text class="store-coming-tag">即将上线</text></view>
-    <view class="store-option coming" bindtap="toastComing"><text>📍 琶洲店</text><text class="store-coming-tag">即将上线</text></view>
+    <view class="store-option {{currentStore=='yilong' ? 'active' : ''}}" bindtap="selectStore" data-store="yilong" data-name="盈隆店"><text>📍 盈隆店</text><text wx:if="{{currentStore=='yilong'}}" style="color:#5D8A6B;">✓ 当前</text></view>
+    <view class="store-option {{currentStore=='zhujiang' ? 'active' : ''}}" bindtap="selectStore" data-store="zhujiang" data-name="珠江新城店"><text>📍 珠江新城店</text><text wx:if="{{currentStore=='zhujiang'}}" style="color:#5D8A6B;">✓ 当前</text></view>
+    <view class="store-option {{currentStore=='pazhou' ? 'active' : ''}}" bindtap="selectStore" data-store="pazhou" data-name="琶洲店"><text>📍 琶洲店</text><text wx:if="{{currentStore=='pazhou'}}" style="color:#5D8A6B;">✓ 当前</text></view>
     <view class="modal-close" bindtap="hideStoreSelector">关闭</view>
   </view>
 </view>
