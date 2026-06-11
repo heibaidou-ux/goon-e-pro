@@ -8,10 +8,10 @@ Page({
     activeOrder: { roomName: '', timeStr: '', roomId: '' },
     currentSlide: 0,
     carousels: [
-      { title: '高岸茶室', desc: '城市中的静谧茶空间', img: '../../images/中英文标题LOGO-蓝天白云-16比9-A.jpg', url: '' },
-      { title: '会员首充特惠', desc: '首充享7折 + 赠送优惠券包', img: '../../images/头图四-店面招牌.jpg', url: '../member-center/index.html?action=topup' },
-      { title: '精选包间', desc: '大茶室 · 会议室 · 中茶室', img: '../../images/茶荟头图-空间-诗梳风大茶室.jpg', url: '../home/index.html' },
-      { title: '优惠券大放送', desc: '领取专属优惠券，到店享更多折扣', img: '../../images/金德大诗梳风004.jpg', url: '../coupon-verify/index.html' }
+      { title: '高岸茶室', desc: '城市中的静谧茶空间', img: '/images/中英文标题LOGO-蓝天白云-16比9-A.jpg', url: '' },
+      { title: '会员首充特惠', desc: '首充享7折 + 赠送优惠券包', img: '/images/头图四-店面招牌.jpg', url: '../member-center/index.html?action=topup' },
+      { title: '精选包间', desc: '大茶室 · 会议室 · 中茶室', img: '/images/茶荟头图-空间-诗梳风大茶室.jpg', url: '../home/index.html' },
+      { title: '优惠券大放送', desc: '领取专属优惠券，到店享更多折扣', img: '/images/金德大诗梳风004.jpg', url: '../coupon-verify/index.html' }
     ],
     rooms: [], teaProducts: [], cartCount: 0,
     balance: 0, balanceDisplay: '', balanceVisible: true,
@@ -65,7 +65,7 @@ Page({
 
   onSwiperChange: function(e) { this.setData({ currentSlide: e.detail.current }) },
   goSlide: function(e) { this.setData({ currentSlide: parseInt(e.currentTarget.dataset.idx) }) },
-  onCarouselTap: function(e) { var urls = ['', '/pages/member-center/member-center?action=topup', '/pages/room-list/room-list', '/pages/coupon-verify/coupon-verify']; var idx = e.currentTarget.dataset.index; if (idx >= 0 && idx < urls.length && urls[idx]) wx.navigateTo({ url: urls[idx] }) },
+  onCarouselTap: function(e) { var urls = ['/pages/room-list/room-list', '/pages/member-center/member-center?action=topup', '/pages/room-list/room-list', '/pages/coupon-verify/coupon-verify']; var idx = e.currentTarget.dataset.index; if (idx >= 0 && idx < urls.length && urls[idx]) wx.navigateTo({ url: urls[idx] }) },
 
   handleBalanceClick: function() { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'profile', showLoginModal: true }); return } wx.navigateTo({ url: '/pages/member-center/member-center' }) },
   handleCouponClick: function() { if (!this.data.isLoggedIn) { this.setData({ pendingAction: 'coupon', showLoginModal: true }); return } wx.navigateTo({ url: '/pages/my-coupons/my-coupons' }) },
@@ -121,6 +121,21 @@ Page({
     if (a === 'coupon') { wx.navigateTo({ url: '/pages/my-coupons/my-coupons' }); return }
   },
   clearError: function() { this.setData({ errorMsg: '' }) },
+
+
+  // 轮播图加载失败时显示占位
+  onImageError: function(e) {
+    var idx = e.currentTarget.dataset.index
+    if (idx === undefined) return
+    var key = 'carousels[' + idx + '].img'
+    this.setData({ __cached: {} })
+    // fallback: use a placeholder
+    var carousels = this.data.carousels
+    if (carousels[idx] && carousels[idx].img.indexOf('data:') !== 0) {
+      carousels[idx].img = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="375" height="200" viewBox="0 0 375 200"><rect fill="#e8f5e9" width="375" height="200"/><text x="50%" y="50%" fill="#5D8A6B" font-size="16" text-anchor="middle" dy=".3em">' + (carousels[idx].title || '图片加载失败') + '</text></svg>')
+      this.setData({ carousels: carousels })
+    }
+  },
 
   toggleBalanceVis: function() {
     var visible = !this.data.balanceVisible
