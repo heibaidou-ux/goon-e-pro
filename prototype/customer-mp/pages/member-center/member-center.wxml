@@ -55,7 +55,7 @@
 
   <!-- 充值弹窗 -->
   <view class="modal-overlay" wx:if="{{showRechargeModal}}" bindtap="hideRecharge">
-    <view class="modal" catchtap="">
+    <view class="modal" catchtap="preventBubble">
       <text class="modal-h3">💳 充值</text>
       <text class="modal-promo">首充享7折优惠，最高减¥300</text>
       <view class="amount-grid">

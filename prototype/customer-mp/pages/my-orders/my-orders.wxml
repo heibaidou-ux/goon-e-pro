@@ -142,7 +142,7 @@
 
   <!-- 物流详情弹窗 -->
   <view class="lg-modal-overlay" wx:if="{{showLogisticsModal}}" bindtap="hideLogistics">
-    <view class="lg-modal" catchtap="">
+    <view class="lg-modal" catchtap>
       <view class="lg-modal-header">
         <text class="lg-title">物流详情</text>
         <text class="lg-modal-close" bindtap="hideLogistics">✕</text>
@@ -166,7 +166,7 @@
 
   <!-- 取消确认弹窗 -->
   <view class="modal-overlay" wx:if="{{showCancelModal}}" bindtap="hideCancelModal">
-    <view class="modal" catchtap="">
+    <view class="modal" catchtap>
       <text class="modal-title">取消预约</text>
       <text class="modal-desc">{{cancelMsg}}</text>
       <view class="modal-buttons">
@@ -178,7 +178,7 @@
 
   <!-- 续订弹窗 -->
   <view class="modal-overlay" wx:if="{{showExtendModal}}" bindtap="hideExtendModal">
-    <view class="modal modal-extend" catchtap="">
+    <view class="modal modal-extend" catchtap>
       <text class="modal-title">续订包间</text>
       <text class="modal-desc">{{extendInfo}}</text>
       <view class="extend-grid">

@@ -50,4 +50,13 @@ page { background:#f0f2ef; margin:0; padding:0; }
 .ext-price { font-size:10px;display:block;margin-top:2px;opacity:.8; }
 .extend-option.selected .ext-price { color:#fff; }
 .extend-pay-amount { font-size:28px;font-weight:800;color:#B8860B;display:block;margin:8px 0; }
-.extend-pay-hint { font-size:12px;color:#999;display:block; }
+.pay-modal { width:340px; max-width:90vw; }
+.pay-methods-section { margin:12px 0; }
+.pay-section-title { font-size:13px;font-weight:600;color:#333;margin-bottom:8px;display:block;text-align:left; }
+.pay-method { display:flex;align-items:center;padding:12px;border:2px solid #e0d8d0;border-radius:12px;background:#fff;gap:10px;margin-bottom:8px; }
+.pay-method.selected { border-color:#5D8A6B;background:#F2F6F0; }
+.pay-method-icon { font-size:22px;width:32px;text-align:center; }
+.pay-method-info { flex:1; }
+.pay-method-name { font-size:14px;font-weight:500;display:block; }
+.pay-method-desc { font-size:11px;color:#999;margin-top:1px;display:block; }
+.pay-method-check { font-size:16px;color:#5D8A6B; }

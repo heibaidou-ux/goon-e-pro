@@ -87,7 +87,7 @@
 
 <!-- 门店选择弹窗 -->
 <view class="modal-overlay" hidden="{{!showStoreModal}}" bindtap="hideStoreSelector">
-  <view class="modal" catchtap=""><text class="modal-title">选择门店</text>
+  <view class="modal" catchtap><text class="modal-title">选择门店</text>
     <view class="store-option active"><text>📍 盈隆店</text><text style="color:#5D8A6B;">✓ 当前</text></view>
     <view class="store-option coming" bindtap="toastComing"><text>📍 珠江新城店</text><text class="store-coming-tag">即将上线</text></view>
     <view class="store-option coming" bindtap="toastComing"><text>📍 琶洲店</text><text class="store-coming-tag">即将上线</text></view>
@@ -122,7 +122,7 @@
 
 <!-- 茶品详情弹窗 -->
 <view class="pay-modal-overlay" wx:if="{{showDetail}}" bindtap="hideDetail">
-  <view class="pay-modal" style="text-align:left;" catchtap="">
+  <view class="pay-modal" style="text-align:left;" catchtap>
     <view class="detail-img-area" style="background:{{detailProduct.bg}}">
       <text style="font-size:56px;">{{detailProduct.icon}}</text>
     </view>

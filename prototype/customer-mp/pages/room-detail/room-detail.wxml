@@ -125,7 +125,7 @@
 </view>
 
 <view class="cal-modal-overlay" wx:if="{{showCalModal}}" bindtap="hideCalModal">
-  <view class="cal-modal-content" catchtap="">
+  <view class="cal-modal-content" catchtap>
     <view class="cal-header">
       <view class="cal-nav" bindtap="calChangeMonth" data-dir="-1">◀</view>
       <text class="cal-month">{{calYear}}年 {{calMonth+1}}月</text>

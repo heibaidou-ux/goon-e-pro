@@ -5,9 +5,10 @@ Page({
     roomId: '', roomName: '房间',
     countdown: '--:--', endTime: '--:--', orderSlot: '', orderStart: '',
     devices: [],
+    balance: 0,
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
-    extendPayInfo: '', extendPayAmount: 0
+    extendPayInfo: '', extendPayAmount: 0, extendPayMethod: 'balance'
   },
 
   onLoad: function(e) {
@@ -19,6 +20,8 @@ Page({
     this.setData({ roomId: roomId, roomName: roomName, orderStart: startStr })
     this.loadDevices()
     this.startCountdown(duration, endStr)
+    var self = this
+    API.getBalance().then(function(b) { self.setData({ balance: b || 0 }) })
   },
 
   loadDevices: function() {
@@ -100,6 +103,7 @@ Page({
     return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0')
   },
 
+  preventBubble: function() {},
   onUnload: function() {
     if (this._countdownTimer) clearInterval(this._countdownTimer)
   },
@@ -135,12 +139,21 @@ Page({
     var idx = this.data.selectedExtendIdx
     if (idx < 0 || idx >= this.data.extendOptions.length) return
     var opt = this.data.extendOptions[idx]
-    this.setData({
-      extendPayInfo: '续订' + opt.minutes + '分钟至 ' + opt.label.replace('至 ','') + '，+¥' + opt.price,
-      extendPayAmount: opt.price,
-      showExtendModal: false,
-      showExtendPayModal: true
+    var self = this
+    API.getBalance().then(function(b) {
+      self.setData({
+        balance: b || 0,
+        extendPayInfo: '续订' + opt.minutes + '分钟至 ' + opt.label.replace('至 ','') + '，+¥' + opt.price,
+        extendPayAmount: opt.price,
+        extendPayMethod: 'balance',
+        showExtendModal: false,
+        showExtendPayModal: true
+      })
     })
+  },
+
+  selectExtendPay: function(e) {
+    this.setData({ extendPayMethod: e.currentTarget.dataset.pay })
   },
 
   doExtendPayment: function() {
@@ -148,16 +161,8 @@ Page({
     var idx = this.data.selectedExtendIdx
     if (idx < 0 || idx >= this.data.extendOptions.length) return
     var opt = this.data.extendOptions[idx]
-    API.getBalance().then(function(balance) {
-      if (balance < opt.price) {
-        wx.showToast({ title: '余额不足，请充值', icon: 'none' })
-        self.setData({ showExtendPayModal: false })
-        return
-      }
-      var newBalance = balance - opt.price
-      var user = wx.getStorageSync('mp_user') || {}
-      user.balance = newBalance
-      wx.setStorageSync('mp_user', user)
+    var method = this.data.extendPayMethod
+    var proceedExtend = function() {
       self._countdownTotal = (self._countdownTotal || 0) + opt.minutes * 60
       self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
       if (self._endDate) {
@@ -180,8 +185,30 @@ Page({
       } catch(e) {}
       self._updateSlot()
       self.setData({ showExtendPayModal: false })
-      wx.showToast({ title: '续订成功！已扣除 ¥' + opt.price, icon: 'success' })
-    })
+      wx.showToast({ title: '续订成功！已支付 ¥' + opt.price, icon: 'success' })
+    }
+
+    if (method === 'balance') {
+      API.getBalance().then(function(balance) {
+        if (balance < opt.price) {
+          wx.showToast({ title: '余额不足（¥' + balance + '），请选择其他支付方式或充值', icon: 'none' })
+          return
+        }
+        var newBalance = balance - opt.price
+        var user = wx.getStorageSync('mp_user') || {}
+        user.balance = newBalance
+        wx.setStorageSync('mp_user', user)
+        self.setData({ balance: newBalance })
+        proceedExtend()
+      })
+    } else if (method === 'wechat' || method === 'alipay') {
+      // 真实环境中调wx.requestPayment，目前mock直接成功
+      wx.showLoading({ title: '支付中...' })
+      setTimeout(function() {
+        wx.hideLoading()
+        proceedExtend()
+      }, 800)
+    }
   },
 
   hideExtend: function() { this.setData({ showExtendModal: false }) },

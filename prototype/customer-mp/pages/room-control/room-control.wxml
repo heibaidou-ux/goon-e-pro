@@ -50,7 +50,7 @@
 
   <!-- 续订弹窗 -->
   <view class="modal-overlay" wx:if="{{showExtendModal}}" bindtap="hideExtend">
-    <view class="modal" catchtap="">
+    <view class="modal" catchtap="preventBubble">
       <text class="modal-title">续订包间</text>
       <text class="modal-desc">{{extendInfo}}</text>
       <view class="extend-grid">
@@ -68,11 +68,30 @@
 
   <!-- 续订支付确认 -->
   <view class="modal-overlay" wx:if="{{showExtendPayModal}}" bindtap="cancelExtendPay">
-    <view class="modal" catchtap="">
+    <view class="modal pay-modal" catchtap="preventBubble">
       <text class="modal-title">确认续订支付</text>
       <text class="modal-desc">{{extendPayInfo}}</text>
       <text class="extend-pay-amount">¥{{extendPayAmount}}</text>
-      <text class="extend-pay-hint">从账户余额扣除</text>
+
+      <view class="pay-methods-section">
+        <text class="pay-section-title">选择支付方式</text>
+        <view class="pay-method {{extendPayMethod=='wechat'?'selected':''}}" bindtap="selectExtendPay" data-pay="wechat">
+          <text class="pay-method-icon">💚</text>
+          <view class="pay-method-info"><text class="pay-method-name">微信支付</text><text class="pay-method-desc">微信零钱/银行卡</text></view>
+          <text class="pay-method-check" wx:if="{{extendPayMethod=='wechat'}}">✓</text>
+        </view>
+        <view class="pay-method {{extendPayMethod=='alipay'?'selected':''}}" bindtap="selectExtendPay" data-pay="alipay">
+          <text class="pay-method-icon">💙</text>
+          <view class="pay-method-info"><text class="pay-method-name">支付宝</text><text class="pay-method-desc">支付宝余额/花呗</text></view>
+          <text class="pay-method-check" wx:if="{{extendPayMethod=='alipay'}}">✓</text>
+        </view>
+        <view class="pay-method {{extendPayMethod=='balance'?'selected':''}}" bindtap="selectExtendPay" data-pay="balance">
+          <text class="pay-method-icon">💰</text>
+          <view class="pay-method-info"><text class="pay-method-name">会员余额</text><text class="pay-method-desc">当前余额 ¥{{balance}}</text></view>
+          <text class="pay-method-check" wx:if="{{extendPayMethod=='balance'}}">✓</text>
+        </view>
+      </view>
+
       <view class="modal-buttons">
         <view class="modal-btn cancel" bindtap="cancelExtendPay">取消</view>
         <view class="modal-btn primary" bindtap="doExtendPayment">确认支付</view>

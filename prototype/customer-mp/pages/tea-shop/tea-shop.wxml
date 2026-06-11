@@ -80,7 +80,7 @@
 
 <!-- Product Detail Modal -->
 <view class="pay-modal-overlay" wx:if="{{showDetail}}" bindtap="hideDetail">
-  <view class="pay-modal" style="text-align:left;" catchtap="">
+  <view class="pay-modal" style="text-align:left;" catchtap>
     <view class="detail-img-area" style="background:{{detailProduct.bg}}">
       <text style="font-size:56px;">{{detailProduct.icon}}</text>
     </view>
@@ -116,7 +116,7 @@
 
 <!-- Insufficient Balance Modal -->
 <view class="pay-modal-overlay" wx:if="{{showInsufficient}}" bindtap="hideInsufficient">
-  <view class="pay-modal" catchtap="">
+  <view class="pay-modal" catchtap>
     <text class="modal-h3">⚠️ 余额不足</text>
     <text class="insufficient-msg">{{insufficientMsg}}</text>
     <view class="pay-modal-btns">
@@ -128,7 +128,7 @@
 
 <!-- Payment Modal -->
 <view class="pay-modal-overlay" wx:if="{{showPayModal}}" bindtap="cancelPay">
-  <view class="pay-modal" catchtap="">
+  <view class="pay-modal" catchtap>
     <text class="modal-h3">确认支付</text>
     <view class="pay-items">
       <view class="pay-item-row" wx:for="{{cart}}" wx:key="id"><text>{{item.name}} ×{{item.qty}}</text><text>¥{{item.price * item.qty}}</text></view>
