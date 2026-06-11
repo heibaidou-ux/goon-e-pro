@@ -47,10 +47,10 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .quick-grid { display:grid; grid-template-columns:repeat(4,1fr); padding:20px 0; background:#fff; margin-bottom:12px; }
 .quick-item { display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px 2px; }
 .quick-item:active { opacity:.7; }
-.quick-icon { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+.quick-icon { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:34px; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.1); }
 .quick-icon.brand { background:linear-gradient(135deg,#1f5c2e,#5D8A6B); }
 .quick-icon.balance { background:linear-gradient(135deg,#4d6666,#7b9a9a); flex-direction:column; font-size:14px; gap:0; }
-.balance-icon { font-size:16px; display:block; line-height:1; }
+.balance-icon { font-size:20px; display:block; line-height:1; }
 .balance-amt { font-size:12px; font-weight:600; display:block; line-height:1; }
 .quick-icon.coupon { background:linear-gradient(135deg,#8a6500,#c4941c); }
 .quick-icon.profile { background:linear-gradient(135deg,#655a4a,#9b8b7b); }
