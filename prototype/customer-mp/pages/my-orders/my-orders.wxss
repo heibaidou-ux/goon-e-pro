@@ -36,6 +36,10 @@ page { background:#f5f7fa; margin:0; padding:0; }
 .device-label { font-size:10px; color:#666; }
 
 /* ── Action Buttons ── */
+.tea-order-items { padding:8px 0; border-top:1px solid #f0f0f0; margin-top:6px; }
+.tea-order-item { display:flex; justify-content:space-between; padding:4px 0; font-size:13px; }
+.toi-name { color:#333; }
+.toi-price { color:#999; font-weight:500; }
 .big-actions { display:flex; gap:10px; margin-top:10px; }
 .big-action-btn { flex:1; padding:14px; border-radius:16px; font-size:15px; font-weight:600; text-align:center; }
 .big-action-btn.primary { background:#5D8A6B; color:#fff; border:none; }
