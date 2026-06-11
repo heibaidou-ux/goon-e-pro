@@ -49,6 +49,37 @@ Page({
           }
         }
 
+        // 开门条件：预约开始前30分钟内 + 房间未被占用
+        var doorCanOpen = false
+        var doorHint = ''
+        var roomOccupied = false
+        if (status === 'Booked' && o.date && o.time) {
+          var sb = o.time.split('-')[0].split(':')
+          if (sb.length >= 2) {
+            var orderDate = new Date(o.date)
+            var orderDT = new Date(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate(), parseInt(sb[0]), parseInt(sb[1]))
+            var minUntilStart = (orderDT - now) / 60000
+            // 检查房间是否被其他进行中订单占用
+            for (var oi = 0; oi < orders.length; oi++) {
+              var oo = orders[oi]
+              if (oo.orderId === o.orderId) continue
+              if (oo.roomId === o.roomId && (oo.status === 'InUse' || oo.status === 'in_use')) {
+                roomOccupied = true; break
+              }
+            }
+            // 条件1: 在开始前30分钟内(>= -30)
+            // 条件2: 房间未被占用
+            doorCanOpen = (minUntilStart <= 30) && !roomOccupied
+            if (minUntilStart > 30) {
+              doorHint = '预约开始前' + Math.ceil(minUntilStart - 30) + '分钟可开门'
+            } else if (roomOccupied) {
+              doorHint = '房间正在使用中'
+            } else {
+              doorHint = '可开门'
+            }
+          }
+        }
+
         // 状态标签
         var statusClass = 'status-completed', statusLabel = '已完成'
         if (status === 'InUse' || status === 'in_use') { statusClass = 'status-inuse'; statusLabel = '进行中' }
@@ -95,7 +126,8 @@ Page({
           timeStr: (o.date||'')+' '+(o.time||(o.start?o.start.slice(0,5)+'-'+o.end.slice(0,5):'')),
           amount: o.amount||0, doorCode: o.doorCode||'0000',
           remaining: remaining, cancelFree: cancelFree, cancelMsg: cancelMsg,
-          logistics: log, payment: o.payment||''
+          logistics: log, payment: o.payment||'',
+          doorCanOpen: doorCanOpen, doorHint: doorHint
         }
       })
       self.setData({ orders: mapped })
@@ -130,6 +162,11 @@ Page({
   openDoor: function(e) {
     var order = this.findOrder(e.currentTarget.dataset.id)
     if (!order) return
+    // 待使用订单：校验开门条件
+    if (order.status === 'Booked' && !order.doorCanOpen) {
+      wx.showToast({ title: order.doorHint || '暂不能开门', icon: 'none' })
+      return
+    }
     wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+(order.roomId||'')+'&roomName='+encodeURIComponent(order.roomName||'') })
   },
 

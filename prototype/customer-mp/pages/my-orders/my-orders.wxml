@@ -82,10 +82,14 @@
         </view>
       </view>
       <view wx:else class="door-section">
-        <text class="door-label">门禁密码</text>
-        <text class="door-hint">预约前30分钟显示</text>
+        <view>
+          <text class="door-label">门禁密码</text>
+          <text class="door-code">{{item.doorCode ? item.doorCode : '0000'}}</text>
+        </view>
+        <text wx:if="{{!item.doorCanOpen}}" class="door-hint">{{item.doorHint}}</text>
       </view>
       <view class="big-actions">
+        <view wx:if="{{item.doorCanOpen}}" class="big-action-btn primary" bindtap="openDoor" data-id="{{item.orderId}}">🚪 开门</view>
         <view class="big-action-btn danger" bindtap="showCancel" data-id="{{item.orderId}}">取消预约</view>
       </view>
       <text class="cancel-note" wx:if="{{item.cancelMsg}}">{{item.cancelMsg}}</text>

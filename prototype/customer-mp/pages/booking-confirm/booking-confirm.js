@@ -251,15 +251,15 @@ Page({
         if (!bParts || bParts.length < 2) continue
         var bStartMin = parseInt(bParts[0]) * 60 + parseInt(bParts[1])
         // 找到在原始时间段之后最近的预订
-        if (bStartMin >= endMin - 15) {
+        if (bStartMin >= endMin - 30) {
           if (!nextBooking || bStartMin < nextBooking.startMin) {
             nextBooking = { startMin: bStartMin, booking: b }
           }
         }
       }
 
-      // 情况1: 提前到店（早于预订时间15分钟以上）
-      if (curMin < startMin - 15) {
+      // 情况1: 提前到店（早于预订时间30分钟以上）
+      if (curMin < startMin - 30) {
         // 检查房间当前是否空闲（从curMin到originalEnd之间无冲突）
         var isRoomFree = true
         for (var i = 0; i < bookings.length; i++) {
@@ -270,7 +270,7 @@ Page({
           var bsMin = parseInt(bs[0]) * 60 + parseInt(bs[1])
           var beMin = parseInt(be[0]) * 60 + parseInt(be[1])
           // 检查[curMin, endMin]时间段是否与现有预订冲突
-          if (curMin < beMin + 15 && endMin > bsMin) { isRoomFree = false; break }
+          if (curMin < beMin + 30 && endMin > bsMin) { isRoomFree = false; break }
         }
 
         if (isRoomFree) {
@@ -279,7 +279,7 @@ Page({
           var actualEndMin = curMin + durationMin
           // 如果有后续预订，提前开始不延长结束时间
           if (nextBooking) {
-            var actualEnd = Math.min(actualEndMin, nextBooking.startMin - 15)
+            var actualEnd = Math.min(actualEndMin, nextBooking.startMin - 30)
             var adjustEndStr = String(Math.floor(actualEnd / 60) % 24).padStart(2, '0') + ':' + String(actualEnd % 60).padStart(2, '0')
             self.setData({ slot: newStartStr + '-' + adjustEndStr, editableStart: newStartStr, editableEnd: adjustEndStr })
           } else {
@@ -297,7 +297,7 @@ Page({
       }
 
       // 情况2: 晚到（当前时间晚于预订开始时间）
-      if (curMin > startMin + 15) {
+      if (curMin > startMin + 30) {
         var actualEndMin = curMin + durationMin
         // 检查原始结束时间
         if (curMin >= endMin) {
