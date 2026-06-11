@@ -182,7 +182,19 @@ Page({
     else { this.setData({ conflictMsg: '该时段已被预约，请选择其他日期', suggestTime: '' }) }
   },
 
-  applySuggested: function() { /* 用户手动选择 */ },
+  applySuggested: function() {
+    var suggestTime = this.data.suggestTime
+    if (!suggestTime || !this.data.selectedDuration) return
+    var sp = suggestTime.split(':'), sMin = parseInt(sp[0]) * 60 + parseInt(sp[1]), eMin = sMin + this.data.selectedDuration
+    var endH = Math.floor(eMin / 60) % 24, endM = eMin % 60
+    this.setData({
+      selectedStart: suggestTime,
+      selectedEnd: String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0'),
+      selectedTimeLabel: suggestTime,
+      conflictMsg: '', suggestTime: ''
+    })
+    this.updateBilling()
+  },
 
   updateBilling: function() {
     var price = 0, detail = '', canBook = false

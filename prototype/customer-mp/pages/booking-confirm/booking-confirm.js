@@ -222,35 +222,123 @@ Page({
     }).catch(function(err) { wx.showToast({ title: err.message || '预订失败', icon: 'none' }) })
   },
 
-  // 原型 openDoor 逻辑：检查后续订单→更新状态→跳转智控
+  // 2.2 订房逻辑：提前到店/晚到时灵活处理
   openDoor: function() {
     var now = new Date()
     var durationMin = this.data.editableDuration || this.data.duration || 90
     var slotParts = (this.data.slot || '').split('-')
+    var originalStartStr = slotParts.length >= 1 ? slotParts[0].trim() : ''
     var originalEndStr = slotParts.length >= 2 ? slotParts[1].trim() : ''
     var roomId = this.data.roomId
     var roomName = this.data.roomName
     var dateStr = this.data.dateStr
+    var curMin = now.getHours() * 60 + now.getMinutes()
+    var startParts = originalStartStr ? originalStartStr.split(':') : null
+    var startMin = startParts ? parseInt(startParts[0]) * 60 + parseInt(startParts[1]) : 0
+    var endParts = originalEndStr ? originalEndStr.split(':') : null
+    var endMin = endParts ? parseInt(endParts[0]) * 60 + parseInt(endParts[1]) : curMin + durationMin
 
-    // 检查时间段：未到时间或已过时间不能开门
-    if (originalEndStr && dateStr) {
-      var origEndParts = originalEndStr.split(':')
-      var origEndMin = parseInt(origEndParts[0]) * 60 + parseInt(origEndParts[1])
-      var curMin = now.getHours() * 60 + now.getMinutes()
+    var self = this
 
-      // 如果还没到预订时间，不能开门
-      var startParts = slotParts[0] ? slotParts[0].split(':') : null
-      if (startParts) {
-        var startMin = parseInt(startParts[0]) * 60 + parseInt(startParts[1])
-        if (curMin < startMin - 15) { wx.showToast({ title: '未到开门时间', icon: 'none' }); return }
+    // 获取该房间当日的所有未取消订单用于冲突判断
+    API.getRoomBookings(roomId, dateStr).then(function(bookings) {
+      if (!bookings) bookings = []
+      // 检查后续预订：找出所有在原始结束时间之后开始的预订
+      var nextBooking = null
+      for (var i = 0; i < bookings.length; i++) {
+        var b = bookings[i]
+        var bParts = (b.time || b.start || '').split('-')[0] && (b.time || b.start || '').split(':')
+        if (!bParts || bParts.length < 2) continue
+        var bStartMin = parseInt(bParts[0]) * 60 + parseInt(bParts[1])
+        // 找到在原始时间段之后最近的预订
+        if (bStartMin >= endMin - 15) {
+          if (!nextBooking || bStartMin < nextBooking.startMin) {
+            nextBooking = { startMin: bStartMin, booking: b }
+          }
+        }
       }
-    }
 
-    // 将订单状态更新为InUse，并跳转到智控页
-    wx.showToast({ title: '🚪 门已开', icon: 'success', duration: 1000 })
-    setTimeout(function() {
-      wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) })
-    }, 1200)
+      // 情况1: 提前到店（早于预订时间15分钟以上）
+      if (curMin < startMin - 15) {
+        // 检查房间当前是否空闲（从curMin到originalEnd之间无冲突）
+        var isRoomFree = true
+        for (var i = 0; i < bookings.length; i++) {
+          var b = bookings[i]
+          var bTimeParts = (b.time || b.start || '').split('-')
+          if (bTimeParts.length < 2) continue
+          var bs = bTimeParts[0].split(':'), be = bTimeParts[1].split(':')
+          var bsMin = parseInt(bs[0]) * 60 + parseInt(bs[1])
+          var beMin = parseInt(be[0]) * 60 + parseInt(be[1])
+          // 检查[curMin, endMin]时间段是否与现有预订冲突
+          if (curMin < beMin + 15 && endMin > bsMin) { isRoomFree = false; break }
+        }
+
+        if (isRoomFree) {
+          // 允许提前开始，更新开始时间为当前时间
+          var newStartStr = String(Math.floor(curMin / 60)).padStart(2, '0') + ':' + String(curMin % 60).padStart(2, '0')
+          var actualEndMin = curMin + durationMin
+          // 如果有后续预订，提前开始不延长结束时间
+          if (nextBooking) {
+            var actualEnd = Math.min(actualEndMin, nextBooking.startMin - 15)
+            var adjustEndStr = String(Math.floor(actualEnd / 60) % 24).padStart(2, '0') + ':' + String(actualEnd % 60).padStart(2, '0')
+            self.setData({ slot: newStartStr + '-' + adjustEndStr, editableStart: newStartStr, editableEnd: adjustEndStr })
+          } else {
+            var adjustEndStr = String(Math.floor(actualEndMin / 60) % 24).padStart(2, '0') + ':' + String(actualEndMin % 60).padStart(2, '0')
+            self.setData({ slot: newStartStr + '-' + adjustEndStr, editableStart: newStartStr, editableEnd: adjustEndStr })
+          }
+          wx.showToast({ title: '✅ 房间空闲，已提前开始', icon: 'success', duration: 1500 })
+          setTimeout(function() {
+            wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) })
+          }, 1800)
+        } else {
+          wx.showToast({ title: '房间当前被占用，请在预订时间前来', icon: 'none' })
+        }
+        return
+      }
+
+      // 情况2: 晚到（当前时间晚于预订开始时间）
+      if (curMin > startMin + 15) {
+        var actualEndMin = curMin + durationMin
+        // 检查原始结束时间
+        if (curMin >= endMin) {
+          // 已过结束时间，检查是否还有后续预订
+          if (nextBooking) {
+            wx.showToast({ title: '已过原预订时段，且后续有预约，请联系前台', icon: 'none' })
+          } else {
+            // 没有后续预订，自动延长到新时段
+            var newEndStr = String(Math.floor(actualEndMin / 60) % 24).padStart(2, '0') + ':' + String(actualEndMin % 60).padStart(2, '0')
+            wx.showToast({ title: '已过预订时间，房间空闲可继续使用至 ' + newEndStr, icon: 'none', duration: 2000 })
+            self.setData({ slot: originalStartStr + '-' + newEndStr, editableEnd: newEndStr })
+          }
+          return
+        }
+
+        // 晚到但仍在时段内：如果有后续预订，调整结束时间
+        if (nextBooking && actualEndMin > nextBooking.startMin - 15) {
+          var adjustedEnd = Math.min(endMin, nextBooking.startMin - 15)
+          if (adjustedEnd <= curMin + 15) {
+            wx.showToast({ title: '剩余时间不足，后续有预订安排', icon: 'none' })
+            return
+          }
+          var adjustEndStr = String(Math.floor(adjustedEnd / 60) % 24).padStart(2, '0') + ':' + String(adjustedEnd % 60).padStart(2, '0')
+          wx.showToast({ title: '⏰ 后续有预订，结束时间调整为 ' + adjustEndStr, icon: 'none', duration: 2000 })
+          self.setData({ slot: originalStartStr + '-' + adjustEndStr, editableEnd: adjustEndStr })
+        }
+      }
+
+      // 情况3: 正常时间到店，开门
+      proceedToOpen()
+    }).catch(function() {
+      // API失败时默认开门
+      proceedToOpen()
+    })
+
+    function proceedToOpen() {
+      wx.showToast({ title: '🚪 门已开', icon: 'success', duration: 1000 })
+      setTimeout(function() {
+        wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) })
+      }, 1200)
+    }
   },
 
   copyCode: function() { wx.setClipboardData({ data: this.data.doorCode }); wx.showToast({ title: '密码已复制', icon: 'none' }) },
