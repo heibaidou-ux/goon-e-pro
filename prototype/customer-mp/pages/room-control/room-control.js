@@ -4,8 +4,15 @@ Page({
   data: {
     roomId: '', roomName: '房间',
     countdown: '--:--', endTime: '--:--', orderSlot: '', orderStart: '',
-    devices: [],
     balance: 0,
+    // 设备分组
+    lightDevices: [],
+    fanDevices: [],
+    exhaustDevices: [],
+    acDevice: null,
+    curtainDevices: [],
+    bgmDevice: null,
+    // 续订
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
     extendPayInfo: '', extendPayAmount: 0, extendPayMethod: 'balance'
@@ -27,24 +34,147 @@ Page({
   loadDevices: function() {
     var self = this
     API.getRoomDevices(this.data.roomId).then(function(devices) {
-      var labels = { Lock:'门锁', AC:'空调', Light:'灯光', Curtain:'窗帘', Speaker:'音响' }
-      var icons = { Lock:'🔒', AC:'❄️', Light:'💡', Curtain:'🪟', Speaker:'🔊' }
+      var lights = [], fans = [], exhausts = [], ac = null, curtains = [], bgm = null
       for (var i = 0; i < devices.length; i++) {
-        devices[i].typeLabel = labels[devices[i].type] || devices[i].type
-        devices[i].typeIcon = icons[devices[i].type] || '📡'
-        if (devices[i].type === 'Curtain' && devices[i].position) {
-          devices[i].positionNum = devices[i].position === 'open' ? 100 : (devices[i].position === 'closed' ? 0 : parseInt(devices[i].position) || 50)
+        var d = devices[i]
+        if (d.type === 'Light') {
+          d.on = (d.brightness || 0) > 0
+          lights.push(d)
+        } else if (d.type === 'Fan') {
+          d.on = (d.speed || 0) > 0
+          fans.push(d)
+        } else if (d.type === 'ExhaustFan') {
+          d.on = (d.speed || 0) > 0
+          exhausts.push(d)
+        } else if (d.type === 'AC') {
+          ac = d
+        } else if (d.type === 'Curtain') {
+          d.positionNum = d.position === 'open' ? 100 : (d.position === 'closed' ? 0 : parseInt(d.position) || 0)
+          curtains.push(d)
+        } else if (d.type === 'BGM') {
+          bgm = d
         }
       }
-      self.setData({ devices: devices })
+      self.setData({
+        lightDevices: lights,
+        fanDevices: fans,
+        exhaustDevices: exhausts,
+        acDevice: ac,
+        curtainDevices: curtains,
+        bgmDevice: bgm
+      })
     })
   },
 
+  // ── 灯光 ──
+  toggleLight: function(e) {
+    var id = e.currentTarget.dataset.id
+    var on = e.currentTarget.dataset.on === 'true' ? false : true
+    var devices = this.data.lightDevices
+    for (var i = 0; i < devices.length; i++) {
+      if (devices[i].deviceId === id) { devices[i].on = on; break }
+    }
+    this.setData({ lightDevices: devices })
+    API.controlDevice(id, { on: on }).catch(function(){})
+  },
+
+  // ── 风扇 ──
+  toggleFan: function(e) {
+    var id = e.currentTarget.dataset.id
+    var on = e.currentTarget.dataset.on === 'true' ? false : true
+    var devices = this.data.fanDevices
+    for (var i = 0; i < devices.length; i++) {
+      if (devices[i].deviceId === id) { devices[i].on = on; break }
+    }
+    this.setData({ fanDevices: devices })
+    API.controlDevice(id, { on: on }).catch(function(){})
+  },
+
+  // ── 换气扇 ──
+  toggleExhaust: function(e) {
+    var id = e.currentTarget.dataset.id
+    var on = e.currentTarget.dataset.on === 'true' ? false : true
+    var devices = this.data.exhaustDevices
+    for (var i = 0; i < devices.length; i++) {
+      if (devices[i].deviceId === id) { devices[i].on = on; break }
+    }
+    this.setData({ exhaustDevices: devices })
+    API.controlDevice(id, { on: on }).catch(function(){})
+  },
+
+  // ── 空调 ──
+  toggleAC: function(e) {
+    var id = e.currentTarget.dataset.id
+    var ac = this.data.acDevice
+    if (!ac) return
+    var newMode = ac.mode === 'cool' ? 'off' : 'cool'
+    ac.mode = newMode
+    this.setData({ acDevice: ac })
+    API.controlDevice(id, { mode: newMode }).catch(function(){})
+  },
+
+  acTempUp: function(e) {
+    var id = e.currentTarget.dataset.id
+    var ac = this.data.acDevice
+    if (!ac) return
+    var t = Math.min(30, (ac.temperature || 24) + 1)
+    ac.temperature = t
+    this.setData({ acDevice: ac })
+    API.controlDevice(id, { temperature: t }).catch(function(){})
+  },
+
+  acTempDown: function(e) {
+    var id = e.currentTarget.dataset.id
+    var ac = this.data.acDevice
+    if (!ac) return
+    var t = Math.max(16, (ac.temperature || 24) - 1)
+    ac.temperature = t
+    this.setData({ acDevice: ac })
+    API.controlDevice(id, { temperature: t }).catch(function(){})
+  },
+
+  // ── 窗帘 ──
+  onCurtainChange: function(e) {
+    var id = e.currentTarget.dataset.id
+    var val = parseInt(e.detail.value)
+    var position = val >= 80 ? 'open' : (val <= 20 ? 'closed' : val + '%')
+    var devices = this.data.curtainDevices
+    for (var i = 0; i < devices.length; i++) {
+      if (devices[i].deviceId === id) {
+        devices[i].positionNum = val
+        devices[i].position = position
+        break
+      }
+    }
+    this.setData({ curtainDevices: devices })
+    API.controlDevice(id, { position: position }).catch(function(){})
+  },
+
+  // ── 背景音乐 ──
+  toggleBGM: function(e) {
+    var id = e.currentTarget.dataset.id
+    var bgm = this.data.bgmDevice
+    if (!bgm) return
+    bgm.playing = !bgm.playing
+    this.setData({ bgmDevice: bgm })
+    API.controlDevice(id, { playing: bgm.playing }).catch(function(){})
+  },
+
+  onBGMVolumeChange: function(e) {
+    var id = e.currentTarget.dataset.id
+    var val = parseInt(e.detail.value)
+    var bgm = this.data.bgmDevice
+    if (!bgm) return
+    bgm.volume = val
+    this.setData({ bgmDevice: bgm })
+    API.controlDevice(id, { volume: val }).catch(function(){})
+  },
+
+  // ── 倒计时 ──
   startCountdown: function(durationMin, endStr) {
     var self = this
     durationMin = durationMin || 120
     var now = new Date()
-
     if (endStr) {
       var ep = endStr.split(':')
       if (ep.length >= 2) {
@@ -62,13 +192,10 @@ Page({
         return
       }
     }
-
-    // fallback
     var endH = (now.getHours() + Math.floor((now.getMinutes() + durationMin) / 60)) % 24
     var endM = (now.getMinutes() + durationMin) % 60
     self._endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endH, endM)
-    var endStr2 = String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0')
-    self.setData({ endTime: endStr2 })
+    self.setData({ endTime: String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0') })
     var totalSec = durationMin * 60
     self._countdownTotal = totalSec
     if (totalSec <= 0) { self.setData({ countdown: '00:00' }); return }
@@ -88,7 +215,6 @@ Page({
   _startTimer: function() {
     var self = this
     if (self._countdownTimer) clearInterval(self._countdownTimer)
-    // 延迟启动，避免与loadDevices的setData冲突
     setTimeout(function() {
       self._countdownTimer = setInterval(function() {
         self._countdownTotal = Math.max(0, self._countdownTotal - 1)
@@ -103,27 +229,24 @@ Page({
     return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0')
   },
 
-  preventBubble: function() {},
   onUnload: function() {
     if (this._countdownTimer) clearInterval(this._countdownTimer)
   },
 
-  goBack: function() { wx.navigateBack() },
+  preventBubble: function() {},
+
   goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
 
+  // ── 续订 ──
   showExtend: function() {
     var self = this
-    // 直接用_endDate计算当前结束时间，与页面顶部显示一致
     var endDate = self._endDate ? new Date(self._endDate) : new Date()
-    var eh = endDate.getHours()
-    var em = endDate.getMinutes()
-    var curEndStr = String(eh).padStart(2,'0') + ':' + String(em).padStart(2,'0')
+    var curEndStr = String(endDate.getHours()).padStart(2,'0') + ':' + String(endDate.getMinutes()).padStart(2,'0')
     self.setData({ extendInfo: '当前将于 ' + curEndStr + ' 结束。请选择续订时长：', selectedExtendIdx: -1 })
     var options = []
     for (var i = 1; i <= 24; i++) {
       var newDate = new Date(endDate.getTime() + i * 30 * 60000)
-      var oh = newDate.getHours()
-      var om = newDate.getMinutes()
+      var oh = newDate.getHours(), om = newDate.getMinutes()
       var extMin = i * 30
       var price = Math.round(120 * extMin / 60)
       options.push({ label: '至 ' + String(oh).padStart(2,'0') + ':' + String(om).padStart(2,'0'), minutes: extMin, price: price })
@@ -143,7 +266,7 @@ Page({
     API.getBalance().then(function(b) {
       self.setData({
         balance: b || 0,
-        extendPayInfo: '续订' + opt.minutes + '分钟至 ' + opt.label.replace('至 ','') + '，+¥' + opt.price,
+        extendPayInfo: '续订' + opt.minutes + '分钟至 ' + opt.label.replace('至 ',''),
         extendPayAmount: opt.price,
         extendPayMethod: 'balance',
         showExtendModal: false,
@@ -162,13 +285,13 @@ Page({
     if (idx < 0 || idx >= this.data.extendOptions.length) return
     var opt = this.data.extendOptions[idx]
     var method = this.data.extendPayMethod
+
     var proceedExtend = function() {
       self._countdownTotal = (self._countdownTotal || 0) + opt.minutes * 60
       self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
       if (self._endDate) {
         self._endDate = new Date(self._endDate.getTime() + opt.minutes * 60000)
-        var nh = self._endDate.getHours()
-        var nm = self._endDate.getMinutes()
+        var nh = self._endDate.getHours(), nm = self._endDate.getMinutes()
         self.setData({ endTime: String(nh).padStart(2,'0') + ':' + String(nm).padStart(2,'0') })
       }
       try {
@@ -201,13 +324,9 @@ Page({
         self.setData({ balance: newBalance })
         proceedExtend()
       })
-    } else if (method === 'wechat' || method === 'alipay') {
-      // 真实环境中调wx.requestPayment，目前mock直接成功
+    } else {
       wx.showLoading({ title: '支付中...' })
-      setTimeout(function() {
-        wx.hideLoading()
-        proceedExtend()
-      }, 800)
+      setTimeout(function() { wx.hideLoading(); proceedExtend() }, 800)
     }
   },
 
@@ -215,22 +334,5 @@ Page({
   cancelExtendPay: function() {
     this.setData({ showExtendPayModal: false })
     wx.showToast({ title: '已取消续订', icon: 'none' })
-  },
-
-  onLockToggle: function(e) { API.controlDevice(e.currentTarget.dataset.id, { locked: !e.detail.value }).catch(function(){}) },
-  onTempChange: function(e) {
-    var id = e.currentTarget.dataset.id
-    var devices = this.data.devices
-    for (var i = 0; i < devices.length; i++) { if (devices[i].deviceId === id && devices[i].type === 'AC') { devices[i].temperature = parseInt(e.detail.value); break } }
-    this.setData({ devices: devices })
-    API.controlDevice(id, { temperature: parseInt(e.detail.value) }).catch(function(){})
-  },
-  onAcToggle: function(e) { API.controlDevice(e.currentTarget.dataset.id, { mode: e.detail.value ? 'cool' : 'off' }).catch(function(){}) },
-  onLightToggle: function(e) { API.controlDevice(e.currentTarget.dataset.id, { brightness: e.detail.value ? 80 : 0 }).catch(function(){}) },
-  onCurtainChange: function(e) {
-    var val = parseInt(e.detail.value)
-    var position = val >= 80 ? 'open' : (val <= 20 ? 'closed' : val + '%')
-    API.controlDevice(e.currentTarget.dataset.id, { position: position }).catch(function(){})
-  },
-  onSpeakerToggle: function(e) { API.controlDevice(e.currentTarget.dataset.id, { playing: e.detail.value }).catch(function(){}) }
+  }
 })

@@ -190,7 +190,7 @@ const API = {
             if (d.type === 'Curtain' && p.curtain) d.position = p.curtain
             if (d.type === 'AC' && p.ac) { d.mode = p.ac.on ? 'cool' : 'off'; if (p.ac.temp) d.temperature = p.ac.temp }
             if (d.type === 'Light' && p.lights) { d.brightness = p.lights.brightness || 0; d.colorTemp = p.lights.colorTemp || 4000 }
-            if (d.type === 'Speaker' && p.music) d.playing = p.music.on || false
+            if ((d.type === 'BGM' || d.type === 'Speaker') && p.music) d.playing = p.music.on || false
           })
           return { success: true, sceneId: sceneId, sceneName: scene.name }
         }
@@ -204,7 +204,7 @@ const API = {
   // ── 音频 ──
   getAudioStatus(roomId) {
     return delay().then(() => {
-      var speakers = MOCK.devices.filter(d => d.roomId === roomId && d.type === 'Speaker')
+      var speakers = MOCK.devices.filter(d => d.roomId === roomId && (d.type === 'BGM' || d.type === 'Speaker'))
       if (!speakers.length) return null
       var s = speakers[0] || {}
       return { roomId, online: speakers.some(function(sp) { return sp.status === 'Online' }), speakers, volume: s.volume || 0, playing: s.playing || false, source: s.source || 'none' }
@@ -213,7 +213,7 @@ const API = {
 
   setVolume(roomId, volume) {
     return delay(150).then(() => {
-      MOCK.devices.forEach(function(d) { if (d.roomId === roomId && d.type === 'Speaker') d.volume = volume })
+      MOCK.devices.forEach(function(d) { if (d.roomId === roomId && (d.type === 'BGM' || d.type === 'Speaker')) d.volume = volume })
       return { success: true, roomId, volume }
     })
   },

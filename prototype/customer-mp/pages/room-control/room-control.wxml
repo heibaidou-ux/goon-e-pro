@@ -15,35 +15,110 @@
       </view>
     </view>
 
-    <!-- 两大操作按钮 -->
-    <view class="action-btns">
-      <view class="action-btn renew" bindtap="showExtend">
-        <text class="action-icon">🕐</text>
-        <text class="action-text">续订</text>
+    <!-- 快捷操作 -->
+    <view class="quick-cards">
+      <view class="qcard renew" bindtap="showExtend">
+        <text class="qcard-icon">⏱</text>
+        <text class="qcard-label">续订</text>
       </view>
-      <view class="action-btn tea" bindtap="goTeaShop">
-        <text class="action-icon">🍵</text>
-        <text class="action-text">茶品</text>
+      <view class="qcard tea" bindtap="goTeaShop">
+        <text class="qcard-icon">🍵</text>
+        <text class="qcard-label">茶品</text>
       </view>
     </view>
 
-    <!-- 设备控制 -->
-    <text class="section-title">设备控制</text>
-    <view class="device-list">
-      <view class="device-item" wx:for="{{devices}}" wx:key="deviceId">
-        <text class="device-icon">{{item.typeIcon}}</text>
-        <view class="device-info">
-          <text class="device-name">{{item.typeLabel}}</text>
+    <!-- 灯光设备组 -->
+    <view class="device-group" wx:if="{{lightDevices.length>0}}">
+      <text class="group-title">💡 灯光</text>
+      <view class="group-grid">
+        <view class="device-card light-card {{item.on ? 'on' : ''}}" wx:for="{{lightDevices}}" wx:key="deviceId" bindtap="toggleLight" data-id="{{item.deviceId}}" data-on="{{item.on}}">
+          <text class="dc-icon">{{item.on ? '💡' : '🏮'}}</text>
+          <text class="dc-label">{{item.label}}</text>
+          <view class="dc-toggle {{item.on ? 'on' : ''}}">
+            <view class="dc-toggle-knob"></view>
+          </view>
         </view>
-        <switch wx:if="{{item.type=='Lock'}}" checked="{{item.locked!==false}}" bindchange="onLockToggle" data-id="{{item.deviceId}}" />
-        <view wx:elif="{{item.type=='AC'}}" class="ac-ring">
-          <text class="ac-temp">{{item.temperature||24}}°</text>
-          <slider value="{{item.temperature||24}}" min="16" max="30" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" bindchanging="onTempChange" data-id="{{item.deviceId}}" />
-          <switch checked="{{item.mode=='cool'}}" bindchange="onAcToggle" data-id="{{item.deviceId}}" />
+      </view>
+    </view>
+
+    <!-- 风扇设备组 -->
+    <view class="device-group" wx:if="{{fanDevices.length>0}}">
+      <text class="group-title">🌀 风扇</text>
+      <view class="group-grid">
+        <view class="device-card fan-card {{item.on ? 'on' : ''}}" wx:for="{{fanDevices}}" wx:key="deviceId" bindtap="toggleFan" data-id="{{item.deviceId}}" data-on="{{item.on}}">
+          <text class="dc-icon">{{item.on ? '🌀' : '🍃'}}</text>
+          <text class="dc-label">{{item.label}}</text>
+          <view class="dc-toggle {{item.on ? 'on' : ''}}">
+            <view class="dc-toggle-knob"></view>
+          </view>
         </view>
-        <switch wx:elif="{{item.type=='Light'}}" checked="{{item.brightness>0}}" bindchange="onLightToggle" data-id="{{item.deviceId}}" />
-        <slider wx:elif="{{item.type=='Curtain'}}" value="{{item.position=='open'?100:item.positionNum||0}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" show-value bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
-        <switch wx:elif="{{item.type=='Speaker'}}" checked="{{item.playing}}" bindchange="onSpeakerToggle" data-id="{{item.deviceId}}" />
+      </view>
+    </view>
+
+    <!-- 换气扇（小茶室） -->
+    <view class="device-group" wx:if="{{exhaustDevices.length>0}}">
+      <text class="group-title">🌬️ 换气扇</text>
+      <view class="group-grid">
+        <view class="device-card exhaust-card {{item.on ? 'on' : ''}}" wx:for="{{exhaustDevices}}" wx:key="deviceId" bindtap="toggleExhaust" data-id="{{item.deviceId}}" data-on="{{item.on}}">
+          <text class="dc-icon">{{item.on ? '🌬️' : '💨'}}</text>
+          <text class="dc-label">{{item.label}}</text>
+          <view class="dc-toggle {{item.on ? 'on' : ''}}">
+            <view class="dc-toggle-knob"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空调 -->
+    <view class="device-group" wx:if="{{acDevice}}">
+      <text class="group-title">❄️ 空调</text>
+      <view class="ac-card">
+        <view class="ac-display">
+          <text class="ac-temp">{{acDevice.temperature}}°</text>
+          <text class="ac-mode">{{acDevice.mode === 'cool' ? '制冷中' : '已关闭'}}</text>
+        </view>
+        <view class="ac-controls">
+          <view class="ac-btn" bindtap="acTempDown" data-id="{{acDevice.deviceId}}">−</view>
+          <view class="ac-temp-val">{{acDevice.temperature}}°</view>
+          <view class="ac-btn" bindtap="acTempUp" data-id="{{acDevice.deviceId}}">+</view>
+        </view>
+        <view class="ac-power {{acDevice.mode === 'cool' ? 'on' : ''}}" bindtap="toggleAC" data-id="{{acDevice.deviceId}}">
+          <text>{{acDevice.mode === 'cool' ? '❄️ 关闭空调' : '❄️ 开启空调'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 窗帘 -->
+    <view class="device-group" wx:if="{{curtainDevices.length>0}}">
+      <text class="group-title">🪟 窗帘</text>
+      <view class="curtain-list">
+        <view class="curtain-item" wx:for="{{curtainDevices}}" wx:key="deviceId">
+          <text class="curtain-label">{{item.label}}</text>
+          <view class="curtain-slider-wrap">
+            <text class="slider-end">关闭</text>
+            <slider value="{{item.positionNum}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" show-value bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
+            <text class="slider-end">打开</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 背景音乐 -->
+    <view class="device-group" wx:if="{{bgmDevice}}">
+      <text class="group-title">🎵 背景音乐</text>
+      <view class="bgm-card">
+        <view class="bgm-header">
+          <text class="bgm-icon">🎵</text>
+          <text class="bgm-status">{{bgmDevice.playing ? '▶ 播放中' : '⏸ 已暂停'}}</text>
+          <view class="bgm-toggle {{bgmDevice.playing ? 'on' : ''}}" bindtap="toggleBGM" data-id="{{bgmDevice.deviceId}}">
+            <view class="bgm-toggle-knob"></view>
+          </view>
+        </view>
+        <view class="bgm-volume-row">
+          <text class="vol-icon">🔈</text>
+          <slider value="{{bgmDevice.volume}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" bindchanging="onBGMVolumeChange" data-id="{{bgmDevice.deviceId}}" />
+          <text class="vol-num">{{bgmDevice.volume}}%</text>
+        </view>
       </view>
     </view>
   </view>
@@ -72,32 +147,30 @@
       <text class="modal-title">确认续订支付</text>
       <text class="modal-desc">{{extendPayInfo}}</text>
       <text class="extend-pay-amount">¥{{extendPayAmount}}</text>
-
       <view class="pay-methods-section">
         <text class="pay-section-title">选择支付方式</text>
         <view class="pay-method {{extendPayMethod=='wechat'?'selected':''}}" bindtap="selectExtendPay" data-pay="wechat">
           <text class="pay-method-icon">💚</text>
-          <view class="pay-method-info"><text class="pay-method-name">微信支付</text><text class="pay-method-desc">微信零钱/银行卡</text></view>
+          <view class="pay-method-info"><text class="pay-method-name">微信支付</text></view>
           <text class="pay-method-check" wx:if="{{extendPayMethod=='wechat'}}">✓</text>
         </view>
         <view class="pay-method {{extendPayMethod=='alipay'?'selected':''}}" bindtap="selectExtendPay" data-pay="alipay">
           <text class="pay-method-icon">💙</text>
-          <view class="pay-method-info"><text class="pay-method-name">支付宝</text><text class="pay-method-desc">支付宝余额/花呗</text></view>
+          <view class="pay-method-info"><text class="pay-method-name">支付宝</text></view>
           <text class="pay-method-check" wx:if="{{extendPayMethod=='alipay'}}">✓</text>
         </view>
         <view class="pay-method {{extendPayMethod=='balance'?'selected':''}}" bindtap="selectExtendPay" data-pay="balance">
           <text class="pay-method-icon">💰</text>
-          <view class="pay-method-info"><text class="pay-method-name">会员余额</text><text class="pay-method-desc">当前余额 ¥{{balance}}</text></view>
+          <view class="pay-method-info"><text class="pay-method-name">会员余额</text><text class="pay-method-desc">¥{{balance}}</text></view>
           <text class="pay-method-check" wx:if="{{extendPayMethod=='balance'}}">✓</text>
         </view>
       </view>
-
       <view class="modal-buttons">
         <view class="modal-btn cancel" bindtap="cancelExtendPay">取消</view>
         <view class="modal-btn primary" bindtap="doExtendPayment">确认支付</view>
       </view>
     </view>
-
-    <bottom-nav active="home" />
   </view>
+
+  <bottom-nav active="home" />
 </view>

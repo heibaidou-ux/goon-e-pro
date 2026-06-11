@@ -25,51 +25,56 @@ const rooms = [
     facilities: ["储物", "机柜"], status: "Active", bookable: false }
 ]
 
-// 设备
+// 设备（客人端可见设备，隐藏继电器等基础设施）
 const devices = [
-  { deviceId: "DEV001", roomId: "RM001", type: "Lock", protocol: "Zigbee", status: "Online", batteryLevel: 85 },
-  { deviceId: "DEV002", roomId: "RM001", type: "AC", protocol: "RS485", status: "Online", temperature: 24, mode: "cool" },
-  { deviceId: "DEV003", roomId: "RM001", type: "Light", protocol: "RS485", status: "Online", brightness: 80, colorTemp: 4000 },
-  { deviceId: "DEV004", roomId: "RM001", type: "Light", protocol: "RS485", status: "Online", brightness: 80, colorTemp: 4000 },
-  { deviceId: "DEV005", roomId: "RM001", type: "Curtain", protocol: "RS485", status: "Online", position: "closed" },
-  { deviceId: "DEV006", roomId: "RM001", type: "Speaker", protocol: "IP", status: "Online", volume: 70, playing: true, source: "bgm" },
-  { deviceId: "DEV007", roomId: "RM001", type: "Speaker", protocol: "IP", status: "Online", volume: 70, playing: true, source: "bgm" },
-  { deviceId: "DEV008", roomId: "RM002", type: "Lock", protocol: "Zigbee", status: "Offline", batteryLevel: 0 },
-  { deviceId: "DEV009", roomId: "RM002", type: "AC", protocol: "RS485", status: "Online", temperature: 26, mode: "cool" },
-  { deviceId: "DEV010", roomId: "RM002", type: "Light", protocol: "RS485", status: "Online", brightness: 60, colorTemp: 3000 },
-  { deviceId: "DEV011", roomId: "RM002", type: "Light", protocol: "RS485", status: "Online", brightness: 60, colorTemp: 3000 },
-  { deviceId: "DEV012", roomId: "RM002", type: "Curtain", protocol: "RS485", status: "Online", position: "closed" },
-  { deviceId: "DEV013", roomId: "RM002", type: "Speaker", protocol: "IP", status: "Online", volume: 50, playing: false, source: "bgm" },
-  { deviceId: "DEV014", roomId: "RM003", type: "Lock", protocol: "Zigbee", status: "Online", batteryLevel: 92 },
-  { deviceId: "DEV015", roomId: "RM003", type: "AC", protocol: "RS485", status: "Online", temperature: 26, mode: "off" },
-  { deviceId: "DEV016", roomId: "RM003", type: "Light", protocol: "RS485", status: "Online", brightness: 0, colorTemp: 3000 },
-  { deviceId: "DEV017", roomId: "RM003", type: "Light", protocol: "RS485", status: "Online", brightness: 0, colorTemp: 3000 },
-  { deviceId: "DEV018", roomId: "RM003", type: "Curtain", protocol: "RS485", status: "Online", position: "open" },
-  { deviceId: "DEV019", roomId: "RM003", type: "Speaker", protocol: "IP", status: "Online", volume: 0, playing: false, source: "bgm" },
-  { deviceId: "DEV020", roomId: "RM004", type: "Lock", protocol: "Zigbee", status: "Online", batteryLevel: 73 },
-  { deviceId: "DEV021", roomId: "RM004", type: "AC", protocol: "RS485", status: "Online", temperature: 24, mode: "cool" },
-  { deviceId: "DEV022", roomId: "RM004", type: "Light", protocol: "RS485", status: "Online", brightness: 80, colorTemp: 3000 },
-  { deviceId: "DEV023", roomId: "RM004", type: "Light", protocol: "RS485", status: "Online", brightness: 80, colorTemp: 3000 },
-  { deviceId: "DEV024", roomId: "RM004", type: "Light", protocol: "RS485", status: "Online", brightness: 80, colorTemp: 3000 },
-  { deviceId: "DEV025", roomId: "RM004", type: "Curtain", protocol: "RS485", status: "Online", position: "open" },
-  { deviceId: "DEV026", roomId: "RM004", type: "Speaker", protocol: "IP", status: "Online", volume: 70, playing: true, source: "bgm" },
-  { deviceId: "DEV027", roomId: "RM005", type: "AC", protocol: "RS485", status: "Online", temperature: 26, mode: "cool" },
-  { deviceId: "DEV028", roomId: "RM005", type: "Light", protocol: "RS485", status: "Online", brightness: 90, colorTemp: 4000 },
-  { deviceId: "DEV029", roomId: "RM005", type: "Light", protocol: "RS485", status: "Online", brightness: 90, colorTemp: 4000 },
-  { deviceId: "DEV030", roomId: "RM005", type: "Light", protocol: "RS485", status: "Online", brightness: 90, colorTemp: 4000 },
-  { deviceId: "DEV031", roomId: "RM005", type: "Light", protocol: "RS485", status: "Online", brightness: 90, colorTemp: 4000 },
-  { deviceId: "DEV032", roomId: "RM005", type: "Speaker", protocol: "IP", status: "Online", volume: 50, playing: true, source: "bgm" },
-  { deviceId: "DEV033", roomId: "RM005", type: "Speaker", protocol: "IP", status: "Online", volume: 50, playing: true, source: "bgm" },
-  { deviceId: "DEV034", roomId: "RM006", type: "Light", protocol: "RS485", status: "Online", brightness: 50, colorTemp: 4000 }
+  // ── 会议室 RM001 ──
+  { deviceId: "DEV001", roomId: "RM001", type: "Light", label: "筒灯1", protocol: "RS485", status: "Online", brightness: 80 },
+  { deviceId: "DEV002", roomId: "RM001", type: "Light", label: "筒灯2", protocol: "RS485", status: "Online", brightness: 80 },
+  { deviceId: "DEV003", roomId: "RM001", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 80 },
+  { deviceId: "DEV004", roomId: "RM001", type: "Fan", label: "风扇1", protocol: "RS485", status: "Online", speed: 3 },
+  { deviceId: "DEV005", roomId: "RM001", type: "Fan", label: "风扇2", protocol: "RS485", status: "Online", speed: 0 },
+  { deviceId: "DEV006", roomId: "RM001", type: "Fan", label: "风扇3", protocol: "RS485", status: "Online", speed: 0 },
+  { deviceId: "DEV007", roomId: "RM001", type: "AC", label: "空调", protocol: "RS485", status: "Online", temperature: 24, mode: "cool" },
+  { deviceId: "DEV008", roomId: "RM001", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: false, volume: 50 },
+  // ── 小茶室 RM002 ──
+  { deviceId: "DEV009", roomId: "RM002", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 60 },
+  { deviceId: "DEV010", roomId: "RM002", type: "Light", label: "筒灯", protocol: "RS485", status: "Online", brightness: 60 },
+  { deviceId: "DEV011", roomId: "RM002", type: "ExhaustFan", label: "换气扇", protocol: "RS485", status: "Online", speed: 0 },
+  { deviceId: "DEV012", roomId: "RM002", type: "Fan", label: "风扇", protocol: "RS485", status: "Online", speed: 0 },
+  { deviceId: "DEV013", roomId: "RM002", type: "AC", label: "空调", protocol: "RS485", status: "Online", temperature: 26, mode: "cool" },
+  { deviceId: "DEV014", roomId: "RM002", type: "Curtain", label: "窗帘", protocol: "RS485", status: "Online", position: "closed" },
+  { deviceId: "DEV015", roomId: "RM002", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: false, volume: 50 },
+  // ── 中茶室B RM003 ──
+  { deviceId: "DEV016", roomId: "RM003", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 0 },
+  { deviceId: "DEV017", roomId: "RM003", type: "Light", label: "筒灯", protocol: "RS485", status: "Online", brightness: 0 },
+  { deviceId: "DEV018", roomId: "RM003", type: "Light", label: "背景灯", protocol: "RS485", status: "Online", brightness: 0 },
+  { deviceId: "DEV019", roomId: "RM003", type: "Fan", label: "风扇", protocol: "RS485", status: "Online", speed: 0 },
+  { deviceId: "DEV020", roomId: "RM003", type: "AC", label: "空调", protocol: "RS485", status: "Online", temperature: 26, mode: "off" },
+  { deviceId: "DEV021", roomId: "RM003", type: "Curtain", label: "窗帘左", protocol: "RS485", status: "Online", position: "open" },
+  { deviceId: "DEV022", roomId: "RM003", type: "Curtain", label: "窗帘中", protocol: "RS485", status: "Online", position: "open" },
+  { deviceId: "DEV023", roomId: "RM003", type: "Curtain", label: "窗帘右", protocol: "RS485", status: "Online", position: "closed" },
+  { deviceId: "DEV024", roomId: "RM003", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: false, volume: 50 },
+  // ── 大茶室C RM004 ──
+  { deviceId: "DEV025", roomId: "RM004", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 80 },
+  { deviceId: "DEV026", roomId: "RM004", type: "Light", label: "筒灯", protocol: "RS485", status: "Online", brightness: 80 },
+  { deviceId: "DEV027", roomId: "RM004", type: "Light", label: "背景灯", protocol: "RS485", status: "Online", brightness: 80 },
+  { deviceId: "DEV028", roomId: "RM004", type: "Fan", label: "风扇", protocol: "RS485", status: "Online", speed: 0 },
+  { deviceId: "DEV029", roomId: "RM004", type: "AC", label: "空调", protocol: "RS485", status: "Online", temperature: 24, mode: "cool" },
+  { deviceId: "DEV030", roomId: "RM004", type: "Curtain", label: "窗帘左", protocol: "RS485", status: "Online", position: "open" },
+  { deviceId: "DEV031", roomId: "RM004", type: "Curtain", label: "窗帘中", protocol: "RS485", status: "Online", position: "open" },
+  { deviceId: "DEV032", roomId: "RM004", type: "Curtain", label: "窗帘右", protocol: "RS485", status: "Online", position: "closed" },
+  { deviceId: "DEV033", roomId: "RM004", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: true, volume: 70 },
+  // ── 展厅 RM005 ──
+  { deviceId: "DEV034", roomId: "RM005", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: true, volume: 50 },
 ]
 
 const deviceTypes = {
-  Lock: { label: "门锁", icon: "🔒" },
-  AC: { label: "空调", icon: "❄️" },
   Light: { label: "灯光", icon: "💡" },
+  AC: { label: "空调", icon: "❄️" },
+  Fan: { label: "风扇", icon: "🌀" },
+  ExhaustFan: { label: "换气扇", icon: "🌬️" },
   Curtain: { label: "窗帘", icon: "🪟" },
-  Speaker: { label: "音响", icon: "🔊" },
-  Sensor: { label: "传感器", icon: "📡" }
+  BGM: { label: "背景音乐", icon: "🎵" }
 }
 
 // 订单
