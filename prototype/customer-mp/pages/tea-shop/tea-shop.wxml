@@ -51,13 +51,13 @@
       <button class="clear-btn" bindtap="clearCart">清空</button>
     </view>
     <view class="cart-items" wx:if="{{cart.length>0}}">
-      <view class="cart-item" wx:for="{{cart}}" wx:key="id">
-        <text class="cart-item-icon">{{item.icon || '🛒'}}</text>
+      <view class="cart-item" wx:for="{{cart}}" wx:key="productId">
+        <text class="cart-item-icon">🛒</text>
         <text class="cart-item-name">{{item.name}}</text>
         <view class="qty-ctrl">
-          <button class="qty-btn" bindtap="cartQtyDec" data-id="{{item.id}}">−</button>
+          <button class="qty-btn" bindtap="cartQtyDec" data-id="{{item.productId}}">−</button>
           <text class="qty-num">{{item.qty}}</text>
-          <button class="qty-btn" bindtap="cartQtyInc" data-id="{{item.id}}">+</button>
+          <button class="qty-btn" bindtap="cartQtyInc" data-id="{{item.productId}}">+</button>
         </view>
         <text class="cart-item-price">¥{{item.price * item.qty}}</text>
       </view>

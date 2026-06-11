@@ -95,16 +95,20 @@ Page({
     var self = this
     API.getCart().then(function(cartData) {
       var cart = cartData || []
-      var total = 0
-      for (var i = 0; i < cart.length; i++) { total += (cart[i].qty || 1) * (cart[i].price || 0) }
-      self.setData({ cart: cart, cartTotal: cart.length, cartTotalPrice: total.toFixed(2) })
-      // Sync _qty with products
+      var totalAmt = 0
+      var totalQty = 0
+      for (var i = 0; i < cart.length; i++) {
+        totalAmt += (cart[i].qty || 1) * (cart[i].price || 0)
+        totalQty += (cart[i].qty || 1)
+      }
+      self.setData({ cart: cart, cartTotal: totalQty, cartTotalPrice: totalAmt.toFixed(2) })
+      // Sync _qty with products —— cart存的是productId，产品列表是id
       var products = self.data.products
       for (var cat in products) {
         for (var j = 0; j < products[cat].length; j++) {
           products[cat][j]._qty = 0
           for (var k = 0; k < cart.length; k++) {
-            if (cart[k].id === products[cat][j].id) { products[cat][j]._qty = cart[k].qty; break }
+            if (cart[k].productId === products[cat][j].id) { products[cat][j]._qty = cart[k].qty; break }
           }
         }
       }
@@ -162,7 +166,7 @@ Page({
     var count = cart.length
     var cleared = 0
     for (var i = 0; i < cart.length; i++) {
-      API.removeFromCart(cart[i].id).then(function() {
+      API.removeFromCart(cart[i].productId).then(function() {
         cleared++
         if (cleared >= count) { self.loadCart(); wx.showToast({ title: '购物车已清空', icon: 'none' }) }
       })
