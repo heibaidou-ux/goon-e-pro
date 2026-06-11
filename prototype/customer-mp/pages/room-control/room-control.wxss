@@ -48,8 +48,11 @@ page { background:#f0f2ef; margin:0; padding:0; }
 .ac-temp-status { font-size:11px; color:#888; display:block; margin-top:6px; letter-spacing:1px; }
 .ac-ctrl-area { flex:1; display:flex; flex-direction:column; justify-content:center; padding:4px 0; gap:10px; }
 .ac-mode-row { display:flex; gap:8px; }
-.ac-mode-btn { flex:1; padding:12px 6px; border-radius:12px; background:#3a3a3a; border:1px solid #4a4a4a; font-size:13px; font-weight:500; color:#888; text-align:center; letter-spacing:1px; }
-.ac-mode-btn.active { background:#1a3a1a; border-color:#5D8A6B; color:#5D8A6B; }
+.ac-mode-btn { flex:1; padding:10px 6px; border-radius:12px; background:#3a3a3a; border:1px solid #4a4a4a; text-align:center; letter-spacing:1px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+.ac-mode-btn.active { background:#1a3a1a; border-color:#5D8A6B; }
+.mode-icon { font-size:20px; display:block; line-height:1.2; }
+.mode-label { font-size:12px; font-weight:500; color:#888; display:block; }
+.ac-mode-btn.active .mode-label { color:#5D8A6B; }
 .ac-power-bar { border-top:1px solid #3a3a3a; padding-top:10px; }
 .ac-power-btn { padding:10px; border-radius:10px; font-size:13px; font-weight:500; color:#666; text-align:center; letter-spacing:1px; }
 .ac-power-btn.on { color:#5D8A6B; }
