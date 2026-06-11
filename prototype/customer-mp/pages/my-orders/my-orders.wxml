@@ -201,7 +201,7 @@
         <view class="detail-row"><text class="dl">状态</text><text class="dv">{{detailOrder.statusLabel}}</text></view>
         <view class="detail-row"><text class="dl">时间</text><text class="dv">{{detailOrder.timeStr}}</text></view>
         <view class="detail-row"><text class="dl">金额</text><text class="dv">¥{{detailOrder.amount}}</text></view>
-        <view class="detail-row" wx:if="{{detailOrder.payment}}"><text class="dl">支付方式</text><text class="dv">{{detailOrder.payment}}</text></view>
+        <view class="detail-row" wx:if="{{detailOrder.payment}}"><text class="dl">支付方式</text><text class="dv">{{detailOrder.payLabel}}</text></view>
         <view wx:if="{{detailOrder.isTeaOrder && detailOrder.items.length>0}}" class="detail-items">
           <text class="detail-items-title">商品明细</text>
           <view class="detail-item" wx:for="{{detailOrder.items}}" wx:key="name">

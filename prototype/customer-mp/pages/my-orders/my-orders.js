@@ -278,9 +278,13 @@ Page({
     var id = e.currentTarget.dataset.id
     var order = this.findOrder(id)
     if (!order) return
+    // 翻译支付方式
+    var payLabels = { WeChat: '微信支付', Alipay: '支付宝', Balance: '会员余额', Coupon: '验券', wechat: '微信支付', alipay: '支付宝', balance: '会员余额', coupon: '验券', WxPay: '微信支付' }
+    var detail = Object.assign({}, order)
+    detail.payLabel = payLabels[order.payment] || order.payment || '—'
     // 显示订单详情弹窗
     this.setData({
-      detailOrder: order,
+      detailOrder: detail,
       showDetailModal: true
     })
   },
