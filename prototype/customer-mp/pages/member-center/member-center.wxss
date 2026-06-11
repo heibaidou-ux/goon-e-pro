@@ -1,5 +1,5 @@
 page { background:#f5f7fa; margin:0; padding:0; }
-.phone { width:100%; min-height:100vh; background:#f5f7fa; display:flex; flex-direction:column; }
+.phone { width:100%; min-height:100vh; background:#f5f7fa; display:flex; flex-direction:column; transform:translateZ(0); }
 .page { flex:1; overflow-y:auto; padding-bottom:60px; }
 
 /* 首充条 */
