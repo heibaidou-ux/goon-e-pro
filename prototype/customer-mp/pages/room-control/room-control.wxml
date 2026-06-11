@@ -3,13 +3,16 @@
     <text class="nav-title">{{roomName}}</text>
   </view>
   <view class="page">
-    <!-- 房间名+倒计时 -->
+    <!-- 订单时间+剩余时间 -->
     <view class="room-info-bar">
       <view class="room-info-left">
         <text class="room-info-name">{{roomName}}</text>
-        <text class="room-info-time">剩余时间 <text class="countdown">{{countdown}}</text></text>
+        <text class="room-info-slot">{{orderSlot}}</text>
       </view>
-      <text class="room-info-end">结束时间 {{endTime}}</text>
+      <view class="room-info-right">
+        <text class="countdown">{{countdown}}</text>
+        <text class="room-info-end">剩余</text>
+      </view>
     </view>
 
     <!-- 两大操作按钮 -->

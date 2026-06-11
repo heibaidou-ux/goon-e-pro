@@ -3,7 +3,7 @@ var API = require('../../utils/api')
 Page({
   data: {
     roomId: '', roomName: '房间',
-    countdown: '--:--', endTime: '--:--',
+    countdown: '--:--', endTime: '--:--', orderSlot: '', orderStart: '',
     devices: [],
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
@@ -15,7 +15,8 @@ Page({
     var roomName = e.roomName ? decodeURIComponent(e.roomName) : '大茶室C'
     var duration = parseInt(e.duration) || 120
     var endStr = e.end || ''
-    this.setData({ roomId: roomId, roomName: roomName })
+    var startStr = e.start || ''
+    this.setData({ roomId: roomId, roomName: roomName, orderStart: startStr })
     this.loadDevices()
     this.startCountdown(duration, endStr)
   },
@@ -54,6 +55,7 @@ Page({
         if (totalSec <= 0) { self.setData({ countdown: '00:00' }); return }
         self.setData({ countdown: self._fmtCountdown(totalSec) })
         self._startTimer()
+        self._updateSlot()
         return
       }
     }
@@ -62,12 +64,22 @@ Page({
     var endH = (now.getHours() + Math.floor((now.getMinutes() + durationMin) / 60)) % 24
     var endM = (now.getMinutes() + durationMin) % 60
     self._endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endH, endM)
-    self.setData({ endTime: String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0') })
+    var endStr2 = String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0')
+    self.setData({ endTime: endStr2 })
     var totalSec = durationMin * 60
     self._countdownTotal = totalSec
     if (totalSec <= 0) { self.setData({ countdown: '00:00' }); return }
     self.setData({ countdown: self._fmtCountdown(totalSec) })
     self._startTimer()
+    self._updateSlot()
+  },
+
+  _updateSlot: function() {
+    var start = this.data.orderStart
+    var end = this.data.endTime
+    if (end) {
+      this.setData({ orderSlot: (start ? start : '--:--') + ' - ' + end })
+    }
   },
 
   _startTimer: function() {
@@ -86,6 +98,10 @@ Page({
     if (s <= 0) return '00:00'
     var m = Math.floor(s / 60), sec = s % 60
     return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0')
+  },
+
+  onUnload: function() {
+    if (this._countdownTimer) clearInterval(this._countdownTimer)
   },
 
   goBack: function() { wx.navigateBack() },
@@ -163,6 +179,7 @@ Page({
         }
         wx.setStorageSync('mp_bookings', bookings)
       } catch(e) {}
+      self._updateSlot()
       self.setData({ showExtendPayModal: false })
       wx.showToast({ title: '续订成功！已扣除 ¥' + opt.price, icon: 'success' })
     })

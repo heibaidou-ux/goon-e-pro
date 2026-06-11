@@ -303,7 +303,7 @@ Page({
           }
           wx.showToast({ title: '✅ 房间空闲，已提前开始', icon: 'success', duration: 1500 })
           setTimeout(function() {
-            wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) + '&end=' + self.data.slot.split('-')[1] + '&duration=' + durationMin })
+            wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) + '&start=' + self.data.slot.split('-')[0] + '&end=' + self.data.slot.split('-')[1] + '&duration=' + durationMin })
           }, 1800)
         } else {
           wx.showToast({ title: '房间当前被占用，请在预订时间前来', icon: 'none' })
@@ -351,7 +351,7 @@ Page({
     function proceedToOpen() {
       wx.showToast({ title: '🚪 门已开', icon: 'success', duration: 1000 })
       setTimeout(function() {
-        wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) + '&end=' + originalEndStr + '&duration=' + durationMin })
+        wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) + '&start=' + originalStartStr + '&end=' + originalEndStr + '&duration=' + durationMin })
       }, 1200)
     }
   },

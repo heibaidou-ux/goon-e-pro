@@ -3,11 +3,13 @@ page { background:#f0f2ef; margin:0; padding:0; }
 .nav-bar { display:flex; align-items:center; padding:12px 0; background:#fff; }
 .nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; }
 .page { flex:1; overflow-y:auto; padding-bottom:60px; }
-.room-info-bar { display:flex; justify-content:space-between; align-items:center; padding:16px 0; background:#5D8A6B; color:#fff; }
+.room-info-bar { display:flex; justify-content:space-between; align-items:center; padding:14px 0; background:#5D8A6B; color:#fff; }
+.room-info-left { }
 .room-info-name { font-size:18px; font-weight:700; display:block; }
-.room-info-time { font-size:12px; opacity:.9; }
-.countdown { font-size:20px; font-weight:700; }
-.room-info-end { font-size:11px; opacity:.7; }
+.room-info-slot { font-size:12px; opacity:.85; margin-top:2px; display:block; }
+.room-info-right { display:flex; flex-direction:column; align-items:flex-end; }
+.countdown { font-size:24px; font-weight:700; display:block; }
+.room-info-end { font-size:10px; opacity:.7; display:block; }
 .action-btns { display:flex; gap:12px; padding:16px 0; background:#f5f5f5; margin-bottom:12px; }
 .action-btn { flex:1; padding:20px; border-radius:16px; text-align:center; }
 .action-btn.renew { background:#5D8A6B; }

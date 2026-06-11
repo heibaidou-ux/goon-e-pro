@@ -171,8 +171,9 @@ Page({
       return
     }
     var timeParts = (order.timeStr || '').split(' ').pop().split('-')
+    var startStr = timeParts.length >= 1 ? timeParts[0].trim() : ''
     var endStr = timeParts.length >= 2 ? timeParts[1].trim() : ''
-    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+(order.roomId||'')+'&roomName='+encodeURIComponent(order.roomName||'')+'&end='+endStr+'&duration='+(order.remaining ? Math.ceil(order.remaining/60) : 120) })
+    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+(order.roomId||'')+'&roomName='+encodeURIComponent(order.roomName||'')+'&start='+startStr+'&end='+endStr+'&duration='+(order.remaining ? Math.ceil(order.remaining/60) : 120) })
   },
 
   goRoomControl: function(e) {
