@@ -27,97 +27,86 @@
       </view>
     </view>
 
-    <!-- 灯光设备组 -->
-    <view class="device-group" wx:if="{{lightDevices.length>0}}">
-      <text class="group-title">💡 灯光</text>
-      <view class="group-grid">
-        <view class="device-card light-card {{item.on ? 'on' : ''}}" wx:for="{{lightDevices}}" wx:key="deviceId" bindtap="toggleLight" data-id="{{item.deviceId}}" data-on="{{item.on}}">
-          <text class="dc-icon">{{item.on ? '💡' : '🏮'}}</text>
-          <text class="dc-label">{{item.label}}</text>
-          <view class="dc-toggle {{item.on ? 'on' : ''}}">
-            <view class="dc-toggle-knob"></view>
+    <!-- 墙面开关面板 -->
+    <view class="panel-section" wx:if="{{panel1.length>0}}">
+      <text class="section-label">开关面板</text>
+      <view class="panel-row">
+        <view class="switch-panel">
+          <text class="panel-title">面板1</text>
+          <view class="panel-grid">
+            <view class="switch-key {{item.active ? 'on' : ''}} {{item.type=='blank' ? 'blank' : ''}}" wx:for="{{panel1}}" wx:key="key" bindtap="onPanelKeyTap" data-key="{{item.key}}" data-type="{{item.type}}" data-roomid="{{roomId}}">
+              <text class="key-icon">{{item.icon}}</text>
+              <text class="key-label">{{item.label}}</text>
+              <view class="key-indicator {{item.active ? 'on' : ''}}"></view>
+            </view>
           </view>
         </view>
-      </view>
-    </view>
-
-    <!-- 风扇设备组 -->
-    <view class="device-group" wx:if="{{fanDevices.length>0}}">
-      <text class="group-title">🌀 风扇</text>
-      <view class="group-grid">
-        <view class="device-card fan-card {{item.on ? 'on' : ''}}" wx:for="{{fanDevices}}" wx:key="deviceId" bindtap="toggleFan" data-id="{{item.deviceId}}" data-on="{{item.on}}">
-          <text class="dc-icon">{{item.on ? '🌀' : '🍃'}}</text>
-          <text class="dc-label">{{item.label}}</text>
-          <view class="dc-toggle {{item.on ? 'on' : ''}}">
-            <view class="dc-toggle-knob"></view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 换气扇（小茶室） -->
-    <view class="device-group" wx:if="{{exhaustDevices.length>0}}">
-      <text class="group-title">🌬️ 换气扇</text>
-      <view class="group-grid">
-        <view class="device-card exhaust-card {{item.on ? 'on' : ''}}" wx:for="{{exhaustDevices}}" wx:key="deviceId" bindtap="toggleExhaust" data-id="{{item.deviceId}}" data-on="{{item.on}}">
-          <text class="dc-icon">{{item.on ? '🌬️' : '💨'}}</text>
-          <text class="dc-label">{{item.label}}</text>
-          <view class="dc-toggle {{item.on ? 'on' : ''}}">
-            <view class="dc-toggle-knob"></view>
+        <view class="switch-panel" wx:if="{{panel2.length>0}}">
+          <text class="panel-title">面板2</text>
+          <view class="panel-grid">
+            <view class="switch-key {{item.active ? 'on' : ''}} {{item.type=='blank' ? 'blank' : ''}}" wx:for="{{panel2}}" wx:key="key" bindtap="onPanelKeyTap" data-key="{{item.key}}" data-type="{{item.type}}" data-roomid="{{roomId}}">
+              <text class="key-icon">{{item.icon}}</text>
+              <text class="key-label">{{item.label}}</text>
+              <view class="key-indicator {{item.active ? 'on' : ''}}"></view>
+            </view>
           </view>
         </view>
       </view>
     </view>
 
     <!-- 空调 -->
-    <view class="device-group" wx:if="{{acDevice}}">
-      <text class="group-title">❄️ 空调</text>
+    <view class="device-section" wx:if="{{acDevice}}">
+      <text class="section-label">❄️ 空调</text>
       <view class="ac-card">
-        <view class="ac-display">
-          <text class="ac-temp">{{acDevice.temperature}}°</text>
-          <text class="ac-mode">{{acDevice.mode === 'cool' ? '制冷中' : '已关闭'}}</text>
-        </view>
-        <view class="ac-controls">
-          <view class="ac-btn" bindtap="acTempDown" data-id="{{acDevice.deviceId}}">−</view>
-          <view class="ac-temp-val">{{acDevice.temperature}}°</view>
-          <view class="ac-btn" bindtap="acTempUp" data-id="{{acDevice.deviceId}}">+</view>
-        </view>
-        <view class="ac-power {{acDevice.mode === 'cool' ? 'on' : ''}}" bindtap="toggleAC" data-id="{{acDevice.deviceId}}">
-          <text>{{acDevice.mode === 'cool' ? '❄️ 关闭空调' : '❄️ 开启空调'}}</text>
+        <view class="ac-main">
+          <view class="ac-temp-area">
+            <text class="ac-temp-num">{{acDevice.temperature}}°</text>
+            <text class="ac-temp-status">{{acDevice.mode === 'cool' ? '制冷中' : '已关闭'}}</text>
+          </view>
+          <view class="ac-ctrl-area">
+            <view class="ac-temp-ctrl">
+              <text class="ac-btn" bindtap="acTempDown" data-id="{{acDevice.deviceId}}">−</text>
+              <text class="ac-val">{{acDevice.temperature}}°</text>
+              <text class="ac-btn" bindtap="acTempUp" data-id="{{acDevice.deviceId}}">+</text>
+            </view>
+            <view class="ac-power-btn {{acDevice.mode === 'cool' ? 'on' : ''}}" bindtap="toggleAC" data-id="{{acDevice.deviceId}}">
+              {{acDevice.mode === 'cool' ? '❄️ 关闭' : '❄️ 开启'}}
+            </view>
+          </view>
         </view>
       </view>
     </view>
 
     <!-- 窗帘 -->
-    <view class="device-group" wx:if="{{curtainDevices.length>0}}">
-      <text class="group-title">🪟 窗帘</text>
-      <view class="curtain-list">
+    <view class="device-section" wx:if="{{curtainDevices.length>0}}">
+      <text class="section-label">🪟 窗帘</text>
+      <view class="curtain-card">
         <view class="curtain-item" wx:for="{{curtainDevices}}" wx:key="deviceId">
-          <text class="curtain-label">{{item.label}}</text>
-          <view class="curtain-slider-wrap">
-            <text class="slider-end">关闭</text>
-            <slider value="{{item.positionNum}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" show-value bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
-            <text class="slider-end">打开</text>
+          <text class="curtain-name">{{item.label}}</text>
+          <view class="curtain-bar">
+            <text class="curtain-end">关闭</text>
+            <slider value="{{item.positionNum}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
+            <text class="curtain-end">打开</text>
           </view>
         </view>
       </view>
     </view>
 
     <!-- 背景音乐 -->
-    <view class="device-group" wx:if="{{bgmDevice}}">
-      <text class="group-title">🎵 背景音乐</text>
+    <view class="device-section" wx:if="{{bgmDevice}}">
+      <text class="section-label">🎵 背景音乐</text>
       <view class="bgm-card">
-        <view class="bgm-header">
+        <view class="bgm-row">
           <text class="bgm-icon">🎵</text>
-          <text class="bgm-status">{{bgmDevice.playing ? '▶ 播放中' : '⏸ 已暂停'}}</text>
-          <view class="bgm-toggle {{bgmDevice.playing ? 'on' : ''}}" bindtap="toggleBGM" data-id="{{bgmDevice.deviceId}}">
-            <view class="bgm-toggle-knob"></view>
+          <text class="bgm-status">{{bgmDevice.playing ? '播放中' : '已暂停'}}</text>
+          <view class="bgm-switch {{bgmDevice.playing ? 'on' : ''}}" bindtap="toggleBGM" data-id="{{bgmDevice.deviceId}}">
+            <view class="bgm-switch-knob"></view>
           </view>
         </view>
-        <view class="bgm-volume-row">
-          <text class="vol-icon">🔈</text>
+        <view class="bgm-vol-row">
+          <text>🔈</text>
           <slider value="{{bgmDevice.volume}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" bindchanging="onBGMVolumeChange" data-id="{{bgmDevice.deviceId}}" />
-          <text class="vol-num">{{bgmDevice.volume}}%</text>
+          <text class="bgm-vol-num">{{bgmDevice.volume}}%</text>
         </view>
       </view>
     </view>
