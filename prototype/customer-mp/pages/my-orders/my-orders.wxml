@@ -29,7 +29,7 @@
         <view class="door-section">
           <view>
             <text class="door-label">门禁密码</text>
-            <text class="door-code">{{item.doorCode or '0000'}}</text>
+            <text class="door-code">{{item.doorCode ? item.doorCode : '0000'}}</text>
           </view>
           <text class="door-hint">备用开门方式</text>
         </view>
