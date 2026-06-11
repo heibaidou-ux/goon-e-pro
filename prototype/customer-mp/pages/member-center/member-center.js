@@ -18,8 +18,22 @@ Page({
     } catch(e) {}
 
     var self = this
-    Promise.all([API.getCurrentUser(), API.getBalance()]).then(function(results) {
-      var user = results[0], balance = results[1] || 0
+    Promise.all([API.getCurrentUser(), API.getBalance(), API.getUserOrders ? API.getUserOrders() : Promise.resolve([]), API.getShopOrders ? API.getShopOrders() : Promise.resolve([])]).then(function(results) {
+      var user = results[0], balance = results[1] || 0, bookings = results[2] || [], shopOrders = results[3] || []
+      // 从真实订单统计
+      var totalSpent = 0
+      var visitCount = 0
+      var processed = {}
+      for (var i = 0; i < bookings.length; i++) {
+        var b = bookings[i]
+        if (b.status !== 'Cancelled') {
+          totalSpent += b.amount || 0
+          if (!processed[b.roomId + b.date]) { visitCount++; processed[b.roomId + b.date] = true }
+        }
+      }
+      for (var i = 0; i < shopOrders.length; i++) {
+        totalSpent += shopOrders[i].total || 0
+      }
       if (user) {
         var levels = { Normal: { label:'普通会员', icon:'👛' }, Silver: { label:'银卡会员', icon:'💰' }, Gold: { label:'金牌会员', icon:'💎' }, Diamond: { label:'钻石会员', icon:'💳' } }
         var lv = levels[user.memberLevel] || levels.Gold
@@ -27,9 +41,9 @@ Page({
           userName: user.name || user.nickname || user.phone || '会员',
           levelLabel: lv.label,
           balanceIcon: lv.icon,
-          totalSpent: user.totalSpent || 0,
-          visitCount: user.visitCount || 0,
-          points: user.totalSpent || 0
+          totalSpent: totalSpent,
+          visitCount: visitCount,
+          points: totalSpent
         })
       }
       self.setData({ balance: balance })
