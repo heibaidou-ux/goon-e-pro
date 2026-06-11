@@ -99,7 +99,25 @@ Page({
   },
 
   changePassword: function() {
-    wx.showToast({ title: '请联系管理员重置密码', icon: 'none' })
+    var self = this
+    wx.showModal({
+      title: '修改密码',
+      content: '',
+      editable: true,
+      placeholderText: '请输入新密码',
+      success: function(res) {
+        if (res.confirm && res.content) {
+          try {
+            var user = wx.getStorageSync('mp_user') || {}
+            user.password = res.content
+            wx.setStorageSync('mp_user', user)
+            wx.showToast({ title: '密码已修改', icon: 'success' })
+          } catch(e) {
+            wx.showToast({ title: '保存失败', icon: 'none' })
+          }
+        }
+      }
+    })
   },
 
   clearAccount: function() {
