@@ -1,6 +1,5 @@
 <view class="phone">
   <view class="nav-bar">
-    <view class="back-btn" bindtap="goBack">←</view>
     <text class="nav-title">确认预约</text>
   </view>
   <view class="page">
