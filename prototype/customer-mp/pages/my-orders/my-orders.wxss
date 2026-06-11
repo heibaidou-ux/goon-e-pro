@@ -27,6 +27,9 @@ page { background:#f5f7fa; margin:0; padding:0; }
 .door-label { font-size:12px; color:#999; display:block; }
 .door-code { font-size:20px; font-weight:800; color:#333; letter-spacing:6px; display:block; }
 .door-hint { font-size:11px; color:#999; }
+.door-status { font-size:11px; display:block; margin-top:2px; }
+.door-status.ok { color:#5D8A6B; }
+.door-status.no { color:#999; }
 
 /* ── Device Grid ── */
 .device-grid { display:flex; gap:6px; padding:12px 0 0; border-top:1px solid #f0f0f0; margin-top:12px; }

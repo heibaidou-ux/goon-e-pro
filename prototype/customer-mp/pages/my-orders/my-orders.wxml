@@ -30,8 +30,8 @@
           <view>
             <text class="door-label">门禁密码</text>
             <text class="door-code">{{item.doorCode ? item.doorCode : '0000'}}</text>
+            <text class="door-status {{item.doorCanOpen ? 'ok' : 'no'}}">{{item.doorCanOpen ? '✅ 密码可用' : '❌ ' + (item.doorHint || '密码暂不可用')}}</text>
           </view>
-          <text class="door-hint">备用开门方式</text>
         </view>
         <view class="device-grid">
           <view class="device-item" bindtap="goRoomControl" data-room-id="{{item.roomId}}" data-room-name="{{item.roomName}}">

@@ -142,17 +142,18 @@
       </view>
 
       <view class="success-actions">
-        <button class="open-door-btn" bindtap="openDoor">
-          <text class="door-icon">🚪</text>
-          <text>开门</text>
-        </button>
         <view class="pass-area">
           <view class="pass-row">
-            <text class="pass-label">备用密码</text>
+            <text class="pass-label">门禁密码</text>
             <text class="pass-text" bindtap="copyCode">{{doorCode}}</text>
             <text class="pass-copy" bindtap="copyCode">复制</text>
           </view>
+          <text class="door-status {{doorOk ? 'ok' : 'no'}}">{{doorStatus}}</text>
         </view>
+        <button class="open-door-btn {{doorOk ? '' : 'disabled'}}" disabled="{{!doorOk}}" bindtap="openDoor">
+          <text class="door-icon">🚪</text>
+          <text>开门</text>
+        </button>
       </view>
 
       <!-- 地图导航（第19条） -->

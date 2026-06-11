@@ -218,7 +218,17 @@ Page({
     var payLabels = { wechat: '微信支付', alipay: '支付宝', balance: '会员余额', coupon: '验券' }
     var payLabel = self.data.isCombinedPay ? '余额+微信支付' : (self.data.selectedPay == 'coupon' ? '验券' : payLabels[self.data.selectedPay] || '微信支付')
     API.createBooking({ roomId: self.data.roomId, roomName: self.data.roomName, date: self.data.dateStr, time: self.data.slot, duration: self.data.editableDuration, amount: self.data.price, paymentMethod: payLabel, customerSource: self.data.selectedSource }).then(function(result) {
-      self.setData({ showSuccess: true, doorCode: result.doorCode || doorCode, payMethodLabel: payLabel, createdOrderId: result.orderId || '' })
+      // 计算门禁状态
+      var doorOk = false, doorStatus = ''
+      var now = new Date(), curMin = now.getHours() * 60 + now.getMinutes()
+      var slotParts = (self.data.slot || '').split('-')
+      if (slotParts.length >= 2) {
+        var sp = slotParts[0].split(':'), startMin = parseInt(sp[0]) * 60 + parseInt(sp[1])
+        var diff = startMin - curMin
+        if (diff <= 15) { doorOk = true; doorStatus = '✅ 密码可用' }
+        else { doorStatus = '❌ 密码将在预约开始前15分钟生效，还需等待' + Math.ceil(diff - 15) + '分钟' }
+      }
+      self.setData({ showSuccess: true, doorCode: result.doorCode || doorCode, payMethodLabel: payLabel, createdOrderId: result.orderId || '', doorStatus: doorStatus, doorOk: doorOk })
     }).catch(function(err) { wx.showToast({ title: err.message || '预订失败', icon: 'none' }) })
   },
 

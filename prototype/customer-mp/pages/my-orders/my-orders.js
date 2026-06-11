@@ -49,11 +49,14 @@ Page({
           }
         }
 
-        // 开门条件：预约开始前30分钟内 + 房间未被占用
+        // 开门条件：进行中订单随时可用 / 待使用订单需在开始前15分钟内且房间未被占用
         var doorCanOpen = false
         var doorHint = ''
         var roomOccupied = false
-        if (status === 'Booked' && o.date && o.time) {
+        if (status === 'InUse' || status === 'in_use') {
+          doorCanOpen = true
+          doorHint = '密码可用'
+        } else if (status === 'Booked' && o.date && o.time) {
           var sb = o.time.split('-')[0].split(':')
           if (sb.length >= 2) {
             var orderDate = new Date(o.date)
@@ -71,9 +74,10 @@ Page({
             // 条件2: 房间未被占用
             doorCanOpen = (minUntilStart <= 15) && !roomOccupied
             if (minUntilStart > 15) {
-              doorHint = '密码暂不可用'
+              var waitMin = Math.ceil(minUntilStart - 15)
+              doorHint = '密码将在预约开始前15分钟生效，还需等待' + waitMin + '分钟'
             } else if (roomOccupied) {
-              doorHint = '房间正在使用中'
+              doorHint = '当前房间正在使用中，请稍后再试'
             } else {
               doorHint = '密码可用'
             }

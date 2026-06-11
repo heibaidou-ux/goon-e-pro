@@ -89,3 +89,7 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .pass-label { font-size:13px; color:#666; }
 .pass-text { font-size:22px; font-weight:700; color:#333; letter-spacing:4px; }
 .pass-copy { color:#5D8A6B; font-size:13px; }
+.door-status { font-size:11px; display:block; margin-top:4px; }
+.door-status.ok { color:#5D8A6B; }
+.door-status.no { color:#999; }
+.open-door-btn.disabled { opacity:.4; }
