@@ -82,7 +82,7 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .booking-confirm-info { margin:16px 0; text-align:left; }
 .bci-row { display:flex; align-items:flex-start; padding:14px 0; font-size:14px; border-bottom:1px solid #f0f0f0; }
 .bci-row:last-child { border-bottom:none; }
-.bci-label { color:#999; flex-shrink:0; font-size:13px; min-width:64px; margin-right:12px; }
+.bci-label { color:#999; flex-shrink:0; font-size:13px; width:64px; margin-right:16px; }
 .bci-value { font-weight:600; color:#333; font-size:14px; }
 .bci-wide { text-align:right; flex:1; }
 

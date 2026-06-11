@@ -41,7 +41,7 @@ Page({
     confirmPreview: '',
     pendingCode: '',
     matchedCouponInfo: '',
-    couponName: '', couponPlatform: '', couponPrice: 0,
+    couponName: '', couponPlatform: '', couponPrice: 0, couponDuration: 120, selectedTimeSlot: '',
     availableRooms: [],
     selectedRoom: '',
     selectedRoomName: '',
@@ -123,6 +123,7 @@ Page({
       couponName: info.title,
       couponPlatform: info.source,
       couponPrice: info.price,
+      couponDuration: info.duration || 120,
       availableRooms: rooms,
       selectedRoom: rooms.length > 0 ? rooms[0].id : '',
       selectedRoomName: firstRoomName,
@@ -163,7 +164,8 @@ Page({
       wx.showToast({ title: '该时段已过，请选择其他时段', icon: 'none' })
       return
     }
-    this.setData({ selectedTime: ds.time, showBookingConfirm: true })
+    var slot = this._makeSlot(ds.time)
+    this.setData({ selectedTime: slot, showBookingConfirm: true })
   },
 
   pickNow: function() {
@@ -174,7 +176,19 @@ Page({
     var m = roundedMin % 60
     if (h >= 24) { wx.showToast({ title: '已过营业时间', icon: 'none' }); return }
     var t = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')
-    this.setData({ selectedTime: t, showBookingConfirm: true })
+    var slot = this._makeSlot(t)
+    this.setData({ selectedTime: slot, showBookingConfirm: true })
+  },
+
+  _makeSlot: function(startTime) {
+    var sp = startTime.split(':')
+    var startMin = parseInt(sp[0]) * 60 + parseInt(sp[1])
+    var dur = this.data.couponDuration || 120
+    var endMin = startMin + dur
+    var eh = Math.floor(endMin / 60) % 24
+    var em = endMin % 60
+    var endStr = String(eh).padStart(2,'0') + ':' + String(em).padStart(2,'0')
+    return startTime + ' - ' + endStr
   },
 
   hideBookingConfirm: function() { this.setData({ showBookingConfirm: false }) },
