@@ -163,10 +163,10 @@ Page({
     this.setData({ acDevice: ac }); API.controlDevice(id, { temperature: ac.temperature }).catch(function(){})
   },
   _acModeLabel: function(mode) {
-    if (mode === 'cool') return '❄️ 制冷中'
-    if (mode === 'heat') return '🔥 制热中'
-    if (mode === 'fan') return '🌀 送风中'
-    return '已关闭'
+    if (mode === 'cool') return '制冷中'
+    if (mode === 'heat') return '制热中'
+    if (mode === 'fan') return '送风中'
+    return '已关机'
   },
 
   // ── 窗帘 ──
