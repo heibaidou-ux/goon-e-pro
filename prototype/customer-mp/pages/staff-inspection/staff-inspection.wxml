@@ -1,1 +1,36 @@
-<view class="page"><view class="placeholder"><text class="ph-icon">🚧</text><text class="ph-text">开发中</text><text class="ph-desc">{{title}}</text></view></view>
+<view class="page">
+  <view class="header">
+    <text class="back-btn" bindtap="goBack">←</text>
+    <text class="header-title">🔍 巡检</text>
+  </view>
+
+  <view class="content">
+    <view class="section-title">选择房间</view>
+    <view class="room-tabs">
+      <view class="room-tab {{selectedRoom === item.roomId ? 'active' : ''}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="selectRoom" data-roomid="{{item.roomId}}">
+        <text class="rt-name">{{item.name}}</text>
+        <text class="rt-status {{item.status === 'Active' ? 'ok' : ''}}">{{item.status === 'Active' ? '在线' : '离线'}}</text>
+      </view>
+    </view>
+
+    <!-- 巡检项 -->
+    <view class="section-title" wx:if="{{selectedRoom}}">设备巡检清单 — {{selectedRoomName}}</view>
+    <view class="inspect-list" wx:if="{{selectedRoom}}">
+      <view class="inspect-item" wx:for="{{inspectionItems}}" wx:key="name">
+        <view class="ii-left">
+          <text class="ii-name">{{item.name}}</text>
+          <text class="ii-desc" wx:if="{{item.ok}}">状态正常</text>
+          <text class="ii-desc warn" wx:else>需要检修</text>
+        </view>
+        <view class="ii-status {{item.ok ? 'ok' : 'fail'}}" bindtap="toggleInspect" data-index="{{index}}">
+          <text wx:if="{{item.ok}}">✅ 正常</text>
+          <text wx:else>❌ 异常</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="inspect-actions" wx:if="{{selectedRoom}}">
+      <button class="inspect-submit-btn" bindtap="submitInspection">提交巡检报告</button>
+    </view>
+  </view>
+</view>

@@ -1,1 +1,32 @@
-<view class="page"><view class="placeholder"><text class="ph-icon">🚧</text><text class="ph-text">开发中</text><text class="ph-desc">{{title}}</text></view></view>
+<view class="page">
+  <view class="header">
+    <text class="back-btn" bindtap="goBack">←</text>
+    <text class="header-title">📋 排班</text>
+  </view>
+
+  <view class="content">
+    <!-- 周导航 -->
+    <view class="week-nav">
+      <text class="week-nav-btn" bindtap="prevWeek">◀</text>
+      <text class="week-nav-title">{{schedule.weekStart}} ~ {{schedule.weekEnd}}</text>
+      <text class="week-nav-btn" bindtap="nextWeek">▶</text>
+    </view>
+
+    <!-- 排班表 -->
+    <view class="schedule-table">
+      <view class="st-header">
+        <text class="st-cell st-name">姓名</text>
+        <text class="st-cell st-day" wx:for="{{dayLabels}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="st-row" wx:for="{{schedule.staff}}" wx:key="index">
+        <view class="st-cell st-name">
+          <text class="st-worker">{{item.name}}</text>
+          <text class="st-role">{{item.role}}</text>
+        </view>
+        <view class="st-cell st-day {{d === '休息' ? 'off' : (d === '全天' ? 'full' : '')}}" wx:for="{{item.schedule}}" wx:key="*this" wx:for-item="d">
+          <text class="st-shift">{{d === '早班' ? '早' : (d === '晚班' ? '晚' : (d === '全天' ? '全' : (d === '休息' ? '—' : d)))}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

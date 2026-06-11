@@ -1,1 +1,33 @@
-<view class="page"><view class="placeholder"><text class="ph-icon">🚧</text><text class="ph-text">开发中</text><text class="ph-desc">{{title}}</text></view></view>
+<view class="page">
+  <view class="header">
+    <text class="back-btn" bindtap="goBack">←</text>
+    <text class="header-title">📦 商品管理</text>
+  </view>
+
+  <view class="content">
+    <!-- 分类 -->
+    <view class="category-tabs">
+      <view class="cat-tab {{selectedCat === '' ? 'active' : ''}}" bindtap="filterCat" data-cat="">全部</view>
+      <view class="cat-tab {{selectedCat === 'Tea' ? 'active' : ''}}" bindtap="filterCat" data-cat="Tea">茶品</view>
+      <view class="cat-tab {{selectedCat === 'Snack' ? 'active' : ''}}" bindtap="filterCat" data-cat="Snack">茶点</view>
+      <view class="cat-tab {{selectedCat === 'Ware' ? 'active' : ''}}" bindtap="filterCat" data-cat="Ware">茶具</view>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="product-list">
+      <view class="product-card" wx:for="{{products}}" wx:key="productId">
+        <view class="pc-left">
+          <text class="pc-icon">{{item.image}}</text>
+        </view>
+        <view class="pc-body">
+          <text class="pc-name">{{item.name}}</text>
+          <text class="pc-desc">{{item.desc}}</text>
+          <text class="pc-price">¥{{item.price}}</text>
+        </view>
+        <view class="pc-right">
+          <text class="pc-status {{item.status === '上架' ? 'on' : 'off'}}">{{item.status || '上架'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

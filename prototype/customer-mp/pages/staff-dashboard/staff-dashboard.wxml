@@ -1,1 +1,90 @@
-<view class="page"><view class="header"><text class="header-title">📊 工作台</text><text class="header-store">{{storeName}}</text></view><view class="stats-grid"><view class="stat-card"><text class="stat-num">{{stats.roomCount.inUse}}</text><text class="stat-label">使用中</text></view><view class="stat-card"><text class="stat-num">¥{{stats.todayRevenue}}</text><text class="stat-label">今日收入</text></view><view class="stat-card"><text class="stat-num">{{stats.todayOrders}}</text><text class="stat-label">今日订单</text></view><view class="stat-card"><text class="stat-num">{{stats.pendingTasks}}</text><text class="stat-label">待办任务</text></view></view><view class="quick-actions"><view class="action-item" bindtap="goRoomStatus">🏠 房态</view><view class="action-item" bindtap="goDeviceMonitor">📡 设备</view><view class="action-item" bindtap="goCleaning">🧹 保洁</view><view class="action-item" bindtap="goOrders">📋 订单</view><view class="action-item" bindtap="goTodo">✅ 待办</view><view class="action-item" bindtap="goProfile">👤 我的</view></view><view class="section"><text class="section-title">待办事项</text></view><view class="todo-list"><view class="todo-item {{item.priority === 'high' ? 'high' : ''}}" wx:for="{{todos}}" wx:key="id" bindtap="goTodo"><text class="todo-title">{{item.title}}</text><text class="todo-deadline">{{item.deadline}}</text></view></view></view>
+<view class="page">
+  <!-- 顶部 -->
+  <view class="header">
+    <view class="header-left">
+      <text class="header-title">📊 工作台</text>
+      <text class="header-store">{{storeName}}</text>
+    </view>
+    <view class="header-right">
+      <text class="header-time">{{timeStr}}</text>
+    </view>
+  </view>
+
+  <!-- 四宫格：今日营收/待办事项/订单状态/告警信息 -->
+  <view class="stats-grid">
+    <view class="stat-card">
+      <text class="stat-icon">💰</text>
+      <text class="stat-num">¥{{stats.todayRevenue}}</text>
+      <text class="stat-label">今日营收</text>
+    </view>
+    <view class="stat-card" bindtap="goTodo">
+      <text class="stat-icon">📋</text>
+      <text class="stat-num">{{stats.pendingTasks}}</text>
+      <text class="stat-label">待办事项</text>
+    </view>
+    <view class="stat-card" bindtap="goOrders">
+      <text class="stat-icon">📦</text>
+      <text class="stat-num">{{stats.orderStatus || stats.todayOrders}}</text>
+      <text class="stat-label">订单状态</text>
+    </view>
+    <view class="stat-card {{stats.alerts > 0 ? 'alert' : ''}}" bindtap="goDeviceMonitor">
+      <text class="stat-icon">{{stats.alerts > 0 ? '⚠️' : '✅'}}</text>
+      <text class="stat-num">{{stats.alerts > 0 ? stats.alerts : 0}}</text>
+      <text class="stat-label">告警信息</text>
+    </view>
+  </view>
+
+  <!-- 快捷按钮：验券、开门、监控、对账 2×2 -->
+  <view class="section-title">快捷操作</view>
+  <view class="quick-actions">
+    <view class="action-item" bindtap="goCouponVerify">
+      <text class="action-icon">🎫</text>
+      <text class="action-label">验券</text>
+    </view>
+    <view class="action-item" bindtap="goOpenDoor">
+      <text class="action-icon">🚪</text>
+      <text class="action-label">开门</text>
+    </view>
+    <view class="action-item" bindtap="goDeviceMonitor">
+      <text class="action-icon">📡</text>
+      <text class="action-label">监控</text>
+    </view>
+    <view class="action-item" bindtap="goReconciliation">
+      <text class="action-icon">🧾</text>
+      <text class="action-label">对账</text>
+    </view>
+  </view>
+
+  <!-- 功能入口：考勤/商品管理/巡检/排班 -->
+  <view class="section-title">更多功能</view>
+  <view class="feature-grid">
+    <view class="feature-item" bindtap="goAttendance">
+      <text class="feature-icon">📅</text>
+      <text class="feature-label">考勤</text>
+    </view>
+    <view class="feature-item" bindtap="goProducts">
+      <text class="feature-icon">📦</text>
+      <text class="feature-label">商品管理</text>
+    </view>
+    <view class="feature-item" bindtap="goInspection">
+      <text class="feature-icon">🔍</text>
+      <text class="feature-label">巡检</text>
+    </view>
+    <view class="feature-item" bindtap="goScheduling">
+      <text class="feature-icon">📋</text>
+      <text class="feature-label">排班</text>
+    </view>
+  </view>
+
+  <!-- 待办事项预览 -->
+  <view class="section-title">待办事项</view>
+  <view class="todo-list">
+    <view class="todo-item {{item.priority === 'high' ? 'high' : ''}}" wx:for="{{todos}}" wx:key="id" bindtap="goTodo">
+      <view class="todo-body">
+        <text class="todo-title">{{item.title}}</text>
+        <text class="todo-meta">{{item.type}} · 截止 {{item.deadline}}</text>
+      </view>
+      <text class="todo-arrow">›</text>
+    </view>
+  </view>
+</view>
