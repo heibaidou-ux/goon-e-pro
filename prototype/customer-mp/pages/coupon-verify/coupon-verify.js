@@ -43,8 +43,10 @@ Page({
     matchedCouponInfo: '',
     availableRooms: [],
     selectedRoom: '',
+    selectedRoomName: '',
     timeSlots: [],
     selectedTime: '',
+    showBookingConfirm: false,
     myCoupons: []
   },
 
@@ -114,17 +116,23 @@ Page({
       var rid = info.matchRooms[i]
       if (ROOM_DATA[rid]) rooms.push({ id: rid, name: ROOM_DATA[rid].name, capacity: ROOM_DATA[rid].capacity, icon: ROOM_DATA[rid].icon })
     }
+    var firstRoomName = rooms.length > 0 ? rooms[0].name : ''
     this.setData({
       matchedCouponInfo: info.title + ' · 价值 ¥' + info.price,
       availableRooms: rooms,
       selectedRoom: rooms.length > 0 ? rooms[0].id : '',
+      selectedRoomName: firstRoomName,
       step: 2
     })
     wx.showToast({ title: '验券成功！', icon: 'none' })
   },
 
   selectCouponRoom: function(e) {
-    this.setData({ selectedRoom: e.currentTarget.dataset.id })
+    var id = e.currentTarget.dataset.id
+    var rooms = this.data.availableRooms
+    var name = ''
+    for (var i = 0; i < rooms.length; i++) { if (rooms[i].id === id) { name = rooms[i].name; break } }
+    this.setData({ selectedRoom: id, selectedRoomName: name })
   },
 
   goToTimeSelect: function() { this.setData({ step: 3 }) },
@@ -147,14 +155,11 @@ Page({
 
   selectTime: function(e) {
     var ds = e.currentTarget.dataset
-    var slots = this.data.timeSlots
-    for (var i = 0; i < slots.length; i++) {
-      if (slots[i].time === ds.time && !slots[i].available) {
-        wx.showToast({ title: '该时段已过，请选择其他时段', icon: 'none' })
-        return
-      }
+    if (ds.available === 'false' || ds.available === false) {
+      wx.showToast({ title: '该时段已过，请选择其他时段', icon: 'none' })
+      return
     }
-    this.setData({ selectedTime: ds.time })
+    this.setData({ selectedTime: ds.time, showBookingConfirm: true })
   },
 
   pickNow: function() {
@@ -165,12 +170,13 @@ Page({
     var m = roundedMin % 60
     if (h >= 24) { wx.showToast({ title: '已过营业时间', icon: 'none' }); return }
     var t = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')
-    this.setData({ selectedTime: t })
-    wx.showToast({ title: '已选择 ' + t + ' 开始', icon: 'none' })
+    this.setData({ selectedTime: t, showBookingConfirm: true })
   },
 
+  hideBookingConfirm: function() { this.setData({ showBookingConfirm: false }) },
+
   confirmBooking: function() {
-    if (!this.data.selectedRoom || !this.data.selectedTime) { wx.showToast({ title: '请选择时段', icon: 'none' }); return }
+    this.setData({ showBookingConfirm: false })
     wx.showToast({ title: '✅ 预约成功！', icon: 'success' })
     setTimeout(function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) }, 1000)
   },

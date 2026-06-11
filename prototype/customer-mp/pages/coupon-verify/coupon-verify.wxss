@@ -11,8 +11,8 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .step-line { width:24px; height:1px; background:#e5e5e5; }
 .section-title { font-size:15px; font-weight:600; margin-bottom:12px; display:block; }
 .coupon-field-row { display:flex; gap:8px; margin-bottom:16px; align-items:center; }
-.coupon-field-wrap { position:relative; flex:1; }
-.coupon-field { width:100%; padding:0 48px 0 14px; height:50px; line-height:50px; border:2px solid #e5e5e5; border-radius:16px; font-size:16px; text-align:center; box-sizing:border-box; }
+.coupon-field-wrap { position:relative; flex:1; display:flex; align-items:center; }
+.coupon-field { width:100%; padding:12px 48px 12px 14px; border:2px solid #e5e5e5; border-radius:16px; font-size:16px; text-align:center; box-sizing:border-box; }
 .coupon-field:focus { border-color:#5D8A6B; }
 .coupon-verify-btn { padding:14px 24px; border-radius:16px; background:#5D8A6B; color:#fff; border:none; font-size:15px; font-weight:600; white-space:nowrap; }
 .scan-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); width:28px; height:28px; padding:4px; cursor:pointer; }
@@ -49,8 +49,20 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .confirm-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f5f5f5; }
 .confirm-row .label { color:#999; font-size:14px; }
 .confirm-row .price { color:#B8860B; font-weight:600; font-size:14px; }
+.confirm-row .price.past { color:#ddd; }
 
 /* 底部确认条 */
-.bottom-bar { position:fixed; bottom:0; left:0; right:0; padding:12px 0; background:#fff; border-top:1px solid #f0f0f0; z-index:20; }
-.submit-btn { width:100%; padding:14px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; text-align:center; }
-.submit-btn[disabled] { background:#ccc; }
+.booking-confirm-info { margin:12px 0; text-align:left; }
+.bci-row { display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid #f0f0f0; }
+.bci-label { color:#999; }
+.bci-value { font-weight:600; color:#333; text-align:right; max-width:60%; }
+
+/* 确认弹窗 */
+.confirm-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
+.confirm-modal { background:#fff;border-radius:16px;padding:24px;width:320px;max-width:90vw;text-align:center; }
+.confirm-h3 { font-size:16px;font-weight:700;display:block;margin-bottom:8px; }
+.confirm-preview { font-size:14px;color:#666;margin:8px 0; }
+.confirm-modal-buttons { display:flex;gap:10px;margin-top:16px; }
+.confirm-modal-btn { flex:1;padding:12px;border-radius:16px;font-size:14px;font-weight:600;text-align:center;border:none; }
+.confirm-modal-btn.cancel { background:#f5f5f5;color:#666; }
+.confirm-modal-btn.confirm { background:#5D8A6B;color:#fff; }
