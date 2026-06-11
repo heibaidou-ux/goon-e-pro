@@ -131,7 +131,8 @@ Page({
           amount: o.amount||0, doorCode: o.doorCode||'0000',
           remaining: remaining, cancelFree: cancelFree, cancelMsg: cancelMsg,
           logistics: log, payment: o.payment||'',
-          doorCanOpen: doorCanOpen, doorHint: doorHint
+          doorCanOpen: doorCanOpen, doorHint: doorHint,
+          isTeaOrder: o.isTeaOrder || false, items: o.items || []
         }
       })
       self.setData({ orders: mapped })
