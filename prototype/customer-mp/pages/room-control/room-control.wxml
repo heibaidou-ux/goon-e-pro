@@ -97,5 +97,7 @@
         <view class="modal-btn primary" bindtap="doExtendPayment">确认支付</view>
       </view>
     </view>
+
+    <bottom-nav active="home" />
   </view>
 </view>
