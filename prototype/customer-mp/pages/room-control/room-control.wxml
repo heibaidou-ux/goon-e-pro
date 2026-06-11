@@ -33,15 +33,12 @@
       <view class="ac-card">
         <view class="ac-main">
           <view class="ac-temp-area">
+            <text class="ac-up" bindtap="acTempUp" data-id="{{acDevice.deviceId}}">▲</text>
             <text class="ac-temp-num">{{acDevice.temperature}}°</text>
+            <text class="ac-down" bindtap="acTempDown" data-id="{{acDevice.deviceId}}">▼</text>
             <text class="ac-temp-status">{{acModeLabel}}</text>
           </view>
           <view class="ac-ctrl-area">
-            <view class="ac-temp-ctrl">
-              <text class="ac-btn" bindtap="acTempDown" data-id="{{acDevice.deviceId}}">−</text>
-              <text class="ac-val">{{acDevice.temperature}}°</text>
-              <text class="ac-btn" bindtap="acTempUp" data-id="{{acDevice.deviceId}}">+</text>
-            </view>
             <view class="ac-mode-row">
               <view class="ac-mode-btn {{acDevice.mode == 'cool' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="cool">❄️ 制冷</view>
               <view class="ac-mode-btn {{acDevice.mode == 'heat' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="heat">🔥 制热</view>
