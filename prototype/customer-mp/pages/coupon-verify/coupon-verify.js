@@ -41,6 +41,7 @@ Page({
     confirmPreview: '',
     pendingCode: '',
     matchedCouponInfo: '',
+    couponName: '', couponPlatform: '', couponPrice: 0,
     availableRooms: [],
     selectedRoom: '',
     selectedRoomName: '',
@@ -119,6 +120,9 @@ Page({
     var firstRoomName = rooms.length > 0 ? rooms[0].name : ''
     this.setData({
       matchedCouponInfo: info.title + ' · 价值 ¥' + info.price,
+      couponName: info.title,
+      couponPlatform: info.source,
+      couponPrice: info.price,
       availableRooms: rooms,
       selectedRoom: rooms.length > 0 ? rooms[0].id : '',
       selectedRoomName: firstRoomName,

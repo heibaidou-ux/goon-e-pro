@@ -138,9 +138,10 @@
   <view class="confirm-modal" catchtap>
     <text class="confirm-h3">确认预约</text>
     <view class="booking-confirm-info">
-      <text class="bci-row"><text class="bci-label">券</text><text class="bci-value">{{matchedCouponInfo}}</text></text>
-      <text class="bci-row"><text class="bci-label">房间</text><text class="bci-value">{{selectedRoomName}}</text></text>
-      <text class="bci-row"><text class="bci-label">时间</text><text class="bci-value">{{selectedTime}}</text></text>
+      <text class="bci-row"><text class="bci-label">券名称</text><text class="bci-value bci-wide">{{couponName}}</text></text>
+      <text class="bci-row"><text class="bci-label">券类型</text><text class="bci-value bci-wide">{{couponPlatform}} · ¥{{couponPrice}}</text></text>
+      <text class="bci-row"><text class="bci-label">房间</text><text class="bci-value bci-wide">{{selectedRoomName}}</text></text>
+      <text class="bci-row"><text class="bci-label">预订时段</text><text class="bci-value bci-wide">{{selectedTime}}</text></text>
     </view>
     <view class="confirm-modal-buttons">
       <button class="confirm-modal-btn cancel" bindtap="hideBookingConfirm">取消</button>
