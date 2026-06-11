@@ -218,7 +218,7 @@ Page({
     var payLabels = { wechat: '微信支付', alipay: '支付宝', balance: '会员余额', coupon: '验券' }
     var payLabel = self.data.isCombinedPay ? '余额+微信支付' : (self.data.selectedPay == 'coupon' ? '验券' : payLabels[self.data.selectedPay] || '微信支付')
     API.createBooking({ roomId: self.data.roomId, roomName: self.data.roomName, date: self.data.dateStr, time: self.data.slot, duration: self.data.editableDuration, amount: self.data.price, paymentMethod: payLabel, customerSource: self.data.selectedSource }).then(function(result) {
-      self.setData({ showSuccess: true, doorCode: result.doorCode || doorCode, payMethodLabel: payLabel })
+      self.setData({ showSuccess: true, doorCode: result.doorCode || doorCode, payMethodLabel: payLabel, createdOrderId: result.orderId || '' })
     }).catch(function(err) { wx.showToast({ title: err.message || '预订失败', icon: 'none' }) })
   },
 
@@ -243,10 +243,14 @@ Page({
     // 获取该房间当日的所有未取消订单用于冲突判断
     API.getRoomBookings(roomId, dateStr).then(function(bookings) {
       if (!bookings) bookings = []
+      // 排除当前订单（自己刚创建的预订不参与冲突检测）
+      var myOrderId = self.data.createdOrderId || ''
+
       // 检查后续预订：找出所有在原始结束时间之后开始的预订
       var nextBooking = null
       for (var i = 0; i < bookings.length; i++) {
         var b = bookings[i]
+        if (b.orderId === myOrderId) continue
         var bParts = (b.time || b.start || '').split('-')[0] && (b.time || b.start || '').split(':')
         if (!bParts || bParts.length < 2) continue
         var bStartMin = parseInt(bParts[0]) * 60 + parseInt(bParts[1])
@@ -264,6 +268,7 @@ Page({
         var isRoomFree = true
         for (var i = 0; i < bookings.length; i++) {
           var b = bookings[i]
+          if (b.orderId === myOrderId) continue
           var bTimeParts = (b.time || b.start || '').split('-')
           if (bTimeParts.length < 2) continue
           var bs = bTimeParts[0].split(':'), be = bTimeParts[1].split(':')

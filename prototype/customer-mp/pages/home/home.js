@@ -57,11 +57,26 @@ Page({
     }).catch(function() { self.setData({ loading: false, errorMsg: '加载失败' }) })
   },
 
+  isOrderActiveNow: function(order) {
+    if (!order.date || !order.time) return false
+    var now = new Date()
+    var todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0')
+    if (order.date !== todayStr) return false
+    var parts = order.time.split('-')
+    if (parts.length < 2) return false
+    var sp = parts[0].split(':'), ep = parts[1].split(':')
+    if (sp.length < 2 || ep.length < 2) return false
+    var curMin = now.getHours() * 60 + now.getMinutes()
+    var startMin = parseInt(sp[0]) * 60 + parseInt(sp[1])
+    var endMin = parseInt(ep[0]) * 60 + parseInt(ep[1])
+    return curMin >= startMin && curMin < endMin
+  },
+
   checkActiveOrder: function() {
     var self = this
     API.getUserOrders().then(function(orders) {
       var active = null
-      for (var i = 0; i < orders.length; i++) { if (orders[i].status === 'InUse' || orders[i].status === 'Booked') { active = orders[i]; break } }
+      for (var i = 0; i < orders.length; i++) { if (orders[i].status === 'InUse' || (orders[i].status === 'Booked' && self.isOrderActiveNow(orders[i]))) { active = orders[i]; break } }
       if (active) { self.setData({ hasActiveOrder: true, activeOrder: { roomName: active.roomName || '大茶室C', roomId: active.roomId || '', timeStr: (active.date||'')+' '+(active.time||'') } }) }
       else { self.setData({ hasActiveOrder: false }) }
     })

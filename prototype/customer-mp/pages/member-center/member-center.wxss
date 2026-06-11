@@ -1,6 +1,6 @@
 page { background:#f5f7fa; margin:0; padding:0; }
 .phone { width:100%; min-height:100vh; background:#f5f7fa; display:flex; flex-direction:column; transform:translateZ(0); }
-.page { flex:1; overflow-y:auto; padding-bottom:60px; }
+.page { flex:1; overflow-y:auto; padding-bottom:16px; }
 
 /* 首充条 */
 .promo-banner { background:linear-gradient(135deg,#B8860B,#f5a623); padding:14px 0; color:#fff; display:flex; align-items:center; justify-content:space-between; }

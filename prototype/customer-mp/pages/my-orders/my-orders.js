@@ -71,7 +71,7 @@ Page({
             // 条件2: 房间未被占用
             doorCanOpen = (minUntilStart <= 30) && !roomOccupied
             if (minUntilStart > 30) {
-              doorHint = '预约开始前' + Math.ceil(minUntilStart - 30) + '分钟可开门'
+              doorHint = '提前30分钟可开门，还需' + Math.ceil(minUntilStart - 30) + '分钟'
             } else if (roomOccupied) {
               doorHint = '房间正在使用中'
             } else {
