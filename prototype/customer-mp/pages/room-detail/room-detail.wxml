@@ -73,8 +73,7 @@
         </view>
         <view class="custom-hours-row" wx:if="{{isCustomMode}}">
           <text class="ch-label">自定义</text>
-          <input class="custom-hours-input" type="text" value="{{customHours}}" bindinput="onCustomHoursInput" placeholder="时" />
-          <text class="ch-label">小时</text>
+          <input class="custom-hours-input" type="text" value="{{customHours}}" bindinput="onCustomHoursInput" placeholder="输入小时数" />
         </view>
       </view>
 
