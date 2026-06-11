@@ -22,10 +22,10 @@ var ROOM_IMAGES = {
 }
 
 var STORE_INFO = {
-  address: '广州市天河区珠江新城华夏路28号盈隆大厦16层',
-  phone: '020-8888-8888',
-  hours: '09:00-23:00',
-  lat: 23.1291,
+  address: '广州市天河区珠江新城富力盈隆广场3801',
+  phone: '18011821388',
+  hours: '24小时',
+  lat: 23.1275,
   lng: 113.3220
 }
 
@@ -244,5 +244,13 @@ Page({
     wx.navigateTo({ url: '/pages/booking-confirm/booking-confirm?roomId=' + d.roomId + '&roomName=' + encodeURIComponent(d.room.name) + '&date=' + dateStr + '&start=' + d.selectedStart + '&end=' + d.selectedEnd + '&total=' + d.totalPrice + '&duration=' + (parseFloat(d.selectedDuration) || 120) })
   },
 
-  openNavigation: function() { wx.showToast({ title: '🗺 导航中...', icon: 'none' }) }
+  openNavigation: function() {
+    wx.openLocation({
+      latitude: 23.1275,
+      longitude: 113.3220,
+      name: '高岸·富力盈隆广场',
+      address: '广州市天河区珠江新城富力盈隆广场3801',
+      scale: 18
+    })
+  },
 })

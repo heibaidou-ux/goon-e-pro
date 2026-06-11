@@ -160,7 +160,7 @@
       <view class="address-section">
         <view class="address-card">
           <text class="address-title">📍 盈隆店</text>
-          <text class="address-detail">广州市天河区盈隆广场3楼 · 富力盈隆大厦</text>
+          <text class="address-detail">广州市天河区珠江新城富力盈隆广场3801</text>
           <button class="nav-btn" bindtap="openNav">🗺 查看导航</button>
         </view>
       </view>

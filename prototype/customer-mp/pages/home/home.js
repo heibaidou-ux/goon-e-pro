@@ -16,7 +16,7 @@ Page({
     rooms: [], teaProducts: [], cartCount: 0,
     balance: 0, balanceDisplay: '', balanceVisible: true,
     qrRoomId: '', qrRoomName: '', qrTableId: '',
-    showStoreModal: false, showParkingModal: false, showLoginModal: false,
+    showStoreModal: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
     loginMode: 'login', loginPhone: '138****8888', loginCode: '8888',
     regPhone: '', regName: '', regCode: '',
@@ -29,7 +29,7 @@ Page({
     var role = API.getUserRole()
     if (role === 'staff') { wx.reLaunch({ url: '/pages/staff-dashboard/staff-dashboard' }); return }
     if (role === 'shareholder') { wx.reLaunch({ url: '/pages/investor-workbench/investor-workbench' }); return }
-    try { var sys = wx.getSystemInfoSync(); self.setData({ topPadding: (sys.statusBarHeight || 44) + 44 }) } catch(e) {}
+    try { self.setData({ topPadding: (wx.getWindowInfo().statusBarHeight || 44) + 44 }) } catch(e) {}
     self.loadData(); self.checkActiveOrder()
   },
   onShow: function() { this.loadData(); this.checkActiveOrder() },
@@ -104,10 +104,17 @@ Page({
   goSmartControl: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) }) },
   openDoor: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName) }) },
   callService: function() { wx.showToast({ title: '📞 已通知店员', icon: 'none' }) },
-  callPhone: function() { wx.makePhoneCall({ phoneNumber: '020-8888-8888' }) },
-  openNavigation: function() { wx.showToast({ title: '🗺 导航中...', icon: 'none' }) },
-  showStoreSelector: function() { this.setData({ showStoreModal: true }) }, hideStoreSelector: function() { this.setData({ showStoreModal: false }) },
-  showParkingInfo: function() { this.setData({ showParkingModal: true }) }, hideParkingInfo: function() { this.setData({ showParkingModal: false }) },
+  callPhone: function() { wx.makePhoneCall({ phoneNumber: '18011821388' }) },
+  openNavigation: function() {
+    wx.openLocation({
+      latitude: 23.1275,
+      longitude: 113.3220,
+      name: '高岸·富力盈隆广场',
+      address: '广州市天河区珠江新城富力盈隆广场3801',
+      scale: 18
+    })
+  },
+  showParkingInfo: function() { wx.navigateTo({ url: '/pages/parking-guide/parking-guide' }) },
   toastComing: function() { wx.showToast({ title: '即将上线', icon: 'none' }) },
   closeQrContext: function() { this.setData({ qrRoomId: '', qrRoomName: '', qrTableId: '' }) },
   goCartWithRoom: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?room_id='+this.data.qrRoomId }) },

@@ -28,8 +28,8 @@
 
   // ── 门店 ──
   MOCK.stores = [{
-    storeId: "ST001", name: "盈隆店", address: "广州珠江新城盈隆广场",
-    phone: "020-88888888", status: "Active"
+    storeId: "ST001", name: "盈隆店", address: "广州市天河区珠江新城富力盈隆广场3801",
+    phone: "18011821388", status: "Active"
   }];
 
   // ── 房间 ──

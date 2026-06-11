@@ -115,7 +115,7 @@ Page({
     var slots = []
     var now = new Date()
     var curMin = now.getHours() * 60 + now.getMinutes()
-    for (var h = 9; h < 22; h++) {
+    for (var h = 0; h < 24; h++) {
       for (var m = 0; m < 60; m += 30) {
         var min = h * 60 + m
         var timeStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')
@@ -144,7 +144,7 @@ Page({
     var roundedMin = Math.ceil(curMin / 30) * 30
     var h = Math.floor(roundedMin / 60)
     var m = roundedMin % 60
-    if (h >= 22) { wx.showToast({ title: '已过营业时间', icon: 'none' }); return }
+    if (h >= 24) { wx.showToast({ title: '已过营业时间', icon: 'none' }); return }
     var t = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')
     this.setData({ selectedTime: t })
     wx.showToast({ title: '已选择 ' + t + ' 开始', icon: 'none' })

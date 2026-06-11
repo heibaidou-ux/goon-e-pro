@@ -1,0 +1,10 @@
+<view class="page">
+  <view class="header">
+    <text class="back-btn" bindtap="goBack">←</text>
+    <text class="header-title">🅿️ 停车指引</text>
+  </view>
+
+  <view class="content">
+    <!-- 空白占位，后续补充停车及上楼登记指引 -->
+  </view>
+</view>

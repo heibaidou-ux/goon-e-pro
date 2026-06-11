@@ -26,8 +26,8 @@
 
   <!-- 门店信息栏 -->
   <view class="store-info-bar">
-    <view class="info-row"><text>📍 广州市天河区珠江新城华夏路28号盈隆大厦16层</text><text class="info-link" bindtap="openNavigation">🗺 导航</text></view>
-    <view class="info-row"><text>📞 020-8888-8888</text><text class="info-link" bindtap="callPhone">📞 电话</text><text class="info-link" bindtap="showParkingInfo">🅿️ 停车</text><text>🕐 09:00-23:00</text></view>
+    <view class="info-row"><text>📍 广州市天河区珠江新城富力盈隆广场3801</text><text class="info-link" bindtap="openNavigation">🗺 导航</text></view>
+    <view class="info-row"><text>📞 18011821388</text><text class="info-link" bindtap="showParkingInfo">🅿️ 停车</text><text>🕐 24小时</text></view>
   </view>
 
   <!-- 当前消费 -->
@@ -55,7 +55,7 @@
   <!-- 可预约包间 -->
   <view class="section">
     <view class="section-title"><text>可预约包间</text><text class="section-more" bindtap="goRoomList">查看全部 ›</text></view>
-    <scroll-view class="room-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <scroll-view class="room-scroll" scroll-x enhanced show-scrollbar="{{false}}" enable-flex>
       <view class="room-card" wx:for="{{rooms}}" wx:key="roomId" bindtap="goRoom" data-roomid="{{item.roomId}}">
         <view class="room-card-img" style="background:{{item.bgColor}}">{{item.icon}}</view>
         <view class="room-card-body"><text class="room-card-name">{{item.name}}</text><view class="room-card-tags"><text class="room-tag">{{item.capacity}}人</text><text class="room-tag">{{item.area}}㎡</text></view><text class="room-card-price">¥{{item.pricePerHour}}<text class="unit">/时</text></text></view>
@@ -88,19 +88,6 @@
     <view class="store-option coming" bindtap="toastComing"><text>📍 珠江新城店</text><text class="store-coming-tag">即将上线</text></view>
     <view class="store-option coming" bindtap="toastComing"><text>📍 琶洲店</text><text class="store-coming-tag">即将上线</text></view>
     <view class="modal-close" bindtap="hideStoreSelector">关闭</view>
-  </view>
-</view>
-
-<!-- 停车指引弹窗 -->
-<view class="modal-overlay" hidden="{{!showParkingModal}}" bindtap="hideParkingInfo">
-  <view class="modal parking-modal" catchtap=""><text class="modal-title" style="text-align:center;">🅿️ 停车指引</text>
-    <view class="parking-content">
-      <view class="parking-section"><text class="ps-title">📍 停车场位置</text><text class="ps-text">盈隆大厦地下停车场（B2-B4层）入口位于大厦东侧华夏路辅路</text></view>
-      <view class="parking-section"><text class="ps-title">💰 收费标准</text><view class="ps-text"><text class="ps-tag free">前30分钟免费</text><text class="ps-tag paid">¥8/小时</text><text class="ps-tag paid">¥64/天封顶</text></view></view>
-      <view class="parking-section"><text class="ps-title">🚗 车位信息</text><text class="ps-text">总车位约300个</text></view>
-      <view class="parking-section"><text class="ps-title">📌 温馨提示</text><text class="ps-text">高峰时段车位较紧张，建议绿色出行</text></view>
-    </view>
-    <view class="modal-close" bindtap="hideParkingInfo">我知道了</view>
   </view>
 </view>
 

@@ -344,7 +344,15 @@ Page({
   copyCode: function() { wx.setClipboardData({ data: this.data.doorCode }); wx.showToast({ title: '密码已复制', icon: 'none' }) },
 
   goTopup: function() { wx.navigateTo({ url: '/pages/member-center/member-center' }) },
-  openNav: function() { wx.showToast({ title: '🗺 已规划路线', icon: 'none' }) },
+  openNav: function() {
+    wx.openLocation({
+      latitude: 23.1275,
+      longitude: 113.3220,
+      name: '高岸·富力盈隆广场',
+      address: '广州市天河区珠江新城富力盈隆广场3801',
+      scale: 18
+    })
+  },
   scanCouponCode: function(e) { var self = this, key = e.currentTarget.dataset.key; wx.scanCode({ onlyFromCamera: true, success: function(res) { var platforms = self.data.couponPlatforms; for (var i = 0; i < platforms.length; i++) { if (platforms[i].key === key) { platforms[i].code = res.result; break } } self.setData({ couponPlatforms: platforms }); wx.showToast({ title: '券码已识别', icon: 'none' }) } }) },
   goBack: function() { wx.navigateBack() },
   goHome: function() { wx.navigateTo({ url: '/pages/home/home' }) },
