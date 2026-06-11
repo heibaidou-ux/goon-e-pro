@@ -31,7 +31,6 @@
         <text class="device-icon">{{item.typeIcon}}</text>
         <view class="device-info">
           <text class="device-name">{{item.typeLabel}}</text>
-          <text class="device-status {{item.status=='Online'?'online':'offline'}}">{{item.status=='Online'?'在线':'离线'}}</text>
         </view>
         <switch wx:if="{{item.type=='Lock'}}" checked="{{item.locked!==false}}" bindchange="onLockToggle" data-id="{{item.deviceId}}" />
         <view wx:elif="{{item.type=='AC'}}" class="ac-ring">
