@@ -263,11 +263,25 @@ Page({
   // ── 已完成操作 ──
 
   reBook: function(e) {
-    wx.showToast({ title: '再次预约', icon: 'none' })
+    var id = e.currentTarget.dataset.id
+    var order = this.findOrder(id)
+    if (!order) return
+    if (order.isTeaOrder) {
+      wx.navigateTo({ url: '/pages/tea-shop/tea-shop' })
+    } else {
+      wx.navigateTo({ url: '/pages/room-list/room-list' })
+    }
   },
 
   goRoomDetail: function(e) {
-    wx.navigateTo({ url: '/pages/room-detail/room-detail' })
+    var id = e.currentTarget.dataset.id
+    var order = this.findOrder(id)
+    if (!order) return
+    if (order.isTeaOrder) {
+      wx.navigateTo({ url: '/pages/tea-shop/tea-shop' })
+    } else {
+      wx.navigateTo({ url: '/pages/room-detail/room-detail' })
+    }
   },
 
   // ── 物流 ──
