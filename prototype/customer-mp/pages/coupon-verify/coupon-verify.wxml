@@ -93,8 +93,8 @@
 
       <view class="my-coupon-section">
         <text class="section-subtitle">🎫 我的优惠券</text>
-        <view wx:if="{{myCoupons.length==0}}" style="font-size:12px;color:#999;text-align:center;padding:12px;">暂无优惠券，首次充值可获赠</view>
-        <view class="ticket-card" wx:for="{{myCoupons}}" wx:key="id" bindtap="useMyCoupon" data-id="{{item.id}}" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+        <view wx:if="{{myCoupons.length==0}}"><text style="font-size:12px;color:#999;text-align:center;padding:12px;">暂无优惠券，首次充值可获赠</text></view>
+        <view class="ticket-card" wx:for="{{myCoupons}}" wx:key="id" bindtap="useMyCoupon" data-id="{{item.id}}">
           <view class="ticket-card-header"><text class="ticket-source" style="color:#5D8A6B;">🏷️ 系统券</text><text style="font-size:18px;font-weight:800;color:#5D8A6B;">¥{{item.value}}</text></view>
           <text class="ticket-title" style="font-size:13px;">{{item.source}} · 全场通用</text>
           <text class="ticket-expiry">有效期至 {{item.expiry}}</text>
@@ -118,7 +118,7 @@
       <view class="bottom-action"><button class="book-btn" bindtap="goToTimeSelect">选择时段</button></view>
     </view>
 
-    <!-- 6.1 Step 3: 选时段 — 选完后弹窗确认 -->
+    <!-- Step 3: 选时段 -->
     <view class="time-select-section" wx:elif="{{step==3}}">
       <button class="now-btn" bindtap="pickNow">⚡ 现在开始</button>
       <view class="confirm-card">
@@ -131,31 +131,32 @@
 
     <bottom-nav active="home" />
   </view>
+</view>
 
-  <!-- 预约确认弹窗 — 在.phone外，避免transform影响position:fixed -->
-  <view class="confirm-overlay" wx:if="{{showBookingConfirm}}" bindtap="hideBookingConfirm">
-    <view class="confirm-modal" catchtap>
-      <text class="confirm-h3">确认预约</text>
-      <view class="booking-confirm-info">
-        <text class="bci-row"><text class="bci-label">券</text><text class="bci-value">{{matchedCouponInfo}}</text></text>
-        <text class="bci-row"><text class="bci-label">房间</text><text class="bci-value">{{selectedRoomName}}</text></text>
-        <text class="bci-row"><text class="bci-label">时间</text><text class="bci-value">{{selectedTime}}</text></text>
-      </view>
-      <view class="confirm-modal-buttons">
-        <button class="confirm-modal-btn cancel" bindtap="hideBookingConfirm">取消</button>
-        <button class="confirm-modal-btn confirm" bindtap="confirmBooking">确认预约</button>
-      </view>
+<!-- 预约确认弹窗 -->
+<view class="confirm-overlay" wx:if="{{showBookingConfirm}}" bindtap="hideBookingConfirm">
+  <view class="confirm-modal" catchtap>
+    <text class="confirm-h3">确认预约</text>
+    <view class="booking-confirm-info">
+      <text class="bci-row"><text class="bci-label">券</text><text class="bci-value">{{matchedCouponInfo}}</text></text>
+      <text class="bci-row"><text class="bci-label">房间</text><text class="bci-value">{{selectedRoomName}}</text></text>
+      <text class="bci-row"><text class="bci-label">时间</text><text class="bci-value">{{selectedTime}}</text></text>
+    </view>
+    <view class="confirm-modal-buttons">
+      <button class="confirm-modal-btn cancel" bindtap="hideBookingConfirm">取消</button>
+      <button class="confirm-modal-btn confirm" bindtap="confirmBooking">确认预约</button>
     </view>
   </view>
+</view>
 
-  <!-- 确认使用券弹窗 — 在.phone外 -->
-  <view class="confirm-overlay" wx:if="{{showConfirmModal}}">
-    <view class="confirm-modal">
-      <text class="confirm-h3">确认使用此券</text>
-      <view class="coupon-preview">{{confirmPreview}}</view>
-      <view class="confirm-modal-buttons">
-        <button class="confirm-modal-btn cancel" bindtap="hideConfirmModal">取消</button>
-        <button class="confirm-modal-btn confirm" bindtap="confirmCouponUse">确认使用</button>
-      </view>
+<!-- 确认使用券弹窗 -->
+<view class="confirm-overlay" wx:if="{{showConfirmModal}}">
+  <view class="confirm-modal">
+    <text class="confirm-h3">确认使用此券</text>
+    <view class="coupon-preview">{{confirmPreview}}</view>
+    <view class="confirm-modal-buttons">
+      <button class="confirm-modal-btn cancel" bindtap="hideConfirmModal">取消</button>
+      <button class="confirm-modal-btn confirm" bindtap="confirmCouponUse">确认使用</button>
     </view>
   </view>
+</view>
