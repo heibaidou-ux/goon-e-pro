@@ -14,7 +14,7 @@ Page({
 
   onLoad: function(e) {
     var roomId = e.roomId || 'RM004'
-    var roomName = e.roomName || '大茶室C'
+    var roomName = e.roomName ? decodeURIComponent(e.roomName) : '大茶室C'
     this.setData({ roomId: roomId, roomName: roomName })
     this.loadDevices()
     this.startCountdown()
