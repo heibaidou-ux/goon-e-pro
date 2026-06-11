@@ -26,8 +26,15 @@
 
   <!-- 门店信息栏 -->
   <view class="store-info-bar">
-    <view class="info-row"><text>📍 广州市天河区珠江新城富力盈隆广场3801</text><text class="info-link" bindtap="openNavigation">🗺 导航</text></view>
-    <view class="info-row"><text>📞 18011821388</text><text class="info-link" bindtap="showParkingInfo">🅿️ 停车</text><text>🕐 24小时</text></view>
+    <view class="info-row">
+      <text class="info-addr">📍 广州市天河区珠江新城富力盈隆广场3801</text>
+      <text class="info-link" bindtap="openNavigation">🗺 导航</text>
+    </view>
+    <view class="info-row info-row-split">
+      <text class="info-cell">📞 18011821388</text>
+      <text class="info-cell info-link" bindtap="showParkingInfo">🅿️ 停车</text>
+      <text class="info-cell">🕐 24小时</text>
+    </view>
   </view>
 
   <!-- 当前消费 -->
