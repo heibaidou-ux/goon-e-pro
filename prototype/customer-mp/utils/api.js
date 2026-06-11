@@ -301,6 +301,10 @@ const API = {
     })
   },
 
+  getShopOrders() {
+    return delay().then(() => lsGet('shop_orders', []))
+  },
+
   // ── 余额 ──
   getBalance() { return delay(100).then(() => (lsGet('user', {})).balance || 0) },
 

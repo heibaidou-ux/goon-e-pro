@@ -13,7 +13,22 @@ Page({
 
   loadOrders: function() {
     var self = this
-    API.getUserOrders().then(function(orders) {
+    Promise.all([API.getUserOrders(), API.getShopOrders ? API.getShopOrders() : Promise.resolve([])]).then(function(results) {
+      var orders = results[0] || []
+      var shopOrders = results[1] || []
+      // 合并茶品订单
+      for (var si = 0; si < shopOrders.length; si++) {
+        var so = shopOrders[si]
+        orders.push({
+          orderId: so.orderId, roomName: '茶品订单', roomId: '',
+          status: so.status === 'Paid' ? 'Completed' : so.status,
+          date: so.created ? so.created.slice(0,10) : '',
+          time: so.created ? so.created.slice(11,16) : '',
+          amount: so.total || 0, doorCode: '',
+          payment: so.paymentMethod || '',
+          isTeaOrder: true, items: so.items || []
+        })
+      }
       var now = new Date()
       var todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0')
       var curMin = now.getHours() * 60 + now.getMinutes()
