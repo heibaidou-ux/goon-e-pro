@@ -19,7 +19,7 @@ Page({
     showStoreModal: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
     loginMode: 'login', loginType: 'code', loginPhone: '138****8888', loginCode: '8888', loginPassword: '',
-    regPhone: '', regName: '', regPassword: '', regCode: '',
+    regPhone: '', regCode: '',
     billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false
   },
 
@@ -164,7 +164,7 @@ Page({
   switchLoginType: function(e) { this.setData({ loginType: e.currentTarget.dataset.type }) },
   onLoginPhone: function(e) { this.setData({ loginPhone: e.detail.value }) }, onLoginCode: function(e) { this.setData({ loginCode: e.detail.value }) },
   onLoginPassword: function(e) { this.setData({ loginPassword: e.detail.value }) },
-  onRegPhone: function(e) { this.setData({ regPhone: e.detail.value }) }, onRegName: function(e) { this.setData({ regName: e.detail.value }) }, onRegPassword: function(e) { this.setData({ regPassword: e.detail.value }) },
+  onRegPhone: function(e) { this.setData({ regPhone: e.detail.value }) },
   getVerifyCode: function() { wx.showToast({ title: '验证码已发送: 8888', icon: 'none' }) },
   doLogin: function() {
     var self = this; wx.showLoading({ title: '登录中...' })
@@ -198,24 +198,14 @@ Page({
   doRegister: function() {
     var self = this
     var phone = self.data.regPhone || '130****0000'
-    var name = self.data.regName || '新会员'
-    var pwd = self.data.regPassword || '8888'
-    if (pwd.length < 6) { wx.showToast({ title: '密码至少6位', icon: 'none' }); return }
     wx.showLoading({ title: '注册中...' })
     API.login(phone, '8888').then(function(u) {
-      // 注册成功后保存密码
       try {
         var users = wx.getStorageSync('mp_users') || {}
-        if (!users[phone]) { users[phone] = { name: name, role: 'guest' } }
-        users[phone].password = pwd
-        users[phone].name = name
+        if (!users[phone]) { users[phone] = { name: phone, role: 'guest' } }
         wx.setStorageSync('mp_users', users)
-        var user = wx.getStorageSync('mp_user') || {}
-        user.password = pwd
-        user.name = name
-        wx.setStorageSync('mp_user', user)
       } catch(e) {}
-      wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false })
+      wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false, loginPhone: phone })
       wx.showToast({ title: '注册成功', icon: 'success' }); self.handlePendingAction()
     }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'注册失败', icon: 'none' }) })
   },

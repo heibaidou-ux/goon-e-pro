@@ -115,11 +115,10 @@
       </view>
       <view wx:else>
         <view class="form-item"><text class="form-label">手机号</text><input class="form-input" placeholder="请输入手机号" bindinput="onRegPhone" /></view>
-        <view class="form-item"><text class="form-label">昵称</text><input class="form-input" placeholder="请输入昵称" bindinput="onRegName" /></view>
-        <view class="form-item"><text class="form-label">密码</text><input class="form-input" placeholder="设置登录密码" password="{{true}}" bindinput="onRegPassword" /></view>
         <view class="form-item"><text class="form-label">验证码</text><view class="code-row"><input class="form-input" placeholder="验证码" /><view class="code-btn" bindtap="getVerifyCode">获取验证码</view></view></view>
         <view class="form-btn" bindtap="doRegister">注 册</view>
         <text class="form-switch" bindtap="switchLoginTab" data-mode="login">已有账号？立即登录 →</text>
+        <text class="form-hint">注册后可在"我的"中补充昵称和密码</text>
       </view>
       <text class="login-hint">演示环境，任意手机号即可登录</text>
       <text class="form-switch staff-login-link" bindtap="goStaffLogin">🔐 员工/管理员登录 →</text>
