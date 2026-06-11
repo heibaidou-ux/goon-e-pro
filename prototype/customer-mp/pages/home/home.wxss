@@ -98,7 +98,7 @@ button::after { border:none; }
 .login-tab.active { background:#5D8A6B;color:#fff; }
 .form-item { margin-bottom:14px;text-align:left; }
 .form-label { font-size:13px;color:#666;margin-bottom:6px;display:block; }
-.form-input { width:100%;padding:14px 14px;border:1.5px solid #ddd;border-radius:12px;font-size:16px;box-sizing:border-box;height:48px; }
+.form-input { width:100%;padding:16px 14px;border:1.5px solid #ddd;border-radius:12px;font-size:16px;box-sizing:border-box;height:52px;line-height:1.2; }
 .form-input:focus { border-color:#5D8A6B; }
 .code-row { display:flex;gap:8px;align-items:center; }
 .code-row .form-input { flex:1; }
