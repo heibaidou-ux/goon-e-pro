@@ -73,7 +73,7 @@
           <text class="curtain-name">{{item.label}}</text>
           <view class="curtain-bar">
             <text class="curtain-end">关闭</text>
-            <slider value="{{item.positionNum}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
+            <slider value="{{item.positionNum}}" min="0" max="100" activeColor="#FFC107" backgroundColor="#555" block-color="#FFC107" bindchanging="onCurtainChange" data-id="{{item.deviceId}}" />
             <text class="curtain-end">打开</text>
           </view>
         </view>
@@ -93,7 +93,7 @@
         </view>
         <view class="bgm-vol-row">
           <text>🔈</text>
-          <slider value="{{bgmDevice.volume}}" min="0" max="100" activeColor="#5D8A6B" backgroundColor="#d0d0d0" block-color="#5D8A6B" bindchanging="onBGMVolumeChange" data-id="{{bgmDevice.deviceId}}" />
+          <slider value="{{bgmDevice.volume}}" min="0" max="100" activeColor="#FFC107" backgroundColor="#555" block-color="#FFC107" bindchanging="onBGMVolumeChange" data-id="{{bgmDevice.deviceId}}" />
           <text class="bgm-vol-num">{{bgmDevice.volume}}%</text>
         </view>
       </view>
