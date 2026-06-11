@@ -100,22 +100,44 @@ Page({
 
   changePassword: function() {
     var self = this
+    var userPhone = self.data.userPhone || ''
+    // 第一步：发送验证码到手机
+    if (!userPhone || userPhone === '—') {
+      wx.showToast({ title: '未绑定手机号，请联系管理员', icon: 'none' })
+      return
+    }
+    wx.showToast({ title: '验证码已发送至 ' + userPhone, icon: 'none' })
+    // 弹窗输入验证码
     wx.showModal({
-      title: '修改密码',
-      content: '',
+      title: '手机验证',
+      content: '验证码已发送至 ' + userPhone,
       editable: true,
-      placeholderText: '请输入新密码',
-      success: function(res) {
-        if (res.confirm && res.content) {
-          try {
-            var user = wx.getStorageSync('mp_user') || {}
-            user.password = res.content
-            wx.setStorageSync('mp_user', user)
-            wx.showToast({ title: '密码已修改', icon: 'success' })
-          } catch(e) {
-            wx.showToast({ title: '保存失败', icon: 'none' })
-          }
+      placeholderText: '请输入验证码',
+      success: function(r1) {
+        if (!r1.confirm) return
+        if (r1.content !== '8888') {
+          wx.showToast({ title: '验证码错误', icon: 'none' })
+          return
         }
+        // 第二步：设置新密码
+        wx.showModal({
+          title: '设置新密码',
+          editable: true,
+          placeholderText: '请输入新密码（至少6位）',
+          success: function(r2) {
+            if (!r2.confirm || !r2.content) return
+            if (r2.content.length < 6) {
+              wx.showToast({ title: '密码至少6位', icon: 'none' })
+              return
+            }
+            try {
+              var u = wx.getStorageSync('mp_user') || {}
+              u.password = r2.content
+              wx.setStorageSync('mp_user', u)
+              wx.showToast({ title: '密码已修改，下次登录请使用新密码', icon: 'success' })
+            } catch(e) { wx.showToast({ title: '保存失败', icon: 'none' }) }
+          }
+        })
       }
     })
   },
