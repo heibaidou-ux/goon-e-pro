@@ -98,12 +98,6 @@
         <text wx:else>⚠️ 该时段已被预约，请选择其他日期。</text>
       </view>
 
-      <!-- 计费说明：预约仅为预定，实际以扫码进门为准 -->
-      <view class="billing-notice">
-        <text class="billing-notice-icon">📌</text>
-        <text class="billing-notice-text">预约时间为预留时段，实际计费时间以扫码进门开始计算，提前到或延后走不额外扣费</text>
-      </view>
-
       <!-- 门店位置 -->
       <view class="location-section">
         <text class="section-label">📍 门店位置</text>
