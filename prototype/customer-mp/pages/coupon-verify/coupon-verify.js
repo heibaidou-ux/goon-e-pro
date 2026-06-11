@@ -1,6 +1,11 @@
 var API = require('../../utils/api')
 
 var COUPON_DB = {
+  'MT20260601': { source:'美团', title:'茶室双人体验套餐', matchRooms:['RM004','RM002'], price:168, duration:120 },
+  'DY20260601': { source:'抖音', title:'茶室双人体验套餐', matchRooms:['RM004','RM002'], price:168, duration:120 },
+  'DP20260601': { source:'大众点评', title:'中茶室休闲体验', matchRooms:['RM002','RM003'], price:88, duration:120 },
+  'GD20260601': { source:'高德', title:'茶室双人体验套餐', matchRooms:['RM004','RM002'], price:168, duration:120 },
+  'SY20260602': { source:'系统赠送', title:'首充赠送代金券', matchRooms:['RM001','RM002','RM003','RM004'], price:50, duration:120 },
   'MT001298': { source:'美团', title:'茶室双人体验套餐', matchRooms:['RM004','RM002'], price:168, duration:120 },
   'MT002456': { source:'美团', title:'茶室单人品茗券', matchRooms:['RM002','RM003'], price:68, duration:60 },
   'MT003789': { source:'美团', title:'商务会议3小时套餐', matchRooms:['RM001'], price:358, duration:180 },
@@ -43,9 +48,23 @@ Page({
     myCoupons: []
   },
 
-  onLoad: function() {
+  onLoad: function(e) {
     this.renderMyCoupons()
     this.generateTimeSlots()
+    // 从优惠券页跳转过来时自动填入券码
+    if (e && e.code) {
+      this.setData({ couponCode: e.code, selectedPlatform: '' })
+      // 自动识别平台
+      var prefix = e.code.substring(0, 2).toUpperCase()
+      var platformMap = { MT: 'meituan', DY: 'douyin', DP: 'dianping', GD: 'gaode' }
+      var platform = platformMap[prefix] || 'meituan'
+      this.setData({ selectedPlatform: platform, platformHint: PLATFORM_HINTS[platform] })
+      // 如果券码在数据库中有记录，直接触发确认
+      if (COUPON_DB[e.code]) {
+        this.setData({ pendingCode: e.code })
+        setTimeout(function() { this.setData({ showConfirmModal: true }) }.bind(this), 500)
+      }
+    }
   },
 
   selectPlatform: function(e) {
