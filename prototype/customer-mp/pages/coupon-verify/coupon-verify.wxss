@@ -31,8 +31,26 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .ticket-desc { font-size:12px; color:#666; margin-top:2px; display:block; }
 .platform-grid { display:flex; gap:10px; margin-bottom:16px; }
 .platform-chip { flex:1; padding:12px 6px; border-radius:16px; text-align:center; border:2px solid transparent; display:flex; flex-direction:column; align-items:center; gap:4px; }
-.plat-logo { display:block; font-size:22px; line-height:1.3; }
+.plat-logo { width:30px; height:30px; display:flex; align-items:center; justify-content:center; position:relative; }
 .plat-name { font-size:11px; font-weight:500; display:block; }
+
+/* 美团 — 袋鼠简化轮廓 */
+.mt-body { width:14px; height:14px; border-radius:50%; background:currentColor; opacity:.9; }
+.mt-head { position:absolute; top:3px; left:16px; width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.9; }
+.mt-tail { position:absolute; bottom:2px; left:-4px; width:10px; height:6px; border:2px solid currentColor; border-radius:0 0 10px 0; border-top:none; border-left:none; opacity:.9; }
+
+/* 抖音 — 音符 */
+.dy-circle { width:8px; height:8px; border-radius:50%; border:2px solid currentColor; position:absolute; bottom:2px; right:4px; }
+.dy-stem { width:2px; height:18px; background:currentColor; position:absolute; top:2px; right:10px; }
+.dy-flag { width:8px; height:6px; border:2px solid currentColor; border-left:none; border-bottom:none; position:absolute; top:2px; right:10px; border-radius:0 4px 0 0; }
+
+/* 大众点评 — 星星 */
+.dp-star-inner { width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-bottom:14px solid currentColor; position:relative; }
+.dp-star-inner::after { content:''; position:absolute; top:-9px; left:-8px; width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:9px solid currentColor; }
+
+/* 高德 — 图钉 */
+.gd-pin { width:16px; height:16px; border-radius:50% 50% 50% 0; background:currentColor; transform:rotate(-45deg); }
+.gd-inner-dot { position:absolute; top:5px; left:50%; margin-left:-3px; width:6px; height:6px; border-radius:50%; background:#fff; }
 .platform-meituan { background:#FFF8E1; color:#B8860B; border-color:#FFD54F; }
 .platform-meituan.selected { background:#FFB300; color:#fff; border-color:#FF8F00; box-shadow:0 2px 8px rgba(255,179,0,.3); }
 .platform-douyin { background:#F5F5F5; color:#333; border-color:#ddd; }
