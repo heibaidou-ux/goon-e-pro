@@ -31,7 +31,7 @@ button::after { border:none; }
 .active-order-btn .btn-icon { font-size:40px; line-height:1; display:block; }
 .active-order-btn .btn-label { font-size:20px; line-height:1; display:block; }
 .active-order-btn.primary { background:#fff; color:#5D8A6B; }
-.active-order-btn.outline { background:rgba(255,255,255,.15); color:#fff; border:1.5px solid rgba(255,255,255,.4); }
+.active-order-btn.outline { background:#fff; color:#5D8A6B; border:1.5px solid rgba(255,255,255,.4); }
 .quick-grid { display:grid; grid-template-columns:repeat(4,1fr); padding:20px 0; background:#fff; margin-bottom:12px; }
 .quick-item { display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px 2px; }
 .quick-item:active { opacity:.7; }
