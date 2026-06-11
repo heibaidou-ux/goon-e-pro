@@ -2,9 +2,9 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .phone { width:100%; min-height:100vh; background:#fff; display:flex; flex-direction:column; transform:translateZ(0); }
 .page { flex:1; overflow-y:auto; padding-bottom:60px; transform:translateZ(0); }
 .page-header { padding:16px; border-bottom:1px solid #f0f0f0; background:#fff; }
-.page-header .title { font-size:18px; font-weight:700; color:#1a1a1a; }
-.page-header .sub { font-size:12px; color:#999; margin-top:4px; }
-.room-section { padding:20px 16px; }
+.page-header .title { font-size:18px; font-weight:700; color:#1a1a1a; display:block; }
+.page-header .sub { font-size:12px; color:#999; margin-top:8px; display:block; }
+.room-section { padding:24px 16px; }
 .room-card { display:flex; padding:14px; background:#f9fafb; margin-bottom:10px; border-radius:16px; }
 .room-card:active { background:#f0f0f0; }
 .room-card-img { width:80px; height:80px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:28px; }
