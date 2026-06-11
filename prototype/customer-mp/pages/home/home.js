@@ -18,8 +18,8 @@ Page({
     qrRoomId: '', qrRoomName: '', qrTableId: '',
     showStoreModal: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
-    loginMode: 'login', loginPhone: '138****8888', loginCode: '8888',
-    regPhone: '', regName: '', regCode: '',
+    loginMode: 'login', loginType: 'code', loginPhone: '138****8888', loginCode: '8888', loginPassword: '',
+    regPhone: '', regName: '', regPassword: '', regCode: '',
     billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false
   },
 
@@ -161,11 +161,64 @@ Page({
   closeQrContext: function() { this.setData({ qrRoomId: '', qrRoomName: '', qrTableId: '' }) },
   goCartWithRoom: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?room_id='+this.data.qrRoomId }) },
   switchLoginTab: function(e) { this.setData({ loginMode: e.currentTarget.dataset.mode }) },
+  switchLoginType: function(e) { this.setData({ loginType: e.currentTarget.dataset.type }) },
   onLoginPhone: function(e) { this.setData({ loginPhone: e.detail.value }) }, onLoginCode: function(e) { this.setData({ loginCode: e.detail.value }) },
-  onRegPhone: function(e) { this.setData({ regPhone: e.detail.value }) }, onRegName: function(e) { this.setData({ regName: e.detail.value }) },
+  onLoginPassword: function(e) { this.setData({ loginPassword: e.detail.value }) },
+  onRegPhone: function(e) { this.setData({ regPhone: e.detail.value }) }, onRegName: function(e) { this.setData({ regName: e.detail.value }) }, onRegPassword: function(e) { this.setData({ regPassword: e.detail.value }) },
   getVerifyCode: function() { wx.showToast({ title: '验证码已发送: 8888', icon: 'none' }) },
-  doLogin: function() { var self = this; wx.showLoading({ title: '登录中...' }); API.login(self.data.loginPhone, self.data.loginCode).then(function(u) { wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false }); wx.showToast({ title: '登录成功', icon: 'none' }); self.handlePendingAction() }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'登录失败', icon: 'none' }) }) },
-  doRegister: function() { var self = this; wx.showLoading({ title: '注册中...' }); API.login(self.data.regPhone||'130****0000', '8888').then(function(u) { wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false }); wx.showToast({ title: '注册成功', icon: 'none' }); self.handlePendingAction() }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'注册失败', icon: 'none' }) }) },
+  doLogin: function() {
+    var self = this; wx.showLoading({ title: '登录中...' })
+    if (self.data.loginType === 'pwd') {
+      // 密码登录
+      var phone = self.data.loginPhone
+      var pwd = self.data.loginPassword
+      if (!pwd) { wx.hideLoading(); wx.showToast({ title: '请输入密码', icon: 'none' }); return }
+      try {
+        var users = wx.getStorageSync('mp_users') || {}
+        var user = users[phone]
+        if (!user || user.password !== pwd) {
+          wx.hideLoading(); wx.showToast({ title: '手机号或密码错误', icon: 'none' }); return
+        }
+        user.phone = phone
+        wx.setStorageSync('mp_user', user)
+        wx.setStorageSync('mp_logged_in', true)
+        wx.setStorageSync('mp_user_role', 'guest')
+        wx.hideLoading()
+        self.setData({ isLoggedIn: true, showLoginModal: false })
+        wx.showToast({ title: '登录成功', icon: 'none' })
+        self.handlePendingAction()
+      } catch(e) { wx.hideLoading(); wx.showToast({ title: '登录失败', icon: 'none' }) }
+    } else {
+      API.login(self.data.loginPhone, self.data.loginCode).then(function(u) {
+        wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false })
+        wx.showToast({ title: '登录成功', icon: 'none' }); self.handlePendingAction()
+      }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'登录失败', icon: 'none' }) })
+    }
+  },
+  doRegister: function() {
+    var self = this
+    var phone = self.data.regPhone || '130****0000'
+    var name = self.data.regName || '新会员'
+    var pwd = self.data.regPassword || '8888'
+    if (pwd.length < 6) { wx.showToast({ title: '密码至少6位', icon: 'none' }); return }
+    wx.showLoading({ title: '注册中...' })
+    API.login(phone, '8888').then(function(u) {
+      // 注册成功后保存密码
+      try {
+        var users = wx.getStorageSync('mp_users') || {}
+        if (!users[phone]) { users[phone] = { name: name, role: 'guest' } }
+        users[phone].password = pwd
+        users[phone].name = name
+        wx.setStorageSync('mp_users', users)
+        var user = wx.getStorageSync('mp_user') || {}
+        user.password = pwd
+        user.name = name
+        wx.setStorageSync('mp_user', user)
+      } catch(e) {}
+      wx.hideLoading(); self.setData({ isLoggedIn: true, showLoginModal: false })
+      wx.showToast({ title: '注册成功', icon: 'success' }); self.handlePendingAction()
+    }).catch(function(e) { wx.hideLoading(); wx.showToast({ title: e.message||'注册失败', icon: 'none' }) })
+  },
   handlePendingAction: function() {
     var a = this.data.pendingAction; if (!a) return; this.setData({ pendingAction: null })
     if (a.indexOf('room-')===0) { wx.navigateTo({ url: '/pages/room-detail/room-detail?roomId='+a.replace('room-','') }); return }

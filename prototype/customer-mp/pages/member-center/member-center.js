@@ -134,7 +134,7 @@ Page({
               var u = wx.getStorageSync('mp_user') || {}
               u.password = r2.content
               wx.setStorageSync('mp_user', u)
-              wx.showToast({ title: '密码已修改，下次登录请使用新密码', icon: 'success' })
+              wx.showToast({ title: '密码已修改', icon: 'success' })
             } catch(e) { wx.showToast({ title: '保存失败', icon: 'none' }) }
           }
         })

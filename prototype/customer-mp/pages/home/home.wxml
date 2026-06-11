@@ -86,7 +86,7 @@
 </scroll-view>
 
 <!-- 门店选择弹窗 -->
-<view class="modal-overlay" hidden="{{!showStoreModal}}" bindtap="hideStoreSelector">
+<view class="modal-overlay" wx:if="{{showStoreModal}}" bindtap="hideStoreSelector">
   <view class="modal" catchtap><text class="modal-title">选择门店</text>
     <view class="store-option active"><text>📍 盈隆店</text><text style="color:#5D8A6B;">✓ 当前</text></view>
     <view class="store-option coming" bindtap="toastComing"><text>📍 珠江新城店</text><text class="store-coming-tag">即将上线</text></view>
@@ -103,14 +103,20 @@
       <text class="login-card-sub">高岸茶室 · 会员中心</text>
       <view class="login-tabs"><text class="login-tab {{loginMode=='login'?'active':''}}" bindtap="switchLoginTab" data-mode="login">登录</text><text class="login-tab {{loginMode=='register'?'active':''}}" bindtap="switchLoginTab" data-mode="register">注册</text></view>
       <view wx:if="{{loginMode=='login'}}">
+        <view class="login-type-tabs">
+          <text class="login-type-tab {{loginType=='code'?'active':''}}" bindtap="switchLoginType" data-type="code">验证码登录</text>
+          <text class="login-type-tab {{loginType=='pwd'?'active':''}}" bindtap="switchLoginType" data-type="pwd">密码登录</text>
+        </view>
         <view class="form-item"><text class="form-label">手机号</text><input class="form-input" placeholder="请输入手机号" value="{{loginPhone}}" bindinput="onLoginPhone" /></view>
-        <view class="form-item"><text class="form-label">验证码</text><view class="code-row"><input class="form-input" placeholder="验证码" value="{{loginCode}}" bindinput="onLoginCode" /><view class="code-btn" bindtap="getVerifyCode">获取验证码</view></view></view>
+        <view wx:if="{{loginType=='code'}}" class="form-item"><text class="form-label">验证码</text><view class="code-row"><input class="form-input" placeholder="验证码" value="{{loginCode}}" bindinput="onLoginCode" /><view class="code-btn" bindtap="getVerifyCode">获取验证码</view></view></view>
+        <view wx:else class="form-item"><text class="form-label">密码</text><input class="form-input" placeholder="请输入密码" password="{{true}}" bindinput="onLoginPassword" /></view>
         <view class="form-btn" bindtap="doLogin">登 录</view>
         <text class="form-switch" bindtap="switchLoginTab" data-mode="register">没有账号？立即注册 →</text>
       </view>
       <view wx:else>
         <view class="form-item"><text class="form-label">手机号</text><input class="form-input" placeholder="请输入手机号" bindinput="onRegPhone" /></view>
         <view class="form-item"><text class="form-label">昵称</text><input class="form-input" placeholder="请输入昵称" bindinput="onRegName" /></view>
+        <view class="form-item"><text class="form-label">密码</text><input class="form-input" placeholder="设置登录密码" password="{{true}}" bindinput="onRegPassword" /></view>
         <view class="form-item"><text class="form-label">验证码</text><view class="code-row"><input class="form-input" placeholder="验证码" /><view class="code-btn" bindtap="getVerifyCode">获取验证码</view></view></view>
         <view class="form-btn" bindtap="doRegister">注 册</view>
         <text class="form-switch" bindtap="switchLoginTab" data-mode="login">已有账号？立即登录 →</text>
