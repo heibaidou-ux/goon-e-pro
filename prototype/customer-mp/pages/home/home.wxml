@@ -31,9 +31,9 @@
       <text class="info-link" bindtap="openNavigation">🗺 导航</text>
     </view>
     <view class="info-row info-row-split">
-      <text class="info-cell">📞 18011821388</text>
-      <text class="info-cell info-link" bindtap="showParkingInfo">🅿️ 停车指引</text>
-      <text class="info-cell">营业时间 24小时</text>
+      <text class="info-cell info-left">📞 18011821388</text>
+      <text class="info-cell info-link info-center" bindtap="showParkingInfo">🅿️ 停车指引</text>
+      <text class="info-cell info-right">营业时间：24小时</text>
     </view>
   </view>
 

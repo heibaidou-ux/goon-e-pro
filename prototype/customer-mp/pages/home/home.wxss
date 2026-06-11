@@ -24,8 +24,10 @@ page { background:#f5f5f5; margin:0; padding:0; font-family:-apple-system,BlinkM
 .info-row.info-row-split { justify-content:space-between; }
 .info-addr { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .info-link { color:#5D8A6B; font-weight:600; flex-shrink:0; }
-.info-cell { text-align:center; }
-.info-row-split .info-cell { flex:1; }
+.info-cell { flex:1; }
+.info-left { text-align:left; }
+.info-center { text-align:center; }
+.info-right { text-align:right; }
 
 /* 当前消费 */
 .active-order-banner { display:none; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; }
