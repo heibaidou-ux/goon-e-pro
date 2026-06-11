@@ -40,9 +40,9 @@
           </view>
           <view class="ac-ctrl-area">
             <view class="ac-mode-row">
-              <view class="ac-mode-btn {{acDevice.mode == 'cool' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="cool">❄️ 制冷</view>
-              <view class="ac-mode-btn {{acDevice.mode == 'heat' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="heat">🔥 制热</view>
-              <view class="ac-mode-btn {{acDevice.mode == 'fan' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="fan">🌀 送风</view>
+              <view class="ac-mode-btn {{acDevice.mode == 'cool' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="cool">▾ 制冷</view>
+              <view class="ac-mode-btn {{acDevice.mode == 'heat' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="heat">▴ 制热</view>
+              <view class="ac-mode-btn {{acDevice.mode == 'fan' ? 'active' : ''}}" bindtap="setACMode" data-id="{{acDevice.deviceId}}" data-mode="fan">◉ 送风</view>
             </view>
             <view class="ac-power-btn {{acDevice.mode != 'off' ? 'on' : ''}}" bindtap="toggleAC" data-id="{{acDevice.deviceId}}">
               {{acDevice.mode != 'off' ? '⏻ 关闭空调' : '⏻ 开启空调'}}

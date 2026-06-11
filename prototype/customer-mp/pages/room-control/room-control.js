@@ -18,10 +18,10 @@ var FAN_DEVICE_IDS = {
   RM005: []
 }
 
-// 灯光图标映射
-var LIGHT_ICONS = { 'DEV001':'◯','DEV002':'◯','DEV003':'💡','DEV009':'💡','DEV010':'◯','DEV016':'💡','DEV017':'◯','DEV018':'✨','DEV025':'💡','DEV026':'◯','DEV027':'✨' }
+// 灯光图标 — 简笔画风格
+var LIGHT_ICONS = { 'DEV001':'◯','DEV002':'◯','DEV003':'⊙','DEV009':'⊙','DEV010':'◯','DEV016':'⊙','DEV017':'◯','DEV018':'✦','DEV025':'⊙','DEV026':'◯','DEV027':'✦' }
 var LIGHT_LABELS = { 'DEV001':'筒灯1','DEV002':'筒灯2','DEV003':'吊灯','DEV009':'吊灯','DEV010':'筒灯','DEV016':'吊灯','DEV017':'筒灯','DEV018':'背景灯','DEV025':'吊灯','DEV026':'筒灯','DEV027':'背景灯' }
-var FAN_ICONS = { 'DEV004':'🌀','DEV005':'🌀','DEV006':'🌀','DEV011':'🌬️','DEV012':'🌀','DEV019':'🌀','DEV028':'🌀' }
+var FAN_ICONS = { 'DEV004':'⏣','DEV005':'⏣','DEV006':'⏣','DEV011':'⏏','DEV012':'⏣','DEV019':'⏣','DEV028':'⏣' }
 var FAN_LABELS = { 'DEV004':'风扇1','DEV005':'风扇2','DEV006':'风扇3','DEV011':'换气扇','DEV012':'风扇','DEV019':'风扇','DEV028':'风扇' }
 
 Page({
@@ -72,8 +72,8 @@ Page({
         if (!stateMap[lightIds[j]]) { allLightsOn = false; break }
       }
       var devKeys = [
-        { key: 'light_all_on',  label: '灯全开', icon: '💡', type: 'virtual', active: allLightsOn },
-        { key: 'light_all_off', label: '灯全关', icon: '🔌', type: 'virtual', active: false },
+        { key: 'light_all_on',  label: '灯全开', icon: '◉', type: 'virtual', active: allLightsOn },
+        { key: 'light_all_off', label: '灯全关', icon: '◎', type: 'virtual', active: false },
       ]
       for (var j = 0; j < lightIds.length; j++) {
         devKeys.push({ key: lightIds[j], label: LIGHT_LABELS[lightIds[j]] || lightIds[j], icon: LIGHT_ICONS[lightIds[j]] || '💡', type: 'Light', active: stateMap[lightIds[j]] || false })

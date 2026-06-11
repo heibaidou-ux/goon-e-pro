@@ -25,44 +25,48 @@ page { background:#f0f2ef; margin:0; padding:0; }
 .device-section { margin-bottom:16px; }
 .section-label { font-size:14px; font-weight:600; color:#333; margin-bottom:10px; display:block; }
 
-/* 2列网格 */
+/* 2列网格 — 深灰按键+简笔画图标 */
 .dev-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.switch-key { background:#fff; border-radius:12px; padding:14px 8px; text-align:center; border:1.5px solid #eee; display:flex; flex-direction:column; align-items:center; gap:4px; transition:all .15s; }
+.switch-key { background:#2a2a2a; border-radius:12px; padding:16px 8px; text-align:center; border:1.5px solid #3a3a3a; display:flex; flex-direction:column; align-items:center; gap:6px; transition:all .15s; }
 .switch-key:active { transform:scale(.95); }
-.switch-key.on { border-color:#5D8A6B; background:#f0faf2; }
-.key-icon { font-size:20px; display:block; }
-.key-label { font-size:12px; font-weight:600; color:#444; display:block; }
-.key-indicator { width:6px; height:6px; border-radius:50%; background:#ddd; display:inline-block; flex-shrink:0; }
+.switch-key.on { border-color:#5D8A6B; background:#1a2a1a; }
+.key-icon { font-size:24px; display:block; color:#ddd; font-weight:300; }
+.switch-key.on .key-icon { color:#5D8A6B; }
+.key-label { font-size:11px; font-weight:500; color:#aaa; display:block; letter-spacing:1px; }
+.switch-key.on .key-label { color:#5D8A6B; }
+.key-indicator { width:5px; height:5px; border-radius:50%; background:#555; display:inline-block; flex-shrink:0; }
 .key-indicator.on { background:#5D8A6B; box-shadow:0 0 4px rgba(93,138,107,.4); }
 
-/* 空调 */
-.ac-card { background:#fff; border-radius:14px; padding:16px; border:1px solid #eee; }
+/* 空调 — 黑色底色 */
+.ac-card { background:#1a1a1a; border-radius:14px; padding:16px; border:1px solid #333; }
 .ac-main { display:flex; align-items:center; gap:16px; }
 .ac-temp-area { display:flex; flex-direction:column; align-items:center; flex-shrink:0; min-width:80px; }
-.ac-up { font-size:14px; color:#5D8A6B; padding:6px 12px; cursor:pointer; }
-.ac-temp-num { font-size:42px; font-weight:800; color:#333; display:block; line-height:1; }
-.ac-down { font-size:14px; color:#5D8A6B; padding:6px 12px; cursor:pointer; }
-.ac-temp-status { font-size:11px; color:#999; display:block; margin-top:4px; }
-.ac-ctrl-area { flex:1; }
-.ac-mode-row { display:flex; gap:6px; margin-bottom:8px; }
-.ac-mode-btn { flex:1; padding:6px 4px; border-radius:10px; background:#f5f5f5; font-size:12px; font-weight:600; color:#666; text-align:center; }
-.ac-mode-btn.active { background:#e8f5e9; color:#5D8A6B; }
-.ac-power-btn { padding:8px; border-radius:10px; background:#f5f5f5; font-size:12px; font-weight:600; color:#666; text-align:center; }
-.ac-power-btn.on { background:#e8f5e9; color:#5D8A6B; }
+.ac-up { font-size:12px; color:#5D8A6B; padding:8px 12px; cursor:pointer; opacity:.7; }
+.ac-up:active { opacity:1; }
+.ac-temp-num { font-size:42px; font-weight:200; color:#f0f0f0; display:block; line-height:1; letter-spacing:-2px; }
+.ac-down { font-size:12px; color:#5D8A6B; padding:8px 12px; cursor:pointer; opacity:.7; }
+.ac-down:active { opacity:1; }
+.ac-temp-status { font-size:10px; color:#888; display:block; margin-top:4px; letter-spacing:1px; }
+.ac-ctrl-area { flex:1; display:flex; flex-direction:column; justify-content:center; padding:8px 0; }
+.ac-mode-row { display:flex; gap:6px; margin-bottom:6px; }
+.ac-mode-btn { flex:1; padding:10px 4px; border-radius:10px; background:#2a2a2a; border:1px solid #3a3a3a; font-size:11px; font-weight:500; color:#888; text-align:center; letter-spacing:1px; display:flex; align-items:center; justify-content:center; }
+.ac-mode-btn.active { background:#0a2a0a; border-color:#5D8A6B; color:#5D8A6B; }
+.ac-power-btn { padding:10px; border-radius:10px; background:#2a2a2a; border:1px solid #3a3a3a; font-size:11px; font-weight:500; color:#888; text-align:center; letter-spacing:1px; }
+.ac-power-btn.on { background:#0a2a0a; border-color:#5D8A6B; color:#5D8A6B; }
 
 /* 窗帘 */
-.curtain-card { background:#fff; border-radius:14px; padding:14px; border:1px solid #eee; }
+.curtain-card { background:#1a1a1a; border-radius:14px; padding:14px; border:1px solid #333; }
 .curtain-item { margin:6px 0; }
-.curtain-name { font-size:12px; font-weight:600; color:#333; margin-bottom:2px; display:block; }
+.curtain-name { font-size:12px; font-weight:500; color:#aaa; margin-bottom:4px; display:block; letter-spacing:1px; }
 .curtain-bar { display:flex; align-items:center; gap:6px; }
 .curtain-bar slider { flex:1; }
-.curtain-end { font-size:10px; color:#999; white-space:nowrap; }
+.curtain-end { font-size:10px; color:#666; white-space:nowrap; }
 
 /* 背景音乐 */
-.bgm-card { background:linear-gradient(135deg,#f5f0ff,#ede7f6); border-radius:14px; padding:14px; border:1px solid #e8e0f0; }
+.bgm-card { background:#1a1a1a; border-radius:14px; padding:14px; border:1px solid #333; }
 .bgm-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
 .bgm-icon { font-size:22px; }
-.bgm-status { flex:1; font-size:12px; font-weight:600; color:#333; }
+.bgm-status { flex:1; font-size:12px; font-weight:500; color:#aaa; letter-spacing:1px; }
 .bgm-switch { width:36px; height:20px; border-radius:10px; background:#ddd; position:relative; transition:all .2s; flex-shrink:0; }
 .bgm-switch.on { background:#7c4dff; }
 .bgm-switch-knob { width:16px; height:16px; border-radius:50%; background:#fff; position:absolute; top:2px; left:2px; box-shadow:0 1px 3px rgba(0,0,0,.15); transition:all .2s; }
