@@ -2,15 +2,15 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .phone { width:100%; min-height:100vh; background:#fff; display:flex; flex-direction:column; transform:translateZ(0); }
 .nav-bar { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; background:#fff; }
 .nav-title { flex:1; text-align:center; font-size:16px; font-weight:600; }
-.page { flex:1; overflow-y:auto; padding:16px 16px 60px; }
-.steps { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; }
+.page { flex:1; overflow-y:auto; padding:0 0 60px; }
+.steps { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; padding:0 16px; }
 .step { display:flex; align-items:center; gap:4px; font-size:12px; color:#999; }
 .step.active { color:#5D8A6B; font-weight:600; }
 .step-num { width:22px; height:22px; border-radius:50%; background:#e5e5e5; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; }
 .step.active .step-num { background:#5D8A6B; }
 .step-line { width:24px; height:1px; background:#e5e5e5; }
 .section-title { font-size:15px; font-weight:600; margin-bottom:12px; display:block; }
-.coupon-field-row { display:flex; gap:8px; margin-bottom:16px; align-items:stretch; }
+.coupon-field-row { display:flex; gap:8px; margin-bottom:16px; align-items:stretch; padding:0 16px; }
 .coupon-field-wrap { position:relative; flex:1; display:flex; }
 .coupon-field { width:100%; height:48px; line-height:44px; padding:0 48px 0 16px; border:2px solid #e5e5e5; border-radius:16px; font-size:16px; text-align:center; box-sizing:border-box; }
 .coupon-field:focus { border-color:#5D8A6B; }
@@ -29,7 +29,7 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .ticket-source { font-size:12px; font-weight:600; color:#B8860B; display:block; }
 .ticket-title { font-size:15px; font-weight:700; margin-top:4px; display:block; }
 .ticket-desc { font-size:12px; color:#666; margin-top:2px; display:block; }
-.platform-grid { display:flex; gap:10px; margin-bottom:16px; }
+.platform-grid { display:flex; gap:10px; margin-bottom:16px; padding:0 16px; }
 .platform-chip { flex:1; padding:12px 6px; border-radius:16px; text-align:center; border:2px solid transparent; display:flex; flex-direction:column; align-items:center; gap:4px; }
 .plat-logo { width:30px; height:30px; display:flex; align-items:center; justify-content:center; position:relative; }
 .plat-name { font-size:11px; font-weight:500; display:block; }
@@ -70,7 +70,13 @@ page { background:#f5f5f5; margin:0; padding:0; }
 .book-btn:disabled { background:#ccc; }
 
 /* 6.1 按booking-confirm风格复刻时段选择 */
-.time-select-section { padding:16px 0; }
+.time-select-section { padding:16px 16px; }
+.format-hint { font-size:12px; color:#999; margin-bottom:12px; display:block; padding:0 16px; }
+.demo-coupon-list { padding:0 16px; }
+.my-coupon-section { padding:0 16px; }
+.section-subtitle { font-size:13px; font-weight:600; color:#333; margin:8px 0; display:block; padding:0 16px; }
+.h3 { font-size:16px; font-weight:600; margin-bottom:12px; display:block; padding:0 16px; }
+.room-match-section { padding:0 16px; }
 .now-btn { display:block; margin:0 auto 16px; padding:10px 24px; border-radius:16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; border:none; font-size:14px; font-weight:600; }
 .confirm-card { margin:12px 0; background:#fff; border-radius:12px; padding:16px; }
 .confirm-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f5f5f5; }

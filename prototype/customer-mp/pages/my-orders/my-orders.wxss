@@ -9,7 +9,7 @@ page { background:#f5f7fa; margin:0; padding:0; }
 .tab.active::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:24px; height:3px; background:#5D8A6B; border-radius:2px; }
 
 /* ── Order Card ── */
-.order-card { background:#fff; padding:16px 16px; margin:0 0 10px; }
+.order-card { background:#fff; padding:16px 16px; margin:0 0 10px; border-radius:14px; }
 .order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .order-room { font-size:16px; font-weight:600; }
 .order-header-right { display:flex; align-items:center; gap:4px; }
