@@ -1,4 +1,5 @@
 {
+  "entryPagePath": "pages/home/home",
   "pages": [
     "pages/home/home",
     "pages/room-list/room-list",
