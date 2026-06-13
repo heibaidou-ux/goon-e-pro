@@ -29,6 +29,11 @@ Component({
       if (key !== this.properties.active) {
         switch (key) {
           case 'home':
+            try {
+              var role = wx.getStorageSync('mp_user_role')
+              if (role === 'staff') { wx.reLaunch({ url: '/pages/staff-dashboard/staff-dashboard' }); return }
+              if (role === 'shareholder') { wx.reLaunch({ url: '/pages/investor-workbench/investor-workbench' }); return }
+            } catch(e) {}
             wx.navigateTo({ url: '/pages/home/home' })
             break
           case 'booking':
