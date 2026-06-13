@@ -304,8 +304,8 @@ const API = {
         order.expressName = deliveryInfo.expressName || ''
         order.expressPhone = deliveryInfo.expressPhone || ''
         order.expressAddress = deliveryInfo.expressAddress || ''
-        order.trackingNum = ''
-        order.carrier = ''
+        order.trackingNum = 'SF' + String(Date.now()).slice(-10)
+        order.carrier = '顺丰速运'
       }
       if (deliveryInfo.method === 'inroom') {
         order.roomName = deliveryInfo.roomName || ''

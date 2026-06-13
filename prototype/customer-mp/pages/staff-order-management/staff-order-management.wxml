@@ -3,7 +3,6 @@
     <text class="header-title">📋 订单管理</text>
   </view>
 
-  <!-- Tab切换 -->
   <view class="order-tabs">
     <view class="order-tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">进行中</view>
     <view class="order-tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">已预订</view>
@@ -20,11 +19,29 @@
       <text class="oc-amount">¥{{item.amount}}</text>
       <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}}</text>
       <text class="oc-source" wx:if="{{item.customerSource}}">📌 来源：{{item.customerSource}}</text>
+      <text class="oc-delivery" wx:if="{{item.isTeaOrder}}">
+        {{item.deliveryMethod=='express'?'📬快递配送':(item.deliveryMethod=='inroom'?'🏠送到房间':'🚶到店自取')}}
+      </text>
 
-      <view class="oc-actions" wx:if="{{tabIndex==0}}">
+      <!-- 进行中操作 -->
+      <view class="oc-actions" wx:if="{{tabIndex==0 && item.isRoomOrder}}">
         <view class="oc-btn primary" bindtap="completeOrder" data-id="{{item.orderId}}">完成订单</view>
         <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
       </view>
+
+      <!-- 茶品待发货→发货 -->
+      <view class="oc-actions" wx:if="{{tabIndex==0 && item.isTeaOrder && item.deliveryMethod=='express'}}">
+        <view class="oc-btn primary" bindtap="shipOrder" data-id="{{item.orderId}}">📬 发货</view>
+        <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+      </view>
+
+      <!-- 茶品送到房间/自取→配送完成 -->
+      <view class="oc-actions" wx:if="{{tabIndex==0 && item.isTeaOrder && item.deliveryMethod!='express'}}">
+        <view class="oc-btn primary" bindtap="completeDelivery" data-id="{{item.orderId}}">{{item.deliveryMethod=='inroom'?'🏠 已送达':'🚶 已取货'}}</view>
+        <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+      </view>
+
+      <!-- 预订操作 -->
       <view class="oc-actions" wx:if="{{tabIndex==1}}">
         <view class="oc-btn primary" bindtap="checkIn" data-id="{{item.orderId}}">办理入住</view>
         <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
@@ -32,33 +49,63 @@
     </view>
 
     <view class="empty" wx:if="{{filteredOrders.length==0}}">
-      <text class="empty-icon">📋</text>
-      <text>暂无订单</text>
+      <text>📋 暂无订单</text>
     </view>
   </view>
 
-  <!-- 订单详情弹窗（含客户来源） -->
+  <!-- 订单详情弹窗 -->
   <view class="modal-overlay" wx:if="{{showDetail}}" bindtap="hideDetail">
     <view class="modal" catchtap>
       <text class="modal-title">📋 订单详情</text>
       <view class="detail-content" wx:if="{{detailOrder}}">
-        <view class="detail-row"><text class="dl">房间</text><text class="dv">{{detailOrder.roomName}}</text></view>
+        <view class="detail-row"><text class="dl">订单</text><text class="dv">{{detailOrder.orderId}}</text></view>
+        <view class="detail-row" wx:if="{{detailOrder.isTeaOrder}}"><text class="dl">类型</text><text class="dv">茶品订单</text></view>
+        <view class="detail-row" wx:if="{{!detailOrder.isTeaOrder}}"><text class="dl">房间</text><text class="dv">{{detailOrder.roomName}}</text></view>
         <view class="detail-row"><text class="dl">时段</text><text class="dv">{{detailOrder.time}}</text></view>
         <view class="detail-row"><text class="dl">金额</text><text class="dv">¥{{detailOrder.amount}}</text></view>
         <view class="detail-row"><text class="dl">姓名</text><text class="dv">{{detailOrder.customerName || '—'}}</text></view>
         <view class="detail-row"><text class="dl">电话</text><text class="dv">{{detailOrder.phone || '—'}}</text></view>
+        <view class="detail-row" wx:if="{{detailOrder.deliveryMethod}}"><text class="dl">配送</text><text class="dv">{{detailOrder.deliveryLabel}}</text></view>
+        <view class="detail-row" wx:if="{{detailOrder.trackingNum}}"><text class="dl">运单号</text><text class="dv">{{detailOrder.trackingNum}}</text></view>
 
-        <!-- 客户来源（店员端必填） -->
+        <!-- 客户来源 -->
         <view class="source-section">
           <text class="source-title">👤 客户来源</text>
           <picker mode="selector" range="{{sourceOptions}}" bindchange="onSourceChange">
-            <view class="source-picker">{{editSource || '请选择客户来源'}} ▾</view>
+            <view class="source-picker">{{editSource || '请选择'}} ▾</view>
           </picker>
         </view>
       </view>
       <view class="modal-buttons">
         <view class="modal-btn cancel" bindtap="hideDetail">关闭</view>
         <view class="modal-btn primary" bindtap="saveSource">保存来源</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 发货弹窗 -->
+  <view class="modal-overlay" wx:if="{{showShipModal}}" bindtap="hideShipModal">
+    <view class="modal" catchtap>
+      <text class="modal-title">📬 发货</text>
+      <view class="ship-form">
+        <view class="ship-row" wx:if="{{shipOrder}}">
+          <text class="ship-label">订单</text>
+          <text class="ship-value">{{shipOrder.orderId}}</text>
+        </view>
+        <view class="ship-row">
+          <text class="ship-label">收件人</text>
+          <text class="ship-value">{{shipName}}</text>
+        </view>
+        <view class="ship-row">
+          <text class="ship-label">地址</text>
+          <text class="ship-value">{{shipAddress}}</text>
+        </view>
+        <input class="form-input" placeholder="快递公司（如顺丰速运）" value="{{shipCarrier}}" bindinput="onShipCarrier" />
+        <input class="form-input" placeholder="运单号" value="{{shipTrackingNum}}" bindinput="onShipTrackingNum" />
+      </view>
+      <view class="modal-buttons">
+        <view class="modal-btn cancel" bindtap="hideShipModal">取消</view>
+        <view class="modal-btn primary" bindtap="confirmShip">确认发货</view>
       </view>
     </view>
   </view>

@@ -26,6 +26,24 @@ Page({
           // 根据配送方式显示不同的状态
           shopStatus = 'PendingDelivery'
         }
+        var teaLog = null
+        if (so.deliveryMethod === 'express') {
+          var carriers = { SF: '顺丰速运', YT: '圆通速递', ZTO: '中通快递', STO: '申通快递', YD: '韵达快递', JD: '京东物流' }
+          var carrierCodes = ['SF','YT','ZTO','STO','YD','JD']
+          var cc = carrierCodes[Math.floor(Math.random()*carrierCodes.length)]
+          teaLog = {
+            carrier: carriers[cc] || '顺丰速运', icon: '📦',
+            trackingNum: so.trackingNum || (cc + String(Date.now()).slice(-8)),
+            statusBadge: 'transit', statusLabel: '运输中',
+            estimated: '预计2-3天送达',
+            steps: [
+              { label: '已揽收', active: true },
+              { label: '运输中', active: true, current: true },
+              { label: '派送中', active: false },
+              { label: '已签收', active: false }
+            ]
+          }
+        }
         orders.push({
           orderId: so.orderId, roomName: '茶品订单', roomId: '',
           status: shopStatus,
@@ -36,7 +54,8 @@ Page({
           isTeaOrder: true, items: so.items || [],
           deliveryMethod: so.deliveryMethod || '',
           deliveryStatus: so.deliveryStatus || 'pending',
-          deliveryLabel: so.deliveryMethod === 'inroom' ? '配送中' : (so.deliveryMethod === 'express' ? '待发货' : (so.deliveryMethod === 'pickup' ? '待取货' : ''))
+          deliveryLabel: so.deliveryMethod === 'inroom' ? '配送中' : (so.deliveryMethod === 'express' ? '待发货' : (so.deliveryMethod === 'pickup' ? '待取货' : '')),
+          logistics: teaLog
         })
       }
       var now = new Date()
