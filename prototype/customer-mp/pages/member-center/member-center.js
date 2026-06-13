@@ -13,12 +13,17 @@ Page({
   },
 
   onShow: function() {
-    // 第一条：从storage恢复余额显隐状态
+    // 未登录时跳转首页弹出登录框
+    if (!API.isLoggedIn()) {
+      wx.reLaunch({ url: '/pages/home/home' })
+      return
+    }
+    // 从storage恢复余额显隐状态
     try {
       var v = wx.getStorageSync('balance_visible')
       if (v !== '') { this.data.balanceVisible = v; this.setData({ balanceVisible: v }) }
     } catch(e) {}
-    // 同步读取用户信息，避免异步延迟导致显示"会员"
+    // 同步读取用户信息
     try {
       var cachedUser = wx.getStorageSync('mp_user')
       if (cachedUser) {
