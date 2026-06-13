@@ -1,7 +1,7 @@
 <view class="phone">
   <view class="page">
     <!-- 首充特惠横幅 -->
-    <view class="promo-banner" bindtap="showTopup">
+    <view wx:if="{{!showLoginPrompt}}"><view class="promo-banner" bindtap="showTopup">
       <view>
         <text class="promo-text"><text class="promo-em">🎉 首充特惠</text> · 首次充值享7折 + 赠优惠券包</text>
       </view>
@@ -50,7 +50,7 @@
 
     <!-- 退出登录 -->
     <view class="logout-wrap"><button class="logout-btn" bindtap="handleLogout">退出登录</button></view>
-  </view>
+  </view></view>
 
   <!-- 充值弹窗 -->
   <view class="modal-overlay" wx:if="{{showRechargeModal}}" bindtap="hideRecharge">
@@ -95,6 +95,14 @@
         <button class="modal-btn confirm" bindtap="saveAccountSettings">保存设置</button>
       </view>
     </view>
+  </view>
+
+  <!-- 未登录提示 -->
+  <view class="login-prompt" wx:if="{{showLoginPrompt}}">
+    <text class="lp-icon">👤</text>
+    <text class="lp-title">未登录</text>
+    <text class="lp-desc">请先登录后查看会员信息</text>
+    <view class="lp-btn" bindtap="goLogin">立即登录</view>
   </view>
 
   <!-- 底部导航 -->

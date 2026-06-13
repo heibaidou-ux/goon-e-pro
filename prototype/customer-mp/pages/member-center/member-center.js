@@ -5,7 +5,7 @@ Page({
     userName: '会员', levelLabel: '金牌会员', balanceIcon: '💎',
     balance: 0, balanceDisplay: '¥0', balanceVisible: true,
     totalSpent: 0, visitCount: 0, points: 0,
-    showRechargeModal: false, showSettingsModal: false,
+    showRechargeModal: false, showSettingsModal: false, showLoginPrompt: false,
     selectedAmount: 100,
     selectedPayment: 'WeChat',
     userPhone: '',
@@ -13,9 +13,9 @@ Page({
   },
 
   onShow: function() {
-    // 未登录时跳转首页弹出登录框
+    // 未登录时在页面内显示登录引导，不跳转
     if (!API.isLoggedIn()) {
-      wx.reLaunch({ url: '/pages/home/home' })
+      this.setData({ showLoginPrompt: true })
       return
     }
     // 从storage恢复余额显隐状态
@@ -162,6 +162,10 @@ Page({
         }
       }
     })
+  },
+
+  goLogin: function() {
+    wx.reLaunch({ url: '/pages/home/home?showLogin=1' })
   },
 
   goOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },

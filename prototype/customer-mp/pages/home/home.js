@@ -23,11 +23,15 @@ Page({
     billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false
   },
 
-  onLoad: function() {
+  onLoad: function(e) {
     var self = this
     // 角色重定向
     var role = API.getUserRole()
     if (role === 'staff') { wx.reLaunch({ url: '/pages/staff-dashboard/staff-dashboard' }); return }
+    // 从"我的"跳转过来时自动弹出登录框
+    if (e && e.showLogin == '1') {
+      self.setData({ showLoginModal: true, pendingAction: 'profile' })
+    }
     if (role === 'shareholder') { wx.reLaunch({ url: '/pages/investor-workbench/investor-workbench' }); return }
     try { self.setData({ topPadding: (wx.getWindowInfo().statusBarHeight || 44) + 44 }) } catch(e) {}
     self.loadData(); self.checkActiveOrder()
