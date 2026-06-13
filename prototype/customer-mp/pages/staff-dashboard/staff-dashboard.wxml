@@ -37,17 +37,17 @@
   <!-- 快捷按钮：验券、开门、监控、对账 2×2 -->
   <view class="section-title">快捷操作</view>
   <view class="quick-actions">
-    <view class="action-item" bindtap="goCouponVerify">
-      <text class="action-icon">🎫</text>
-      <text class="action-label">验券</text>
+    <view class="action-item" bindtap="goRoomStatus">
+      <text class="action-icon">🏠</text>
+      <text class="action-label">房态</text>
     </view>
     <view class="action-item" bindtap="goOpenDoor">
       <text class="action-icon">🚪</text>
       <text class="action-label">开门</text>
     </view>
-    <view class="action-item" bindtap="goDeviceMonitor">
-      <text class="action-icon">📡</text>
-      <text class="action-label">监控</text>
+    <view class="action-item" bindtap="goCouponVerify">
+      <text class="action-icon">🎫</text>
+      <text class="action-label">验券</text>
     </view>
     <view class="action-item" bindtap="goReconciliation">
       <text class="action-icon">🧾</text>
@@ -58,9 +58,9 @@
   <!-- 功能入口 -->
   <view class="section-title">更多功能</view>
   <view class="feature-grid">
-    <view class="feature-item" bindtap="goRoomStatus">
-      <text class="feature-icon">🏠</text>
-      <text class="feature-label">房态</text>
+    <view class="feature-item" bindtap="goDeviceMonitor">
+      <text class="feature-icon">📡</text>
+      <text class="feature-label">监控</text>
     </view>
     <view class="feature-item" bindtap="goAttendance">
       <text class="feature-icon">📅</text>
