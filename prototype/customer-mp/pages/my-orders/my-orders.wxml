@@ -57,7 +57,7 @@
       </view>
       <view class="big-actions">
         <view wx:if="{{!item.isTeaOrder}}" class="big-action-btn primary" bindtap="openDoor" data-id="{{item.orderId}}">🚪 开门</view>
-        <view class="big-action-btn outline" bindtap="showExtend" data-id="{{item.orderId}}">⏱ 续订</view>
+        <view wx:if="{{!item.isTeaOrder}}" class="big-action-btn outline" bindtap="showExtend" data-id="{{item.orderId}}">⏱ 续订</view>
         <view class="big-action-btn ghost" bindtap="callService" data-id="{{item.orderId}}">📞 客服</view>
       </view>
     </view>
