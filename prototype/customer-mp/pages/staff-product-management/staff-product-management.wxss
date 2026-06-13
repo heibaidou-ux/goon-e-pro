@@ -1,7 +1,7 @@
 .page { min-height:100vh; background:#f5f5f5; }
-.header { display:flex; align-items:center; padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; }
+.header { display:flex; align-items:center; padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
 .header-title { font-size:18px; font-weight:700; }
-.content { padding:0 0 60px; }
+.content { padding:0 16px 60px; }
 .category-tabs { display:flex; gap:6px; padding:12px 0; background:#fff; }
 .cat-tab { flex:1; padding:8px; border-radius:10px; text-align:center; font-size:12px; font-weight:600; background:#f5f5f5; color:#666; }
 .cat-tab.active { background:#5D8A6B; color:#fff; }
