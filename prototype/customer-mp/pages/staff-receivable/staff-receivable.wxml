@@ -1,1 +1,30 @@
-<view class="page"><view class="placeholder"><text class="ph-icon">🚧</text><text class="ph-text">开发中</text><text class="ph-desc">{{title}}</text></view></view>
+<view class="page">
+  <view class="header">
+    <text class="header-title">💰 应收款</text>
+  </view>
+  <view class="summary-card">
+    <text class="sc-label">待收款总额</text>
+    <text class="sc-amount">¥{{totalReceivable}}</text>
+    <view class="sc-detail">
+      <view class="sc-item"><text class="si-label">已结算</text><text class="si-value">¥{{totalSettled}}</text></view>
+      <view class="sc-item"><text class="si-label">挂账中</text><text class="si-value warn">¥{{totalPending}}</text></view>
+      <view class="sc-item"><text class="si-label">笔数</text><text class="si-value">{{orderCount}}笔</text></view>
+    </view>
+  </view>
+  <view class="list-section">
+    <text class="section-title">挂账单</text>
+    <view class="bill-card" wx:for="{{bills}}" wx:key="billId">
+      <view class="bc-header">
+        <text class="bc-room">{{item.roomName}}</text>
+        <text class="bc-status {{item.status}}">{{item.statusLabel}}</text>
+      </view>
+      <text class="bc-amount">¥{{item.amount}}</text>
+      <text class="bc-time">{{item.date}} {{item.time}}</text>
+      <view class="bc-actions" wx:if="{{item.status=='pending'}}">
+        <view class="bc-btn primary" bindtap="settleBill" data-id="{{item.billId}}">结算</view>
+        <view class="bc-btn outline" bindtap="showBillDetail" data-id="{{item.billId}}">详情</view>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{bills.length==0}}"><text>✅ 暂无待收款</text></view>
+  </view>
+</view>

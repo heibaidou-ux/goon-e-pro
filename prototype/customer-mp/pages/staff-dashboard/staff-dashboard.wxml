@@ -55,7 +55,7 @@
     </view>
   </view>
 
-  <!-- 功能入口：考勤/商品管理/巡检/排班 -->
+  <!-- 功能入口：考勤/商品管理/巡检/排班/个人中心 -->
   <view class="section-title">更多功能</view>
   <view class="feature-grid">
     <view class="feature-item" bindtap="goAttendance">
@@ -74,6 +74,10 @@
       <text class="feature-icon">📋</text>
       <text class="feature-label">排班</text>
     </view>
+    <view class="feature-item" bindtap="goProfile">
+      <text class="feature-icon">👤</text>
+      <text class="feature-label">个人中心</text>
+    </view>
   </view>
 
   <!-- 待办事项预览 -->
@@ -86,5 +90,10 @@
       </view>
       <text class="todo-arrow">›</text>
     </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section" bindtap="doLogout">
+    <text class="logout-text">退出登录 → 回到客人端</text>
   </view>
 </view>

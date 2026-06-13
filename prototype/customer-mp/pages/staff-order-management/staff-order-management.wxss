@@ -1,4 +1,40 @@
-.placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
-.ph-icon { font-size:48px; margin-bottom:12px; }
-.ph-text { font-size:18px; color:#333; font-weight:600; }
-.ph-desc { font-size:13px; color:#999; margin-top:4px; }
+.page { background:#f5f7fa; min-height:100vh; }
+.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+.header-title { font-size:18px; font-weight:700; }
+.order-tabs { display:flex; background:#fff; border-bottom:1px solid #f0f0f0; padding:0 16px; }
+.order-tab { flex:1; text-align:center; padding:14px 0; font-size:13px; color:#999; }
+.order-tab.active { color:#5D8A6B; font-weight:600; border-bottom:2px solid #5D8A6B; }
+.order-list { padding:12px 16px; }
+.order-card { background:#fff; border-radius:14px; padding:16px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+.oc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.oc-room { font-size:15px; font-weight:600; }
+.oc-status { font-size:11px; padding:3px 10px; border-radius:10px; }
+.oc-status.status-inuse { background:#e8f5e9; color:#00a870; }
+.oc-status.status-booked { background:#f3e5f5; color:#9c27b0; }
+.oc-status.status-completed { background:#f5f5f5; color:#999; }
+.oc-time { font-size:12px; color:#999; display:block; }
+.oc-amount { font-size:16px; font-weight:700; color:#B8860B; display:block; margin:4px 0; }
+.oc-customer { font-size:12px; color:#666; display:block; }
+.oc-source { font-size:11px; color:#5D8A6B; display:block; margin-top:2px; }
+.oc-actions { display:flex; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid #f0f0f0; }
+.oc-btn { flex:1; padding:10px; border-radius:12px; font-size:13px; font-weight:600; text-align:center; }
+.oc-btn.primary { background:#5D8A6B; color:#fff; border:none; }
+.oc-btn.outline { background:#fff; color:#5D8A6B; border:1.5px solid #5D8A6B; }
+.empty { text-align:center; padding:60px 20px; color:#ccc; }
+.empty-icon { font-size:48px; display:block; margin-bottom:12px; }
+
+/* 详情弹窗 */
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
+.modal { background:#fff;border-radius:16px;padding:24px;width:320px;max-width:90vw; }
+.modal-title { font-size:16px;font-weight:600;display:block;margin-bottom:12px;text-align:center; }
+.detail-content { margin-bottom:8px; }
+.detail-row { display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f5f5f5;font-size:13px; }
+.dl { color:#999; }
+.dv { color:#333;font-weight:500; }
+.source-section { margin-top:12px; padding:12px; background:#f9fafb; border-radius:10px; }
+.source-title { font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:8px; }
+.source-picker { padding:10px 12px; border:1.5px solid #e0d8d0; border-radius:10px; font-size:13px; color:#333; background:#fff; text-align:center; }
+.modal-buttons { display:flex;gap:10px;margin-top:16px; }
+.modal-btn { flex:1;padding:12px;border-radius:16px;font-size:14px;font-weight:600;text-align:center; }
+.modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.primary { background:#5D8A6B;color:#fff; }

@@ -1,1 +1,65 @@
-<view class="page"><view class="placeholder"><text class="ph-icon">🚧</text><text class="ph-text">开发中</text><text class="ph-desc">{{title}}</text></view></view>
+<view class="page">
+  <view class="header">
+    <text class="header-title">📋 订单管理</text>
+  </view>
+
+  <!-- Tab切换 -->
+  <view class="order-tabs">
+    <view class="order-tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">进行中</view>
+    <view class="order-tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">已预订</view>
+    <view class="order-tab {{tabIndex==2?'active':''}}" bindtap="switchTab" data-tab="2">已完成</view>
+  </view>
+
+  <view class="order-list">
+    <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId">
+      <view class="oc-header">
+        <text class="oc-room">{{item.roomName}}</text>
+        <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
+      </view>
+      <text class="oc-time">{{item.date}} {{item.time}}</text>
+      <text class="oc-amount">¥{{item.amount}}</text>
+      <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}}</text>
+      <text class="oc-source" wx:if="{{item.customerSource}}">📌 来源：{{item.customerSource}}</text>
+
+      <view class="oc-actions" wx:if="{{tabIndex==0}}">
+        <view class="oc-btn primary" bindtap="completeOrder" data-id="{{item.orderId}}">完成订单</view>
+        <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+      </view>
+      <view class="oc-actions" wx:if="{{tabIndex==1}}">
+        <view class="oc-btn primary" bindtap="checkIn" data-id="{{item.orderId}}">办理入住</view>
+        <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{filteredOrders.length==0}}">
+      <text class="empty-icon">📋</text>
+      <text>暂无订单</text>
+    </view>
+  </view>
+
+  <!-- 订单详情弹窗（含客户来源） -->
+  <view class="modal-overlay" wx:if="{{showDetail}}" bindtap="hideDetail">
+    <view class="modal" catchtap>
+      <text class="modal-title">📋 订单详情</text>
+      <view class="detail-content" wx:if="{{detailOrder}}">
+        <view class="detail-row"><text class="dl">房间</text><text class="dv">{{detailOrder.roomName}}</text></view>
+        <view class="detail-row"><text class="dl">时段</text><text class="dv">{{detailOrder.time}}</text></view>
+        <view class="detail-row"><text class="dl">金额</text><text class="dv">¥{{detailOrder.amount}}</text></view>
+        <view class="detail-row"><text class="dl">姓名</text><text class="dv">{{detailOrder.customerName || '—'}}</text></view>
+        <view class="detail-row"><text class="dl">电话</text><text class="dv">{{detailOrder.phone || '—'}}</text></view>
+
+        <!-- 客户来源（店员端必填） -->
+        <view class="source-section">
+          <text class="source-title">👤 客户来源</text>
+          <picker mode="selector" range="{{sourceOptions}}" bindchange="onSourceChange">
+            <view class="source-picker">{{editSource || '请选择客户来源'}} ▾</view>
+          </picker>
+        </view>
+      </view>
+      <view class="modal-buttons">
+        <view class="modal-btn cancel" bindtap="hideDetail">关闭</view>
+        <view class="modal-btn primary" bindtap="saveSource">保存来源</view>
+      </view>
+    </view>
+  </view>
+</view>

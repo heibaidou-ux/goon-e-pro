@@ -1,4 +1,25 @@
-.placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
-.ph-icon { font-size:48px; margin-bottom:12px; }
-.ph-text { font-size:18px; color:#333; font-weight:600; }
-.ph-desc { font-size:13px; color:#999; margin-top:4px; }
+.page{background:#f5f7fa;min-height:100vh}
+.header{padding:14px 16px;background:#fff;border-bottom:1px solid #f0f0f0}
+.header-title{font-size:18px;font-weight:700}
+.summary-card{background:linear-gradient(135deg,#5D8A6B,#8bba94);border-radius:16px;padding:20px;margin:12px 16px;color:#fff}
+.sc-label{font-size:12px;opacity:.8;display:block}
+.sc-amount{font-size:36px;font-weight:800;display:block;margin:4px 0 16px}
+.sc-detail{display:flex;gap:12px}
+.sc-item{flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center}
+.si-label{font-size:10px;opacity:.8;display:block}
+.si-value{font-size:16px;font-weight:700;display:block;margin-top:2px}
+.si-value.warn{color:#FFD54F}
+.list-section{padding:0 16px}
+.section-title{font-size:14px;font-weight:600;color:#333;margin:12px 0 8px;display:block}
+.bill-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.bc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.bc-room{font-size:15px;font-weight:600}
+.bc-status{font-size:11px;padding:2px 8px;border-radius:6px}
+.bc-status.pending{background:#fff3e0;color:#B8860B}
+.bc-amount{font-size:18px;font-weight:700;color:#B8860B;display:block}
+.bc-time{font-size:12px;color:#999;display:block;margin-top:2px}
+.bc-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0}
+.bc-btn{flex:1;padding:10px;border-radius:12px;font-size:13px;font-weight:600;text-align:center}
+.bc-btn.primary{background:#5D8A6B;color:#fff;border:none}
+.bc-btn.outline{background:#fff;color:#5D8A6B;border:1.5px solid #5D8A6B}
+.empty{text-align:center;padding:40px 0;color:#999;font-size:14px}

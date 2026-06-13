@@ -63,5 +63,20 @@ Page({
   // 保留旧导航供其他引用
   goRoomStatus: function() { wx.navigateTo({ url: '/pages/staff-room-status/staff-room-status' }) },
   goCleaning: function() { wx.navigateTo({ url: '/pages/staff-cleaning-task/staff-cleaning-task' }) },
-  goProfile: function() { wx.navigateTo({ url: '/pages/staff-profile/staff-profile' }) }
+  goProfile: function() { wx.navigateTo({ url: '/pages/staff-profile/staff-profile' }) },
+
+  // 退出登录
+  doLogout: function() {
+    var self = this
+    wx.showModal({
+      title: '退出登录',
+      content: '确定退出店员端，返回客人首页？',
+      success: function(res) {
+        if (res.confirm) {
+          API.logout()
+          wx.reLaunch({ url: '/pages/home/home' })
+        }
+      }
+    })
+  }
 })

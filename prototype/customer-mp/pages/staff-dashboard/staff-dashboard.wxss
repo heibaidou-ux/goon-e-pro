@@ -1,4 +1,4 @@
-.header { padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
 .header-left { flex:1; }
 .header-title { font-size:18px; font-weight:700; display:block; }
 .header-store { font-size:12px; color:#666; margin-top:2px; display:block; }
@@ -13,7 +13,7 @@
 .stat-card.alert .stat-num { color:#e53935; }
 
 /* 快捷按钮 2×2 */
-.section-title { font-size:13px; font-weight:600; color:#333; margin:0 0 8px; display:block; }
+.section-title { font-size:13px; font-weight:600; color:#333; margin:0 0 8px; display:block; padding:0 16px; }
 .quick-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; background:#fff; margin-bottom:16px; }
 .action-item { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; background:#F2F6F0; border-radius:16px; }
 .action-item:active { opacity:.7; }
@@ -35,3 +35,7 @@
 .todo-title { font-size:14px; font-weight:500; display:block; }
 .todo-meta { font-size:11px; color:#999; margin-top:2px; display:block; }
 .todo-arrow { color:#ccc; font-size:18px; }
+.logout-section { text-align:center; padding:24px 16px; }
+.logout-text { display:inline-block; padding:10px 24px; border-radius:10px; font-size:13px; color:#d54941; border:1px solid #d54941; background:#fff; }
+.logout-text:active { background:#fff5f5; }
+.feature-grid { grid-template-columns:repeat(5,1fr); }

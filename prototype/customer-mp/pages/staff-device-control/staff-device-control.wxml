@@ -1,1 +1,14 @@
-<view class="page"><view class="placeholder"><text class="ph-icon">🚧</text><text class="ph-text">开发中</text><text class="ph-desc">{{title}}</text></view></view>
+<view class="page">
+  <view class="header"><text class="header-title">📡 设备控制面板</text></view>
+  <view class="room-select"><picker mode="selector" range="{{roomNames}}" bindchange="switchRoom"><view class="rs-trigger">{{currentRoomName}} ▾</view></picker></view>
+  <view class="device-list">
+    <view class="device-card" wx:for="{{devices}}" wx:key="deviceId">
+      <view class="dc-left">
+        <text class="dc-icon">{{item.typeIcon}}</text>
+        <view><text class="dc-name">{{item.typeLabel}}</text><text class="dc-status {{item.status}}">{{item.status=='Online'?'在线':'离线'}}</text></view>
+      </view>
+      <switch checked="{{item.on}}" bindchange="toggleDevice" data-id="{{item.deviceId}}" wx:if="{{item.type!='AC'}}" />
+      <view wx:elif="{{item.type=='AC'}}" class="ac-mini"><text>{{item.temperature}}°</text><switch checked="{{item.mode=='cool'}}" bindchange="toggleDevice" data-id="{{item.deviceId}}" /></view>
+    </view>
+  </view>
+</view>
