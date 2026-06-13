@@ -54,10 +54,13 @@ Page({
   },
 
   onLoad: function(e) {
-    // 针对店员端加载已核销记录
+    // 区分店员端和客人端
     try {
       var role = wx.getStorageSync('mp_user_role')
-      if (role === 'staff') this.loadVerifiedCoupons()
+      if (role === 'staff') {
+        this.setData({ isStaff: true })
+        this.loadVerifiedCoupons()
+      }
     } catch(e) {}
 
     this.renderMyCoupons()
