@@ -1,4 +1,4 @@
-<scroll-view class="page" scroll-y show-scrollbar="{{false}}" style="padding-top:{{topPadding}}px;">
+<view class="phone"><scroll-view class="page" scroll-y show-scrollbar="{{false}}" style="padding-top:{{topPadding}}px;">
 
   <!-- 门店头部 -->
   <view class="store-header">
@@ -82,8 +82,9 @@
   </view>
 
   <!-- 底部导航 -->
+  </scroll-view>
   <bottom-nav active="home" />
-</scroll-view>
+</view>
 
 <!-- 门店选择弹窗 -->
 <view class="modal-overlay" wx:if="{{showStoreModal}}" bindtap="hideStoreSelector">
