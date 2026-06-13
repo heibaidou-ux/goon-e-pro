@@ -84,31 +84,31 @@
     <text class="modal-h3">选择配送方式</text>
     <text class="modal-desc">请选择如何获取商品</text>
     <view class="delivery-options">
-      <view class="delivery-option {{deliveryMethod==&apos;inroom&apos;?&apos;selected&apos;:&apos;&apos;}}" bindtap="selectDeliveryMethod" data-method="inroom">
+      <view class="delivery-option {{deliveryMethod=='inroom'?'selected':''}}" bindtap="selectDeliveryMethod" data-method="inroom">
         <text class="do-icon">🏠</text>
         <view class="do-info"><text class="do-title">送到房间</text><text class="do-desc">店员送至当前包间</text></view>
-        <text class="do-check" wx:if="{{deliveryMethod==&apos;inroom&apos;}}">✓</text>
+        <text class="do-check" wx:if="{{deliveryMethod=='inroom'}}">✓</text>
       </view>
-      <view class="delivery-option {{deliveryMethod==&apos;express&apos;?&apos;selected&apos;:&apos;&apos;}}" bindtap="selectDeliveryMethod" data-method="express">
+      <view class="delivery-option {{deliveryMethod=='express'?'selected':''}}" bindtap="selectDeliveryMethod" data-method="express">
         <text class="do-icon">📬</text>
         <view class="do-info"><text class="do-title">快递配送</text><text class="do-desc">填写收货地址，快递到家</text></view>
-        <text class="do-check" wx:if="{{deliveryMethod==&apos;express&apos;}}">✓</text>
+        <text class="do-check" wx:if="{{deliveryMethod=='express'}}">✓</text>
       </view>
-      <view class="delivery-option {{deliveryMethod==&apos;pickup&apos;?&apos;selected&apos;:&apos;&apos;}}" bindtap="selectDeliveryMethod" data-method="pickup">
+      <view class="delivery-option {{deliveryMethod=='pickup'?'selected':''}}" bindtap="selectDeliveryMethod" data-method="pickup">
         <text class="do-icon">🚶</text>
         <view class="do-info"><text class="do-title">到店自取</text><text class="do-desc">到店后出示订单给店员</text></view>
-        <text class="do-check" wx:if="{{deliveryMethod==&apos;pickup&apos;}}">✓</text>
+        <text class="do-check" wx:if="{{deliveryMethod=='pickup'}}">✓</text>
       </view>
     </view>
-    <view class="express-fields" wx:if="{{deliveryMethod==&apos;express&apos;}}">
+    <view class="express-fields" wx:if="{{deliveryMethod=='express'}}">
       <input class="delivery-input" placeholder="收件人姓名" value="{{expressName}}" bindinput="onExpressName" />
       <input class="delivery-input" placeholder="联系电话" value="{{expressPhone}}" bindinput="onExpressPhone" />
       <input class="delivery-input" placeholder="收货地址" value="{{expressAddress}}" bindinput="onExpressAddress" />
     </view>
-    <view class="delivery-summary" wx:if="{{deliveryMethod==&apos;inroom&apos;}}">
-      <text>商品将送至 {{roomName || roomBannerRoomName || &apos;当前包间&apos;}}</text>
+    <view class="delivery-summary" wx:if="{{deliveryMethod=='inroom'}}">
+      <text>商品将送至 {{roomName || roomBannerRoomName || '当前包间'}}</text>
     </view>
-    <view class="delivery-summary" wx:if="{{deliveryMethod==&apos;pickup&apos;}}">
+    <view class="delivery-summary" wx:if="{{deliveryMethod=='pickup'}}">
       <text>到店后告知店员订单号即可取货</text>
     </view>
     <view class="pay-modal-btns">
