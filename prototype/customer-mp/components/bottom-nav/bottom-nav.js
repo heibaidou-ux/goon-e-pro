@@ -41,6 +41,11 @@ Component({
             wx.navigateTo({ url: '/pages/my-orders/my-orders' })
             break
           case 'profile':
+            // 未登录时跳首页弹出登录框
+            try {
+              var loggedIn = wx.getStorageSync('mp_logged_in')
+              if (!loggedIn) { wx.navigateTo({ url: '/pages/home/home?showLogin=1' }); return }
+            } catch(e) {}
             wx.navigateTo({ url: '/pages/member-center/member-center' })
             break
         }
