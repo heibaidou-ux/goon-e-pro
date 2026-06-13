@@ -1,30 +1,50 @@
 <view class="page">
   <view class="header">
-    <text class="header-title">📋 排班</text>
+    <text class="header-title">📋 排班管理</text>
   </view>
-
   <view class="content">
-    <!-- 周导航 -->
     <view class="week-nav">
-      <text class="week-nav-btn" bindtap="prevWeek">◀</text>
+      <text class="week-nav-btn" bindtap="prevWeek">◀ 上一周</text>
       <text class="week-nav-title">{{schedule.weekStart}} ~ {{schedule.weekEnd}}</text>
-      <text class="week-nav-btn" bindtap="nextWeek">▶</text>
+      <text class="week-nav-btn" bindtap="nextWeek">下一周 ▶</text>
     </view>
 
     <!-- 排班表 -->
-    <view class="schedule-table">
-      <view class="st-header">
-        <text class="st-cell st-name">姓名</text>
-        <text class="st-cell st-day" wx:for="{{dayLabels}}" wx:key="*this">{{item}}</text>
+    <scroll-view class="schedule-scroll" scroll-x>
+      <view class="schedule-table">
+        <view class="st-header">
+          <text class="st-cell st-name-h">姓名</text>
+          <text class="st-cell st-day" wx:for="{{dayLabels}}" wx:key="*this">{{item}}</text>
+        </view>
+        <view class="st-row" wx:for="{{schedule.staff}}" wx:key="index">
+          <view class="st-cell st-name">
+            <text class="st-worker">{{item.name}}</text>
+            <text class="st-role">{{item.role}}</text>
+          </view>
+          <view class="st-cell st-day {{d=='休息'?'off':''}}" wx:for="{{item.schedule}}" wx:key="*this" wx:for-item="d" bindtap="editShift" data-name="{{item.name}}" data-day="{{index}}" data-shift="{{d}}">
+            <text class="st-shift">{{d=='早班'?'早':(d=='晚班'?'晚':(d=='全天'?'全':(d=='休息'?'—':d)))}}</text>
+          </view>
+        </view>
       </view>
-      <view class="st-row" wx:for="{{schedule.staff}}" wx:key="index">
-        <view class="st-cell st-name">
-          <text class="st-worker">{{item.name}}</text>
-          <text class="st-role">{{item.role}}</text>
-        </view>
-        <view class="st-cell st-day {{d === '休息' ? 'off' : (d === '全天' ? 'full' : '')}}" wx:for="{{item.schedule}}" wx:key="*this" wx:for-item="d">
-          <text class="st-shift">{{d === '早班' ? '早' : (d === '晚班' ? '晚' : (d === '全天' ? '全' : (d === '休息' ? '—' : d)))}}</text>
-        </view>
+    </scroll-view>
+
+    <text class="legend">💡 点击班次可修改排班</text>
+  </view>
+
+  <!-- 排班编辑弹窗 -->
+  <view class="modal-overlay" wx:if="{{showEditModal}}" bindtap="hideEditModal">
+    <view class="modal" catchtap>
+      <text class="modal-title">排班编辑</text>
+      <text class="modal-desc">{{editName}} · {{editDayLabel}}</text>
+      <view class="shift-options">
+        <view class="shift-opt {{editNewShift=='早班'?'selected':''}}" bindtap="setShift" data-shift="早班">🌅 早班</view>
+        <view class="shift-opt {{editNewShift=='晚班'?'selected':''}}" bindtap="setShift" data-shift="晚班">🌙 晚班</view>
+        <view class="shift-opt {{editNewShift=='全天'?'selected':''}}" bindtap="setShift" data-shift="全天">☀ 全天</view>
+        <view class="shift-opt {{editNewShift=='休息'?'selected':''}}" bindtap="setShift" data-shift="休息">💤 休息</view>
+      </view>
+      <view class="modal-buttons">
+        <view class="modal-btn cancel" bindtap="hideEditModal">取消</view>
+        <view class="modal-btn primary" bindtap="saveShift">保存</view>
       </view>
     </view>
   </view>

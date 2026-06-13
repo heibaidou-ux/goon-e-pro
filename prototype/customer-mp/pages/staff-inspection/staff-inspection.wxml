@@ -1,35 +1,50 @@
 <view class="page">
   <view class="header">
     <text class="header-title">🔍 巡检</text>
+    <view class="header-tabs">
+      <text class="htab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">执行</text>
+      <text class="htab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">报告</text>
+    </view>
   </view>
 
-  <view class="content">
-    <view class="section-title">选择房间</view>
-    <view class="room-tabs">
-      <view class="room-tab {{selectedRoom === item.roomId ? 'active' : ''}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="selectRoom" data-roomid="{{item.roomId}}">
+  <view class="content" wx:if="{{tabIndex==0}}">
+    <view class="section-title" wx:if="{{!selectedRoom}}">选择房间</view>
+    <view class="room-tabs" wx:if="{{!selectedRoom}}">
+      <view class="room-tab {{item.status=='Active'?'online':'off'}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="selectRoom" data-roomid="{{item.roomId}}">
         <text class="rt-name">{{item.name}}</text>
-        <text class="rt-status {{item.status === 'Active' ? 'ok' : ''}}">{{item.status === 'Active' ? '在线' : '离线'}}</text>
+        <text class="rt-status">{{item.status=='Active'?'在线':'离线'}}</text>
       </view>
     </view>
 
-    <!-- 巡检项 -->
-    <view class="section-title" wx:if="{{selectedRoom}}">设备巡检清单 — {{selectedRoomName}}</view>
-    <view class="inspect-list" wx:if="{{selectedRoom}}">
-      <view class="inspect-item" wx:for="{{inspectionItems}}" wx:key="name">
-        <view class="ii-left">
+    <view wx:if="{{selectedRoom}}">
+      <view class="section-title">巡检清单 — {{selectedRoomName}}</view>
+      <view class="inspect-list">
+        <view class="inspect-item {{item.ok?'ok':'fail'}}" wx:for="{{inspectionItems}}" wx:key="name" bindtap="toggleInspect" data-index="{{index}}">
           <text class="ii-name">{{item.name}}</text>
-          <text class="ii-desc" wx:if="{{item.ok}}">状态正常</text>
-          <text class="ii-desc warn" wx:else>需要检修</text>
-        </view>
-        <view class="ii-status {{item.ok ? 'ok' : 'fail'}}" bindtap="toggleInspect" data-index="{{index}}">
-          <text wx:if="{{item.ok}}">✅ 正常</text>
-          <text wx:else>❌ 异常</text>
+          <text class="ii-result">{{item.ok?'✅ 正常':'❌ 异常'}}</text>
         </view>
       </view>
+      <view class="inspect-actions">
+        <button class="ia-btn primary" bindtap="submitInspection">📋 提交巡检报告</button>
+        <button class="ia-btn outline" bindtap="cancelInspect">← 返回选房</button>
+      </view>
     </view>
+  </view>
 
-    <view class="inspect-actions" wx:if="{{selectedRoom}}">
-      <button class="inspect-submit-btn" bindtap="submitInspection">提交巡检报告</button>
+  <view class="content" wx:if="{{tabIndex==1}}">
+    <view class="section-title">巡检记录</view>
+    <view class="report-card" wx:for="{{reports}}" wx:key="id">
+      <view class="rc-header">
+        <text class="rc-room">{{item.roomId}}</text>
+        <text class="rc-status {{item.status=='待复核'?'pending':'done'}}">{{item.status}}</text>
+      </view>
+      <text class="rc-time">{{item.time}}</text>
+      <text class="rc-inspector">👤 {{item.inspector}}</text>
+      <view class="rc-items">
+        <text class="ri-tag {{i.ok?'ok':'no'}}" wx:for="{{item.items}}" wx:key="name">{{i.name}}</text>
+      </view>
+      <view class="rc-btn primary" wx:if="{{item.status=='待复核'}}" bindtap="confirmReport" data-id="{{item.id}}">确认复核</view>
     </view>
+    <view class="empty" wx:if="{{reports.length==0}}"><text>暂无巡检记录</text></view>
   </view>
 </view>

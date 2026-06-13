@@ -1,11 +1,30 @@
 <view class="page">
-  <view class="header"><text class="header-title">🏠 房态管理</text></view>
+  <view class="header">
+    <text class="header-title">🏠 房态管理</text>
+    <text class="header-stats">{{stats.inUse}}使用 · {{stats.available}}空闲</text>
+  </view>
+
+  <view class="legend-bar">
+    <text class="legend-dot inuse"></text><text class="legend-label">使用中</text>
+    <text class="legend-dot booked"></text><text class="legend-label">已预订</text>
+    <text class="legend-dot free"></text><text class="legend-label">空闲</text>
+  </view>
+
   <view class="room-grid">
-    <view class="room-card {{item.statusClass}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="goRoom" data-roomid="{{item.roomId}}">
-      <text class="rc-icon">{{item.icon}}</text>
-      <text class="rc-name">{{item.name}}</text>
-      <text class="rc-status">{{item.statusLabel}}</text>
-      <text class="rc-time" wx:if="{{item.time}}">{{item.time}}</text>
+    <view class="room-card {{item.statusClass}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="showDetail" data-roomid="{{item.roomId}}">
+      <view class="rc-top">
+        <text class="rc-dot {{item.statusClass}}"></text>
+        <text class="rc-name">{{item.name}}</text>
+        <text class="rc-type">{{item.capacity}}人 {{item.typeLabel}}</text>
+      </view>
+      <text class="rc-status {{item.statusClass}}">{{item.statusLabel}}</text>
+      <view class="rc-order" wx:if="{{item.currentOrder}}">
+        <text class="rc-customer">👤 {{item.currentOrder.customerName}}</text>
+        <text class="rc-time">{{item.currentOrder.start}}-{{item.currentOrder.end}}</text>
+      </view>
+      <view class="rc-actions" wx:if="{{item.statusClass=='inuse'}}">
+        <text class="rca-btn" bindtap="showRoomControl" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}">🔧 智控</text>
+      </view>
     </view>
   </view>
 </view>

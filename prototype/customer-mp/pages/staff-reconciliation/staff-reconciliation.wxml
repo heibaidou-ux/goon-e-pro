@@ -2,9 +2,7 @@
   <view class="header">
     <text class="header-title">🧾 对账</text>
   </view>
-
   <view class="content">
-    <!-- 日期 -->
     <view class="date-row">
       <text class="date-label">日期</text>
       <picker mode="date" value="{{dateStr}}" bindchange="pickDate">
@@ -12,7 +10,6 @@
       </picker>
     </view>
 
-    <!-- 营收总览卡片 -->
     <view class="revenue-card">
       <text class="rev-label">总营收</text>
       <text class="rev-amount">¥{{data.totalRevenue}}</text>
@@ -23,7 +20,6 @@
       </view>
     </view>
 
-    <!-- 支付方式 -->
     <view class="section-title">支付方式</view>
     <view class="pay-list">
       <view class="pay-row" wx:for="{{payBreakdownList}}" wx:key="key">
@@ -32,11 +28,28 @@
       </view>
     </view>
 
-    <!-- 优惠与待收 -->
     <view class="section-title">其他</view>
     <view class="extra-list">
       <view class="extra-row"><text class="ex-label">券抵扣</text><text class="ex-value">-¥{{data.couponDiscount}}</text></view>
       <view class="extra-row"><text class="ex-label">待收款</text><text class="ex-value warn">¥{{data.pendingPayment}}</text></view>
+      <view class="extra-row" bindtap="settlePayment"><text class="ex-label">💳 结算待收款</text><text class="ex-arrow">›</text></view>
+    </view>
+
+    <!-- 异常账单 -->
+    <view class="section-title" wx:if="{{data.anomalies && data.anomalies.length>0}}">
+      ⚠️ 异常账单 <text class="section-badge">{{data.anomalies.length}}</text>
+    </view>
+    <view class="anomaly-list" wx:if="{{data.anomalies && data.anomalies.length>0}}">
+      <view class="anomaly-card" wx:for="{{data.anomalies}}" wx:key="index">
+        <view class="ac-left">
+          <text class="ac-type">{{item.type}}</text>
+          <text class="ac-desc">{{item.desc}}</text>
+          <text class="ac-time">{{item.time}}</text>
+        </view>
+        <view class="ac-right">
+          <text class="ac-btn" bindtap="resolveAnomaly" data-idx="{{index}}">处理</text>
+        </view>
+      </view>
     </view>
   </view>
 </view>

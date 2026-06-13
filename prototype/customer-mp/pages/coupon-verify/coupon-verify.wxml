@@ -100,6 +100,16 @@
           <text class="ticket-expiry">有效期至 {{item.expiry}}</text>
         </view>
       </view>
+
+      <!-- 已核销记录（店员端可见） -->
+      <view class="verified-section" wx:if="{{isStaff && verifiedCoupons.length>0}}">
+        <text class="section-subtitle">✅ 已核销记录</text>
+        <view class="v-item" wx:for="{{verifiedCoupons}}" wx:key="code">
+          <text class="vi-code">{{item.code}}</text>
+          <text class="vi-title">{{item.platform}} · ¥{{item.price}}</text>
+          <text class="vi-time">{{item.time}}</text>
+        </view>
+      </view>
     </view>
 
     <!-- Step 2: Room match -->

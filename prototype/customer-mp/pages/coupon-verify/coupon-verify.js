@@ -48,10 +48,18 @@ Page({
     timeSlots: [],
     selectedTime: '',
     showBookingConfirm: false,
-    myCoupons: []
+    myCoupons: [],
+    verifiedCoupons: [],
+    isStaff: false
   },
 
   onLoad: function(e) {
+    // 针对店员端加载已核销记录
+    try {
+      var role = wx.getStorageSync('mp_user_role')
+      if (role === 'staff') this.loadVerifiedCoupons()
+    } catch(e) {}
+
     this.renderMyCoupons()
     this.generateTimeSlots()
     // 从优惠券页跳转过来时自动填入券码
@@ -106,7 +114,28 @@ Page({
 
   confirmCouponUse: function() {
     this.setData({ showConfirmModal: false })
-    this.doVerify(this.data.pendingCode)
+    // 记录核销记录
+    var code = this.data.pendingCode
+    var info = COUPON_DB[code]
+    if (info) {
+      try {
+        var verified = wx.getStorageSync('mp_verified_coupons') || []
+        verified.unshift({
+          code: code, platform: info.source, title: info.title, price: info.price,
+          time: new Date().toLocaleString(), room: ''
+        })
+        wx.setStorageSync('mp_verified_coupons', verified)
+      } catch(e) {}
+    }
+    this.doVerify(code)
+  },
+
+  // 店员端：加载已核销记录
+  loadVerifiedCoupons: function() {
+    try {
+      var verified = wx.getStorageSync('mp_verified_coupons') || []
+      this.setData({ verifiedCoupons: verified })
+    } catch(e) {}
   },
 
   doVerify: function(code) {
