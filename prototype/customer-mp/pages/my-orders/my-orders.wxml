@@ -26,6 +26,15 @@
           <text class="ds-icon">{{item.deliveryMethod=='inroom'?'🏠':(item.deliveryMethod=='express'?'📬':'🚶')}}</text>
           <text class="ds-text">{{item.deliveryLabel}}</text>
         </view>
+        <!-- 物流追踪 -->
+        <view class="logistics-card mini" wx:if="{{item.logistics}}" bindtap="showLogistics" data-id="{{item.orderId}}">
+          <view class="logistics-header">
+            <text class="logistics-carrier">{{item.logistics.icon}} {{item.logistics.carrier}}</text>
+            <view class="logistics-btn">查看物流 ›</view>
+          </view>
+          <text class="logistics-tracking">运单号：{{item.logistics.trackingNum}}</text>
+          <view class="ls-badge {{item.logistics.statusBadge}}">{{item.logistics.statusLabel}}</view>
+        </view>
       </view>
       <!-- 房间订单：门禁+设备 -->
       <view wx:else>
