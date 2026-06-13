@@ -1,39 +1,22 @@
 {
   "entryPagePath": "pages/home/home",
   "pages": [
-    "pages/home/home",
-    "pages/room-list/room-list",
-    "pages/room-detail/room-detail",
-    "pages/booking-confirm/booking-confirm",
-    "pages/tea-shop/tea-shop",
-    "pages/my-orders/my-orders",
-    "pages/member-center/member-center",
-    "pages/scan-landing/scan-landing",
-    "pages/scan-order/scan-order",
-    "pages/scan-bill/scan-bill",
-    "pages/room-control/room-control",
-    "pages/my-coupons/my-coupons",
-    "pages/coupon-verify/coupon-verify",
-    "pages/finance-workbench/finance-workbench",
-    "pages/gm-workbench/gm-workbench",
-    "pages/investor-workbench/investor-workbench",
-    "pages/technician-workbench/technician-workbench",
-    "pages/parking-guide/parking-guide",
-    "pages/staff-login/staff-login",
-    "pages/staff-dashboard/staff-dashboard",
-    "pages/staff-room-status/staff-room-status",
-    "pages/staff-device-monitor/staff-device-monitor",
-    "pages/staff-cleaning-task/staff-cleaning-task",
-    "pages/staff-order-management/staff-order-management",
-    "pages/staff-todo/staff-todo",
-    "pages/staff-profile/staff-profile",
-    "pages/staff-attendance/staff-attendance",
-    "pages/staff-inspection/staff-inspection",
-    "pages/staff-scheduling/staff-scheduling",
-    "pages/staff-reconciliation/staff-reconciliation",
+    "pages/home/home","pages/room-list/room-list","pages/room-detail/room-detail",
+    "pages/booking-confirm/booking-confirm","pages/tea-shop/tea-shop",
+    "pages/my-orders/my-orders","pages/member-center/member-center",
+    "pages/scan-landing/scan-landing","pages/scan-order/scan-order","pages/scan-bill/scan-bill",
+    "pages/room-control/room-control","pages/my-coupons/my-coupons",
+    "pages/coupon-verify/coupon-verify","pages/finance-workbench/finance-workbench",
+    "pages/gm-workbench/gm-workbench","pages/investor-workbench/investor-workbench",
+    "pages/technician-workbench/technician-workbench","pages/parking-guide/parking-guide",
+    "pages/staff-login/staff-login","pages/staff-dashboard/staff-dashboard",
+    "pages/staff-room-status/staff-room-status","pages/staff-device-monitor/staff-device-monitor",
+    "pages/staff-cleaning-task/staff-cleaning-task","pages/staff-order-management/staff-order-management",
+    "pages/staff-todo/staff-todo","pages/staff-profile/staff-profile",
+    "pages/staff-attendance/staff-attendance","pages/staff-inspection/staff-inspection",
+    "pages/staff-scheduling/staff-scheduling","pages/staff-reconciliation/staff-reconciliation",
     "pages/staff-product-management/staff-product-management",
-    "pages/staff-device-control/staff-device-control",
-    "pages/staff-scene-control/staff-scene-control",
+    "pages/staff-device-control/staff-device-control","pages/staff-scene-control/staff-scene-control",
     "pages/staff-receivable/staff-receivable"
   ],
   "window": {
@@ -42,11 +25,7 @@
     "navigationBarBackgroundColor": "#ffffff",
     "backgroundColor": "#f5f5f5"
   },
-  "networkTimeout": {
-    "request": 10000
-  },
+  "networkTimeout": { "request": 10000 },
   "sitemapLocation": "sitemap.json",
-  "usingComponents": {
-    "bottom-nav": "/components/bottom-nav/bottom-nav"
-  }
+  "usingComponents": { "bottom-nav": "/components/bottom-nav/bottom-nav" }
 }
