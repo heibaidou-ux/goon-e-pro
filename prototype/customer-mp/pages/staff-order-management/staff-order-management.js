@@ -101,10 +101,46 @@ Page({
 
   // ── 操作 ──
   checkIn: function(e) {
-    wx.showToast({ title: '已办理入住', icon: 'success' })
+    var self = this
+    var id = e.currentTarget.dataset.id
+    wx.showModal({
+      title: '办理入住',
+      content: '确认客人已到店？将开通房间门禁权限。',
+      success: function(res) {
+        if (res.confirm) {
+          try {
+            var bookings = wx.getStorageSync('mp_bookings') || []
+            for (var i = 0; i < bookings.length; i++) {
+              if (bookings[i].orderId === id) { bookings[i].status = 'InUse'; break }
+            }
+            wx.setStorageSync('mp_bookings', bookings)
+          } catch(e) {}
+          wx.showToast({ title: '✅ 入住办理成功，门禁已开通', icon: 'success' })
+          self.loadOrders()
+        }
+      }
+    })
   },
 
   completeOrder: function(e) {
-    wx.showToast({ title: '订单已完成', icon: 'success' })
+    var self = this
+    var id = e.currentTarget.dataset.id
+    wx.showModal({
+      title: '完成订单',
+      content: '确认该订单已完成所有服务？将自动结算。',
+      success: function(res) {
+        if (res.confirm) {
+          try {
+            var bookings = wx.getStorageSync('mp_bookings') || []
+            for (var i = 0; i < bookings.length; i++) {
+              if (bookings[i].orderId === id) { bookings[i].status = 'Completed'; break }
+            }
+            wx.setStorageSync('mp_bookings', bookings)
+          } catch(e) {}
+          wx.showToast({ title: '✅ 订单已完成，感谢客人', icon: 'success' })
+          self.loadOrders()
+        }
+      }
+    })
   }
 })

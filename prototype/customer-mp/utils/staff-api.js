@@ -147,6 +147,42 @@ const STAFF_API = {
     })
   },
 
+  // ── 保洁任务 ──
+  getCleaningTasks() {
+    return delay().then(function() {
+      return {
+        pending: [
+          { taskId:'CT001', roomName:'大茶室C', type:'FullClean', priority:'High', deadline:'10:30' },
+          { taskId:'CT002', roomName:'中茶室A', type:'QuickClean', priority:'Normal', deadline:'11:00' }
+        ],
+        inProgress: [
+          { taskId:'CT003', roomName:'大会议室', type:'FullClean', priority:'Normal', deadline:'10:00' }
+        ]
+      }
+    })
+  },
+
+  acceptCleaningTask(taskId) {
+    return delay(200).then(function() { return { success: true } })
+  },
+
+  completeCleaningTask(taskId) {
+    return delay(200).then(function() { return { success: true } })
+  },
+
+  getRoomStatusList() {
+    return delay().then(function() {
+      return MOCK.rooms.map(function(r) {
+        return {
+          roomId: r.roomId, name: r.name, type: r.type, capacity: r.capacity,
+          statusColor: r.status === 'Active' ? '#00A870' : '#999',
+          statusLabel: r.status === 'Active' ? '在线' : '离线',
+          currentOrder: null
+        }
+      })
+    })
+  },
+
   // ── 排班 ──
   getSchedule(weekOffset) {
     return delay().then(function() {

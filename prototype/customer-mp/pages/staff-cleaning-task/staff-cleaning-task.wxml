@@ -1,1 +1,21 @@
-<view class="page"><view class="header"><text class="header-title">🧹 保洁任务</text></view><view class="task-section"><text class="task-section-title">待处理</text><view class="task-card urgent" wx:for="{{pending}}" wx:key="taskId"><view class="task-top"><text class="task-room">{{item.roomName}}</text><text class="task-priority">{{item.priority === 'High' ? '紧急' : '普通'}}</text></view><text class="task-meta">{{item.type === 'FullClean' ? '全面清洁' : '快速清洁'}} · 截止 {{item.deadline}}</text><view class="task-btns"><button class="task-btn accept" bindtap="acceptTask" data-id="{{item.taskId}}">接单</button></view></view><view class="empty" wx:if="{{pending.length === 0}}">暂无待处理任务</view></view><view class="task-section"><text class="task-section-title">进行中</text><view class="task-card" wx:for="{{inProgress}}" wx:key="taskId"><view class="task-top"><text class="task-room">{{item.roomName}}</text></view><text class="task-meta">{{item.type === 'FullClean' ? '全面清洁' : '快速清洁'}}</text><view class="task-btns"><button class="task-btn complete" bindtap="completeTask" data-id="{{item.taskId}}">完成</button></view></view></view></view>
+<view class="page">
+  <view class="header"><text class="header-title">🧹 保洁任务</text></view>
+  <view class="tsection">
+    <text class="ts-title">待处理</text>
+    <view class="task-card urgent" wx:for="{{pending}}" wx:key="taskId" wx:if="{{pending.length>0}}">
+      <view class="tc-top"><text class="tc-room">{{item.roomName}}</text><text class="tc-priority">{{item.priority==='High'?'紧急':'普通'}}</text></view>
+      <text class="tc-meta">{{item.type==='FullClean'?'全面清洁':'快速清洁'}} · 截止 {{item.deadline}}</text>
+      <view class="tc-btns"><button class="tc-btn accept" bindtap="acceptTask" data-id="{{item.taskId}}">接单</button></view>
+    </view>
+    <view class="empty" wx:if="{{pending.length==0}}"><text>✅ 暂无待处理</text></view>
+  </view>
+  <view class="tsection">
+    <text class="ts-title">进行中</text>
+    <view class="task-card" wx:for="{{inProgress}}" wx:key="taskId">
+      <view class="tc-top"><text class="tc-room">{{item.roomName}}</text></view>
+      <text class="tc-meta">{{item.type==='FullClean'?'全面清洁':'快速清洁'}}</text>
+      <view class="tc-btns"><button class="tc-btn complete" bindtap="completeTask" data-id="{{item.taskId}}">完成</button></view>
+    </view>
+    <view class="empty" wx:if="{{inProgress.length==0}}"><text>✅ 暂无进行中</text></view>
+  </view>
+</view>
