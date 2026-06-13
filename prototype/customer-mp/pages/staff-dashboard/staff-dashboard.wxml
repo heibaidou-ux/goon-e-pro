@@ -55,16 +55,20 @@
     </view>
   </view>
 
-  <!-- 功能入口：考勤/商品管理/巡检/排班/个人中心 -->
+  <!-- 功能入口 -->
   <view class="section-title">更多功能</view>
   <view class="feature-grid">
+    <view class="feature-item" bindtap="goRoomStatus">
+      <text class="feature-icon">🏠</text>
+      <text class="feature-label">房态</text>
+    </view>
     <view class="feature-item" bindtap="goAttendance">
       <text class="feature-icon">📅</text>
       <text class="feature-label">考勤</text>
     </view>
     <view class="feature-item" bindtap="goProducts">
       <text class="feature-icon">📦</text>
-      <text class="feature-label">商品管理</text>
+      <text class="feature-label">商品</text>
     </view>
     <view class="feature-item" bindtap="goInspection">
       <text class="feature-icon">🔍</text>
@@ -76,7 +80,7 @@
     </view>
     <view class="feature-item" bindtap="goProfile">
       <text class="feature-icon">👤</text>
-      <text class="feature-label">个人中心</text>
+      <text class="feature-label">个人</text>
     </view>
   </view>
 

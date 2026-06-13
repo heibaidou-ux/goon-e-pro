@@ -38,4 +38,4 @@
 .logout-section { text-align:center; padding:24px 16px; }
 .logout-text { display:inline-block; padding:10px 24px; border-radius:10px; font-size:13px; color:#d54941; border:1px solid #d54941; background:#fff; }
 .logout-text:active { background:#fff5f5; }
-.feature-grid { grid-template-columns:repeat(5,1fr); }
+.feature-grid { grid-template-columns:repeat(3,1fr); }
