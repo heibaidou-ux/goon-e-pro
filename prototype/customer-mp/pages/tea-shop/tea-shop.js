@@ -21,7 +21,12 @@ Page({
     showPayModal: false,
     showInsufficient: false,
     insufficientMsg: '',
-    payMethod: 'balance'
+    payMethod: 'balance',
+    // Delivery modal
+    showDeliveryModal: false,
+    deliveryMethod: 'inroom',
+    expressName: '', expressPhone: '', expressAddress: '',
+    pendingOrder: null
   },
 
   onLoad: function(e) {
@@ -248,20 +253,82 @@ Page({
     }
 
     wx.showLoading({ title: '支付中...' })
-    API.createShopOrder(self.data.cart, payMethod, total).then(function() {
+    // 模拟支付，先保存订单数据，然后弹出配送方式选择
+    setTimeout(function() {
       wx.hideLoading()
-      self.setData({ showPayModal: false, showProductView: true })
-      self.loadCart()
-      wx.showToast({ title: '✅ 支付成功！', icon: 'success' })
-    }).catch(function(err) {
-      wx.hideLoading()
-      wx.showToast({ title: '支付失败：' + (err.message || ''), icon: 'none' })
-    })
+      self.setData({
+        showPayModal: false,
+        showDeliveryModal: true,
+        deliveryMethod: self.data.roomId ? 'inroom' : 'pickup',
+        pendingOrder: { cart: self.data.cart, payMethod: payMethod, total: total }
+      })
+    }, 800)
   },
 
   cancelPay: function() { this.setData({ showPayModal: false }) },
   hideInsufficient: function() { this.setData({ showInsufficient: false }) },
   switchPayMethod: function() { this.setData({ showInsufficient: false }) },
+
+  // ── 配送方式 ──
+  selectDeliveryMethod: function(e) {
+    this.setData({ deliveryMethod: e.currentTarget.dataset.method })
+  },
+
+  onExpressName: function(e) { this.setData({ expressName: e.detail.value }) },
+  onExpressPhone: function(e) { this.setData({ expressPhone: e.detail.value }) },
+  onExpressAddress: function(e) { this.setData({ expressAddress: e.detail.value }) },
+
+  confirmDelivery: function() {
+    var self = this
+    var order = self.data.pendingOrder
+    if (!order) return
+    var method = self.data.deliveryMethod
+
+    if (method === 'express') {
+      if (!self.data.expressName || !self.data.expressPhone || !self.data.expressAddress) {
+        wx.showToast({ title: '请填写完整的收货信息', icon: 'none' })
+        return
+      }
+    }
+
+    var deliveryInfo = { method: method }
+    if (method === 'express') {
+      deliveryInfo.expressName = self.data.expressName
+      deliveryInfo.expressPhone = self.data.expressPhone
+      deliveryInfo.expressAddress = self.data.expressAddress
+    }
+    if (method === 'inroom') {
+      deliveryInfo.roomName = self.data.roomName || self.data.roomBannerRoomName || ''
+      deliveryInfo.roomId = self.data.roomId || ''
+    }
+
+    wx.showLoading({ title: '提交订单...' })
+    API.createShopOrder(order.cart, order.payMethod, order.total, deliveryInfo).then(function() {
+      wx.hideLoading()
+      self.setData({
+        showDeliveryModal: false, showProductView: true,
+        pendingOrder: null
+      })
+      self.loadCart()
+      wx.showToast({ title: '✅ 下单成功！', icon: 'success' })
+    }).catch(function(err) {
+      wx.hideLoading()
+      wx.showToast({ title: '提交失败：' + (err.message || ''), icon: 'none' })
+    })
+  },
+
+  hideDeliveryModal: function() {
+    var self = this
+    wx.showModal({
+      title: '放弃订单', content: '确定要放弃当前订单吗？',
+      success: function(res) {
+        if (res.confirm) {
+          self.setData({ showDeliveryModal: false, pendingOrder: null })
+          self.loadCart()
+        }
+      }
+    })
+  },
 
   closeRoomBanner: function() {
     this.setData({ roomBannerVisible: false })

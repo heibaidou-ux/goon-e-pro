@@ -291,9 +291,26 @@ const API = {
     return Promise.resolve(cart)
   },
 
-  createShopOrder(items, paymentMethod, total) {
+  createShopOrder(items, paymentMethod, total, deliveryInfo) {
     return delay(400).then(() => {
-      var order = { orderId: 'SHP' + String(Date.now()).slice(-6), items, total, paymentMethod, status: 'Paid', created: new Date().toISOString() }
+      deliveryInfo = deliveryInfo || {}
+      var order = {
+        orderId: 'SHP' + String(Date.now()).slice(-6), items, total, paymentMethod,
+        status: 'PendingDelivery', created: new Date().toISOString(),
+        deliveryMethod: deliveryInfo.method || 'pickup',
+        deliveryStatus: deliveryInfo.method === 'express' ? 'pending' : 'ready'
+      }
+      if (deliveryInfo.method === 'express') {
+        order.expressName = deliveryInfo.expressName || ''
+        order.expressPhone = deliveryInfo.expressPhone || ''
+        order.expressAddress = deliveryInfo.expressAddress || ''
+        order.trackingNum = ''
+        order.carrier = ''
+      }
+      if (deliveryInfo.method === 'inroom') {
+        order.roomName = deliveryInfo.roomName || ''
+        order.roomId = deliveryInfo.roomId || ''
+      }
       var shopOrders = lsGet('shop_orders', [])
       shopOrders.push(order)
       lsSet('shop_orders', shopOrders)

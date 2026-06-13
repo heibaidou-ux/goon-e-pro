@@ -20,14 +20,23 @@ Page({
       // 合并茶品订单
       for (var si = 0; si < shopOrders.length; si++) {
         var so = shopOrders[si]
+        var shopStatus = so.status || 'PendingDelivery'
+        // 递送状态映射
+        if (shopStatus === 'PendingDelivery' || shopStatus === 'Paid') {
+          // 根据配送方式显示不同的状态
+          shopStatus = 'PendingDelivery'
+        }
         orders.push({
           orderId: so.orderId, roomName: '茶品订单', roomId: '',
-          status: so.status === 'Paid' ? 'Completed' : so.status,
+          status: shopStatus,
           date: so.created ? so.created.slice(0,10) : '',
           time: so.created ? so.created.slice(11,16) : '',
           amount: so.total || 0, doorCode: '',
           payment: so.paymentMethod || '',
-          isTeaOrder: true, items: so.items || []
+          isTeaOrder: true, items: so.items || [],
+          deliveryMethod: so.deliveryMethod || '',
+          deliveryStatus: so.deliveryStatus || 'pending',
+          deliveryLabel: so.deliveryMethod === 'inroom' ? '配送中' : (so.deliveryMethod === 'express' ? '待发货' : (so.deliveryMethod === 'pickup' ? '待取货' : ''))
         })
       }
       var now = new Date()
@@ -89,6 +98,13 @@ Page({
         var statusClass = 'status-completed', statusLabel = '已完成'
         if (status === 'InUse' || status === 'in_use') { statusClass = 'status-inuse'; statusLabel = '进行中' }
         else if (status === 'Booked') { statusClass = 'status-booked'; statusLabel = '待使用' }
+        else if (status === 'PendingDelivery') {
+          statusClass = 'status-inuse'
+          if (o.deliveryMethod === 'inroom') statusLabel = '配送中'
+          else if (o.deliveryMethod === 'express') statusLabel = '待发货'
+          else if (o.deliveryMethod === 'pickup') statusLabel = '待取货'
+          else statusLabel = '处理中'
+        }
 
         // 剩余时间（进行中订单）
         var remaining = null
@@ -133,7 +149,10 @@ Page({
           remaining: remaining, cancelFree: cancelFree, cancelMsg: cancelMsg,
           logistics: log, payment: o.payment||'',
           doorCanOpen: doorCanOpen, doorHint: doorHint,
-          isTeaOrder: o.isTeaOrder || false, items: o.items || []
+          isTeaOrder: o.isTeaOrder || false, items: o.items || [],
+          deliveryMethod: o.deliveryMethod || '',
+          deliveryStatus: o.deliveryStatus || '',
+          deliveryLabel: o.deliveryLabel || ''
         }
       })
       self.setData({ orders: mapped })
@@ -149,7 +168,7 @@ Page({
 
   filterOrders: function() {
     var tab = this.data.tabIndex, list = this.data.orders
-    if (tab === 0) list = list.filter(function(o) { return o.status === 'InUse' || o.status === 'in_use' })
+    if (tab === 0) list = list.filter(function(o) { return o.status === 'InUse' || o.status === 'in_use' || o.status === 'PendingDelivery' })
     else if (tab === 1) list = list.filter(function(o) { return o.status === 'Booked' })
     else if (tab === 2) list = list.filter(function(o) { return o.status === 'Completed' })
     this.setData({ filteredOrders: list })

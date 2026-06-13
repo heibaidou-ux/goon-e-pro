@@ -16,11 +16,15 @@
       <text class="order-time">{{item.timeStr}}</text>
       <text class="order-price">¥{{item.amount}}</text>
       <text class="order-remaining" wx:if="{{item.remaining!=null}}">剩余 {{item.remaining}} 分钟</text>
-      <!-- 茶品订单：显示商品明细 -->
+      <!-- 茶品订单：显示商品明细+配送信息 -->
       <view wx:if="{{item.isTeaOrder}}" class="tea-order-items">
         <view wx:for="{{item.items}}" wx:key="name" class="tea-order-item">
           <text class="toi-name">{{item.name}} x{{item.qty ? item.qty : 1}}</text>
           <text class="toi-price">¥{{item.price ? item.price : 0}}</text>
+        </view>
+        <view class="delivery-status" wx:if="{{item.deliveryMethod}}">
+          <text class="ds-icon">{{item.deliveryMethod=='inroom'?'🏠':(item.deliveryMethod=='express'?'📬':'🚶')}}</text>
+          <text class="ds-text">{{item.deliveryLabel}}</text>
         </view>
       </view>
       <!-- 房间订单：门禁+设备 -->
@@ -202,6 +206,7 @@
         <view class="detail-row"><text class="dl">时间</text><text class="dv">{{detailOrder.timeStr}}</text></view>
         <view class="detail-row"><text class="dl">金额</text><text class="dv">¥{{detailOrder.amount}}</text></view>
         <view class="detail-row" wx:if="{{detailOrder.payment}}"><text class="dl">支付方式</text><text class="dv">{{detailOrder.payLabel}}</text></view>
+        <view class="detail-row" wx:if="{{detailOrder.deliveryMethod}}"><text class="dl">配送方式</text><text class="dv">{{detailOrder.deliveryLabel}}</text></view>
         <view wx:if="{{detailOrder.isTeaOrder && detailOrder.items.length>0}}" class="detail-items">
           <text class="detail-items-title">商品明细</text>
           <view class="detail-item" wx:for="{{detailOrder.items}}" wx:key="name">
