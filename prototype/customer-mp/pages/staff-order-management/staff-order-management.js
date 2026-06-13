@@ -16,7 +16,7 @@ Page({
 
   loadOrders: function() {
     var self = this
-    Promise.all([API.getUserOrders(), API.getShopOrders?API.getShopOrders():Promise.resolve([])]).then(function(results) {
+    Promise.all([API.getAllOrders(), API.getShopOrders?API.getShopOrders():Promise.resolve([])]).then(function(results) {
       var orders = results[0]||[], shopOrders = results[1]||[]
       var now = new Date()
       var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')

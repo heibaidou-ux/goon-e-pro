@@ -239,6 +239,11 @@ const API = {
     })
   },
 
+  // 获取所有订单（不按用户过滤，供店员端使用）
+  getAllOrders() {
+    return delay().then(() => lsGet('bookings', []))
+  },
+
   getUserOrders() {
     return delay().then(() => {
       var bookings = lsGet('bookings', [])

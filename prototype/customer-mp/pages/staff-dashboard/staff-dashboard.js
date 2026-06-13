@@ -19,6 +19,20 @@ Page({
     var self = this
     STAFF_API.getDashboardStats().then(function(stats) { self.setData({ stats: stats }) })
     STAFF_API.getTodos().then(function(todos) { self.setData({ todos: todos }) })
+    // 用真实订单数据覆盖mock统计数据
+    API.getAllOrders().then(function(orders) {
+      if (!orders || !orders.length) return
+      var todayStr = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0')
+      var todayOrders = orders.filter(function(o) { return o.date === todayStr || (o.created && o.created.indexOf(todayStr) === 0) })
+      var inUse = 0, pending = 0
+      for (var i = 0; i < orders.length; i++) {
+        if (orders[i].status === 'InUse') inUse++
+        if (orders[i].status === 'Booked' || orders[i].status === 'InUse') pending++
+      }
+      var revenue = 0
+      for (var i = 0; i < todayOrders.length; i++) revenue += todayOrders[i].amount || 0
+      self.setData({ stats: { roomCount: { inUse: inUse }, todayRevenue: revenue, todayOrders: todayOrders.length, pendingTasks: pending, orderStatus: pending, alerts: 0 } })
+    })
     // 从茶品订单中找出待发货的加入待办
     API.getShopOrders().then(function(shopOrders) {
       if (!shopOrders || !shopOrders.length) return

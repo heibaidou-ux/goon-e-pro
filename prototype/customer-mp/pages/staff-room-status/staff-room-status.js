@@ -7,7 +7,8 @@ Page({
     var self = this
     var typeLabels = { TeaRoom: '茶室', MeetingRoom: '会议室', Exhibition: '展厅', Workspace: '工作间' }
     API.getRooms(true).then(function(rooms) {
-      API.getUserOrders().then(function(orders) {
+      // 使用getAllOrders获取所有订单（不过滤当前用户），保证房态与客人端一致
+      API.getAllOrders().then(function(orders) {
         var now = new Date()
         var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
         var curMin = now.getHours()*60+now.getMinutes()
@@ -17,9 +18,9 @@ Page({
           var currentOrder = null
           for (var i = 0; i < orders.length; i++) {
             var o = orders[i]
-            if (o.roomId !== r.roomId) continue
+            if (o.roomId !== r.roomId || o.status === 'Cancelled') continue
             if (o.status === 'InUse') {
-              currentOrder = { customerName: o.customerName || '客人', start: o.time ? o.time.split('-')[0] : '', end: o.time ? o.time.split('-')[1] : '' }
+              currentOrder = { customerName: o.customerName || o.phone || '客人', start: o.time ? o.time.split('-')[0] : '', end: o.time ? o.time.split('-')[1] : '' }
               break
             }
             if (o.date === todayStr && o.status === 'Booked') {
@@ -27,7 +28,7 @@ Page({
               if (parts.length >= 2) {
                 var sp = parts[0].split(':'), ep = parts[1].split(':')
                 var sm = parseInt(sp[0])*60+parseInt(sp[1]), em = parseInt(ep[0])*60+parseInt(ep[1])
-                if (curMin >= sm && curMin < em) { currentOrder = { customerName: o.customerName || '客人', start: parts[0], end: parts[1] }; break }
+                if (curMin >= sm && curMin < em) { currentOrder = { customerName: o.customerName || o.phone || '客人', start: parts[0], end: parts[1] }; break }
               }
             }
           }

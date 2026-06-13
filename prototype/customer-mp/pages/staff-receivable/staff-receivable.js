@@ -4,7 +4,7 @@ Page({
   loadData: function() {
     var API = require('../../utils/api')
     var self = this
-    API.getUserOrders().then(function(orders) {
+    (API.getAllOrders ? API.getAllOrders() : API.getUserOrders()).then(function(orders) {
       var total=0,pending=0,settled=0
       for(var i=0;i<orders.length;i++){total+=orders[i].amount||0;if(orders[i].status==='Booked'||orders[i].status==='InUse')pending+=orders[i].amount||0;else settled+=orders[i].amount||0}
       var bills=orders.filter(function(o){return o.status==='InUse'||o.status==='Booked'}).slice(0,10).map(function(o){
