@@ -10,7 +10,10 @@ Page({
     extendOrderId: null, extendOptions: [], selectedExtendIdx: -1, extendInfo: ''
   },
 
-  onShow: function() { this.loadOrders() },
+  onShow: function() {
+    if (!API.isLoggedIn()) { wx.reLaunch({ url: '/pages/home/home?showLogin=1' }); return }
+    this.loadOrders()
+  },
 
   loadOrders: function() {
     var self = this
@@ -154,9 +157,9 @@ Page({
           }
         }
 
-        // 已完成订单的物流信息
-        var log = null
-        if (status === 'Completed' && o.orderId === 'ORD003') {
+        // 物流信息（优先使用茶品订单自带的物流数据）
+        var log = o.logistics || null
+        if (!log && status === 'Completed' && o.orderId === 'ORD003') {
           log = { carrier: '顺丰速运', icon: '📦', trackingNum: 'SF1234567890', statusBadge: 'transit', statusLabel: '运输中', estimated: '预计明日送达', steps: [{ label: '已下单', active: true }, { label: '已发货', active: true, current: true }, { label: '派送中', active: false }, { label: '已签收', active: false }] }
         }
 

@@ -15,6 +15,7 @@ Page({
   },
 
   onLoad: function() {
+    if (!require('../../utils/api').isLoggedIn()) { wx.reLaunch({ url: '/pages/home/home?showLogin=1' }); return }
     var self = this
     API.getUserCoupons().then(function(coupons) {
       self.setData({ coupons: coupons })
