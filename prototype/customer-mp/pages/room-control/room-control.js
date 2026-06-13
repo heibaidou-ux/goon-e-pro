@@ -28,7 +28,7 @@ Page({
   data: {
     roomId: '', roomName: '房间',
     countdown: '--:--', endTime: '--:--', orderSlot: '', orderStart: '',
-    balance: 0,
+    balance: 0, hideBottomNav: false,
     devKeys: [], acModeLabel: '',
     acDevice: null, curtainDevices: [], bgmDevice: null,
     showExtendModal: false, showExtendPayModal: false,
@@ -42,6 +42,7 @@ Page({
     var duration = parseInt(e.duration) || 120
     var endStr = e.end || ''
     var startStr = e.start || ''
+    try { if (wx.getStorageSync('mp_user_role') === 'staff') this.setData({ hideBottomNav: true }) } catch(e) {}
     this.setData({ roomId: roomId, roomName: roomName, orderStart: startStr })
     this.loadDevices()
     this.startCountdown(duration, endStr)
