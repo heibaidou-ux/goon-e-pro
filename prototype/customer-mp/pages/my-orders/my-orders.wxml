@@ -6,7 +6,7 @@
   </view>
   <view class="page">
     <!-- 进行中 -->
-    <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{item.status=='InUse' || item.status=='in_use' || item.status=='PendingDelivery'}}">
+    <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{item.status=='InUse' || item.status=='in_use' || item.status=='PendingDelivery' || item.status=='Shipped'}}">
       <view class="order-header">
         <text class="order-room">{{item.roomName}}</text>
         <view class="order-header-right">

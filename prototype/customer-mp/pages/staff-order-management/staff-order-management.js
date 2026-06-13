@@ -41,15 +41,22 @@ Page({
       // 茶品订单
       for(var si=0;si<shopOrders.length;si++){
         var so=shopOrders[si]
-        var shopStatus='PendingDelivery'
-        if(so.deliveryMethod==='inroom'||so.deliveryMethod==='pickup')shopStatus='PendingDelivery'
-        else if(so.deliveryMethod==='express')shopStatus='PendingDelivery'
+        var storedStatus = so.status || 'PendingDelivery'
+        // 映射真实状态
+        var shopStatus = storedStatus
+        if (storedStatus === 'Shipped') shopStatus = 'Shipped'
+        else if (storedStatus === 'Completed') shopStatus = 'Completed'
+        else shopStatus = 'PendingDelivery'
+        var labelMap = { 'inroom':'配送中', 'express': shopStatus==='Shipped'?'已发货':'待发货', 'pickup':'待取货' }
         roomOrders.push({
           orderId:so.orderId,roomName:'茶品订单',roomId:'',status:shopStatus,isRoomOrder:false,isTeaOrder:true,
           date:so.created?so.created.slice(0,10):'',time:so.created?so.created.slice(11,16):'',
           amount:so.total||0,customerName:'',phone:'',customerSource:'',
-          deliveryMethod:so.deliveryMethod||'',deliveryLabel:so.deliveryMethod==='inroom'?'配送中':(so.deliveryMethod==='express'?'待发货':(so.deliveryMethod==='pickup'?'待取货':'')),
-          trackingNum:so.trackingNum||'',statusClass:'status-inuse',statusLabel:'待处理'
+          deliveryMethod:so.deliveryMethod||'',
+          deliveryLabel: so.deliveryMethod==='express' && shopStatus==='Shipped' ? '已发货' : (labelMap[so.deliveryMethod]||'处理中'),
+          trackingNum:so.trackingNum||'',
+          statusClass: shopStatus==='Shipped'||shopStatus==='Completed'?'status-completed':'status-inuse',
+          statusLabel: shopStatus==='Completed'?'已完成':(shopStatus==='Shipped'?'已发货':(shopStatus==='PendingDelivery'?'待处理':'处理中'))
         })
       }
 
@@ -63,7 +70,7 @@ Page({
     var list = this.data.orders
     if(tab===0)list=list.filter(function(o){return o.status==='InUse'||o.status==='PendingDelivery'})
     else if(tab===1)list=list.filter(function(o){return o.status==='Booked'})
-    else if(tab===2)list=list.filter(function(o){return o.status==='Completed'})
+    else if(tab===2)list=list.filter(function(o){return o.status==='Completed'||o.status==='Shipped'})
     this.setData({filteredOrders:list})
   },
 

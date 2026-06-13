@@ -24,11 +24,10 @@ Page({
       for (var si = 0; si < shopOrders.length; si++) {
         var so = shopOrders[si]
         var shopStatus = so.status || 'PendingDelivery'
-        // 递送状态映射
-        if (shopStatus === 'PendingDelivery' || shopStatus === 'Paid') {
-          // 根据配送方式显示不同的状态
-          shopStatus = 'PendingDelivery'
-        }
+        // 递送状态映射：用真实状态而非硬编码
+        if (shopStatus === 'Shipped') { /*保持Shipped*/ }
+        else if (shopStatus === 'Completed') { /*保持Completed*/ }
+        else { shopStatus = 'PendingDelivery' }
         var teaLog = null
         if (so.deliveryMethod === 'express') {
           var carriers = { SF: '顺丰速运', YT: '圆通速递', ZTO: '中通快递', STO: '申通快递', YD: '韵达快递', JD: '京东物流' }
@@ -57,7 +56,7 @@ Page({
           isTeaOrder: true, items: so.items || [],
           deliveryMethod: so.deliveryMethod || '',
           deliveryStatus: so.deliveryStatus || 'pending',
-          deliveryLabel: so.deliveryMethod === 'inroom' ? '配送中' : (so.deliveryMethod === 'express' ? '待发货' : (so.deliveryMethod === 'pickup' ? '待取货' : '')),
+          deliveryLabel: shopStatus === 'Shipped' ? '运输中' : (so.deliveryMethod === 'inroom' ? '配送中' : (so.deliveryMethod === 'express' ? '待发货' : (so.deliveryMethod === 'pickup' ? '待取货' : ''))),
           logistics: teaLog
         })
       }
@@ -120,9 +119,10 @@ Page({
         var statusClass = 'status-completed', statusLabel = '已完成'
         if (status === 'InUse' || status === 'in_use') { statusClass = 'status-inuse'; statusLabel = '进行中' }
         else if (status === 'Booked') { statusClass = 'status-booked'; statusLabel = '待使用' }
-        else if (status === 'PendingDelivery') {
+        else if (status === 'PendingDelivery' || status === 'Shipped') {
           statusClass = 'status-inuse'
-          if (o.deliveryMethod === 'inroom') statusLabel = '配送中'
+          if (status === 'Shipped') statusLabel = '运输中'
+          else if (o.deliveryMethod === 'inroom') statusLabel = '配送中'
           else if (o.deliveryMethod === 'express') statusLabel = '待发货'
           else if (o.deliveryMethod === 'pickup') statusLabel = '待取货'
           else statusLabel = '处理中'
@@ -190,7 +190,7 @@ Page({
 
   filterOrders: function() {
     var tab = this.data.tabIndex, list = this.data.orders
-    if (tab === 0) list = list.filter(function(o) { return o.status === 'InUse' || o.status === 'in_use' || o.status === 'PendingDelivery' })
+    if (tab === 0) list = list.filter(function(o) { return o.status === 'InUse' || o.status === 'in_use' || o.status === 'PendingDelivery' || o.status === 'Shipped' })
     else if (tab === 1) list = list.filter(function(o) { return o.status === 'Booked' })
     else if (tab === 2) list = list.filter(function(o) { return o.status === 'Completed' })
     this.setData({ filteredOrders: list })
