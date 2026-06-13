@@ -34,6 +34,7 @@
     <view class="actions-card">
       <view class="action-row" bindtap="goOrders"><text>📋 我的订单</text><text class="arrow">›</text></view>
       <view class="action-row" bindtap="goCoupons"><text>🎫 我的优惠券</text><text class="arrow">›</text></view>
+      <view class="action-row" bindtap="goMyAddresses"><text>📍 我的地址</text><text class="arrow">›</text></view>
       <view class="action-row" bindtap="showTopup"><text>💳 余额充值</text><text class="arrow">›</text></view>
       <view class="action-row" bindtap="showAccountSettings"><text>⚙ 账户设置</text><text class="arrow">›</text></view>
     </view>

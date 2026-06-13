@@ -3,7 +3,7 @@
   "pages": [
     "pages/home/home","pages/room-list/room-list","pages/room-detail/room-detail",
     "pages/booking-confirm/booking-confirm","pages/tea-shop/tea-shop",
-    "pages/my-orders/my-orders","pages/member-center/member-center",
+    "pages/my-orders/my-orders","pages/member-center/member-center","pages/address-manager/address-manager",
     "pages/scan-landing/scan-landing","pages/scan-order/scan-order","pages/scan-bill/scan-bill",
     "pages/room-control/room-control","pages/my-coupons/my-coupons",
     "pages/coupon-verify/coupon-verify","pages/finance-workbench/finance-workbench",

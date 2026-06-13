@@ -162,6 +162,11 @@ Page({
 
   goOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },
   goCoupons: function() { wx.navigateTo({ url: '/pages/my-coupons/my-coupons' }) },
+
+  goMyAddresses: function() {
+    wx.navigateTo({ url: '/pages/address-manager/address-manager' })
+  },
+
   toastComing: function() { wx.showToast({ title: '开发中', icon: 'none' }) },
   preventBubble: function() {},
 
