@@ -87,7 +87,7 @@
   <!-- 待办事项预览 -->
   <view class="section-title">待办事项</view>
   <view class="todo-list">
-    <view class="todo-item {{item.priority === 'high' ? 'high' : ''}}" wx:for="{{todos}}" wx:key="id" bindtap="goTodo">
+    <view class="todo-item {{item.priority === 'high' ? 'high' : ''}} {{item.type === 'shipping' ? 'ship' : ''}}" wx:for="{{todos}}" wx:key="id" bindtap="goTodo">
       <view class="todo-body">
         <text class="todo-title">{{item.title}}</text>
         <text class="todo-meta">{{item.type}} · 截止 {{item.deadline}}</text>

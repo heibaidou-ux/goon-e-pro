@@ -19,6 +19,27 @@ Page({
     var self = this
     STAFF_API.getDashboardStats().then(function(stats) { self.setData({ stats: stats }) })
     STAFF_API.getTodos().then(function(todos) { self.setData({ todos: todos }) })
+    // 从茶品订单中找出待发货的加入待办
+    API.getShopOrders().then(function(shopOrders) {
+      if (!shopOrders || !shopOrders.length) return
+      var shipTodos = []
+      for (var i = 0; i < shopOrders.length; i++) {
+        var so = shopOrders[i]
+        if (so.deliveryMethod === 'express' && (!so.status || so.status === 'PendingDelivery' || so.status === 'Paid')) {
+          shipTodos.push({
+            id: 'SHIP' + so.orderId,
+            title: '📦 发货 — 茶品订单',
+            type: 'shipping',
+            priority: 'high',
+            deadline: '尽快',
+            status: 'pending'
+          })
+        }
+      }
+      if (shipTodos.length > 0) {
+        self.setData({ todos: shipTodos.concat(self.data.todos) })
+      }
+    })
   },
 
   updateTime: function() {
