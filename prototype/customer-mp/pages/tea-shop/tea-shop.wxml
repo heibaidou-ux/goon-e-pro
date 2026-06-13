@@ -154,18 +154,6 @@
   </view>
 </view>
 
-<!-- Insufficient Balance Modal -->
-<view class="pay-modal-overlay" wx:if="{{showInsufficient}}" bindtap="hideInsufficient">
-  <view class="pay-modal" catchtap>
-    <text class="modal-h3">⚠️ 余额不足</text>
-    <text class="insufficient-msg">{{insufficientMsg}}</text>
-    <view class="pay-modal-btns">
-      <button class="pay-btn-cancel" bindtap="hideInsufficient">取消支付</button>
-      <button class="pay-btn-confirm" bindtap="switchPayMethod">选择其他方式</button>
-    </view>
-  </view>
-</view>
-
 <!-- Payment Modal -->
 <view class="pay-modal-overlay" wx:if="{{showPayModal}}" bindtap="cancelPay">
   <view class="pay-modal" catchtap>
@@ -194,6 +182,17 @@
     <view class="pay-modal-btns">
       <button class="pay-btn-cancel" bindtap="cancelPay">取消</button>
       <button class="pay-btn-confirm" bindtap="confirmPay">确认支付</button>
+    </view>
+  </view>
+</view>
+<!-- 余额不足弹窗 — 放pay-modal后确保z-index覆盖 -->
+<view class="pay-modal-overlay" wx:if="{{showInsufficient}}" bindtap="hideInsufficient">
+  <view class="pay-modal" catchtap>
+    <text class="modal-h3">⚠️ 余额不足</text>
+    <text class="insufficient-msg">{{insufficientMsg}}</text>
+    <view class="pay-modal-btns">
+      <button class="pay-btn-cancel" bindtap="hideInsufficient">取消支付</button>
+      <button class="pay-btn-confirm" bindtap="switchPayMethod">选择其他方式</button>
     </view>
   </view>
 </view>
