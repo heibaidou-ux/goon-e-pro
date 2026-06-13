@@ -43,5 +43,11 @@ Page({
 
   showDetail: function(e) {
     wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + e.currentTarget.dataset.roomid + '&roomName=' + encodeURIComponent(e.currentTarget.dataset.roomname || '') })
+  },
+
+  showRoomControl: function(e) {
+    var roomId = e.currentTarget.dataset.roomid
+    var roomName = e.currentTarget.dataset.roomname || ''
+    wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) })
   }
 })

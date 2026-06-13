@@ -11,7 +11,7 @@
   </view>
 
   <view class="room-grid">
-    <view class="room-card {{item.statusClass}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="showDetail" data-roomid="{{item.roomId}}">
+    <view class="room-card {{item.statusClass}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="showDetail" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}">
       <view class="rc-top">
         <text class="rc-dot {{item.statusClass}}"></text>
         <text class="rc-name">{{item.name}}</text>
