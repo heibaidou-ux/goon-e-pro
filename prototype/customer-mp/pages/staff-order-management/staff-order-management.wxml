@@ -35,9 +35,9 @@
         <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
       </view>
 
-      <!-- 茶品送到房间/自取→配送完成 -->
+      <!-- 茶品自取→发货 / 送到房间→配送完成 -->
       <view class="oc-actions" wx:if="{{tabIndex==0 && item.isTeaOrder && item.deliveryMethod!='express'}}">
-        <view class="oc-btn primary" bindtap="completeDelivery" data-id="{{item.orderId}}">{{item.deliveryMethod=='inroom'?'🏠 已送达':'🚶 已取货'}}</view>
+        <view class="oc-btn primary" bindtap="completeDelivery" data-id="{{item.orderId}}">{{item.deliveryMethod=='inroom'?'🏠 已送达':'📦 发货'}}</view>
         <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
       </view>
 
