@@ -100,10 +100,35 @@
         <text class="do-check" wx:if="{{deliveryMethod=='pickup'}}">✓</text>
       </view>
     </view>
+    <!-- 地址历史 -->
+    <view class="addr-history" wx:if="{{deliveryMethod=='express' && addressHistory.length>0}}">
+      <text class="ah-title">常用地址</text>
+      <view class="ah-item" wx:for="{{addressHistory}}" wx:key="index" bindtap="selectHistoryAddress" data-idx="{{index}}">
+        <view class="ah-info">
+          <text class="ah-name">{{item.name}}</text>
+          <text class="ah-phone">{{item.phone}}</text>
+          <text class="ah-addr">{{item.province}}{{item.city}}{{item.district}}{{item.detail}}</text>
+        </view>
+        <text class="ah-del" bindtap="deleteHistoryAddress" data-idx="{{index}}">删除</text>
+      </view>
+    </view>
+
     <view class="express-fields" wx:if="{{deliveryMethod=='express'}}">
       <input class="delivery-input" placeholder="收件人姓名" value="{{expressName}}" bindinput="onExpressName" />
-      <input class="delivery-input" placeholder="联系电话" value="{{expressPhone}}" bindinput="onExpressPhone" />
-      <input class="delivery-input" placeholder="收货地址" value="{{expressAddress}}" bindinput="onExpressAddress" />
+      <input class="delivery-input" placeholder="联系电话" value="{{expressPhone}}" bindinput="onExpressPhone" type="number" maxlength="11" />
+
+      <view class="region-row">
+        <picker mode="selector" range="{{provinces}}" value="{{provinceIndex}}" bindchange="onProvinceChange">
+          <view class="region-picker">{{expressProvince || '选择省份'}} ▾</view>
+        </picker>
+        <picker mode="selector" range="{{cities}}" value="{{cityIndex}}" bindchange="onCityChange" wx:if="{{cities.length>0}}">
+          <view class="region-picker">{{expressCity || '选择城市'}} ▾</view>
+        </picker>
+        <picker mode="selector" range="{{districts}}" value="{{districtIndex}}" bindchange="onDistrictChange" wx:if="{{districts.length>0}}">
+          <view class="region-picker">{{expressDistrict || '选择区'}} ▾</view>
+        </picker>
+      </view>
+      <input class="delivery-input" placeholder="详细地址（街道/门牌号）" value="{{expressDetail}}" bindinput="onExpressDetail" />
     </view>
     <view class="delivery-summary" wx:if="{{deliveryMethod=='inroom'}}">
       <text>商品将送至 {{roomName || roomBannerRoomName || '当前包间'}}</text>
