@@ -13,6 +13,18 @@ from config import settings
 
 # ── Mock device data: 5 rooms × (2 lights, 1 AC, 1 curtain, relay, audio, lock) ──
 
+# ── HA房间名映射（ERP room_id ↔ HA系统ID）──
+# 从M710Q实际HA导出的实体命名
+
+HA_ROOM_MAP = {
+    "RM001": "meeting",     # 大会议室
+    "RM002": "zhong",       # 中茶室（HA中茶室）
+    "RM003": "xiao",        # 小茶室（HA小茶室）
+    "RM004": "dacha",       # 大茶室
+    "RM005": "exhibition",  # 展厅
+}
+HA_ROOM_REVERSE = {v: k for k, v in HA_ROOM_MAP.items()}
+
 ROOMS = [
     {"room_id": "RM001", "name": "大会议室", "type": "MeetingRoom"},
     {"room_id": "RM002", "name": "中茶室A", "type": "TeaRoom"},
@@ -21,36 +33,60 @@ ROOMS = [
     {"room_id": "RM005", "name": "展厅", "type": "Exhibition"},
 ]
 
+# HA实体前缀映射（不同房间的entity_id命名不一致）
+def _ha_entity_prefix(ha_room: str, domain: str = "switch") -> str:
+    """生成HA实体的前缀。实际HA命名风格不统一，需要逐个映射。"""
+    # 用于switch/sensor域：zhong→zhong_cha_shi, xiao→xiao_cha_shi, dacha→dacha, meeting→meeting
+    if ha_room == "zhong":
+        return f"{domain}.zhong_cha_shi_"
+    if ha_room == "xiao":
+        return f"{domain}.xiao_cha_shi_"
+    # dacha, meeting, exhibition 使用短名称
+    return f"{domain}.{ha_room}_"
+
+
 DEVICE_TEMPLATES = [
-    # Lock
-    {"type": "Lock", "name_template": "{room}门锁", "protocol": "Zigbee", "slave_id": None, "sub_address": None,
-     "ha_entity_id_template": "lock.{room_id}_door", "attributes": {"battery_level": 85, "locked": True}},
-    # AC
-    {"type": "AC", "name_template": "{room}空调", "protocol": "Modbus", "slave_base": 21, "sub_address": None,
-     "ha_entity_id_template": "climate.{room_id}_ac", "attributes": {"temperature": 26, "mode": "auto", "fan_speed": "auto", "target_temperature": 24}},
-    # Light 1 (main)
-    {"type": "Light", "name_template": "{room}主灯", "protocol": "Modbus", "slave_base": 1, "sub_address": 1,
-     "ha_entity_id_template": "light.{room_id}_light_main", "attributes": {"brightness": 80, "color_temp": 4000, "power": False}},
-    # Light 2 (secondary)
-    {"type": "Light", "name_template": "{room}辅灯", "protocol": "Modbus", "slave_base": 1, "sub_address": 2,
-     "ha_entity_id_template": "light.{room_id}_light_secondary", "attributes": {"brightness": 60, "color_temp": 3500, "power": False}},
+    # Lock — 通通锁 (只有中茶室/小茶室有锁实体)
+    {"type": "Lock", "name_template": "{room}门锁", "protocol": "Zigbee",
+     "ha_entity_fn": lambda r: f"switch.{r}_cha_shi_men_suo" if r in ("zhong","xiao") else f"switch.{r}_men_suo",
+     "attributes": {"battery_level": 85, "locked": True}},
+    # AC power (input_boolean.ac_{room}_power)
+    {"type": "AC", "name_template": "{room}空调", "protocol": "Modbus",
+     "ha_entity_fn": lambda r: f"input_boolean.ac_{r}_power",
+     "attributes": {"power": False, "mode": "cool", "target_temperature": 24}},
+    # AC temperature
+    {"type": "AC", "name_template": "{room}空调温度", "protocol": "Modbus",
+     "ha_entity_fn": lambda r: f"input_number.ac_{r}_temp",
+     "attributes": {"value": 26, "unit": "°C"}},
+    # Light - 吊灯 (switch实体)
+    {"type": "Light", "name_template": "{room}吊灯", "protocol": "Modbus",
+     "ha_entity_fn": lambda r: _ha_entity_prefix(r, "switch") + "diao_deng",
+     "attributes": {"power": False}},
+    # Light - 筒灯
+    {"type": "Light", "name_template": "{room}筒灯", "protocol": "Modbus",
+     "ha_entity_fn": lambda r: _ha_entity_prefix(r, "switch") + "tong_deng",
+     "attributes": {"power": False}},
+    # Light - 背景灯 (只有中茶室有)
+    {"type": "Light", "name_template": "{room}背景灯", "protocol": "Modbus",
+     "ha_entity_fn": lambda r: _ha_entity_prefix(r, "switch") + "bei_jing_deng",
+     "attributes": {"power": False}},
+    # Light - 主灯(input_boolean模拟)
+    {"type": "Light", "name_template": "{room}主灯(sim)", "protocol": "Modbus",
+     "ha_entity_fn": lambda r: f"input_boolean.sim_{r}_main",
+     "attributes": {"power": False}},
     # Curtain
-    {"type": "Curtain", "name_template": "{room}窗帘", "protocol": "Modbus", "slave_base": 31, "sub_address": None,
-     "ha_entity_id_template": "cover.{room_id}_curtain", "attributes": {"position": "closed", "current_position": 0}},
-    # Speaker
-    {"type": "Speaker", "name_template": "{room}音响", "protocol": "IPAudio", "slave_id": None, "sub_address": None,
-     "ha_entity_id_template": "media_player.{room_id}_speaker", "attributes": {"volume": 30, "playing": False, "source": "空闲"}},
+    {"type": "Curtain", "name_template": "{room}窗帘", "protocol": "Zigbee",
+     "ha_entity_fn": lambda r: f"cover.curtain_{r}_left",
+     "attributes": {"position": "closed", "current_position": 0}},
+    # Temperature sensor
+    {"type": "Sensor", "name_template": "{room}室温", "protocol": "Modbus",
+     "ha_entity_fn": lambda r: _ha_entity_prefix(r, "sensor") + "shi_wen",
+     "attributes": {"value": 25.0, "unit": "°C"}},
+    # Fan
+    {"type": "Light", "name_template": "{room}风扇", "protocol": "Modbus",
+     "ha_entity_fn": lambda r: _ha_entity_prefix(r, "switch") + "feng_shan",
+     "attributes": {"power": False}},
 ]
-
-ROOM_SLAVE_MAP = {
-    "RM001": {"relay": 1, "ac": 21, "curtain": 31},
-    "RM002": {"relay": 2, "ac": 22, "curtain": 32},
-    "RM003": {"relay": 3, "ac": 23, "curtain": 33},
-    "RM004": {"relay": 4, "ac": 24, "curtain": 34},
-    "RM005": {"relay": 5, "ac": 24, "curtain": 34},  # 展厅 shares with RM004
-}
-
-# ── Scenes ──
 
 SCENES = [
     {"scene_id": "SCN_WELCOME", "name": "Welcome", "label": "迎宾模式", "trigger_type": "Auto",
@@ -118,42 +154,49 @@ _alert_counter = 0
 
 
 def _build_mock_devices():
-    """Generate realistic mock device list for all 5 rooms."""
+    """Generate realistic mock device list matching actual HA entity naming."""
     global _mock_devices
     if _mock_devices:
         return
     idx = 0
     for room in ROOMS:
-        sm = ROOM_SLAVE_MAP[room["room_id"]]
+        ha_room = HA_ROOM_MAP.get(room["room_id"], room["room_id"])
         for tpl in DEVICE_TEMPLATES:
             idx += 1
             attrs = dict(tpl["attributes"])
-            # Randomize some values for realism
+            # 使用ha_entity_fn生成HA实体ID
+            try:
+                ha_entity_id = tpl["ha_entity_fn"](ha_room)
+            except Exception:
+                ha_entity_id = f"{tpl['type'].lower()}.{ha_room}"
+
+            # 随机化状态
             if tpl["type"] == "Lock":
                 attrs["battery_level"] = random.randint(60, 100)
                 attrs["locked"] = True
             elif tpl["type"] == "AC":
-                attrs["temperature"] = random.randint(24, 28)
-                attrs["target_temperature"] = 24
+                if "temp" not in ha_entity_id:
+                    attrs["power"] = random.choice([True, False])
+                    attrs["mode"] = "cool"
+                else:
+                    attrs["value"] = random.randint(24, 28)
             elif tpl["type"] == "Light":
                 attrs["power"] = random.choice([True, False])
             elif tpl["type"] == "Curtain":
                 attrs["position"] = random.choice(["open", "closed"])
                 attrs["current_position"] = 100 if attrs["position"] == "open" else 0
-
-            slave_id = tpl.get("slave_base")
-            if slave_id:
-                slave_id = sm.get(tpl["type"].lower(), slave_id)
+            elif tpl["type"] == "Sensor":
+                attrs["value"] = round(random.uniform(22, 28), 1)
 
             _mock_devices.append({
                 "device_id": f"DEV{idx:04d}",
                 "room_id": room["room_id"],
                 "type": tpl["type"],
                 "name": tpl["name_template"].format(room=room["name"]),
-                "ha_entity_id": tpl["ha_entity_id_template"].format(room_id=room["room_id"]),
+                "ha_entity_id": ha_entity_id,
                 "protocol": tpl["protocol"],
-                "slave_id": slave_id,
-                "sub_address": tpl["sub_address"],
+                "slave_id": None,
+                "sub_address": None,
                 "status": random.choices(["Online", "Online", "Online", "Offline"], weights=[85, 10, 3, 2])[0],
                 "attributes": attrs,
             })
@@ -195,11 +238,11 @@ async def check_health() -> dict:
         async with httpx.AsyncClient(timeout=5) as client:
             resp = await client.get(
                 f"{settings.ha_url}/api/",
-                headers={"Authorization": f"Bearer {settings.ha_token}"}
+                headers=_ha_headers()
             )
             return {"status": "ok" if resp.status_code == 200 else "error", "mode": "ha", "code": resp.status_code}
     except Exception as e:
-        return {"status": "error", "mode": "ha", "message": str(e)}
+        return {"status": "error", "mode": "ha", "message": str(e), "ha_url": settings.ha_url}
 
 
 async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] = None,
@@ -221,12 +264,13 @@ async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] 
         async with httpx.AsyncClient(timeout=5) as client:
             resp = await client.get(
                 f"{settings.ha_url}/api/states",
-                headers={"Authorization": f"Bearer {settings.ha_token}"}
+                headers=_ha_headers()
             )
             if resp.status_code != 200:
                 return []
             ha_states = resp.json()
-            # Map HA states to our device format
+            # Filter to only entities belonging to our rooms
+            our_ha_rooms = set(HA_ROOM_REVERSE.keys())
             devices = []
             for state in ha_states:
                 entity_id = state.get("entity_id", "")
@@ -234,6 +278,8 @@ async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] 
                 if not dev_type:
                     continue
                 ha_room = _ha_entity_to_room(entity_id)
+                if not ha_room:
+                    continue  # Skip entities not in our room set
                 if room_id and ha_room != room_id:
                     continue
                 if device_type and dev_type != device_type:
@@ -245,25 +291,27 @@ async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] 
 
 
 async def get_device(device_id: str) -> Optional[dict]:
-    """Get single device by ID."""
+    """Get single device by ID (or HA entity_id in real mode)."""
     if is_mock_mode():
         return _get_device(device_id)
-    # In real mode, look up from HA
+    # In real mode, query HA for the specific entity
+    # device_id could be an internal ID or the HA entity_id itself
+    ha_entity_id = device_id
+    if not device_id.startswith(("switch.", "climate.", "cover.", "lock.", "sensor.", "input_boolean.")):
+        # Try looking up internal ID mapping in mock data first
+        dev = _get_device(device_id)
+        if dev:
+            ha_entity_id = dev.get("ha_entity_id", device_id)
     try:
         async with httpx.AsyncClient(timeout=5) as client:
             resp = await client.get(
-                f"{settings.ha_url}/api/states",
-                headers={"Authorization": f"Bearer {settings.ha_token}"}
+                f"{settings.ha_url}/api/states/{ha_entity_id}",
+                headers=_ha_headers()
             )
-            if resp.status_code != 200:
-                return None
-            for state in resp.json():
-                if state.get("attributes", {}).get("device_id") == device_id or \
-                   state.get("entity_id") == device_id:
-                    return _ha_state_to_device(state)
+            if resp.status_code == 200:
+                return _ha_state_to_device(resp.json())
     except Exception:
         pass
-    # Fallback to mock
     return _get_device(device_id)
 
 
@@ -350,57 +398,80 @@ def _mock_control(device_id: str, action: str, params: dict) -> dict:
 
 
 async def _ha_control(device_id: str, action: str, params: dict) -> dict:
-    """Control device via real HA REST API."""
+    """Control device via real HA REST API.
+    In real HA mode, device_id is the HA entity_id (e.g. lock.baishawa_door).
+    """
+    # Try to find the device in mock DB for type info, fallback to entity_id as-is
     device = _get_device(device_id)
-    if not device:
-        return {"success": False, "message": f"设备 {device_id} 不存在"}
-    ha_entity_id = device.get("ha_entity_id")
-    if not ha_entity_id:
-        return {"success": False, "message": f"设备 {device_id} 未映射到HA实体"}
+    ha_entity_id = device.get("ha_entity_id", device_id) if device else device_id
+    device_type = device["type"] if device else _ha_entity_to_type(device_id) or "Unknown"
 
-    service_data = _ha_build_service(device["type"], action, params)
+    # Special handling: all_lights → use switch.*_all_lights entity
+    if action == "all_on":
+        ha_room = ha_entity_id.split("_")[0] if "." in ha_entity_id else ""
+        ha_entity_id = f"switch.{ha_room}_all_lights"
+        service_data = {"domain": "switch", "service": "turn_on"}
+    elif action == "all_off":
+        ha_room = ha_entity_id.split("_")[0] if "." in ha_entity_id else ""
+        ha_entity_id = f"switch.{ha_room}_all_lights"
+        service_data = {"domain": "switch", "service": "turn_off"}
+    else:
+        service_data = _ha_build_service(device_type, action, params)
+
     if not service_data:
-        return {"success": False, "message": f"不支持的动作: {device['type']} → {action}"}
+        return {"success": False, "message": f"不支持的动作: {device_type} → {action}"}
 
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             resp = await client.post(
                 f"{settings.ha_url}/api/services/{service_data['domain']}/{service_data['service']}",
-                headers={
-                    "Authorization": f"Bearer {settings.ha_token}",
-                    "Content-Type": "application/json",
-                },
+                headers=_ha_headers(),
                 json={"entity_id": ha_entity_id, **service_data.get("data", {})},
             )
             if resp.status_code == 200:
                 return {"success": True, "message": f"HA指令已发送: {action}", "device_id": device_id}
-            return {"success": False, "message": f"HA返回错误: {resp.status_code}", "device_id": device_id}
+            return {"success": False, "message": f"HA返回错误({resp.status_code})", "device_id": device_id}
     except Exception as e:
         return {"success": False, "message": f"HA请求失败: {str(e)}", "device_id": device_id}
 
 
+def _ha_headers() -> dict:
+    return {
+        "Authorization": f"Bearer {settings.ha_token}",
+        "Content-Type": "application/json",
+    }
+
+
 def _ha_build_service(device_type: str, action: str, params: dict) -> Optional[dict]:
-    """Map ERP action to HA service call."""
+    """Map ERP action to HA service call.
+    Uses actual HA entity types per v1.1 spec:
+    - switch.*_relay_chN for lights
+    - climate.* for AC
+    - cover.*_curtain for curtains
+    - lock.*_door for locks
+    """
     mapping = {
+        # ── AC (climate.*) ──
+        ("AC", "on"): {"domain": "climate", "service": "turn_on"},
         ("AC", "off"): {"domain": "climate", "service": "turn_off"},
         ("AC", "cool"): {"domain": "climate", "service": "set_hvac_mode", "data": {"hvac_mode": "cool"}},
         ("AC", "heat"): {"domain": "climate", "service": "set_hvac_mode", "data": {"hvac_mode": "heat"}},
+        ("AC", "fan_only"): {"domain": "climate", "service": "set_hvac_mode", "data": {"hvac_mode": "fan_only"}},
         ("AC", "auto"): {"domain": "climate", "service": "set_hvac_mode", "data": {"hvac_mode": "auto"}},
         ("AC", "temperature"): {"domain": "climate", "service": "set_temperature",
                                 "data": {"temperature": params.get("temperature", 24)}},
-        ("Light", "on"): {"domain": "homeassistant", "service": "turn_on"},
-        ("Light", "off"): {"domain": "homeassistant", "service": "turn_off"},
+        # ── Light (switch.*_relay_chN) ──
+        ("Light", "on"): {"domain": "switch", "service": "turn_on"},
+        ("Light", "off"): {"domain": "switch", "service": "turn_off"},
+        # ── Curtain (cover.*_curtain) ──
         ("Curtain", "open"): {"domain": "cover", "service": "open_cover"},
         ("Curtain", "close"): {"domain": "cover", "service": "close_cover"},
         ("Curtain", "stop"): {"domain": "cover", "service": "stop_cover"},
-        ("Lock", "unlock"): {"domain": "lock", "service": "open"},
+        ("Curtain", "position"): {"domain": "cover", "service": "set_cover_position",
+                                   "data": {"position": params.get("position", 50)}},
+        # ── Lock (lock.*_door) ──
+        ("Lock", "unlock"): {"domain": "lock", "service": "unlock"},
         ("Lock", "lock"): {"domain": "lock", "service": "lock"},
-        ("Speaker", "on"): {"domain": "media_player", "service": "turn_on"},
-        ("Speaker", "off"): {"domain": "media_player", "service": "turn_off"},
-        ("Speaker", "volume"): {"domain": "media_player", "service": "volume_set",
-                                "data": {"volume_level": params.get("volume", 30) / 100}},
-        ("Speaker", "play"): {"domain": "media_player", "service": "media_play"},
-        ("Speaker", "pause"): {"domain": "media_player", "service": "media_pause"},
     }
     return mapping.get((device_type, action))
 
@@ -408,7 +479,8 @@ def _ha_build_service(device_type: str, action: str, params: dict) -> Optional[d
 async def activate_scene(room_id: str, scene_name: str) -> dict:
     """Activate a scene for a specific room.
 
-    Returns list of control results for each step.
+    Real HA mode: Toggle input_boolean.{room}_scene_{scene}.
+    Mock mode: Execute individual device commands.
     """
     scene = None
     for s in SCENES:
@@ -418,6 +490,31 @@ async def activate_scene(room_id: str, scene_name: str) -> dict:
     if not scene:
         return {"success": False, "message": f"场景不存在: {scene_name}"}
 
+    # Real HA mode: use input_boolean
+    if not is_mock_mode():
+        ha_room = HA_ROOM_MAP.get(room_id, room_id)
+        scene_key = scene["name"].lower()
+        entity_id = f"input_boolean.{ha_room}_scene_{scene_key}"
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.post(
+                    f"{settings.ha_url}/api/services/input_boolean/turn_on",
+                    headers=headers,
+                    json={"entity_id": entity_id},
+                )
+                if resp.status_code == 200:
+                    return {
+                        "success": True,
+                        "scene": scene["name"],
+                        "scene_label": scene["label"],
+                        "room_id": room_id,
+                        "message": f"场景「{scene['label']}」已通过HA激活",
+                    }
+                return {"success": False, "message": f"HA场景激活失败: {resp.status_code}"}
+        except Exception as e:
+            return {"success": False, "message": f"HA请求失败: {str(e)}"}
+
+    # Mock mode: execute individual device commands
     results = []
     for rule in scene["rules"]:
         dev_type = rule["device_type"]
@@ -448,6 +545,40 @@ async def activate_scene(room_id: str, scene_name: str) -> dict:
         "success_count": success_count,
         "results": results,
     }
+
+
+async def init_room(room_id: str) -> dict:
+    """Initialize/reset a room: all off, curtains closed, door locked.
+    Real HA mode uses input_boolean.*_init. Mock mode controls each device.
+    """
+    if not is_mock_mode():
+        ha_room = HA_ROOM_MAP.get(room_id, room_id)
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.post(
+                    f"{settings.ha_url}/api/services/input_boolean/turn_on",
+                    headers=_ha_headers(),
+                    json={"entity_id": f"input_boolean.{ha_room}_init"},
+                )
+                if resp.status_code == 200:
+                    return {"success": True, "room_id": room_id, "message": "房间已初始化复位"}
+                return {"success": False, "room_id": room_id, "message": f"HA返回错误: {resp.status_code}"}
+        except Exception as e:
+            return {"success": False, "room_id": room_id, "message": str(e)}
+
+    # Mock mode: turn everything off
+    devices = _get_room_devices(room_id)
+    results = []
+    for dev in devices:
+        if dev["type"] == "Light" and dev["attributes"].get("power"):
+            results.append(_mock_control(dev["device_id"], "off", {}))
+        elif dev["type"] == "AC" and dev["attributes"].get("mode") != "off":
+            results.append(_mock_control(dev["device_id"], "off", {}))
+        elif dev["type"] == "Curtain" and dev["attributes"].get("position") != "closed":
+            results.append(_mock_control(dev["device_id"], "close", {}))
+        elif dev["type"] == "Lock" and not dev["attributes"].get("locked"):
+            results.append(_mock_control(dev["device_id"], "lock", {}))
+    return {"success": True, "room_id": room_id, "actions": len(results), "results": results}
 
 
 async def get_scenes() -> list[dict]:
@@ -562,59 +693,119 @@ async def get_stats() -> dict:
 # ── HA entity mapping helpers ──
 
 def _ha_entity_to_type(entity_id: str) -> Optional[str]:
-    """Map HA entity_id prefix to our device type."""
+    """Map HA entity_id to ERP device type.
+    实际HA实体类型多样化，根据domain+name综合判断。
+    """
     domain = entity_id.split(".")[0] if "." in entity_id else ""
-    mapping = {
-        "lock": "Lock", "climate": "AC", "light": "Light",
-        "cover": "Curtain", "media_player": "Speaker", "sensor": "Sensor",
-    }
-    return mapping.get(domain)
+    entity_name = entity_id.split(".")[1] if "." in entity_id else ""
+
+    # 明确映射
+    if domain == "lock":
+        return "Lock"
+    if domain == "climate":
+        return "AC"
+    if domain == "cover":
+        return "Curtain"
+    if domain == "switch":
+        return "Light"  # 物理继电器开关=灯光
+    if domain == "sensor":
+        # 温度/湿度传感器
+        if "shi_wen" in entity_name or "temp" in entity_name:
+            return "Sensor"
+        if "wen_kong" in entity_name:
+            return "AC"  # 温控状态（空调）
+        return "Sensor"
+    if domain == "input_boolean":
+        if entity_name.startswith("ac_"):
+            return "AC"  # ac_dacha_power
+        if entity_name.startswith("sim_"):
+            return "Light"  # sim_dacha_main = 灯光模拟
+        if entity_name.startswith("init_"):
+            return "System"  # 初始化场景
+        return "Light"
+    if domain == "input_number":
+        if "amplifier_volume" in entity_name:
+            return "Speaker"
+        if "ac_" in entity_name and "temp" in entity_name:
+            return "AC"
+        return "Sensor"
+    if domain == "input_select":
+        if "amplifier_source" in entity_name:
+            return "Speaker"
+        return "Speaker"
+    if domain == "automation":
+        return "System"
+    return None
 
 
 def _ha_entity_to_room(entity_id: str) -> Optional[str]:
-    """Extract room_id from HA entity_id (e.g. climate.rm001_ac → RM001)."""
-    parts = entity_id.split(".")[1] if "." in entity_id else ""
-    room_part = parts.split("_")[0] if "_" in parts else ""
-    return room_part.upper() if room_part else None
+    """Extract room_id from HA entity_id using substring matching.
+    HA实体命名不规则，用包含匹配：
+      *dacha* → RM004, *zhong* → RM002, *xiao* → RM003, *meeting* → RM001, *exhibition* → RM005
+    """
+    eid_lower = entity_id.lower()
+    # 按完整度排序：先匹配更精确的
+    if "exhibition" in eid_lower:
+        return "RM005"
+    if "meeting" in eid_lower:
+        return "RM001"
+    if "dacha" in eid_lower:
+        return "RM004"
+    if "zhong" in eid_lower and "xiao" not in eid_lower:
+        # zhong_cha_shi, zhong 但排除 xiao_zhong 之类
+        return "RM002"
+    if "xiao" in eid_lower:
+        # xiao_cha_shi, xiao
+        return "RM003"
+    return None
 
 
 def _ha_state_to_device(state: dict) -> dict:
     """Convert HA API state object to our device format."""
     entity_id = state.get("entity_id", "")
-    attrs = state.get("attributes", {})
+    attrs = dict(state.get("attributes", {}))
     device_type = _ha_entity_to_type(entity_id)
     room_id = _ha_entity_to_room(entity_id)
     domain = entity_id.split(".")[0]
+    entity_name = entity_id.split(".")[1] if "." in entity_id else ""
 
     state_val = state.get("state", "")
+    status = "Online" if state_val != "unavailable" else "Offline"
+
     if device_type == "Lock":
-        status = "Online" if state_val in ("locked", "unlocked", "opening", "jammed") else "Offline"
         attrs["locked"] = state_val == "locked"
+        attrs["battery_level"] = attrs.get("battery_level", 85)
     elif device_type == "AC":
-        status = "Online" if state_val != "unavailable" else "Offline"
         attrs["mode"] = state_val
         attrs["temperature"] = attrs.get("current_temperature", 26)
         attrs["target_temperature"] = attrs.get("temperature", 24)
     elif device_type == "Light":
-        status = "Online" if state_val != "unavailable" else "Offline"
         attrs["power"] = state_val == "on"
-        attrs["brightness"] = attrs.get("brightness", 100)
+        # Extract channel number from entity name
+        if "all_lights" in entity_name:
+            attrs["is_all_lights"] = True
+            attrs["channel"] = 0
+        else:
+            ch = entity_name.split("_ch")[-1]
+            attrs["channel"] = int(ch) if ch.isdigit() else None
     elif device_type == "Curtain":
-        status = "Online" if state_val != "unavailable" else "Offline"
         attrs["position"] = state_val
         attrs["current_position"] = attrs.get("current_position", 0)
-    elif device_type == "Speaker":
-        status = "Online" if state_val != "unavailable" else "Offline"
-        attrs["playing"] = state_val == "playing"
-        attrs["volume"] = round(attrs.get("volume_level", 0) * 100)
-    else:
-        status = "Online" if state_val != "unavailable" else "Offline"
+    elif device_type == "Sensor":
+        unit = attrs.get("unit_of_measurement", "")
+        attrs["value"] = float(state_val) if state_val.replace(".", "").replace("-", "").isdigit() else state_val
+        attrs["unit"] = unit
+
+    # Build a friendly name from entity
+    friendly_name = attrs.get("friendly_name", entity_id)
+    if room_id:
+        room_name = next((r["name"] for r in ROOMS if r["room_id"] == room_id), room_id)
 
     return {
         "device_id": entity_id,
         "room_id": room_id or "",
-        "type": device_type,
-        "name": attrs.get("friendly_name", entity_id),
+        "type": device_type or "Unknown",
+        "name": friendly_name,
         "ha_entity_id": entity_id,
         "protocol": "Zigbee" if domain == "lock" else "Modbus",
         "slave_id": None,

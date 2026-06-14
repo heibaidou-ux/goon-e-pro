@@ -1,3 +1,5 @@
+.phone { height:100vh; overflow:hidden; display:flex; flex-direction:column; background:#f5f7fa; }
+.page { flex:1; overflow-y:auto; }
 .profile-header { padding:32px 16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; text-align:center; }
 .avatar { font-size:48px; margin-bottom:8px; }
 .name { font-size:20px; font-weight:700; display:block; }

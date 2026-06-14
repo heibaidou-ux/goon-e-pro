@@ -1,1 +1,115 @@
-<view class="page"><view class="placeholder"><text class="ph-icon">🚧</text><text class="ph-text">开发中</text><text class="ph-desc">{{title}}</text></view></view>
+<view class="phone">
+  <view class="page">
+    <view class="header">
+      <text class="header-title">🎛 场景控制</text>
+    </view>
+
+    <view class="content">
+      <!-- 房间选择器 -->
+      <view class="room-selector" bindtap="showRoomPicker">
+        <view>
+          <text class="rs-label">当前房间</text>
+          <text class="rs-value">{{roomName}}</text>
+        </view>
+        <text class="rs-arrow">▾</text>
+      </view>
+
+      <!-- 当前场景 -->
+      <view class="current-scene-card">
+        <text class="csc-label">当前场景</text>
+        <text class="csc-name">{{activeSceneName}}</text>
+        <text class="csc-trigger" wx:if="{{!isManualOverride}}">{{activeSceneTrigger}}</text>
+        <text class="csc-trigger override" wx:else>⚠ 手动覆盖（已抑制自动触发）</text>
+      </view>
+
+      <view class="override-note" wx:if="{{isManualOverride}}">
+        ⚠ 当前为手动覆盖状态，自动触发场景已抑制
+      </view>
+
+      <!-- 场景网格 -->
+      <text class="section-title">切换场景</text>
+      <view class="scene-grid">
+        <view class="scene-card {{item.id==activeSceneId?'active':''}} {{(!roomBookable && item.id!='EnergySave')?'disabled':''}}"
+          wx:for="{{scenes}}" wx:key="id"
+          bindtap="triggerScene" data-id="{{item.id}}">
+          <text class="sc-icon">{{item.icon}}</text>
+          <text class="sc-name">{{item.name}}</text>
+          <text class="sc-desc">{{item.desc}}</text>
+          <text class="sc-badge {{item.type.toLowerCase()}}">{{typeLabels[item.type]}}</text>
+          <text class="sc-check" wx:if="{{item.id==activeSceneId}}">✓ 当前</text>
+        </view>
+      </view>
+
+      <!-- 场景默认参数 -->
+      <view class="params-section">
+        <text class="section-title">场景默认参数</text>
+
+        <view class="param-group">
+          <text class="param-label">空调温度</text>
+          <view class="temp-grid">
+            <view class="temp-chip {{temperature==t?'active':''}}" wx:for="{{[20,22,24,26,28,30]}}" wx:key="*this" bindtap="onTempChange" data-temp="{{item}}">{{item}}°</view>
+          </view>
+        </view>
+
+        <view class="param-group">
+          <text class="param-label">灯光色温</text>
+          <view class="color-grid">
+            <view class="color-chip {{colorTemp==2700?'active':''}}" bindtap="onColorTempChange" data-temp="2700">
+              <text class="cc-k">2700K</text><text class="cc-name">暖光</text>
+            </view>
+            <view class="color-chip {{colorTemp==3000?'active':''}}" bindtap="onColorTempChange" data-temp="3000">
+              <text class="cc-k">3000K</text><text class="cc-name">暖白</text>
+            </view>
+            <view class="color-chip {{colorTemp==3500?'active':''}}" bindtap="onColorTempChange" data-temp="3500">
+              <text class="cc-k">3500K</text><text class="cc-name">自然</text>
+            </view>
+            <view class="color-chip {{colorTemp==4000?'active':''}}" bindtap="onColorTempChange" data-temp="4000">
+              <text class="cc-k">4000K</text><text class="cc-name">冷白</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="param-group">
+          <text class="param-label">音响音量</text>
+          <view class="vol-row">
+            <text class="vol-label">0%</text>
+            <slider min="0" max="100" value="{{volume}}" bindchange="onVolumeChange" block-size="18" activeColor="#5D8A6B" />
+            <text class="vol-label">{{volume}}%</text>
+          </view>
+        </view>
+
+        <view class="save-actions">
+          <view class="save-btn primary" bindtap="saveParams">💾 保存默认参数</view>
+          <view class="save-btn ghost" bindtap="resetParams">↩ 恢复默认</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 房间选择弹窗 -->
+  <view class="modal-overlay" wx:if="{{showRoomPicker}}" bindtap="hideRoomPicker">
+    <view class="modal" catchtap>
+      <text class="modal-title">选择房间</text>
+      <view class="room-option {{index==roomIndex?'active':''}}" wx:for="{{rooms}}" wx:key="roomId" wx:for-index="index" bindtap="selectRoom" data-idx="{{index}}">
+        <text>{{index==roomIndex?'📍':''}} {{item.name}}</text>
+        <text wx:if="{{index==roomIndex}}" style="color:#5D8A6B;">✓</text>
+        <text wx:else style="color:#ccc;">›</text>
+      </view>
+      <view class="modal-close" bindtap="hideRoomPicker">关闭</view>
+    </view>
+  </view>
+
+  <!-- 场景切换确认弹窗 -->
+  <view class="modal-overlay" wx:if="{{showConfirm}}" bindtap="hideConfirm">
+    <view class="modal" catchtap>
+      <text class="modal-title">{{confirmTitle}}</text>
+      <text class="modal-desc">{{confirmDesc}}</text>
+      <view class="modal-actions">
+        <view class="ma-btn cancel" bindtap="hideConfirm">取消</view>
+        <view class="ma-btn primary" bindtap="confirmScene">确认切换</view>
+      </view>
+    </view>
+  </view>
+
+  <staff-bottom-nav active="device" />
+</view>

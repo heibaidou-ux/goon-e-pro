@@ -1,4 +1,4 @@
-<view class="page">
+<view class="phone"><view class="page">
   <view class="header">
     <text class="header-title">🏠 房态管理</text>
     <text class="header-stats">{{stats.inUse}}使用 · {{stats.available}}空闲</text>
@@ -78,4 +78,5 @@
       </view>
     </view>
   </view>
+  <staff-bottom-nav active="dashboard" />
 </view>

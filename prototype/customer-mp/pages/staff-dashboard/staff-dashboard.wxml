@@ -1,4 +1,4 @@
-<view class="page">
+<view class="phone"><view class="page">
   <!-- 顶部 -->
   <view class="header">
     <view class="header-left">
@@ -31,6 +31,20 @@
       <text class="stat-icon">{{stats.alerts > 0 ? '⚠️' : '✅'}}</text>
       <text class="stat-num">{{stats.alerts > 0 ? stats.alerts : 0}}</text>
       <text class="stat-label">告警信息</text>
+    </view>
+  </view>
+
+  <!-- 房态总览卡片 -->
+  <view class="room-overview-card" bindtap="goRoomStatus">
+    <view class="rov-header">
+      <text class="rov-title">🏠 实时房态</text>
+      <text class="rov-link">查看详情 ›</text>
+    </view>
+    <view class="rov-grid">
+      <view class="rov-item idle"><text class="rov-num">{{roomOverview.idle}}</text><text class="rov-label">空闲</text></view>
+      <view class="rov-item inuse"><text class="rov-num">{{roomOverview.inUse}}</text><text class="rov-label">使用中</text></view>
+      <view class="rov-item booked"><text class="rov-num">{{roomOverview.booked}}</text><text class="rov-label">已预订</text></view>
+      <view class="rov-item cleaning"><text class="rov-num">{{roomOverview.cleaning}}</text><text class="rov-label">待打扫</text></view>
     </view>
   </view>
 
@@ -100,4 +114,4 @@
   <view class="logout-section" bindtap="doLogout">
     <text class="logout-text">退出登录 → 回到客人端</text>
   </view>
-</view>
+</view><staff-bottom-nav active="dashboard" /></view>

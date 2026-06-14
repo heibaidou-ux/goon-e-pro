@@ -27,5 +27,5 @@
   },
   "networkTimeout": { "request": 10000 },
   "sitemapLocation": "sitemap.json",
-  "usingComponents": { "bottom-nav": "/components/bottom-nav/bottom-nav" }
+  "usingComponents": { "bottom-nav": "/components/bottom-nav/bottom-nav", "staff-bottom-nav": "/components/staff-bottom-nav/staff-bottom-nav" }
 }

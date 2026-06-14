@@ -69,7 +69,6 @@
       <view class="payment-option {{selectedPayment=='WeChat'?'active':''}}" bindtap="selectPayment" data-payment="WeChat">💚 微信支付</view>
       <view class="payment-option {{selectedPayment=='AliPay'?'active':''}}" bindtap="selectPayment" data-payment="AliPay">💙 支付宝</view>
       <view class="payment-option {{selectedPayment=='BankCard'?'active':''}}" bindtap="selectPayment" data-payment="BankCard">🏦 银行卡</view>
-      <view class="payment-option {{selectedPayment=='Cash'?'active':''}}" bindtap="selectPayment" data-payment="Cash">💵 现金（到店付）</view>
       <view class="modal-buttons">
         <button class="modal-btn cancel" bindtap="hideRecharge">取消</button>
         <button class="modal-btn confirm" bindtap="confirmRecharge">确认充值</button>

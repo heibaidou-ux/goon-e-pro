@@ -1,4 +1,4 @@
-<view class="page">
+<view class="phone"><view class="page">
   <view class="header">
     <text class="header-title">📋 订单管理</text>
   </view>
@@ -109,4 +109,5 @@
       </view>
     </view>
   </view>
+  <staff-bottom-nav active="orders" />
 </view>

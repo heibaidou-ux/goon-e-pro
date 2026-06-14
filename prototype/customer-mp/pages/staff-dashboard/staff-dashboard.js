@@ -5,6 +5,7 @@ Page({
   data: {
     storeName: '盈隆店',
     timeStr: '',
+    roomOverview: { idle: 0, inUse: 0, booked: 0, cleaning: 0 },
     stats: { roomCount: { inUse: 0 }, todayRevenue: 0, todayOrders: 0, pendingTasks: 0, orderStatus: 0, alerts: 0 },
     todos: []
   },
@@ -32,6 +33,21 @@ Page({
       var revenue = 0
       for (var i = 0; i < todayOrders.length; i++) revenue += todayOrders[i].amount || 0
       self.setData({ stats: { roomCount: { inUse: inUse }, todayRevenue: revenue, todayOrders: todayOrders.length, pendingTasks: pending, orderStatus: pending, alerts: 0 } })
+    })
+    // 加载房态总览
+    STAFF_API.getRoomStatusList().then(function(rooms) {
+      if (!rooms || !rooms.length) return
+      var idle = 0, inUse = 0, booked = 0, cleaning = 0
+      for (var i = 0; i < rooms.length; i++) {
+        var r = rooms[i]
+        if (r.roomId === 'RM005' || r.roomId === 'RM006') continue
+        if (r.status === 'Active' || r.statusLabel === '空闲') idle++
+        else if (r.status === 'InUse' || r.statusLabel === '使用中') inUse++
+        else if (r.status === 'Booked' || r.statusLabel === '已预订') booked++
+        else if (r.status === 'Cleaning' || r.statusLabel === '待打扫') cleaning++
+        else idle++
+      }
+      self.setData({ roomOverview: { idle: idle, inUse: inUse, booked: booked, cleaning: cleaning } })
     })
     // 从茶品订单中找出待发货的加入待办
     API.getShopOrders().then(function(shopOrders) {

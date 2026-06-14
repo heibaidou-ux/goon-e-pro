@@ -1,1 +1,121 @@
-<view class="page"><view class="header"><text class="header-title">✅ 待办任务</text></view><view class="todo-list"><view class="todo-item {{item.priority === 'high' ? 'high' : ''}}" wx:for="{{todos}}" wx:key="id"><view class="todo-body"><text class="todo-title">{{item.title}}</text><text class="todo-meta">{{item.type}} · 截止 {{item.deadline}}</text></view><text class="todo-arrow">›</text></view></view></view>
+<view class="phone">
+  <view class="page">
+    <view class="header">
+      <text class="header-title">✅ 待办任务</text>
+      <text class="header-total">共 {{cleaning.count + reconciliation.count + alerts.count + inspection.count + audit.count}} 项</text>
+    </view>
+
+    <view class="content">
+      <!-- 汇总统计 -->
+      <view class="summary-bar">
+        <view class="sb-item cleaning" bindtap="goTo" data-page="cleaning">
+          <text class="sb-num">{{cleaning.count}}</text>
+          <text class="sb-label">保洁</text>
+        </view>
+        <view class="sb-item reconciliation" bindtap="goTo" data-page="reconciliation">
+          <text class="sb-num">{{reconciliation.count}}</text>
+          <text class="sb-label">对账</text>
+        </view>
+        <view class="sb-item alert" bindtap="goTo" data-page="alerts">
+          <text class="sb-num">{{alerts.count}}</text>
+          <text class="sb-label">告警</text>
+        </view>
+        <view class="sb-item inspection" bindtap="goTo" data-page="inspection">
+          <text class="sb-num">{{inspection.count}}</text>
+          <text class="sb-label">巡检</text>
+        </view>
+      </view>
+
+      <!-- 保洁任务 -->
+      <view class="section-block">
+        <view class="sb-header">
+          <text class="sbh-icon">🧹</text>
+          <text class="sbh-title">保洁任务</text>
+          <text class="sbh-badge red">{{cleaning.count}}</text>
+          <text class="sbh-link" bindtap="goTo" data-page="cleaning">去处理 →</text>
+        </view>
+        <view class="sb-items" wx:if="{{cleaning.items.length > 0}}">
+          <view class="sbi-item {{item.priority === 'High' ? 'urgent' : ''}}" wx:for="{{cleaning.items}}" wx:key="taskId">
+            <text class="sbi-room">{{item.roomName}}</text>
+            <text class="sbi-type">{{item.type === 'FullClean' ? '全面清洁' : '快速清洁'}}</text>
+            <text class="sbi-time">截止 {{item.deadline}}</text>
+          </view>
+        </view>
+        <view class="sb-empty" wx:else>
+          <text>✅ 暂无待保洁房间</text>
+        </view>
+      </view>
+
+      <!-- 对账工单 -->
+      <view class="section-block">
+        <view class="sb-header">
+          <text class="sbh-icon">📊</text>
+          <text class="sbh-title">对账工单</text>
+          <text class="sbh-badge yellow">{{reconciliation.count}}</text>
+          <text class="sbh-link" bindtap="goTo" data-page="reconciliation">去处理 →</text>
+        </view>
+        <view class="sb-items" wx:if="{{reconciliation.items.length > 0}}">
+          <view class="sbi-item" wx:for="{{reconciliation.items}}" wx:key="*this">
+            <text>{{item.title}}</text>
+          </view>
+        </view>
+        <view class="sb-empty" wx:else>
+          <text>✅ 对账已平衡</text>
+        </view>
+      </view>
+
+      <!-- 设备告警 -->
+      <view class="section-block">
+        <view class="sb-header">
+          <text class="sbh-icon">🔔</text>
+          <text class="sbh-title">设备告警</text>
+          <text class="sbh-badge red">{{alerts.count}}</text>
+          <text class="sbh-link" bindtap="goTo" data-page="alerts">查看 →</text>
+        </view>
+        <view class="sb-items" wx:if="{{alerts.items.length > 0}}">
+          <view class="sbi-item" wx:for="{{alerts.items}}" wx:key="*this">
+            <text>{{item.title}}</text>
+          </view>
+        </view>
+        <view class="sb-empty" wx:else>
+          <text>✅ 设备运行正常</text>
+        </view>
+      </view>
+
+      <!-- 巡检任务 -->
+      <view class="section-block">
+        <view class="sb-header">
+          <text class="sbh-icon">📋</text>
+          <text class="sbh-title">巡检任务</text>
+          <text class="sbh-badge yellow">{{inspection.count}}</text>
+          <text class="sbh-link" bindtap="goTo" data-page="inspection">去处理 →</text>
+        </view>
+        <view class="sb-items" wx:if="{{inspection.items.length > 0}}">
+          <view class="sbi-item" wx:for="{{inspection.items}}" wx:key="*this">
+            <text>{{item.title}}</text>
+          </view>
+        </view>
+        <view class="sb-empty" wx:else>
+          <text>✅ 暂无巡检任务</text>
+        </view>
+      </view>
+
+      <!-- 待抽查审核 -->
+      <view class="section-block">
+        <view class="sb-header">
+          <text class="sbh-icon">👀</text>
+          <text class="sbh-title">待抽查审核</text>
+          <text class="sbh-badge gray">{{audit.count}}</text>
+          <text class="sbh-link" bindtap="goTo" data-page="audit">去审核 →</text>
+        </view>
+        <view class="sb-empty">
+          <text wx:if="{{audit.count == 0}}">✅ 暂无待审核</text>
+          <view wx:else wx:for="{{audit.items}}" wx:key="*this">
+            <text>{{item.title}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <staff-bottom-nav active="dashboard" />
+</view>

@@ -84,6 +84,14 @@ async def control_device(
     return result
 
 
+# ── Room init (all-off reset) ──
+
+@router.post("/rooms/{room_id}/init")
+async def init_room(room_id: str):
+    """Initialize/reset a room — all devices off, curtains closed, door locked."""
+    return await ha_service.init_room(room_id)
+
+
 # ── Scenes ──
 
 @router.get("/scenes")
@@ -116,6 +124,40 @@ async def list_alerts(
         room_id=room_id, severity=severity, status_filter=status
     )
     return alerts
+
+
+# ── Room Status (sensors + all devices) ──
+
+@router.get("/rooms/{room_id}/status")
+async def get_room_status(room_id: str):
+    """Get full status for a room: devices + sensors."""
+    devices = await ha_service.get_devices(room_id=room_id)
+    sensors = [d for d in devices if d["type"] == "Sensor"]
+    controls = [d for d in devices if d["type"] != "Sensor"]
+    return {
+        "room_id": room_id,
+        "sensors": sensors,
+        "devices": controls,
+    }
+
+
+@router.get("/sensors/{room_id}")
+async def get_room_sensors(room_id: str):
+    """Get temperature and humidity sensors for a room."""
+    devices = await ha_service.get_devices(room_id=room_id, device_type="Sensor")
+    temp = None
+    humidity = None
+    for d in devices:
+        eid = d.get("ha_entity_id", "")
+        if "temp" in eid:
+            temp = d
+        elif "humidity" in eid:
+            humidity = d
+    return {
+        "room_id": room_id,
+        "temperature": temp,
+        "humidity": humidity,
+    }
 
 
 # ── Stats ──

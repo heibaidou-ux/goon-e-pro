@@ -1,4 +1,4 @@
-<view class="page">
+<view class="phone"><view class="page">
   <view class="header">
     <text class="header-title">📋 排班管理</text>
   </view>
@@ -48,4 +48,5 @@
       </view>
     </view>
   </view>
+  <staff-bottom-nav active="dashboard" />
 </view>

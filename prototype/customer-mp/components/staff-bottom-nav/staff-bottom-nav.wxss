@@ -1,4 +1,4 @@
-.bottom-nav {
+.staff-bottom-nav {
   display: flex;
   border-top: 1px solid #eee;
   background: #fff;
@@ -13,6 +13,9 @@
 }
 .nav-item.active {
   color: #5D8A6B;
+}
+.nav-item:active {
+  opacity: .7;
 }
 .nav-icon {
   font-size: 20px;
