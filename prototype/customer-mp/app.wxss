@@ -1,11 +1,232 @@
-/** 高岸ERP 客人端 全局样式 */
+/** 高岸ERP — 茶室品牌视觉系统 V1.0
+ *  品牌色: #5D8A6B 茶绿 / #B8860B 琥珀金 / #FAF8F5 米白
+ *  字体: -apple-system 无衬线
+ *  圆角: 12-16px 柔和
+ *  阴影: 轻透
+ */
+
+/* ── 全局重置 ── */
 page {
-  background: #f5f5f5;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #FAF8F5;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
   font-size: 14px;
-  color: #333;
+  color: #2C2C2C;
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── 品牌色变量 ── */
+.text-primary { color: #5D8A6B; }
+.text-gold { color: #B8860B; }
+.text-danger { color: #D54941; }
+.text-muted { color: #999; }
+.bg-primary { background: #5D8A6B; }
+.bg-warm { background: #FAF8F5; }
+
+/* ── 卡片通用 ── */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  transition: transform 0.15s ease;
+}
+.card:active {
+  transform: scale(0.98);
+}
+
+/* ── 按钮系统 ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.15s ease;
+}
+.btn:active { opacity: 0.8; }
+.btn-primary {
+  background: linear-gradient(135deg, #5D8A6B, #7BA88E);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(93,138,107,0.3);
+}
+.btn-outline {
+  background: #fff;
+  color: #5D8A6B;
+  border: 1.5px solid #5D8A6B;
+}
+.btn-ghost {
+  background: #f5f5f5;
+  color: #666;
+}
+.btn-danger {
+  background: #fff;
+  color: #D54941;
+  border: 1.5px solid #D54941;
+}
+.btn-gold {
+  background: linear-gradient(135deg, #B8860B, #D4A84B);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(184,134,11,0.3);
+}
+.btn-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── 徽标系统 ── */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: #E8F5E9; color: #00A870; }
+.badge-purple { background: #F3E5F5; color: #9C27B0; }
+.badge-gold { background: #FFF3E0; color: #B8860B; }
+.badge-gray { background: #F5F5F5; color: #999; }
+.badge-red { background: #FFEBEE; color: #D54941; }
+.badge-blue { background: #E3F2FD; color: #5D8A6B; }
+
+/* ── 空状态 ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #999;
+}
+.empty-state .empty-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+.empty-state .empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 4px;
+}
+.empty-state .empty-desc {
+  font-size: 13px;
+  color: #bbb;
+}
+
+/* ── 加载状态 ── */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+.loading-spinner::after {
+  content: '';
+  width: 28px;
+  height: 28px;
+  border: 3px solid #E8F5E9;
+  border-top-color: #5D8A6B;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── 骨架屏加载占位 ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ── 分隔线 ── */
+.divider {
+  height: 1px;
+  background: #f0ece6;
+  margin: 12px 0;
+}
+.divider-text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ccc;
+  font-size: 12px;
+}
+.divider-text::before,
+.divider-text::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #f0ece6;
+}
+
+/* ── 弹窗系统 ── */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 99;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.modal-overlay.modal-center {
+  align-items: center;
+}
+.modal {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 24px;
+  width: 100%;
+  max-width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.25s ease;
+}
+.modal-center .modal {
+  width: 320px;
+  border-radius: 20px;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* ── Toast通知 ── */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 200;
+  animation: toastIn 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
