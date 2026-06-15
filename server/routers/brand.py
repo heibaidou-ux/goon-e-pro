@@ -22,9 +22,9 @@ from schemas.brand import (
     InvestmentCreate, InvestmentUpdate, InvestmentOut, InvestmentListOut,
     MilestoneCreate, MilestoneUpdate, MilestoneOut, MilestoneListOut,
 )
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 
-router = APIRouter(prefix="/api/brand", tags=["品牌运营管理"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/api/brand", tags=["品牌运营管理"])
 
 
 def _gen_id() -> str:
@@ -35,7 +35,7 @@ def _gen_id() -> str:
 # Organization 组织
 # ═══════════════════════════════════════════
 
-@router.get("/orgs", response_model=OrganizationListOut)
+@router.get("/orgs", response_model=OrganizationListOut, dependencies=[Depends(get_optional_user)])
 async def list_organizations(
     parent_org_id: Optional[str] = Query(None, alias="parentOrgId"),
     type: Optional[str] = None,
@@ -81,7 +81,7 @@ async def list_organizations(
     return OrganizationListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/orgs/tree")
+@router.get("/orgs/tree", dependencies=[Depends(get_optional_user)])
 async def get_org_tree(
     db: AsyncSession = Depends(get_db),
 ):
@@ -113,7 +113,7 @@ async def get_org_tree(
     return roots
 
 
-@router.get("/orgs/{org_id}", response_model=OrganizationOut)
+@router.get("/orgs/{org_id}", response_model=OrganizationOut, dependencies=[Depends(get_optional_user)])
 async def get_organization(org_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Organization).where(Organization.orgId == org_id))
     item = r.scalar_one_or_none()
@@ -129,7 +129,7 @@ async def get_organization(org_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/orgs", response_model=OrganizationOut, status_code=201)
+@router.post("/orgs", response_model=OrganizationOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_organization(
     data: OrganizationCreate,
     db: AsyncSession = Depends(get_db),
@@ -154,7 +154,7 @@ async def create_organization(
     )
 
 
-@router.put("/orgs/{org_id}", response_model=OrganizationOut)
+@router.put("/orgs/{org_id}", response_model=OrganizationOut, dependencies=[Depends(get_current_user)])
 async def update_organization(
     org_id: str,
     data: OrganizationUpdate,
@@ -198,7 +198,7 @@ async def update_organization(
     )
 
 
-@router.delete("/orgs/{org_id}")
+@router.delete("/orgs/{org_id}", dependencies=[Depends(get_current_user)])
 async def delete_organization(org_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Organization).where(Organization.orgId == org_id))
     item = r.scalar_one_or_none()
@@ -220,7 +220,7 @@ async def delete_organization(org_id: str, db: AsyncSession = Depends(get_db)):
 # BusinessGoal 经营目标
 # ═══════════════════════════════════════════
 
-@router.get("/goals", response_model=BusinessGoalListOut)
+@router.get("/goals", response_model=BusinessGoalListOut, dependencies=[Depends(get_optional_user)])
 async def list_business_goals(
     org_id: Optional[str] = Query(None, alias="orgId"),
     year: Optional[int] = None,
@@ -272,7 +272,7 @@ async def list_business_goals(
     return BusinessGoalListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/goals/{goal_id}", response_model=BusinessGoalOut)
+@router.get("/goals/{goal_id}", response_model=BusinessGoalOut, dependencies=[Depends(get_optional_user)])
 async def get_business_goal(goal_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(BusinessGoal).where(BusinessGoal.goalId == goal_id))
     item = r.scalar_one_or_none()
@@ -292,7 +292,7 @@ async def get_business_goal(goal_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/goals", response_model=BusinessGoalOut, status_code=201)
+@router.post("/goals", response_model=BusinessGoalOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_business_goal(
     data: BusinessGoalCreate,
     db: AsyncSession = Depends(get_db),
@@ -321,7 +321,7 @@ async def create_business_goal(
     )
 
 
-@router.put("/goals/{goal_id}", response_model=BusinessGoalOut)
+@router.put("/goals/{goal_id}", response_model=BusinessGoalOut, dependencies=[Depends(get_current_user)])
 async def update_business_goal(
     goal_id: str,
     data: BusinessGoalUpdate,
@@ -361,7 +361,7 @@ async def update_business_goal(
     )
 
 
-@router.delete("/goals/{goal_id}")
+@router.delete("/goals/{goal_id}", dependencies=[Depends(get_current_user)])
 async def delete_business_goal(goal_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(BusinessGoal).where(BusinessGoal.goalId == goal_id))
     item = r.scalar_one_or_none()
@@ -382,7 +382,7 @@ async def delete_business_goal(goal_id: str, db: AsyncSession = Depends(get_db))
 # GoalMetric 目标指标
 # ═══════════════════════════════════════════
 
-@router.get("/goals/{goal_id}/metrics", response_model=GoalMetricListOut)
+@router.get("/goals/{goal_id}/metrics", response_model=GoalMetricListOut, dependencies=[Depends(get_optional_user)])
 async def list_goal_metrics(
     goal_id: str,
     page: int = Query(1, ge=1),
@@ -411,7 +411,7 @@ async def list_goal_metrics(
     return GoalMetricListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/metrics/{metric_id}", response_model=GoalMetricOut)
+@router.get("/metrics/{metric_id}", response_model=GoalMetricOut, dependencies=[Depends(get_optional_user)])
 async def get_goal_metric(metric_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(GoalMetric).where(GoalMetric.metricId == metric_id))
     item = r.scalar_one_or_none()
@@ -425,7 +425,7 @@ async def get_goal_metric(metric_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/metrics", response_model=GoalMetricOut, status_code=201)
+@router.post("/metrics", response_model=GoalMetricOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_goal_metric(
     data: GoalMetricCreate,
     db: AsyncSession = Depends(get_db),
@@ -446,7 +446,7 @@ async def create_goal_metric(
     )
 
 
-@router.put("/metrics/{metric_id}", response_model=GoalMetricOut)
+@router.put("/metrics/{metric_id}", response_model=GoalMetricOut, dependencies=[Depends(get_current_user)])
 async def update_goal_metric(
     metric_id: str,
     data: GoalMetricUpdate,
@@ -474,7 +474,7 @@ async def update_goal_metric(
     )
 
 
-@router.delete("/metrics/{metric_id}")
+@router.delete("/metrics/{metric_id}", dependencies=[Depends(get_current_user)])
 async def delete_goal_metric(metric_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(GoalMetric).where(GoalMetric.metricId == metric_id))
     item = r.scalar_one_or_none()
@@ -489,7 +489,7 @@ async def delete_goal_metric(metric_id: str, db: AsyncSession = Depends(get_db))
 # BrandAsset 品牌资产
 # ═══════════════════════════════════════════
 
-@router.get("/assets", response_model=BrandAssetListOut)
+@router.get("/assets", response_model=BrandAssetListOut, dependencies=[Depends(get_optional_user)])
 async def list_brand_assets(
     org_id: Optional[str] = Query(None, alias="orgId"),
     asset_type: Optional[str] = Query(None, alias="assetType"),
@@ -541,7 +541,7 @@ async def list_brand_assets(
     return BrandAssetListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/assets/{asset_id}", response_model=BrandAssetOut)
+@router.get("/assets/{asset_id}", response_model=BrandAssetOut, dependencies=[Depends(get_optional_user)])
 async def get_brand_asset(asset_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(BrandAsset).where(BrandAsset.assetId == asset_id))
     item = r.scalar_one_or_none()
@@ -561,7 +561,7 @@ async def get_brand_asset(asset_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/assets", response_model=BrandAssetOut, status_code=201)
+@router.post("/assets", response_model=BrandAssetOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_brand_asset(
     data: BrandAssetCreate,
     db: AsyncSession = Depends(get_db),
@@ -589,7 +589,7 @@ async def create_brand_asset(
     )
 
 
-@router.put("/assets/{asset_id}", response_model=BrandAssetOut)
+@router.put("/assets/{asset_id}", response_model=BrandAssetOut, dependencies=[Depends(get_current_user)])
 async def update_brand_asset(
     asset_id: str,
     data: BrandAssetUpdate,
@@ -627,7 +627,7 @@ async def update_brand_asset(
     )
 
 
-@router.delete("/assets/{asset_id}")
+@router.delete("/assets/{asset_id}", dependencies=[Depends(get_current_user)])
 async def delete_brand_asset(asset_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(BrandAsset).where(BrandAsset.assetId == asset_id))
     item = r.scalar_one_or_none()
@@ -642,7 +642,7 @@ async def delete_brand_asset(asset_id: str, db: AsyncSession = Depends(get_db)):
 # Contract 合同
 # ═══════════════════════════════════════════
 
-@router.get("/contracts", response_model=ContractListOut)
+@router.get("/contracts", response_model=ContractListOut, dependencies=[Depends(get_optional_user)])
 async def list_contracts(
     org_id: Optional[str] = Query(None, alias="orgId"),
     counterparty_id: Optional[str] = Query(None, alias="counterpartyId"),
@@ -708,7 +708,7 @@ async def list_contracts(
     return ContractListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/contracts/{contract_id}", response_model=ContractOut)
+@router.get("/contracts/{contract_id}", response_model=ContractOut, dependencies=[Depends(get_optional_user)])
 async def get_contract(contract_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Contract).where(Contract.contractId == contract_id))
     item = r.scalar_one_or_none()
@@ -738,7 +738,7 @@ async def get_contract(contract_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/contracts", response_model=ContractOut, status_code=201)
+@router.post("/contracts", response_model=ContractOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_contract(
     data: ContractCreate,
     db: AsyncSession = Depends(get_db),
@@ -779,7 +779,7 @@ async def create_contract(
     )
 
 
-@router.put("/contracts/{contract_id}", response_model=ContractOut)
+@router.put("/contracts/{contract_id}", response_model=ContractOut, dependencies=[Depends(get_current_user)])
 async def update_contract(
     contract_id: str,
     data: ContractUpdate,
@@ -831,7 +831,7 @@ async def update_contract(
     )
 
 
-@router.delete("/contracts/{contract_id}")
+@router.delete("/contracts/{contract_id}", dependencies=[Depends(get_current_user)])
 async def delete_contract(contract_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Contract).where(Contract.contractId == contract_id))
     item = r.scalar_one_or_none()
@@ -846,7 +846,7 @@ async def delete_contract(contract_id: str, db: AsyncSession = Depends(get_db)):
 # Shareholder 股东
 # ═══════════════════════════════════════════
 
-@router.get("/shareholders", response_model=ShareholderListOut)
+@router.get("/shareholders", response_model=ShareholderListOut, dependencies=[Depends(get_optional_user)])
 async def list_shareholders(
     type: Optional[str] = None,
     status: Optional[str] = None,
@@ -899,7 +899,7 @@ async def list_shareholders(
     )
 
 
-@router.get("/shareholders/{shareholder_id}", response_model=ShareholderOut)
+@router.get("/shareholders/{shareholder_id}", response_model=ShareholderOut, dependencies=[Depends(get_optional_user)])
 async def get_shareholder(shareholder_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Shareholder).where(Shareholder.shareholderId == shareholder_id))
     item = r.scalar_one_or_none()
@@ -917,7 +917,7 @@ async def get_shareholder(shareholder_id: str, db: AsyncSession = Depends(get_db
     )
 
 
-@router.post("/shareholders", response_model=ShareholderOut, status_code=201)
+@router.post("/shareholders", response_model=ShareholderOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_shareholder(
     data: ShareholderCreate,
     db: AsyncSession = Depends(get_db),
@@ -947,7 +947,7 @@ async def create_shareholder(
     )
 
 
-@router.put("/shareholders/{shareholder_id}", response_model=ShareholderOut)
+@router.put("/shareholders/{shareholder_id}", response_model=ShareholderOut, dependencies=[Depends(get_current_user)])
 async def update_shareholder(
     shareholder_id: str,
     data: ShareholderUpdate,
@@ -997,7 +997,7 @@ async def update_shareholder(
     )
 
 
-@router.delete("/shareholders/{shareholder_id}")
+@router.delete("/shareholders/{shareholder_id}", dependencies=[Depends(get_current_user)])
 async def delete_shareholder(shareholder_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Shareholder).where(Shareholder.shareholderId == shareholder_id))
     item = r.scalar_one_or_none()
@@ -1018,7 +1018,7 @@ async def delete_shareholder(shareholder_id: str, db: AsyncSession = Depends(get
 # Investment 投资
 # ═══════════════════════════════════════════
 
-@router.get("/investments", response_model=InvestmentListOut)
+@router.get("/investments", response_model=InvestmentListOut, dependencies=[Depends(get_optional_user)])
 async def list_investments(
     shareholder_id: Optional[str] = Query(None, alias="shareholderId"),
     target_type: Optional[str] = Query(None, alias="targetType"),
@@ -1072,7 +1072,7 @@ async def list_investments(
     return InvestmentListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/investments/{investment_id}", response_model=InvestmentOut)
+@router.get("/investments/{investment_id}", response_model=InvestmentOut, dependencies=[Depends(get_optional_user)])
 async def get_investment(investment_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Investment).where(Investment.investmentId == investment_id))
     item = r.scalar_one_or_none()
@@ -1094,7 +1094,7 @@ async def get_investment(investment_id: str, db: AsyncSession = Depends(get_db))
     )
 
 
-@router.post("/investments", response_model=InvestmentOut, status_code=201)
+@router.post("/investments", response_model=InvestmentOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_investment(
     data: InvestmentCreate,
     db: AsyncSession = Depends(get_db),
@@ -1125,7 +1125,7 @@ async def create_investment(
     )
 
 
-@router.put("/investments/{investment_id}", response_model=InvestmentOut)
+@router.put("/investments/{investment_id}", response_model=InvestmentOut, dependencies=[Depends(get_current_user)])
 async def update_investment(
     investment_id: str,
     data: InvestmentUpdate,
@@ -1165,7 +1165,7 @@ async def update_investment(
     )
 
 
-@router.delete("/investments/{investment_id}")
+@router.delete("/investments/{investment_id}", dependencies=[Depends(get_current_user)])
 async def delete_investment(investment_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Investment).where(Investment.investmentId == investment_id))
     item = r.scalar_one_or_none()
@@ -1180,7 +1180,7 @@ async def delete_investment(investment_id: str, db: AsyncSession = Depends(get_d
 # Milestone 里程碑
 # ═══════════════════════════════════════════
 
-@router.get("/goals/{goal_id}/milestones", response_model=MilestoneListOut)
+@router.get("/goals/{goal_id}/milestones", response_model=MilestoneListOut, dependencies=[Depends(get_optional_user)])
 async def list_milestones(
     goal_id: str,
     status: Optional[str] = None,
@@ -1215,7 +1215,7 @@ async def list_milestones(
     return MilestoneListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/milestones/{milestone_id}", response_model=MilestoneOut)
+@router.get("/milestones/{milestone_id}", response_model=MilestoneOut, dependencies=[Depends(get_optional_user)])
 async def get_milestone(milestone_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Milestone).where(Milestone.milestoneId == milestone_id))
     item = r.scalar_one_or_none()
@@ -1229,7 +1229,7 @@ async def get_milestone(milestone_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/milestones", response_model=MilestoneOut, status_code=201)
+@router.post("/milestones", response_model=MilestoneOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_milestone(
     data: MilestoneCreate,
     db: AsyncSession = Depends(get_db),
@@ -1251,7 +1251,7 @@ async def create_milestone(
     )
 
 
-@router.put("/milestones/{milestone_id}", response_model=MilestoneOut)
+@router.put("/milestones/{milestone_id}", response_model=MilestoneOut, dependencies=[Depends(get_current_user)])
 async def update_milestone(
     milestone_id: str,
     data: MilestoneUpdate,
@@ -1283,7 +1283,7 @@ async def update_milestone(
     )
 
 
-@router.delete("/milestones/{milestone_id}")
+@router.delete("/milestones/{milestone_id}", dependencies=[Depends(get_current_user)])
 async def delete_milestone(milestone_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Milestone).where(Milestone.milestoneId == milestone_id))
     item = r.scalar_one_or_none()

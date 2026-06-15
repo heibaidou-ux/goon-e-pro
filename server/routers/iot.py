@@ -12,16 +12,16 @@ from schemas.iot import (
     DeviceOut, DeviceControlReq, SceneActivateReq,
     AlertOut, SceneOut, IoTStats,
 )
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 from services import ha_service
 
-router = APIRouter(prefix="/api/iot", tags=["IoT管理"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/api/iot", tags=["IoT管理"])
 
 
 # ── Devices ──
 
 @router.get("/health")
-async def iot_health():
+async def iot_health(current_user: Optional[User] = Depends(get_optional_user)):
     """Check HA connectivity (mock or real)."""
     return await ha_service.check_health()
 
@@ -32,6 +32,7 @@ async def list_devices(
     device_type: Optional[str] = Query(None, alias="type"),
     status: Optional[str] = Query(None, alias="status"),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """List all IoT devices with live state from HA (or mock)."""
     devices = await ha_service.get_devices(
@@ -55,7 +56,10 @@ async def list_devices(
 
 
 @router.get("/devices/{device_id}", response_model=DeviceOut)
-async def get_device(device_id: str):
+async def get_device(
+    device_id: str,
+    current_user: Optional[User] = Depends(get_optional_user),
+):
     """Get single device detail."""
     dev = await ha_service.get_device(device_id)
     if not dev:
@@ -87,7 +91,10 @@ async def control_device(
 # ── Room init (all-off reset) ──
 
 @router.post("/rooms/{room_id}/init")
-async def init_room(room_id: str):
+async def init_room(
+    room_id: str,
+    current_user: User = Depends(get_current_user),
+):
     """Initialize/reset a room — all devices off, curtains closed, door locked."""
     return await ha_service.init_room(room_id)
 
@@ -95,7 +102,7 @@ async def init_room(room_id: str):
 # ── Scenes ──
 
 @router.get("/scenes")
-async def list_scenes():
+async def list_scenes(current_user: Optional[User] = Depends(get_optional_user)):
     """Get all scene templates."""
     scenes = await ha_service.get_scenes()
     return scenes
@@ -118,6 +125,7 @@ async def list_alerts(
     room_id: Optional[str] = Query(None, alias="room_id"),
     severity: Optional[str] = None,
     status: Optional[str] = None,
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """Get IoT alerts."""
     alerts = await ha_service.get_alerts(
@@ -129,7 +137,10 @@ async def list_alerts(
 # ── Room Status (sensors + all devices) ──
 
 @router.get("/rooms/{room_id}/status")
-async def get_room_status(room_id: str):
+async def get_room_status(
+    room_id: str,
+    current_user: Optional[User] = Depends(get_optional_user),
+):
     """Get full status for a room: devices + sensors."""
     devices = await ha_service.get_devices(room_id=room_id)
     sensors = [d for d in devices if d["type"] == "Sensor"]
@@ -142,7 +153,10 @@ async def get_room_status(room_id: str):
 
 
 @router.get("/sensors/{room_id}")
-async def get_room_sensors(room_id: str):
+async def get_room_sensors(
+    room_id: str,
+    current_user: Optional[User] = Depends(get_optional_user),
+):
     """Get temperature and humidity sensors for a room."""
     devices = await ha_service.get_devices(room_id=room_id, device_type="Sensor")
     temp = None
@@ -163,7 +177,7 @@ async def get_room_sensors(room_id: str):
 # ── Stats ──
 
 @router.get("/stats")
-async def get_stats():
+async def get_stats(current_user: Optional[User] = Depends(get_optional_user)):
     """Get IoT device statistics for dashboard."""
     return await ha_service.get_stats()
 

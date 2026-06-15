@@ -1,12 +1,50 @@
 /**
  * 高岸ERP 店员端 API — 真工具版
+ * 支持 Mock(本地) / Live(后端) 双模式
+ * USE_MOCK = false 时直连后端 FastAPI
  */
 const MOCK = require('./mock-data')
 
+const API_BASE = 'http://localhost:8000'
+const USE_MOCK = true  // false = 连后端
+
+function lsGet(key, fallback) {
+  try { const val = wx.getStorageSync('mp_' + key); return val || fallback } catch (e) { return fallback }
+}
+function lsSet(key, val) { try { wx.setStorageSync('mp_' + key, val) } catch (e) { } }
+
+function getToken() { return lsGet('token', null) }
+
 function delay(ms) { ms = ms || (150 + Math.random() * 200); return new Promise(resolve => setTimeout(resolve, ms)) }
+
+async function request(options) {
+  if (USE_MOCK) return Promise.reject(new Error('MOCK_MODE'))
+  const token = getToken()
+  const header = { 'Content-Type': 'application/json' }
+  if (token) header['Authorization'] = 'Bearer ' + token
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: API_BASE + options.url,
+      method: options.method || 'GET',
+      data: options.data,
+      header: header,
+      success: res => {
+        if (res.statusCode === 401) { wx.reLaunch({ url: '/pages/staff-login/staff-login' }); return }
+        if (res.statusCode >= 400) { reject(new Error((res.data && res.data.detail) || '请求失败')); return }
+        resolve(res.data)
+      },
+      fail: err => reject(new Error('网络请求失败'))
+    })
+  })
+}
 
 const STAFF_API = {
   getDashboardStats() {
+    if (!USE_MOCK) return request({ url: '/api/operations/dashboard' }).catch(() => this._mockDashboard())
+    return this._mockDashboard()
+  },
+
+  _mockDashboard() {
     return delay().then(() => {
       var today = new Date()
       var dateStr = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0')
@@ -39,7 +77,6 @@ const STAFF_API = {
     })
   },
 
-  // ── 异常对账处理 ──
   resolveAnomaly(anomalyId) { return delay(200).then(() => ({ success: true })) },
 
   // ── 考勤 ──
@@ -71,18 +108,14 @@ const STAFF_API = {
   },
   submitInspection(roomId, results) {
     return delay(300).then(() => {
-      // 保存巡检报告
-      var reports = []
-      try { reports = wx.getStorageSync('mp_inspection_reports') || [] } catch(e) {}
+      var reports = []; try { reports = wx.getStorageSync('mp_inspection_reports') || [] } catch(e) {}
       reports.unshift({ id:'IR'+String(Date.now()).slice(-6), roomId: roomId, items: results, inspector: '店员小张', time: new Date().toLocaleString(), status: '待复核' })
       try { wx.setStorageSync('mp_inspection_reports', reports) } catch(e) {}
       return { success: true, message: '巡检记录已保存，等待店长复核' }
     })
   },
   getInspectionReports() {
-    return delay().then(() => {
-      try { return wx.getStorageSync('mp_inspection_reports') || [] } catch(e) { return [] }
-    })
+    return delay().then(() => { try { return wx.getStorageSync('mp_inspection_reports') || [] } catch(e) { return [] } })
   },
   confirmInspectionReport(reportId) {
     return delay(200).then(() => {
@@ -91,7 +124,7 @@ const STAFF_API = {
     })
   },
 
-  // ── 排班（可计划版） ──
+  // ── 排班 ──
   getSchedule(weekOffset) {
     return delay().then(() => ({
       weekStart: '2026-06-08', weekEnd: '2026-06-14',
@@ -103,15 +136,44 @@ const STAFF_API = {
       ]
     }))
   },
-  saveSchedule(staffName, dayIndex, shift) {
-    return delay(200).then(() => ({ success: true }))
-  },
+  saveSchedule(staffName, dayIndex, shift) { return delay(200).then(() => ({ success: true })) },
 
-  // ── 保洁任务 ──
-  getCleaningTasks() { return delay().then(() => ({ pending:[{taskId:'CT001',roomName:'大茶室C',type:'FullClean',priority:'High',deadline:'10:30'},{taskId:'CT002',roomName:'中茶室A',type:'QuickClean',priority:'Normal',deadline:'11:00'}], inProgress:[{taskId:'CT003',roomName:'大会议室',type:'FullClean',priority:'Normal',deadline:'10:00'}] })) },
+  // ── 保洁 ──
+  getCleaningTasks() {
+    if (!USE_MOCK) return request({ url: '/api/operations/cleaning-tasks/today' }).catch(() => this._mockCleaning())
+    return this._mockCleaning()
+  },
+  _mockCleaning() {
+    return delay().then(() => ({
+      pending: [{taskId:'CT001',roomName:'大茶室C',type:'FullClean',priority:'High',deadline:'10:30'},{taskId:'CT002',roomName:'中茶室A',type:'QuickClean',priority:'Normal',deadline:'11:00'}],
+      inProgress: [{taskId:'CT003',roomName:'大会议室',type:'FullClean',priority:'Normal',deadline:'10:00'}]
+    }))
+  },
   acceptCleaningTask(taskId) { return delay(200).then(() => ({ success:true })) },
   completeCleaningTask(taskId) { return delay(200).then(() => ({ success:true })) },
-  getRoomStatusList() { return delay().then(() => MOCK.rooms.map(r => ({ roomId:r.roomId, name:r.name, type:r.type, capacity:r.capacity, statusColor:r.status==='Active'?'#00A870':'#999', statusLabel:r.status==='Active'?'在线':'离线', currentOrder:null }))) }
+
+  // ── 房态 ──
+  getRoomStatusList() {
+    if (!USE_MOCK) return request({ url: '/api/iot/devices' })  // Will adapt later
+    return delay().then(() => MOCK.rooms.map(r => ({
+      roomId: r.roomId, name: r.name, type: r.type, capacity: r.capacity,
+      statusColor: r.status==='Active'?'#00A870':'#999', statusLabel: r.status==='Active'?'在线':'离线', currentOrder: null
+    })))
+  },
+
+  // ── IoT ──
+  getDeviceStats() {
+    if (!USE_MOCK) return request({ url: '/api/iot/stats' })
+    return delay().then(() => {
+      var total = MOCK.devices.length
+      var online = MOCK.devices.filter(d => d.status === 'Online').length
+      return { total, online, offline: total - online, rate: Math.round(online/total*100)+'%' }
+    })
+  },
+
+  getInspections() {
+    return delay().then(() => [])
+  },
 }
 
 module.exports = STAFF_API

@@ -7,7 +7,7 @@ from sqlalchemy import select, func, desc
 from datetime import datetime, date
 
 from database import get_db
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 from models.marketing import (
     Campaign, CouponTemplate, Coupon, Lead, Opportunity,
     MarketingList, CustomerSegment, ThirdPartyActivity, CampaignEffect, Channel,
@@ -26,7 +26,7 @@ from schemas.marketing import (
     ChannelCreate, ChannelUpdate, ChannelOut, ChannelListOut,
 )
 
-router = APIRouter(prefix="/api/marketing", tags=["市场营销管理"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/api/marketing", tags=["市场营销管理"], dependencies=[Depends(get_optional_user)])
 
 
 def _gen_id() -> str:
@@ -123,7 +123,7 @@ async def get_campaign(campaign_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/campaigns", response_model=CampaignOut, status_code=201)
+@router.post("/campaigns", response_model=CampaignOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_campaign(
     data: CampaignCreate,
     db: AsyncSession = Depends(get_db),
@@ -150,7 +150,7 @@ async def create_campaign(
     )
 
 
-@router.put("/campaigns/{campaign_id}", response_model=CampaignOut)
+@router.put("/campaigns/{campaign_id}", response_model=CampaignOut, dependencies=[Depends(get_current_user)])
 async def update_campaign(
     campaign_id: str,
     data: CampaignUpdate,
@@ -302,7 +302,7 @@ async def get_coupon_template(template_id: str, db: AsyncSession = Depends(get_d
     )
 
 
-@router.post("/coupon-templates", response_model=CouponTemplateOut, status_code=201)
+@router.post("/coupon-templates", response_model=CouponTemplateOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_coupon_template(
     data: CouponTemplateCreate,
     db: AsyncSession = Depends(get_db),
@@ -328,7 +328,7 @@ async def create_coupon_template(
     )
 
 
-@router.put("/coupon-templates/{template_id}", response_model=CouponTemplateOut)
+@router.put("/coupon-templates/{template_id}", response_model=CouponTemplateOut, dependencies=[Depends(get_current_user)])
 async def update_coupon_template(
     template_id: str,
     data: CouponTemplateUpdate,
@@ -521,7 +521,7 @@ async def get_coupon(coupon_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/coupons", response_model=CouponOut, status_code=201)
+@router.post("/coupons", response_model=CouponOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_coupon(
     data: CouponCreate,
     db: AsyncSession = Depends(get_db),
@@ -555,7 +555,7 @@ async def create_coupon(
     )
 
 
-@router.put("/coupons/{coupon_id}", response_model=CouponOut)
+@router.put("/coupons/{coupon_id}", response_model=CouponOut, dependencies=[Depends(get_current_user)])
 async def update_coupon(
     coupon_id: str,
     data: CouponUpdate,
@@ -681,7 +681,7 @@ async def get_lead(lead_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/leads", response_model=LeadOut, status_code=201)
+@router.post("/leads", response_model=LeadOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_lead(
     data: LeadCreate,
     db: AsyncSession = Depends(get_db),
@@ -708,7 +708,7 @@ async def create_lead(
     )
 
 
-@router.put("/leads/{lead_id}", response_model=LeadOut)
+@router.put("/leads/{lead_id}", response_model=LeadOut, dependencies=[Depends(get_current_user)])
 async def update_lead(
     lead_id: str,
     data: LeadUpdate,
@@ -829,7 +829,7 @@ async def get_opportunity(opportunity_id: str, db: AsyncSession = Depends(get_db
     )
 
 
-@router.post("/opportunities", response_model=OpportunityOut, status_code=201)
+@router.post("/opportunities", response_model=OpportunityOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_opportunity(
     data: OpportunityCreate,
     db: AsyncSession = Depends(get_db),
@@ -857,7 +857,7 @@ async def create_opportunity(
     )
 
 
-@router.put("/opportunities/{opportunity_id}", response_model=OpportunityOut)
+@router.put("/opportunities/{opportunity_id}", response_model=OpportunityOut, dependencies=[Depends(get_current_user)])
 async def update_opportunity(
     opportunity_id: str,
     data: OpportunityUpdate,
@@ -957,7 +957,7 @@ async def get_marketing_list(list_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/marketing-lists", response_model=MarketingListOut, status_code=201)
+@router.post("/marketing-lists", response_model=MarketingListOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_marketing_list(
     data: MarketingListCreate,
     db: AsyncSession = Depends(get_db),
@@ -981,7 +981,7 @@ async def create_marketing_list(
     )
 
 
-@router.put("/marketing-lists/{list_id}", response_model=MarketingListOut)
+@router.put("/marketing-lists/{list_id}", response_model=MarketingListOut, dependencies=[Depends(get_current_user)])
 async def update_marketing_list(
     list_id: str,
     data: MarketingListUpdate,
@@ -1063,7 +1063,7 @@ async def get_customer_segment(segment_id: str, db: AsyncSession = Depends(get_d
     )
 
 
-@router.post("/customer-segments", response_model=CustomerSegmentOut, status_code=201)
+@router.post("/customer-segments", response_model=CustomerSegmentOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_customer_segment(
     data: CustomerSegmentCreate,
     db: AsyncSession = Depends(get_db),
@@ -1082,7 +1082,7 @@ async def create_customer_segment(
     )
 
 
-@router.put("/customer-segments/{segment_id}", response_model=CustomerSegmentOut)
+@router.put("/customer-segments/{segment_id}", response_model=CustomerSegmentOut, dependencies=[Depends(get_current_user)])
 async def update_customer_segment(
     segment_id: str,
     data: CustomerSegmentUpdate,
@@ -1192,7 +1192,7 @@ async def get_third_party_activity(activity_id: str, db: AsyncSession = Depends(
     )
 
 
-@router.post("/third-party-activities", response_model=ThirdPartyActivityOut, status_code=201)
+@router.post("/third-party-activities", response_model=ThirdPartyActivityOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_third_party_activity(
     data: ThirdPartyActivityCreate,
     db: AsyncSession = Depends(get_db),
@@ -1221,7 +1221,7 @@ async def create_third_party_activity(
     )
 
 
-@router.put("/third-party-activities/{activity_id}", response_model=ThirdPartyActivityOut)
+@router.put("/third-party-activities/{activity_id}", response_model=ThirdPartyActivityOut, dependencies=[Depends(get_current_user)])
 async def update_third_party_activity(
     activity_id: str,
     data: ThirdPartyActivityUpdate,
@@ -1334,7 +1334,7 @@ async def get_campaign_effect(effect_id: str, db: AsyncSession = Depends(get_db)
     )
 
 
-@router.post("/campaign-effects", response_model=CampaignEffectOut, status_code=201)
+@router.post("/campaign-effects", response_model=CampaignEffectOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_campaign_effect(
     data: CampaignEffectCreate,
     db: AsyncSession = Depends(get_db),
@@ -1354,7 +1354,7 @@ async def create_campaign_effect(
     )
 
 
-@router.put("/campaign-effects/{effect_id}", response_model=CampaignEffectOut)
+@router.put("/campaign-effects/{effect_id}", response_model=CampaignEffectOut, dependencies=[Depends(get_current_user)])
 async def update_campaign_effect(
     effect_id: str,
     data: CampaignEffectUpdate,
@@ -1443,7 +1443,7 @@ async def get_channel(channel_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/channels", response_model=ChannelOut, status_code=201)
+@router.post("/channels", response_model=ChannelOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_channel(
     data: ChannelCreate,
     db: AsyncSession = Depends(get_db),
@@ -1463,7 +1463,7 @@ async def create_channel(
     )
 
 
-@router.put("/channels/{channel_id}", response_model=ChannelOut)
+@router.put("/channels/{channel_id}", response_model=ChannelOut, dependencies=[Depends(get_current_user)])
 async def update_channel(
     channel_id: str,
     data: ChannelUpdate,

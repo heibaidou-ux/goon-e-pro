@@ -243,7 +243,11 @@ async def list_products(
 
 
 @router.get("/{product_id}", response_model=ProductOut)
-async def get_product(product_id: str, db: AsyncSession = Depends(get_db)):
+async def get_product(
+    product_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
+):
     query = select(Product).where(Product.productId == product_id).options(selectinload(Product.images))
     result = await db.execute(query)
     product = result.scalar_one_or_none()
@@ -426,7 +430,10 @@ async def delete_product_image(
 # ═══════════════════════════════════════════════════════
 
 @router.get("/units", response_model=list[UnitOfMeasureOut])
-async def list_units(db: AsyncSession = Depends(get_db)):
+async def list_units(
+    db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
+):
     """List all active units of measure."""
     result = await db.execute(
         select(UnitOfMeasure).where(UnitOfMeasure.status == "Active")
@@ -489,6 +496,7 @@ async def delete_unit(
 async def list_price_lists(
     type_filter: Optional[str] = Query(None, alias="type"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(PriceList).where(PriceList.status == "Active")
     if type_filter:
@@ -553,6 +561,7 @@ async def list_suppliers(
     search: Optional[str] = None,
     status_filter: Optional[str] = Query(None, alias="status"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(Supplier)
     if status_filter:
@@ -591,6 +600,7 @@ async def create_supplier(
 async def get_supplier(
     supplier_id: str,
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     r = await db.execute(select(Supplier).where(Supplier.supplierId == supplier_id))
     supplier = r.scalar_one_or_none()
@@ -641,6 +651,7 @@ async def list_supplier_prices(
     supplier_id: str,
     product_id: Optional[str] = Query(None, alias="productId"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(SupplierPrice).where(
         SupplierPrice.supplierId == supplier_id,
@@ -719,6 +730,7 @@ async def list_purchase_orders(
     supplier_id: Optional[str] = Query(None, alias="supplierId"),
     store_id: Optional[str] = Query(None, alias="storeId"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(PurchaseOrder)
     if status_filter:
@@ -792,6 +804,7 @@ async def create_purchase_order(
 async def get_purchase_order(
     order_id: str,
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     r = await db.execute(
         select(PurchaseOrder).where(PurchaseOrder.purchaseOrderId == order_id)
@@ -866,6 +879,7 @@ async def delete_purchase_order(
 async def list_warehouses(
     store_id: Optional[str] = Query(None, alias="storeId"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(Warehouse).where(Warehouse.status == "Active")
     if store_id:
@@ -932,6 +946,7 @@ async def list_inventory(
     warehouse_id: Optional[str] = Query(None, alias="warehouseId"),
     product_id: Optional[str] = Query(None, alias="productId"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(InventoryOnHand)
     if warehouse_id:
@@ -991,6 +1006,7 @@ async def list_inventory_lots(
     warehouse_id: Optional[str] = Query(None, alias="warehouseId"),
     product_id: Optional[str] = Query(None, alias="productId"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(InventoryLot)
     if warehouse_id:
@@ -1047,6 +1063,7 @@ async def update_inventory_lot(
 async def list_inventory_transfers(
     warehouse_id: Optional[str] = Query(None, alias="warehouseId"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(InventoryTransfer).order_by(InventoryTransfer.createdAt.desc())
     if warehouse_id:
@@ -1083,6 +1100,7 @@ async def create_inventory_transfer(
 async def list_transfer_requests(
     status_filter: Optional[str] = Query(None, alias="status"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(TransferRequest).order_by(TransferRequest.createdAt.desc())
     if status_filter:
@@ -1132,6 +1150,7 @@ async def update_transfer_request(
 async def list_internal_settlements(
     status_filter: Optional[str] = Query(None, alias="status"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(InternalSettlement).order_by(InternalSettlement.createdAt.desc())
     if status_filter:
@@ -1151,6 +1170,7 @@ async def list_stock_counts(
     status_filter: Optional[str] = Query(None, alias="status"),
     warehouse_id: Optional[str] = Query(None, alias="warehouseId"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(StockCount)
     if status_filter:
@@ -1224,6 +1244,7 @@ async def create_stock_count(
 async def get_stock_count(
     count_id: str,
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     r = await db.execute(
         select(StockCount).where(StockCount.countId == count_id)

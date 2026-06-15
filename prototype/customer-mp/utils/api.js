@@ -1,5 +1,15 @@
+/**
+ * 高岸ERP 统一API层
+ * 支持 Mock(本地) / Live(后端) 双模式
+ * USE_MOCK = false 时直连后端 FastAPI
+ */
 const MOCK = require('./mock-data')
 
+// ── 后端配置 ──
+const API_BASE = 'http://localhost:8000'
+const USE_MOCK = true  // false = 连后端
+
+// ── 通用HTTP请求（带认证）──
 const LS_PREFIX = 'mp_'
 
 function lsGet(key, fallback) {
@@ -8,57 +18,83 @@ function lsGet(key, fallback) {
 function lsSet(key, val) { try { wx.setStorageSync(LS_PREFIX + key, val) } catch (e) { } }
 function lsRemove(key) { try { wx.removeStorageSync(LS_PREFIX + key) } catch (e) { } }
 
-const USE_MOCK = true
-
 function delay(ms) {
   ms = ms || (200 + Math.random() * 300)
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-function request(options) {
+function getToken() {
+  return lsGet('token', null)
+}
+
+function setToken(token) {
+  if (token) lsSet('token', token)
+  else lsRemove('token')
+}
+
+async function request(options) {
+  if (USE_MOCK) return Promise.reject(new Error('MOCK_MODE'))
+
+  const token = getToken()
+  const header = { 'Content-Type': 'application/json' }
+  if (token) header['Authorization'] = 'Bearer ' + token
+
   return new Promise((resolve, reject) => {
-    if (USE_MOCK) return reject(new Error('MOCK_MODE'))
     wx.request({
-      url: options.url,
+      url: API_BASE + options.url,
       method: options.method || 'GET',
       data: options.data,
-      header: { 'Content-Type': 'application/json' },
-      success: res => resolve(res.data),
-      fail: err => reject(err)
+      header: header,
+      success: res => {
+        if (res.statusCode === 401) {
+          // Token过期，清除登录态
+          setToken(null)
+          lsSet('logged_in', false)
+          wx.reLaunch({ url: '/pages/home/home?showLogin=1' })
+          reject(new Error('登录已过期'))
+          return
+        }
+        if (res.statusCode >= 400) {
+          reject(new Error((res.data && res.data.detail) || '请求失败: ' + res.statusCode))
+          return
+        }
+        resolve(res.data)
+      },
+      fail: err => reject(new Error('网络请求失败: ' + (err.errMsg || '')))
     })
   })
 }
 
 // ── 角色定义 ──
-const ROLES = {
-  GUEST: 'guest',
-  STAFF: 'staff',
-  SHAREHOLDER: 'shareholder'
-}
+const ROLES = { GUEST: 'guest', STAFF: 'staff', SHAREHOLDER: 'shareholder' }
 
 // ── Mock 角色账号 ──
 const MOCK_ACCOUNTS = {
-  // 客人端：手机号+验证码8888
   '138****8888': { name: '张先生', role: ROLES.GUEST, memberLevel: 'Gold', balance: 280, phone: '138****8888' },
-  // 店员端：账号密码
   staff: {
     'admin': { name: '管理员', role: ROLES.STAFF, storeId: 'ST001', storeName: '盈隆店', userId: 'E001' },
     'staff': { name: '店员小张', role: ROLES.STAFF, storeId: 'ST001', storeName: '盈隆店', userId: 'E002' },
-    'cleaner': { name: '保洁员', role: ROLES.STAFF, storeId: 'ST001', storeName: '盈隆店', userId: 'E003' },
   },
-  // 股东端：账号密码
   shareholder: {
     'shareholder': { name: '王股东', role: ROLES.SHAREHOLDER, shares: 30, storeId: 'ST001' },
-    'boss': { name: '李总', role: ROLES.SHAREHOLDER, shares: 55, storeId: 'ST001' },
   }
 }
 
 const API = {
-  ROLES: ROLES,
+  ROLES,
 
-  // ── 客人登录 ──
-  login(phone, code) {
-    if (!USE_MOCK) return request({ url: '/api/auth/login', method: 'POST', data: { phone, code } })
+  // ── 认证 ──
+  async login(phone, code) {
+    if (!USE_MOCK) {
+      const data = await request({ url: '/api/auth/phone-login', method: 'POST', data: { phone, code } })
+      setToken(data.access_token)
+      lsSet('logged_in', true)
+      const user = data.user
+      user.role = ROLES.GUEST
+      lsSet('user', user)
+      lsSet('user_role', ROLES.GUEST)
+      return user
+    }
     return delay().then(() => {
       if (code !== '8888') throw new Error('验证码错误')
       let users = lsGet('users', {})
@@ -67,66 +103,55 @@ const API = {
         user = {
           phone, name: phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'),
           memberLevel: 'Silver', balance: 280, totalSpent: 0, visitCount: 0,
-          role: ROLES.GUEST,
-          created: new Date().toISOString(), tags: []
+          role: ROLES.GUEST, created: new Date().toISOString(), tags: []
         }
-        users[phone] = user
-        lsSet('users', users)
+        users[phone] = user; lsSet('users', users)
       }
       user.role = ROLES.GUEST
-      lsSet('logged_in', true)
-      lsSet('user', user)
-      lsSet('user_role', ROLES.GUEST)
+      lsSet('logged_in', true); lsSet('user', user); lsSet('user_role', ROLES.GUEST)
       return user
     })
   },
 
-  // ── 员工/股东 统一登录 ──
   loginWithRole(account, password, role) {
-    if (!USE_MOCK) return request({ url: '/api/auth/login', method: 'POST', data: { account, password, role } })
+    if (!USE_MOCK) {
+      return request({ url: '/api/auth/login', method: 'POST', data: { username: account, password } })
+        .then(data => {
+          setToken(data.access_token)
+          lsSet('logged_in', true)
+          const user = data.user
+          user.role = role
+          lsSet('user', user)
+          lsSet('user_role', role)
+          return user
+        })
+    }
     return delay().then(() => {
       if (password !== '8888') throw new Error('密码错误')
-
       var user = null
       if (role === ROLES.STAFF) {
         user = MOCK_ACCOUNTS.staff[account]
         if (!user) throw new Error('员工账号不存在')
-        user = Object.assign({}, user, { account: account, role: ROLES.STAFF })
+        user = Object.assign({}, user, { account, role: ROLES.STAFF })
       } else if (role === ROLES.SHAREHOLDER) {
         user = MOCK_ACCOUNTS.shareholder[account]
         if (!user) throw new Error('股东账号不存在')
-        user = Object.assign({}, user, { account: account, role: ROLES.SHAREHOLDER })
-      } else {
-        throw new Error('无效的角色类型')
-      }
-
-      lsSet('logged_in', true)
-      lsSet('user', user)
-      lsSet('user_role', role)
+        user = Object.assign({}, user, { account, role: ROLES.SHAREHOLDER })
+      } else throw new Error('无效的角色类型')
+      lsSet('logged_in', true); lsSet('user', user); lsSet('user_role', role)
       return user
     })
   },
 
-  // ── 登出 ──
   logout() {
-    lsRemove('logged_in')
-    lsRemove('user')
-    lsRemove('user_role')
+    setToken(null)
+    lsRemove('logged_in'); lsRemove('user'); lsRemove('user_role')
     return Promise.resolve({ success: true })
   },
 
-  getCurrentUser() {
-    return Promise.resolve(lsGet('user', null))
-  },
-
-  isLoggedIn() {
-    return !!lsGet('logged_in', false)
-  },
-
-  getUserRole() {
-    return lsGet('user_role', null)
-  },
-
+  getCurrentUser() { return Promise.resolve(lsGet('user', null)) },
+  isLoggedIn() { return !!lsGet('logged_in', false) },
+  getUserRole() { return lsGet('user_role', null) },
   hasRole(requiredRoles) {
     var role = this.getUserRole()
     if (!role) return false
@@ -155,7 +180,7 @@ const API = {
   },
 
   getRoomBookings(roomId, date) {
-    if (!USE_MOCK) return request({ url: '/api/rooms/' + roomId + '/bookings?date=' + date })
+    if (!USE_MOCK) return request({ url: '/api/orders/active' })
     return delay().then(() => {
       const bookings = lsGet('bookings', [])
       return bookings.filter(b => b.roomId === roomId && b.date === date && b.status !== 'Cancelled')
@@ -169,7 +194,7 @@ const API = {
   },
 
   controlDevice(deviceId, command) {
-    if (!USE_MOCK) return request({ url: '/api/iot/control', method: 'POST', data: { device_id: deviceId } })
+    if (!USE_MOCK) return request({ url: '/api/iot/control', method: 'POST', data: { device_id: deviceId, action: command.action || 'toggle', params: command } })
     return delay(200).then(() => {
       for (var i = 0; i < MOCK.devices.length; i++) {
         if (MOCK.devices[i].deviceId === deviceId) { Object.assign(MOCK.devices[i], command); break }
@@ -183,8 +208,7 @@ const API = {
     return delay(800).then(() => {
       for (var i = 0; i < MOCK.scenes.length; i++) {
         if (MOCK.scenes[i].sceneId === sceneId) {
-          var scene = MOCK.scenes[i]
-          var p = scene.params
+          var scene = MOCK.scenes[i]; var p = scene.params
           MOCK.devices.forEach(function(d) {
             if (d.roomId !== roomId) return
             if (d.type === 'Curtain' && p.curtain) d.position = p.curtain
@@ -192,7 +216,7 @@ const API = {
             if (d.type === 'Light' && p.lights) { d.brightness = p.lights.brightness || 0; d.colorTemp = p.lights.colorTemp || 4000 }
             if ((d.type === 'BGM' || d.type === 'Speaker') && p.music) d.playing = p.music.on || false
           })
-          return { success: true, sceneId: sceneId, sceneName: scene.name }
+          return { success: true, sceneId, sceneName: scene.name }
         }
       }
       throw new Error('场景不存在')
@@ -200,20 +224,17 @@ const API = {
   },
 
   getActiveAlerts() { return delay().then(() => []) },
-
-  // ── 音频 ──
   getAudioStatus(roomId) {
     return delay().then(() => {
       var speakers = MOCK.devices.filter(d => d.roomId === roomId && (d.type === 'BGM' || d.type === 'Speaker'))
       if (!speakers.length) return null
       var s = speakers[0] || {}
-      return { roomId, online: speakers.some(function(sp) { return sp.status === 'Online' }), speakers, volume: s.volume || 0, playing: s.playing || false, source: s.source || 'none' }
+      return { roomId, online: speakers.some(sp => sp.status === 'Online'), speakers, volume: s.volume || 0, playing: s.playing || false, source: s.source || 'none' }
     })
   },
-
   setVolume(roomId, volume) {
     return delay(150).then(() => {
-      MOCK.devices.forEach(function(d) { if (d.roomId === roomId && (d.type === 'BGM' || d.type === 'Speaker')) d.volume = volume })
+      MOCK.devices.forEach(d => { if (d.roomId === roomId && (d.type === 'BGM' || d.type === 'Speaker')) d.volume = volume })
       return { success: true, roomId, volume }
     })
   },
@@ -228,18 +249,15 @@ const API = {
         orderId: id, status: 'Booked', doorCode: String(Math.floor(1000 + Math.random() * 9000)),
         created: new Date().toISOString(), phone: (lsGet('user', {}) || {}).phone || ''
       }, booking)
-      bookings.push(b)
-      lsSet('bookings', bookings)
+      bookings.push(b); lsSet('bookings', bookings)
       var user = lsGet('user', {})
       if (booking.paymentMethod === 'Balance' && user.balance !== undefined) {
-        user.balance -= (booking.amount || 0)
-        lsSet('user', user)
+        user.balance -= (booking.amount || 0); lsSet('user', user)
       }
       return b
     })
   },
 
-  // 获取所有订单（不按用户过滤，供店员端使用）
   getAllOrders() {
     return delay().then(() => lsGet('bookings', []))
   },
@@ -248,7 +266,7 @@ const API = {
     return delay().then(() => {
       var bookings = lsGet('bookings', [])
       var user = lsGet('user', null)
-      if (user) return bookings.filter(function(b) { return b.phone === user.phone || b.customerName === user.name }).sort(function(a, b) { return new Date(b.created) - new Date(a.created) })
+      if (user) return bookings.filter(b => b.phone === user.phone || b.customerName === user.name).sort((a, b) => new Date(b.created) - new Date(a.created))
       return []
     })
   },
@@ -256,7 +274,7 @@ const API = {
   cancelOrder(orderId) {
     return delay(200).then(() => {
       var bookings = lsGet('bookings', [])
-      bookings.forEach(function(b) { if (b.orderId === orderId) b.status = 'Cancelled' })
+      bookings.forEach(b => { if (b.orderId === orderId) b.status = 'Cancelled' })
       lsSet('bookings', bookings)
       return { success: true }
     })
@@ -265,8 +283,9 @@ const API = {
   // ── 商品 ──
   getProducts(category) {
     if (!USE_MOCK) return request({ url: '/api/products?category=' + (category || '') })
+    if (!USE_MOCK) return request({ url: '/api/products' + (category ? '?categoryId=' + category : '') })
     return delay().then(() => {
-      if (category) return MOCK.products.filter(function(p) { return p.category === category })
+      if (category) return MOCK.products.filter(p => p.category === category)
       return MOCK.products.slice()
     })
   },
@@ -302,8 +321,7 @@ const API = {
       var order = {
         orderId: 'SHP' + String(Date.now()).slice(-6), items, total, paymentMethod,
         status: 'PendingDelivery', created: new Date().toISOString(),
-        deliveryMethod: deliveryInfo.method || 'pickup',
-        deliveryStatus: deliveryInfo.method === 'express' ? 'pending' : 'ready'
+        deliveryMethod: deliveryInfo.method || 'pickup', deliveryStatus: deliveryInfo.method === 'express' ? 'pending' : 'ready'
       }
       if (deliveryInfo.method === 'express') {
         order.expressName = deliveryInfo.expressName || ''
@@ -317,21 +335,17 @@ const API = {
         order.roomId = deliveryInfo.roomId || ''
       }
       var shopOrders = lsGet('shop_orders', [])
-      shopOrders.push(order)
-      lsSet('shop_orders', shopOrders)
+      shopOrders.push(order); lsSet('shop_orders', shopOrders)
       lsSet('tea_cart', [])
       if (paymentMethod === 'Balance') {
         var user = lsGet('user', {})
-        user.balance = (user.balance || 0) - total
-        lsSet('user', user)
+        user.balance = (user.balance || 0) - total; lsSet('user', user)
       }
       return order
     })
   },
 
-  getShopOrders() {
-    return delay().then(() => lsGet('shop_orders', []))
-  },
+  getShopOrders() { return delay().then(() => lsGet('shop_orders', [])) },
 
   // ── 余额 ──
   getBalance() { return delay(100).then(() => (lsGet('user', {})).balance || 0) },
@@ -341,8 +355,7 @@ const API = {
       var user = lsGet('user', {})
       var bonus = 0
       if (!user._firstRecharge) { bonus = Math.round(amount * 0.3); user._firstRecharge = true }
-      user.balance = (user.balance || 0) + amount + bonus
-      lsSet('user', user)
+      user.balance = (user.balance || 0) + amount + bonus; lsSet('user', user)
       return { success: true, amount, bonus, newBalance: user.balance }
     })
   },
@@ -368,7 +381,7 @@ const API = {
     })
   },
 
-  // ── 扫码消费（V1.1） ──
+  // ── 扫码消费 ──
   scanRoomStatus(roomId) {
     return delay().then(() => {
       var room = null
@@ -411,9 +424,7 @@ const API = {
   },
 
   // ── 物流查询 ──
-  getLogistics(orderId) {
-    return delay().then(() => null)
-  }
+  getLogistics(orderId) { return delay().then(() => null) }
 }
 
 module.exports = API

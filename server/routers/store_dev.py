@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 
 from database import get_db
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 from models.store_dev import (
     LegalEntity, Territory, StoreSiteSelection, StoreConstruction,
     ConstructionCost, DesignDrawing, RoomPricing, RoomPersonPricing,
@@ -29,7 +29,7 @@ from schemas.store_dev import (
     NightPackageCreate, NightPackageUpdate, NightPackageOut, NightPackageListOut,
 )
 
-router = APIRouter(prefix="/api/store-dev", tags=["门店拓展管理"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/api/store-dev", tags=["门店拓展管理"])
 
 
 def _gen_id() -> str:
@@ -47,7 +47,7 @@ async def _resolve_store_name(db: AsyncSession, store_id: str) -> Optional[str]:
 # LegalEntity 法律主体
 # ═══════════════════════════════════════════
 
-@router.get("/legal-entities", response_model=LegalEntityListOut)
+@router.get("/legal-entities", response_model=LegalEntityListOut, dependencies=[Depends(get_optional_user)])
 async def list_legal_entities(
     status: Optional[str] = None,
     search: Optional[str] = None,
@@ -86,7 +86,7 @@ async def list_legal_entities(
     )
 
 
-@router.get("/legal-entities/{legal_entity_id}", response_model=LegalEntityOut)
+@router.get("/legal-entities/{legal_entity_id}", response_model=LegalEntityOut, dependencies=[Depends(get_optional_user)])
 async def get_legal_entity(legal_entity_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(LegalEntity).where(LegalEntity.legalEntityId == legal_entity_id))
     item = r.scalar_one_or_none()
@@ -101,7 +101,7 @@ async def get_legal_entity(legal_entity_id: str, db: AsyncSession = Depends(get_
     )
 
 
-@router.post("/legal-entities", response_model=LegalEntityOut, status_code=201)
+@router.post("/legal-entities", response_model=LegalEntityOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_legal_entity(
     data: LegalEntityCreate,
     db: AsyncSession = Depends(get_db),
@@ -128,7 +128,7 @@ async def create_legal_entity(
     )
 
 
-@router.put("/legal-entities/{legal_entity_id}", response_model=LegalEntityOut)
+@router.put("/legal-entities/{legal_entity_id}", response_model=LegalEntityOut, dependencies=[Depends(get_current_user)])
 async def update_legal_entity(
     legal_entity_id: str,
     data: LegalEntityUpdate,
@@ -167,7 +167,7 @@ async def update_legal_entity(
     )
 
 
-@router.delete("/legal-entities/{legal_entity_id}", status_code=204)
+@router.delete("/legal-entities/{legal_entity_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_legal_entity(legal_entity_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(LegalEntity).where(LegalEntity.legalEntityId == legal_entity_id))
     item = r.scalar_one_or_none()
@@ -181,7 +181,7 @@ async def delete_legal_entity(legal_entity_id: str, db: AsyncSession = Depends(g
 # Territory 行政区划
 # ═══════════════════════════════════════════
 
-@router.get("/territories", response_model=TerritoryListOut)
+@router.get("/territories", response_model=TerritoryListOut, dependencies=[Depends(get_optional_user)])
 async def list_territories(
     parent_id: Optional[str] = Query(None, alias="parentId"),
     level: Optional[int] = None,
@@ -222,7 +222,7 @@ async def list_territories(
     )
 
 
-@router.get("/territories/{territory_id}", response_model=TerritoryOut)
+@router.get("/territories/{territory_id}", response_model=TerritoryOut, dependencies=[Depends(get_optional_user)])
 async def get_territory(territory_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Territory).where(Territory.territoryId == territory_id))
     item = r.scalar_one_or_none()
@@ -234,7 +234,7 @@ async def get_territory(territory_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/territories", response_model=TerritoryOut, status_code=201)
+@router.post("/territories", response_model=TerritoryOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_territory(
     data: TerritoryCreate,
     db: AsyncSession = Depends(get_db),
@@ -252,7 +252,7 @@ async def create_territory(
     )
 
 
-@router.put("/territories/{territory_id}", response_model=TerritoryOut)
+@router.put("/territories/{territory_id}", response_model=TerritoryOut, dependencies=[Depends(get_current_user)])
 async def update_territory(
     territory_id: str,
     data: TerritoryUpdate,
@@ -278,7 +278,7 @@ async def update_territory(
     )
 
 
-@router.delete("/territories/{territory_id}", status_code=204)
+@router.delete("/territories/{territory_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_territory(territory_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Territory).where(Territory.territoryId == territory_id))
     item = r.scalar_one_or_none()
@@ -292,7 +292,7 @@ async def delete_territory(territory_id: str, db: AsyncSession = Depends(get_db)
 # StoreSiteSelection 门店选址
 # ═══════════════════════════════════════════
 
-@router.get("/site-selections", response_model=StoreSiteSelectionListOut)
+@router.get("/site-selections", response_model=StoreSiteSelectionListOut, dependencies=[Depends(get_optional_user)])
 async def list_site_selections(
     source: Optional[str] = None,
     approval_status: Optional[str] = Query(None, alias="approvalStatus"),
@@ -343,7 +343,7 @@ async def list_site_selections(
     return StoreSiteSelectionListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/site-selections/{selection_id}", response_model=StoreSiteSelectionOut)
+@router.get("/site-selections/{selection_id}", response_model=StoreSiteSelectionOut, dependencies=[Depends(get_optional_user)])
 async def get_site_selection(selection_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(StoreSiteSelection).where(StoreSiteSelection.selectionId == selection_id))
     item = r.scalar_one_or_none()
@@ -366,7 +366,7 @@ async def get_site_selection(selection_id: str, db: AsyncSession = Depends(get_d
     )
 
 
-@router.post("/site-selections", response_model=StoreSiteSelectionOut, status_code=201)
+@router.post("/site-selections", response_model=StoreSiteSelectionOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_site_selection(
     data: StoreSiteSelectionCreate,
     db: AsyncSession = Depends(get_db),
@@ -403,7 +403,7 @@ async def create_site_selection(
     )
 
 
-@router.put("/site-selections/{selection_id}", response_model=StoreSiteSelectionOut)
+@router.put("/site-selections/{selection_id}", response_model=StoreSiteSelectionOut, dependencies=[Depends(get_current_user)])
 async def update_site_selection(
     selection_id: str,
     data: StoreSiteSelectionUpdate,
@@ -458,7 +458,7 @@ async def update_site_selection(
     )
 
 
-@router.delete("/site-selections/{selection_id}", status_code=204)
+@router.delete("/site-selections/{selection_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_site_selection(selection_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(StoreSiteSelection).where(StoreSiteSelection.selectionId == selection_id))
     item = r.scalar_one_or_none()
@@ -472,7 +472,7 @@ async def delete_site_selection(selection_id: str, db: AsyncSession = Depends(ge
 # StoreConstruction 门店建设
 # ═══════════════════════════════════════════
 
-@router.get("/constructions", response_model=StoreConstructionListOut)
+@router.get("/constructions", response_model=StoreConstructionListOut, dependencies=[Depends(get_optional_user)])
 async def list_constructions(
     store_id: Optional[str] = Query(None, alias="storeId"),
     status: Optional[str] = None,
@@ -512,7 +512,7 @@ async def list_constructions(
     return StoreConstructionListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/constructions/{construction_id}", response_model=StoreConstructionOut)
+@router.get("/constructions/{construction_id}", response_model=StoreConstructionOut, dependencies=[Depends(get_optional_user)])
 async def get_construction(construction_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(StoreConstruction).where(StoreConstruction.constructionId == construction_id))
     item = r.scalar_one_or_none()
@@ -529,7 +529,7 @@ async def get_construction(construction_id: str, db: AsyncSession = Depends(get_
     )
 
 
-@router.post("/constructions", response_model=StoreConstructionOut, status_code=201)
+@router.post("/constructions", response_model=StoreConstructionOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_construction(
     data: StoreConstructionCreate,
     db: AsyncSession = Depends(get_db),
@@ -557,7 +557,7 @@ async def create_construction(
     )
 
 
-@router.put("/constructions/{construction_id}", response_model=StoreConstructionOut)
+@router.put("/constructions/{construction_id}", response_model=StoreConstructionOut, dependencies=[Depends(get_current_user)])
 async def update_construction(
     construction_id: str,
     data: StoreConstructionUpdate,
@@ -597,7 +597,7 @@ async def update_construction(
     )
 
 
-@router.delete("/constructions/{construction_id}", status_code=204)
+@router.delete("/constructions/{construction_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_construction(construction_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(StoreConstruction).where(StoreConstruction.constructionId == construction_id))
     item = r.scalar_one_or_none()
@@ -611,7 +611,7 @@ async def delete_construction(construction_id: str, db: AsyncSession = Depends(g
 # ConstructionCost 建设成本
 # ═══════════════════════════════════════════
 
-@router.get("/construction-costs", response_model=ConstructionCostListOut)
+@router.get("/construction-costs", response_model=ConstructionCostListOut, dependencies=[Depends(get_optional_user)])
 async def list_construction_costs(
     construction_id: Optional[str] = Query(None, alias="constructionId"),
     category: Optional[str] = None,
@@ -663,7 +663,7 @@ async def list_construction_costs(
     )
 
 
-@router.get("/construction-costs/{cost_id}", response_model=ConstructionCostOut)
+@router.get("/construction-costs/{cost_id}", response_model=ConstructionCostOut, dependencies=[Depends(get_optional_user)])
 async def get_construction_cost(cost_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(ConstructionCost).where(ConstructionCost.costId == cost_id))
     item = r.scalar_one_or_none()
@@ -677,7 +677,7 @@ async def get_construction_cost(cost_id: str, db: AsyncSession = Depends(get_db)
     )
 
 
-@router.post("/construction-costs", response_model=ConstructionCostOut, status_code=201)
+@router.post("/construction-costs", response_model=ConstructionCostOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_construction_cost(
     data: ConstructionCostCreate,
     db: AsyncSession = Depends(get_db),
@@ -704,7 +704,7 @@ async def create_construction_cost(
     )
 
 
-@router.put("/construction-costs/{cost_id}", response_model=ConstructionCostOut)
+@router.put("/construction-costs/{cost_id}", response_model=ConstructionCostOut, dependencies=[Depends(get_current_user)])
 async def update_construction_cost(
     cost_id: str,
     data: ConstructionCostUpdate,
@@ -736,7 +736,7 @@ async def update_construction_cost(
     )
 
 
-@router.delete("/construction-costs/{cost_id}", status_code=204)
+@router.delete("/construction-costs/{cost_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_construction_cost(cost_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(ConstructionCost).where(ConstructionCost.costId == cost_id))
     item = r.scalar_one_or_none()
@@ -750,7 +750,7 @@ async def delete_construction_cost(cost_id: str, db: AsyncSession = Depends(get_
 # DesignDrawing 设计图纸
 # ═══════════════════════════════════════════
 
-@router.get("/drawings", response_model=DesignDrawingListOut)
+@router.get("/drawings", response_model=DesignDrawingListOut, dependencies=[Depends(get_optional_user)])
 async def list_drawings(
     store_id: Optional[str] = Query(None, alias="storeId"),
     construction_id: Optional[str] = Query(None, alias="constructionId"),
@@ -801,7 +801,7 @@ async def list_drawings(
     return DesignDrawingListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/drawings/{drawing_id}", response_model=DesignDrawingOut)
+@router.get("/drawings/{drawing_id}", response_model=DesignDrawingOut, dependencies=[Depends(get_optional_user)])
 async def get_drawing(drawing_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(DesignDrawing).where(DesignDrawing.drawingId == drawing_id))
     item = r.scalar_one_or_none()
@@ -819,7 +819,7 @@ async def get_drawing(drawing_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/drawings", response_model=DesignDrawingOut, status_code=201)
+@router.post("/drawings", response_model=DesignDrawingOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_drawing(
     data: DesignDrawingCreate,
     db: AsyncSession = Depends(get_db),
@@ -855,7 +855,7 @@ async def create_drawing(
     )
 
 
-@router.put("/drawings/{drawing_id}", response_model=DesignDrawingOut)
+@router.put("/drawings/{drawing_id}", response_model=DesignDrawingOut, dependencies=[Depends(get_current_user)])
 async def update_drawing(
     drawing_id: str,
     data: DesignDrawingUpdate,
@@ -893,7 +893,7 @@ async def update_drawing(
     )
 
 
-@router.delete("/drawings/{drawing_id}", status_code=204)
+@router.delete("/drawings/{drawing_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_drawing(drawing_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(DesignDrawing).where(DesignDrawing.drawingId == drawing_id))
     item = r.scalar_one_or_none()
@@ -907,7 +907,7 @@ async def delete_drawing(drawing_id: str, db: AsyncSession = Depends(get_db)):
 # RoomPricing 房间定价
 # ═══════════════════════════════════════════
 
-@router.get("/room-pricings", response_model=RoomPricingListOut)
+@router.get("/room-pricings", response_model=RoomPricingListOut, dependencies=[Depends(get_optional_user)])
 async def list_room_pricings(
     room_id: Optional[str] = Query(None, alias="roomId"),
     status: Optional[str] = None,
@@ -945,7 +945,7 @@ async def list_room_pricings(
     )
 
 
-@router.get("/room-pricings/{pricing_id}", response_model=RoomPricingOut)
+@router.get("/room-pricings/{pricing_id}", response_model=RoomPricingOut, dependencies=[Depends(get_optional_user)])
 async def get_room_pricing(pricing_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RoomPricing).where(RoomPricing.pricingId == pricing_id))
     item = r.scalar_one_or_none()
@@ -959,7 +959,7 @@ async def get_room_pricing(pricing_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/room-pricings", response_model=RoomPricingOut, status_code=201)
+@router.post("/room-pricings", response_model=RoomPricingOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_room_pricing(
     data: RoomPricingCreate,
     db: AsyncSession = Depends(get_db),
@@ -980,7 +980,7 @@ async def create_room_pricing(
     )
 
 
-@router.put("/room-pricings/{pricing_id}", response_model=RoomPricingOut)
+@router.put("/room-pricings/{pricing_id}", response_model=RoomPricingOut, dependencies=[Depends(get_current_user)])
 async def update_room_pricing(
     pricing_id: str,
     data: RoomPricingUpdate,
@@ -1010,7 +1010,7 @@ async def update_room_pricing(
     )
 
 
-@router.delete("/room-pricings/{pricing_id}", status_code=204)
+@router.delete("/room-pricings/{pricing_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_room_pricing(pricing_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RoomPricing).where(RoomPricing.pricingId == pricing_id))
     item = r.scalar_one_or_none()
@@ -1024,7 +1024,7 @@ async def delete_room_pricing(pricing_id: str, db: AsyncSession = Depends(get_db
 # RoomPersonPricing 房间按人定价
 # ═══════════════════════════════════════════
 
-@router.get("/room-person-pricings", response_model=RoomPersonPricingListOut)
+@router.get("/room-person-pricings", response_model=RoomPersonPricingListOut, dependencies=[Depends(get_optional_user)])
 async def list_room_person_pricings(
     room_id: Optional[str] = Query(None, alias="roomId"),
     person_count: Optional[int] = Query(None, alias="personCount"),
@@ -1066,7 +1066,7 @@ async def list_room_person_pricings(
     )
 
 
-@router.get("/room-person-pricings/{person_pricing_id}", response_model=RoomPersonPricingOut)
+@router.get("/room-person-pricings/{person_pricing_id}", response_model=RoomPersonPricingOut, dependencies=[Depends(get_optional_user)])
 async def get_room_person_pricing(person_pricing_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RoomPersonPricing).where(RoomPersonPricing.personPricingId == person_pricing_id))
     item = r.scalar_one_or_none()
@@ -1079,7 +1079,7 @@ async def get_room_person_pricing(person_pricing_id: str, db: AsyncSession = Dep
     )
 
 
-@router.post("/room-person-pricings", response_model=RoomPersonPricingOut, status_code=201)
+@router.post("/room-person-pricings", response_model=RoomPersonPricingOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_room_person_pricing(
     data: RoomPersonPricingCreate,
     db: AsyncSession = Depends(get_db),
@@ -1098,7 +1098,7 @@ async def create_room_person_pricing(
     )
 
 
-@router.put("/room-person-pricings/{person_pricing_id}", response_model=RoomPersonPricingOut)
+@router.put("/room-person-pricings/{person_pricing_id}", response_model=RoomPersonPricingOut, dependencies=[Depends(get_current_user)])
 async def update_room_person_pricing(
     person_pricing_id: str,
     data: RoomPersonPricingUpdate,
@@ -1123,7 +1123,7 @@ async def update_room_person_pricing(
     )
 
 
-@router.delete("/room-person-pricings/{person_pricing_id}", status_code=204)
+@router.delete("/room-person-pricings/{person_pricing_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_room_person_pricing(person_pricing_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RoomPersonPricing).where(RoomPersonPricing.personPricingId == person_pricing_id))
     item = r.scalar_one_or_none()
@@ -1137,7 +1137,7 @@ async def delete_room_person_pricing(person_pricing_id: str, db: AsyncSession = 
 # TimeSlotCoefficient 时段系数
 # ═══════════════════════════════════════════
 
-@router.get("/time-slot-coefficients", response_model=TimeSlotCoefficientListOut)
+@router.get("/time-slot-coefficients", response_model=TimeSlotCoefficientListOut, dependencies=[Depends(get_optional_user)])
 async def list_time_slot_coefficients(
     store_id: Optional[str] = Query(None, alias="storeId"),
     day_type: Optional[str] = Query(None, alias="dayType"),
@@ -1175,7 +1175,7 @@ async def list_time_slot_coefficients(
     return TimeSlotCoefficientListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/time-slot-coefficients/{coeff_id}", response_model=TimeSlotCoefficientOut)
+@router.get("/time-slot-coefficients/{coeff_id}", response_model=TimeSlotCoefficientOut, dependencies=[Depends(get_optional_user)])
 async def get_time_slot_coefficient(coeff_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(TimeSlotCoefficient).where(TimeSlotCoefficient.coeffId == coeff_id))
     item = r.scalar_one_or_none()
@@ -1190,7 +1190,7 @@ async def get_time_slot_coefficient(coeff_id: str, db: AsyncSession = Depends(ge
     )
 
 
-@router.post("/time-slot-coefficients", response_model=TimeSlotCoefficientOut, status_code=201)
+@router.post("/time-slot-coefficients", response_model=TimeSlotCoefficientOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_time_slot_coefficient(
     data: TimeSlotCoefficientCreate,
     db: AsyncSession = Depends(get_db),
@@ -1212,7 +1212,7 @@ async def create_time_slot_coefficient(
     )
 
 
-@router.put("/time-slot-coefficients/{coeff_id}", response_model=TimeSlotCoefficientOut)
+@router.put("/time-slot-coefficients/{coeff_id}", response_model=TimeSlotCoefficientOut, dependencies=[Depends(get_current_user)])
 async def update_time_slot_coefficient(
     coeff_id: str,
     data: TimeSlotCoefficientUpdate,
@@ -1241,7 +1241,7 @@ async def update_time_slot_coefficient(
     )
 
 
-@router.delete("/time-slot-coefficients/{coeff_id}", status_code=204)
+@router.delete("/time-slot-coefficients/{coeff_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_time_slot_coefficient(coeff_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(TimeSlotCoefficient).where(TimeSlotCoefficient.coeffId == coeff_id))
     item = r.scalar_one_or_none()
@@ -1255,7 +1255,7 @@ async def delete_time_slot_coefficient(coeff_id: str, db: AsyncSession = Depends
 # HolidayCalendar 节假日日历
 # ═══════════════════════════════════════════
 
-@router.get("/holiday-calendars", response_model=HolidayCalendarListOut)
+@router.get("/holiday-calendars", response_model=HolidayCalendarListOut, dependencies=[Depends(get_optional_user)])
 async def list_holiday_calendars(
     status: Optional[str] = None,
     year: Optional[int] = Query(None, alias="year"),
@@ -1295,7 +1295,7 @@ async def list_holiday_calendars(
     )
 
 
-@router.get("/holiday-calendars/{holiday_id}", response_model=HolidayCalendarOut)
+@router.get("/holiday-calendars/{holiday_id}", response_model=HolidayCalendarOut, dependencies=[Depends(get_optional_user)])
 async def get_holiday_calendar(holiday_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(HolidayCalendar).where(HolidayCalendar.holidayId == holiday_id))
     item = r.scalar_one_or_none()
@@ -1309,7 +1309,7 @@ async def get_holiday_calendar(holiday_id: str, db: AsyncSession = Depends(get_d
     )
 
 
-@router.post("/holiday-calendars", response_model=HolidayCalendarOut, status_code=201)
+@router.post("/holiday-calendars", response_model=HolidayCalendarOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_holiday_calendar(
     data: HolidayCalendarCreate,
     db: AsyncSession = Depends(get_db),
@@ -1330,7 +1330,7 @@ async def create_holiday_calendar(
     )
 
 
-@router.put("/holiday-calendars/{holiday_id}", response_model=HolidayCalendarOut)
+@router.put("/holiday-calendars/{holiday_id}", response_model=HolidayCalendarOut, dependencies=[Depends(get_current_user)])
 async def update_holiday_calendar(
     holiday_id: str,
     data: HolidayCalendarUpdate,
@@ -1362,7 +1362,7 @@ async def update_holiday_calendar(
     )
 
 
-@router.delete("/holiday-calendars/{holiday_id}", status_code=204)
+@router.delete("/holiday-calendars/{holiday_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_holiday_calendar(holiday_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(HolidayCalendar).where(HolidayCalendar.holidayId == holiday_id))
     item = r.scalar_one_or_none()
@@ -1376,7 +1376,7 @@ async def delete_holiday_calendar(holiday_id: str, db: AsyncSession = Depends(ge
 # ActivityCalendar 活动日历
 # ═══════════════════════════════════════════
 
-@router.get("/activity-calendars", response_model=ActivityCalendarListOut)
+@router.get("/activity-calendars", response_model=ActivityCalendarListOut, dependencies=[Depends(get_optional_user)])
 async def list_activity_calendars(
     store_id: Optional[str] = Query(None, alias="storeId"),
     status: Optional[str] = None,
@@ -1415,7 +1415,7 @@ async def list_activity_calendars(
     return ActivityCalendarListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/activity-calendars/{activity_id}", response_model=ActivityCalendarOut)
+@router.get("/activity-calendars/{activity_id}", response_model=ActivityCalendarOut, dependencies=[Depends(get_optional_user)])
 async def get_activity_calendar(activity_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(ActivityCalendar).where(ActivityCalendar.activityId == activity_id))
     item = r.scalar_one_or_none()
@@ -1431,7 +1431,7 @@ async def get_activity_calendar(activity_id: str, db: AsyncSession = Depends(get
     )
 
 
-@router.post("/activity-calendars", response_model=ActivityCalendarOut, status_code=201)
+@router.post("/activity-calendars", response_model=ActivityCalendarOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_activity_calendar(
     data: ActivityCalendarCreate,
     db: AsyncSession = Depends(get_db),
@@ -1454,7 +1454,7 @@ async def create_activity_calendar(
     )
 
 
-@router.put("/activity-calendars/{activity_id}", response_model=ActivityCalendarOut)
+@router.put("/activity-calendars/{activity_id}", response_model=ActivityCalendarOut, dependencies=[Depends(get_current_user)])
 async def update_activity_calendar(
     activity_id: str,
     data: ActivityCalendarUpdate,
@@ -1486,7 +1486,7 @@ async def update_activity_calendar(
     )
 
 
-@router.delete("/activity-calendars/{activity_id}", status_code=204)
+@router.delete("/activity-calendars/{activity_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_activity_calendar(activity_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(ActivityCalendar).where(ActivityCalendar.activityId == activity_id))
     item = r.scalar_one_or_none()
@@ -1500,7 +1500,7 @@ async def delete_activity_calendar(activity_id: str, db: AsyncSession = Depends(
 # DurationDiscountRule 时长折扣规则
 # ═══════════════════════════════════════════
 
-@router.get("/duration-discount-rules", response_model=DurationDiscountRuleListOut)
+@router.get("/duration-discount-rules", response_model=DurationDiscountRuleListOut, dependencies=[Depends(get_optional_user)])
 async def list_duration_discount_rules(
     store_id: Optional[str] = Query(None, alias="storeId"),
     status: Optional[str] = None,
@@ -1538,7 +1538,7 @@ async def list_duration_discount_rules(
     return DurationDiscountRuleListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/duration-discount-rules/{rule_id}", response_model=DurationDiscountRuleOut)
+@router.get("/duration-discount-rules/{rule_id}", response_model=DurationDiscountRuleOut, dependencies=[Depends(get_optional_user)])
 async def get_duration_discount_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(DurationDiscountRule).where(DurationDiscountRule.ruleId == rule_id))
     item = r.scalar_one_or_none()
@@ -1553,7 +1553,7 @@ async def get_duration_discount_rule(rule_id: str, db: AsyncSession = Depends(ge
     )
 
 
-@router.post("/duration-discount-rules", response_model=DurationDiscountRuleOut, status_code=201)
+@router.post("/duration-discount-rules", response_model=DurationDiscountRuleOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_duration_discount_rule(
     data: DurationDiscountRuleCreate,
     db: AsyncSession = Depends(get_db),
@@ -1575,7 +1575,7 @@ async def create_duration_discount_rule(
     )
 
 
-@router.put("/duration-discount-rules/{rule_id}", response_model=DurationDiscountRuleOut)
+@router.put("/duration-discount-rules/{rule_id}", response_model=DurationDiscountRuleOut, dependencies=[Depends(get_current_user)])
 async def update_duration_discount_rule(
     rule_id: str,
     data: DurationDiscountRuleUpdate,
@@ -1604,7 +1604,7 @@ async def update_duration_discount_rule(
     )
 
 
-@router.delete("/duration-discount-rules/{rule_id}", status_code=204)
+@router.delete("/duration-discount-rules/{rule_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_duration_discount_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(DurationDiscountRule).where(DurationDiscountRule.ruleId == rule_id))
     item = r.scalar_one_or_none()
@@ -1618,7 +1618,7 @@ async def delete_duration_discount_rule(rule_id: str, db: AsyncSession = Depends
 # NightPackage 夜间/过夜套餐
 # ═══════════════════════════════════════════
 
-@router.get("/night-packages", response_model=NightPackageListOut)
+@router.get("/night-packages", response_model=NightPackageListOut, dependencies=[Depends(get_optional_user)])
 async def list_night_packages(
     store_id: Optional[str] = Query(None, alias="storeId"),
     package_type: Optional[str] = Query(None, alias="packageType"),
@@ -1663,7 +1663,7 @@ async def list_night_packages(
     return NightPackageListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/night-packages/{package_id}", response_model=NightPackageOut)
+@router.get("/night-packages/{package_id}", response_model=NightPackageOut, dependencies=[Depends(get_optional_user)])
 async def get_night_package(package_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(NightPackage).where(NightPackage.packageId == package_id))
     item = r.scalar_one_or_none()
@@ -1680,7 +1680,7 @@ async def get_night_package(package_id: str, db: AsyncSession = Depends(get_db))
     )
 
 
-@router.post("/night-packages", response_model=NightPackageOut, status_code=201)
+@router.post("/night-packages", response_model=NightPackageOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_night_package(
     data: NightPackageCreate,
     db: AsyncSession = Depends(get_db),
@@ -1705,7 +1705,7 @@ async def create_night_package(
     )
 
 
-@router.put("/night-packages/{package_id}", response_model=NightPackageOut)
+@router.put("/night-packages/{package_id}", response_model=NightPackageOut, dependencies=[Depends(get_current_user)])
 async def update_night_package(
     package_id: str,
     data: NightPackageUpdate,
@@ -1738,7 +1738,7 @@ async def update_night_package(
     )
 
 
-@router.delete("/night-packages/{package_id}", status_code=204)
+@router.delete("/night-packages/{package_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_night_package(package_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(NightPackage).where(NightPackage.packageId == package_id))
     item = r.scalar_one_or_none()

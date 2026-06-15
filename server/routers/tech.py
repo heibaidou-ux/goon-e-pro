@@ -28,7 +28,7 @@ from schemas.tech import (
     CommandQueueCreate, CommandQueueUpdate, CommandQueueOut, CommandQueueListOut,
     HeartbeatRecordCreate, HeartbeatRecordOut, HeartbeatRecordListOut,
 )
-from services.auth_service import hash_password
+from services.auth_service import get_current_user, get_optional_user, hash_password
 
 router = APIRouter(prefix="/api/tech", tags=["技术管理"])
 
@@ -41,7 +41,7 @@ def _gen_id() -> str:
 # DeviceEvent 设备事件
 # ═══════════════════════════════════════════
 
-@router.get("/device-events", response_model=DeviceEventListOut)
+@router.get("/device-events", response_model=DeviceEventListOut, dependencies=[Depends(get_optional_user)])
 async def list_device_events(
     device_id: Optional[str] = Query(None, alias="deviceId"),
     room_id: Optional[str] = Query(None, alias="roomId"),
@@ -94,7 +94,7 @@ async def list_device_events(
     )
 
 
-@router.get("/device-events/{event_id}", response_model=DeviceEventOut)
+@router.get("/device-events/{event_id}", response_model=DeviceEventOut, dependencies=[Depends(get_optional_user)])
 async def get_device_event(event_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(DeviceEvent).where(DeviceEvent.eventId == event_id))
     item = r.scalar_one_or_none()
@@ -107,7 +107,7 @@ async def get_device_event(event_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/device-events", response_model=DeviceEventOut, status_code=201)
+@router.post("/device-events", response_model=DeviceEventOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_device_event(
     data: DeviceEventCreate,
     db: AsyncSession = Depends(get_db),
@@ -127,7 +127,7 @@ async def create_device_event(
     )
 
 
-@router.get("/device-events/{device_id}/history", response_model=list[DeviceEventOut])
+@router.get("/device-events/{device_id}/history", response_model=list[DeviceEventOut], dependencies=[Depends(get_optional_user)])
 async def get_device_event_history(
     device_id: str,
     limit: int = Query(50, ge=1, le=500),
@@ -150,7 +150,7 @@ async def get_device_event_history(
 # SmartScene 智能场景
 # ═══════════════════════════════════════════
 
-@router.get("/smart-scenes", response_model=SmartSceneListOut)
+@router.get("/smart-scenes", response_model=SmartSceneListOut, dependencies=[Depends(get_optional_user)])
 async def list_smart_scenes(
     trigger_type: Optional[str] = Query(None, alias="triggerType"),
     is_active: Optional[bool] = Query(None, alias="isActive"),
@@ -187,7 +187,7 @@ async def list_smart_scenes(
     )
 
 
-@router.get("/smart-scenes/{scene_id}", response_model=SmartSceneOut)
+@router.get("/smart-scenes/{scene_id}", response_model=SmartSceneOut, dependencies=[Depends(get_optional_user)])
 async def get_smart_scene(scene_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(SmartScene).where(SmartScene.sceneId == scene_id))
     item = r.scalar_one_or_none()
@@ -200,7 +200,7 @@ async def get_smart_scene(scene_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/smart-scenes", response_model=SmartSceneOut, status_code=201)
+@router.post("/smart-scenes", response_model=SmartSceneOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_smart_scene(
     data: SmartSceneCreate,
     db: AsyncSession = Depends(get_db),
@@ -220,7 +220,7 @@ async def create_smart_scene(
     )
 
 
-@router.put("/smart-scenes/{scene_id}", response_model=SmartSceneOut)
+@router.put("/smart-scenes/{scene_id}", response_model=SmartSceneOut, dependencies=[Depends(get_current_user)])
 async def update_smart_scene(
     scene_id: str,
     data: SmartSceneUpdate,
@@ -249,7 +249,7 @@ async def update_smart_scene(
     )
 
 
-@router.delete("/smart-scenes/{scene_id}")
+@router.delete("/smart-scenes/{scene_id}", dependencies=[Depends(get_current_user)])
 async def delete_smart_scene(scene_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(SmartScene).where(SmartScene.sceneId == scene_id))
     item = r.scalar_one_or_none()
@@ -264,7 +264,7 @@ async def delete_smart_scene(scene_id: str, db: AsyncSession = Depends(get_db)):
 # SceneRule 场景规则
 # ═══════════════════════════════════════════
 
-@router.get("/scene-rules", response_model=SceneRuleListOut)
+@router.get("/scene-rules", response_model=SceneRuleListOut, dependencies=[Depends(get_optional_user)])
 async def list_scene_rules(
     scene_id: Optional[str] = Query(None, alias="sceneId"),
     is_active: Optional[bool] = Query(None, alias="isActive"),
@@ -302,7 +302,7 @@ async def list_scene_rules(
     )
 
 
-@router.get("/scene-rules/{rule_id}", response_model=SceneRuleOut)
+@router.get("/scene-rules/{rule_id}", response_model=SceneRuleOut, dependencies=[Depends(get_optional_user)])
 async def get_scene_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(SceneRule).where(SceneRule.ruleId == rule_id))
     item = r.scalar_one_or_none()
@@ -316,7 +316,7 @@ async def get_scene_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/scene-rules", response_model=SceneRuleOut, status_code=201)
+@router.post("/scene-rules", response_model=SceneRuleOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_scene_rule(
     data: SceneRuleCreate,
     db: AsyncSession = Depends(get_db),
@@ -338,7 +338,7 @@ async def create_scene_rule(
     )
 
 
-@router.put("/scene-rules/{rule_id}", response_model=SceneRuleOut)
+@router.put("/scene-rules/{rule_id}", response_model=SceneRuleOut, dependencies=[Depends(get_current_user)])
 async def update_scene_rule(
     rule_id: str,
     data: SceneRuleUpdate,
@@ -370,7 +370,7 @@ async def update_scene_rule(
     )
 
 
-@router.delete("/scene-rules/{rule_id}")
+@router.delete("/scene-rules/{rule_id}", dependencies=[Depends(get_current_user)])
 async def delete_scene_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(SceneRule).where(SceneRule.ruleId == rule_id))
     item = r.scalar_one_or_none()
@@ -385,7 +385,7 @@ async def delete_scene_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
 # RoomSceneBinding 房间场景绑定
 # ═══════════════════════════════════════════
 
-@router.get("/room-scene-bindings", response_model=RoomSceneBindingListOut)
+@router.get("/room-scene-bindings", response_model=RoomSceneBindingListOut, dependencies=[Depends(get_optional_user)])
 async def list_room_scene_bindings(
     room_id: Optional[str] = Query(None, alias="roomId"),
     scene_id: Optional[str] = Query(None, alias="sceneId"),
@@ -427,7 +427,7 @@ async def list_room_scene_bindings(
     )
 
 
-@router.get("/room-scene-bindings/{binding_id}", response_model=RoomSceneBindingOut)
+@router.get("/room-scene-bindings/{binding_id}", response_model=RoomSceneBindingOut, dependencies=[Depends(get_optional_user)])
 async def get_room_scene_binding(binding_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RoomSceneBinding).where(RoomSceneBinding.bindingId == binding_id))
     item = r.scalar_one_or_none()
@@ -440,7 +440,7 @@ async def get_room_scene_binding(binding_id: str, db: AsyncSession = Depends(get
     )
 
 
-@router.post("/room-scene-bindings", response_model=RoomSceneBindingOut, status_code=201)
+@router.post("/room-scene-bindings", response_model=RoomSceneBindingOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_room_scene_binding(
     data: RoomSceneBindingCreate,
     db: AsyncSession = Depends(get_db),
@@ -459,7 +459,7 @@ async def create_room_scene_binding(
     )
 
 
-@router.put("/room-scene-bindings/{binding_id}", response_model=RoomSceneBindingOut)
+@router.put("/room-scene-bindings/{binding_id}", response_model=RoomSceneBindingOut, dependencies=[Depends(get_current_user)])
 async def update_room_scene_binding(
     binding_id: str,
     data: RoomSceneBindingUpdate,
@@ -482,7 +482,7 @@ async def update_room_scene_binding(
     )
 
 
-@router.delete("/room-scene-bindings/{binding_id}")
+@router.delete("/room-scene-bindings/{binding_id}", dependencies=[Depends(get_current_user)])
 async def delete_room_scene_binding(binding_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RoomSceneBinding).where(RoomSceneBinding.bindingId == binding_id))
     item = r.scalar_one_or_none()
@@ -497,7 +497,7 @@ async def delete_room_scene_binding(binding_id: str, db: AsyncSession = Depends(
 # UserAccount 用户账号
 # ═══════════════════════════════════════════
 
-@router.get("/user-accounts", response_model=UserAccountListOut)
+@router.get("/user-accounts", response_model=UserAccountListOut, dependencies=[Depends(get_optional_user)])
 async def list_user_accounts(
     org_id: Optional[str] = Query(None, alias="orgId"),
     status: Optional[str] = None,
@@ -539,7 +539,7 @@ async def list_user_accounts(
     )
 
 
-@router.get("/user-accounts/{user_id}", response_model=UserAccountOut)
+@router.get("/user-accounts/{user_id}", response_model=UserAccountOut, dependencies=[Depends(get_optional_user)])
 async def get_user_account(user_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(UserAccount).where(UserAccount.userId == user_id))
     item = r.scalar_one_or_none()
@@ -552,7 +552,7 @@ async def get_user_account(user_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/user-accounts", response_model=UserAccountOut, status_code=201)
+@router.post("/user-accounts", response_model=UserAccountOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_user_account(
     data: UserAccountCreate,
     db: AsyncSession = Depends(get_db),
@@ -577,7 +577,7 @@ async def create_user_account(
     )
 
 
-@router.put("/user-accounts/{user_id}", response_model=UserAccountOut)
+@router.put("/user-accounts/{user_id}", response_model=UserAccountOut, dependencies=[Depends(get_current_user)])
 async def update_user_account(
     user_id: str,
     data: UserAccountUpdate,
@@ -604,7 +604,7 @@ async def update_user_account(
     )
 
 
-@router.delete("/user-accounts/{user_id}")
+@router.delete("/user-accounts/{user_id}", dependencies=[Depends(get_current_user)])
 async def delete_user_account(user_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(UserAccount).where(UserAccount.userId == user_id))
     item = r.scalar_one_or_none()
@@ -615,7 +615,7 @@ async def delete_user_account(user_id: str, db: AsyncSession = Depends(get_db)):
     return {"detail": "用户账号已删除"}
 
 
-@router.post("/user-accounts/{user_id}/assign-role/{role_id}")
+@router.post("/user-accounts/{user_id}/assign-role/{role_id}", dependencies=[Depends(get_current_user)])
 async def assign_role_to_user(
     user_id: str,
     role_id: str,
@@ -644,7 +644,7 @@ async def assign_role_to_user(
 # Role 角色
 # ═══════════════════════════════════════════
 
-@router.get("/roles", response_model=RoleListOut)
+@router.get("/roles", response_model=RoleListOut, dependencies=[Depends(get_optional_user)])
 async def list_roles(
     org_id: Optional[str] = Query(None, alias="orgId"),
     status: Optional[str] = None,
@@ -681,7 +681,7 @@ async def list_roles(
     )
 
 
-@router.get("/roles/{role_id}", response_model=RoleOut)
+@router.get("/roles/{role_id}", response_model=RoleOut, dependencies=[Depends(get_optional_user)])
 async def get_role(role_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Role).where(Role.roleId == role_id))
     item = r.scalar_one_or_none()
@@ -694,7 +694,7 @@ async def get_role(role_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.get("/roles/{role_id}/permissions", response_model=list[PermissionOut])
+@router.get("/roles/{role_id}/permissions", response_model=list[PermissionOut], dependencies=[Depends(get_optional_user)])
 async def get_role_permissions(role_id: str, db: AsyncSession = Depends(get_db)):
     """Get all permissions for a specific role."""
     r = await db.execute(select(Permission).where(Permission.roleId == role_id))
@@ -706,7 +706,7 @@ async def get_role_permissions(role_id: str, db: AsyncSession = Depends(get_db))
     ) for item in items]
 
 
-@router.post("/roles", response_model=RoleOut, status_code=201)
+@router.post("/roles", response_model=RoleOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_role(
     data: RoleCreate,
     db: AsyncSession = Depends(get_db),
@@ -725,7 +725,7 @@ async def create_role(
     )
 
 
-@router.put("/roles/{role_id}", response_model=RoleOut)
+@router.put("/roles/{role_id}", response_model=RoleOut, dependencies=[Depends(get_current_user)])
 async def update_role(
     role_id: str,
     data: RoleUpdate,
@@ -750,7 +750,7 @@ async def update_role(
     )
 
 
-@router.delete("/roles/{role_id}")
+@router.delete("/roles/{role_id}", dependencies=[Depends(get_current_user)])
 async def delete_role(role_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Role).where(Role.roleId == role_id))
     item = r.scalar_one_or_none()
@@ -765,7 +765,7 @@ async def delete_role(role_id: str, db: AsyncSession = Depends(get_db)):
 # Permission 权限
 # ═══════════════════════════════════════════
 
-@router.get("/permissions", response_model=PermissionListOut)
+@router.get("/permissions", response_model=PermissionListOut, dependencies=[Depends(get_optional_user)])
 async def list_permissions(
     role_id: Optional[str] = Query(None, alias="roleId"),
     resource: Optional[str] = None,
@@ -807,7 +807,7 @@ async def list_permissions(
     )
 
 
-@router.get("/permissions/{permission_id}", response_model=PermissionOut)
+@router.get("/permissions/{permission_id}", response_model=PermissionOut, dependencies=[Depends(get_optional_user)])
 async def get_permission(permission_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Permission).where(Permission.permissionId == permission_id))
     item = r.scalar_one_or_none()
@@ -820,7 +820,7 @@ async def get_permission(permission_id: str, db: AsyncSession = Depends(get_db))
     )
 
 
-@router.post("/permissions", response_model=PermissionOut, status_code=201)
+@router.post("/permissions", response_model=PermissionOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_permission(
     data: PermissionCreate,
     db: AsyncSession = Depends(get_db),
@@ -840,7 +840,7 @@ async def create_permission(
     )
 
 
-@router.put("/permissions/{permission_id}", response_model=PermissionOut)
+@router.put("/permissions/{permission_id}", response_model=PermissionOut, dependencies=[Depends(get_current_user)])
 async def update_permission(
     permission_id: str,
     data: PermissionUpdate,
@@ -865,7 +865,7 @@ async def update_permission(
     )
 
 
-@router.delete("/permissions/{permission_id}")
+@router.delete("/permissions/{permission_id}", dependencies=[Depends(get_current_user)])
 async def delete_permission(permission_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Permission).where(Permission.permissionId == permission_id))
     item = r.scalar_one_or_none()
@@ -880,7 +880,7 @@ async def delete_permission(permission_id: str, db: AsyncSession = Depends(get_d
 # AuditLog 审计日志
 # ═══════════════════════════════════════════
 
-@router.get("/audit-logs/search", response_model=AuditLogListOut)
+@router.get("/audit-logs/search", response_model=AuditLogListOut, dependencies=[Depends(get_optional_user)])
 async def search_audit_logs(
     user_id: Optional[str] = Query(None, alias="userId"),
     action: Optional[str] = None,
@@ -934,7 +934,7 @@ async def search_audit_logs(
     )
 
 
-@router.get("/audit-logs", response_model=AuditLogListOut)
+@router.get("/audit-logs", response_model=AuditLogListOut, dependencies=[Depends(get_optional_user)])
 async def list_audit_logs(
     user_id: Optional[str] = Query(None, alias="userId"),
     action: Optional[str] = None,
@@ -977,7 +977,7 @@ async def list_audit_logs(
     )
 
 
-@router.get("/audit-logs/{log_id}", response_model=AuditLogOut)
+@router.get("/audit-logs/{log_id}", response_model=AuditLogOut, dependencies=[Depends(get_optional_user)])
 async def get_audit_log(log_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(AuditLog).where(AuditLog.logId == log_id))
     item = r.scalar_one_or_none()
@@ -991,7 +991,7 @@ async def get_audit_log(log_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/audit-logs", response_model=AuditLogOut, status_code=201)
+@router.post("/audit-logs", response_model=AuditLogOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_audit_log(
     data: AuditLogCreate,
     db: AsyncSession = Depends(get_db),
@@ -1017,7 +1017,7 @@ async def create_audit_log(
 # AlertRule 告警规则
 # ═══════════════════════════════════════════
 
-@router.get("/alert-rules", response_model=AlertRuleListOut)
+@router.get("/alert-rules", response_model=AlertRuleListOut, dependencies=[Depends(get_optional_user)])
 async def list_alert_rules(
     device_type: Optional[str] = Query(None, alias="deviceType"),
     severity: Optional[str] = None,
@@ -1059,7 +1059,7 @@ async def list_alert_rules(
     )
 
 
-@router.get("/alert-rules/{rule_id}", response_model=AlertRuleOut)
+@router.get("/alert-rules/{rule_id}", response_model=AlertRuleOut, dependencies=[Depends(get_optional_user)])
 async def get_alert_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(AlertRule).where(AlertRule.ruleId == rule_id))
     item = r.scalar_one_or_none()
@@ -1072,7 +1072,7 @@ async def get_alert_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/alert-rules", response_model=AlertRuleOut, status_code=201)
+@router.post("/alert-rules", response_model=AlertRuleOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_alert_rule(
     data: AlertRuleCreate,
     db: AsyncSession = Depends(get_db),
@@ -1091,7 +1091,7 @@ async def create_alert_rule(
     )
 
 
-@router.put("/alert-rules/{rule_id}", response_model=AlertRuleOut)
+@router.put("/alert-rules/{rule_id}", response_model=AlertRuleOut, dependencies=[Depends(get_current_user)])
 async def update_alert_rule(
     rule_id: str,
     data: AlertRuleUpdate,
@@ -1120,7 +1120,7 @@ async def update_alert_rule(
     )
 
 
-@router.delete("/alert-rules/{rule_id}")
+@router.delete("/alert-rules/{rule_id}", dependencies=[Depends(get_current_user)])
 async def delete_alert_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(AlertRule).where(AlertRule.ruleId == rule_id))
     item = r.scalar_one_or_none()
@@ -1135,7 +1135,7 @@ async def delete_alert_rule(rule_id: str, db: AsyncSession = Depends(get_db)):
 # AlertRecord 告警记录
 # ═══════════════════════════════════════════
 
-@router.get("/alert-records", response_model=AlertRecordListOut)
+@router.get("/alert-records", response_model=AlertRecordListOut, dependencies=[Depends(get_optional_user)])
 async def list_alert_records(
     rule_id: Optional[str] = Query(None, alias="ruleId"),
     device_id: Optional[str] = Query(None, alias="deviceId"),
@@ -1189,7 +1189,7 @@ async def list_alert_records(
     )
 
 
-@router.get("/alert-records/{alert_id}", response_model=AlertRecordOut)
+@router.get("/alert-records/{alert_id}", response_model=AlertRecordOut, dependencies=[Depends(get_optional_user)])
 async def get_alert_record(alert_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(AlertRecord).where(AlertRecord.alertId == alert_id))
     item = r.scalar_one_or_none()
@@ -1204,7 +1204,7 @@ async def get_alert_record(alert_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.put("/alert-records/{alert_id}", response_model=AlertRecordOut)
+@router.put("/alert-records/{alert_id}", response_model=AlertRecordOut, dependencies=[Depends(get_current_user)])
 async def update_alert_record(
     alert_id: str,
     data: AlertRecordUpdate,
@@ -1237,7 +1237,7 @@ async def update_alert_record(
 # SystemJob 系统任务
 # ═══════════════════════════════════════════
 
-@router.get("/system-jobs/active", response_model=list[SystemJobOut])
+@router.get("/system-jobs/active", response_model=list[SystemJobOut], dependencies=[Depends(get_optional_user)])
 async def get_active_system_jobs(db: AsyncSession = Depends(get_db)):
     """Get all active system jobs."""
     r = await db.execute(
@@ -1252,7 +1252,7 @@ async def get_active_system_jobs(db: AsyncSession = Depends(get_db)):
     ) for item in items]
 
 
-@router.get("/system-jobs", response_model=SystemJobListOut)
+@router.get("/system-jobs", response_model=SystemJobListOut, dependencies=[Depends(get_optional_user)])
 async def list_system_jobs(
     type: Optional[str] = None,
     status: Optional[str] = None,
@@ -1289,7 +1289,7 @@ async def list_system_jobs(
     )
 
 
-@router.get("/system-jobs/{job_id}", response_model=SystemJobOut)
+@router.get("/system-jobs/{job_id}", response_model=SystemJobOut, dependencies=[Depends(get_optional_user)])
 async def get_system_job(job_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(SystemJob).where(SystemJob.jobId == job_id))
     item = r.scalar_one_or_none()
@@ -1302,7 +1302,7 @@ async def get_system_job(job_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/system-jobs", response_model=SystemJobOut, status_code=201)
+@router.post("/system-jobs", response_model=SystemJobOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_system_job(
     data: SystemJobCreate,
     db: AsyncSession = Depends(get_db),
@@ -1321,7 +1321,7 @@ async def create_system_job(
     )
 
 
-@router.put("/system-jobs/{job_id}", response_model=SystemJobOut)
+@router.put("/system-jobs/{job_id}", response_model=SystemJobOut, dependencies=[Depends(get_current_user)])
 async def update_system_job(
     job_id: str,
     data: SystemJobUpdate,
@@ -1350,7 +1350,7 @@ async def update_system_job(
     )
 
 
-@router.delete("/system-jobs/{job_id}")
+@router.delete("/system-jobs/{job_id}", dependencies=[Depends(get_current_user)])
 async def delete_system_job(job_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(SystemJob).where(SystemJob.jobId == job_id))
     item = r.scalar_one_or_none()
@@ -1365,7 +1365,7 @@ async def delete_system_job(job_id: str, db: AsyncSession = Depends(get_db)):
 # BackupRecord 备份记录
 # ═══════════════════════════════════════════
 
-@router.get("/backup-records/latest", response_model=BackupRecordOut)
+@router.get("/backup-records/latest", response_model=BackupRecordOut, dependencies=[Depends(get_optional_user)])
 async def get_latest_backup_record(db: AsyncSession = Depends(get_db)):
     """Get the latest backup record."""
     r = await db.execute(
@@ -1381,7 +1381,7 @@ async def get_latest_backup_record(db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.get("/backup-records", response_model=BackupRecordListOut)
+@router.get("/backup-records", response_model=BackupRecordListOut, dependencies=[Depends(get_optional_user)])
 async def list_backup_records(
     type: Optional[str] = None,
     status: Optional[str] = None,
@@ -1418,7 +1418,7 @@ async def list_backup_records(
     )
 
 
-@router.get("/backup-records/{record_id}", response_model=BackupRecordOut)
+@router.get("/backup-records/{record_id}", response_model=BackupRecordOut, dependencies=[Depends(get_optional_user)])
 async def get_backup_record(record_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(BackupRecord).where(BackupRecord.recordId == record_id))
     item = r.scalar_one_or_none()
@@ -1431,7 +1431,7 @@ async def get_backup_record(record_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/backup-records", response_model=BackupRecordOut, status_code=201)
+@router.post("/backup-records", response_model=BackupRecordOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_backup_record(
     data: BackupRecordCreate,
     db: AsyncSession = Depends(get_db),
@@ -1450,7 +1450,7 @@ async def create_backup_record(
     )
 
 
-@router.put("/backup-records/{record_id}", response_model=BackupRecordOut)
+@router.put("/backup-records/{record_id}", response_model=BackupRecordOut, dependencies=[Depends(get_current_user)])
 async def update_backup_record(
     record_id: str,
     data: BackupRecordUpdate,
@@ -1479,7 +1479,7 @@ async def update_backup_record(
 # CommandQueue 命令队列
 # ═══════════════════════════════════════════
 
-@router.get("/command-queue/pending", response_model=list[CommandQueueOut])
+@router.get("/command-queue/pending", response_model=list[CommandQueueOut], dependencies=[Depends(get_optional_user)])
 async def get_pending_commands(db: AsyncSession = Depends(get_db)):
     """Get all pending device commands."""
     r = await db.execute(
@@ -1496,7 +1496,7 @@ async def get_pending_commands(db: AsyncSession = Depends(get_db)):
     ) for item in items]
 
 
-@router.get("/command-queue", response_model=CommandQueueListOut)
+@router.get("/command-queue", response_model=CommandQueueListOut, dependencies=[Depends(get_optional_user)])
 async def list_command_queue(
     device_id: Optional[str] = Query(None, alias="deviceId"),
     command: Optional[str] = None,
@@ -1540,7 +1540,7 @@ async def list_command_queue(
     )
 
 
-@router.get("/command-queue/{command_id}", response_model=CommandQueueOut)
+@router.get("/command-queue/{command_id}", response_model=CommandQueueOut, dependencies=[Depends(get_optional_user)])
 async def get_command(command_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(CommandQueue).where(CommandQueue.commandId == command_id))
     item = r.scalar_one_or_none()
@@ -1555,7 +1555,7 @@ async def get_command(command_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/command-queue", response_model=CommandQueueOut, status_code=201)
+@router.post("/command-queue", response_model=CommandQueueOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_command(
     data: CommandQueueCreate,
     db: AsyncSession = Depends(get_db),
@@ -1576,7 +1576,7 @@ async def create_command(
     )
 
 
-@router.put("/command-queue/{command_id}", response_model=CommandQueueOut)
+@router.put("/command-queue/{command_id}", response_model=CommandQueueOut, dependencies=[Depends(get_current_user)])
 async def update_command(
     command_id: str,
     data: CommandQueueUpdate,
@@ -1605,7 +1605,7 @@ async def update_command(
     )
 
 
-@router.delete("/command-queue/{command_id}")
+@router.delete("/command-queue/{command_id}", dependencies=[Depends(get_current_user)])
 async def delete_command(command_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(CommandQueue).where(CommandQueue.commandId == command_id))
     item = r.scalar_one_or_none()
@@ -1620,7 +1620,7 @@ async def delete_command(command_id: str, db: AsyncSession = Depends(get_db)):
 # HeartbeatRecord 心跳记录
 # ═══════════════════════════════════════════
 
-@router.get("/heartbeat/latest", response_model=HeartbeatRecordOut)
+@router.get("/heartbeat/latest", response_model=HeartbeatRecordOut, dependencies=[Depends(get_optional_user)])
 async def get_latest_heartbeat(
     device_id: str = Query(..., alias="deviceId"),
     db: AsyncSession = Depends(get_db),
@@ -1641,7 +1641,7 @@ async def get_latest_heartbeat(
     )
 
 
-@router.get("/heartbeat", response_model=HeartbeatRecordListOut)
+@router.get("/heartbeat", response_model=HeartbeatRecordListOut, dependencies=[Depends(get_optional_user)])
 async def list_heartbeats(
     device_id: Optional[str] = Query(None, alias="deviceId"),
     status: Optional[str] = None,
@@ -1679,7 +1679,7 @@ async def list_heartbeats(
     )
 
 
-@router.get("/heartbeat/{heartbeat_id}", response_model=HeartbeatRecordOut)
+@router.get("/heartbeat/{heartbeat_id}", response_model=HeartbeatRecordOut, dependencies=[Depends(get_optional_user)])
 async def get_heartbeat(heartbeat_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(HeartbeatRecord).where(HeartbeatRecord.heartbeatId == heartbeat_id))
     item = r.scalar_one_or_none()
@@ -1693,7 +1693,7 @@ async def get_heartbeat(heartbeat_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/heartbeat", response_model=HeartbeatRecordOut, status_code=201)
+@router.post("/heartbeat", response_model=HeartbeatRecordOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_heartbeat(
     data: HeartbeatRecordCreate,
     db: AsyncSession = Depends(get_db),
