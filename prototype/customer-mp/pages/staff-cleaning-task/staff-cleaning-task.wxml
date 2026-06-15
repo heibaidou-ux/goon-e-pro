@@ -14,7 +14,7 @@
     <view class="task-card" wx:for="{{inProgress}}" wx:key="taskId">
       <view class="tc-top"><text class="tc-room">{{item.roomName}}</text></view>
       <text class="tc-meta">{{item.type==='FullClean'?'全面清洁':'快速清洁'}}</text>
-      <view class="tc-btns"><button class="tc-btn complete" bindtap="completeTask" data-id="{{item.taskId}}">完成</button></view>
+      <view class="tc-btns"><button class="tc-btn complete" bindtap="completeTask" data-id="{{item.taskId}}" data-roomid="{{item.roomId}}">完成</button></view>
     </view>
     <view class="empty" wx:if="{{inProgress.length==0}}"><text>✅ 暂无进行中</text></view>
   </view>

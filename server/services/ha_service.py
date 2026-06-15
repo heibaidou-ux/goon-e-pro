@@ -89,13 +89,14 @@ DEVICE_TEMPLATES = [
 ]
 
 SCENES = [
+    # ── 迎宾模式（首次进房）：空调预约前5分钟预开启 → 开门 → 窗帘拉起 → 灯全亮 → 背景音乐 ──
     {"scene_id": "SCN_WELCOME", "name": "Welcome", "label": "迎宾模式", "trigger_type": "Auto",
      "applicable_room_types": ["MeetingRoom", "TeaRoom"],
      "rules": [
-         {"sequence": 1, "device_type": "Lock", "action": "Unlock", "params": {}},
-         {"sequence": 2, "device_type": "Light", "action": "On", "params": {"brightness": 80, "color_temp": 3500}},
+         {"sequence": 1, "device_type": "AC", "action": "Temperature", "params": {"temperature": 24}},
+         {"sequence": 2, "device_type": "Lock", "action": "Unlock", "params": {}},
          {"sequence": 3, "device_type": "Curtain", "action": "Open", "params": {}},
-         {"sequence": 4, "device_type": "AC", "action": "Temperature", "params": {"temperature": 24}},
+         {"sequence": 4, "device_type": "Light", "action": "On", "params": {"brightness": 90, "color_temp": 3500}},
          {"sequence": 5, "device_type": "Speaker", "action": "On", "params": {"volume": 30, "source": "背景音乐"}},
      ]},
     {"scene_id": "SCN_TEA", "name": "TeaSession", "label": "品茶模式", "trigger_type": "Manual",
@@ -143,6 +144,15 @@ SCENES = [
      "rules": [
          {"sequence": 1, "device_type": "AC", "action": "Temperature", "params": {"temperature": 24}},
          {"sequence": 2, "device_type": "Speaker", "action": "On", "params": {"volume": 15, "source": "轻音乐"}},
+     ]},
+    # ── 打扫完成恢复：关灯 → 关空调 → 窗帘完全关闭 → 停止背景音乐 ──
+    {"scene_id": "SCN_CLEANUP", "name": "Cleanup", "label": "打扫完成", "trigger_type": "Auto",
+     "applicable_room_types": ["MeetingRoom", "TeaRoom", "Exhibition"],
+     "rules": [
+         {"sequence": 1, "device_type": "Light", "action": "Off", "params": {}},
+         {"sequence": 2, "device_type": "AC", "action": "Off", "params": {}},
+         {"sequence": 3, "device_type": "Curtain", "action": "Close", "params": {}},
+         {"sequence": 4, "device_type": "Speaker", "action": "Off", "params": {}},
      ]},
 ]
 

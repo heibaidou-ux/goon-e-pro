@@ -2,12 +2,13 @@ var API = require('../../utils/api')
 var STAFF_API = require('../../utils/staff-api')
 
 const ALL_SCENES = [
-  { id: 'Welcome', name: '欢迎', icon: '🚪', desc: '开门即触发', type: 'Auto', params: { temperature: 24, colorTemp: 3000, volume: 40 } },
+  { id: 'Welcome', name: '欢迎', icon: '🚪', desc: '空调预开+开门+灯光+音乐', type: 'Auto', params: { temperature: 24, colorTemp: 3500, volume: 30 } },
   { id: 'TeaSession', name: '品茗', icon: '🍵', desc: '暖光+轻音乐', type: 'Manual', params: { temperature: 24, colorTemp: 3000, volume: 40 } },
   { id: 'Meeting', name: '会议', icon: '💡', desc: '冷白光+静音', type: 'Manual', params: { temperature: 24, colorTemp: 4000, volume: 0 } },
   { id: 'Karaoke', name: 'K歌', icon: '🎤', desc: '彩灯+音响', type: 'Manual', params: { temperature: 24, colorTemp: 3500, volume: 80 } },
   { id: 'EnergySave', name: '节能', icon: '♻️', desc: '全部关闭', type: 'Auto', params: { temperature: 26, colorTemp: 2700, volume: 0 } },
-  { id: 'PreOpen', name: '预开', icon: '⏰', desc: '提前开启空调', type: 'Schedule', params: { temperature: 24, colorTemp: 3000, volume: 20 } }
+  { id: 'PreOpen', name: '预开', icon: '⏰', desc: '提前开启空调', type: 'Schedule', params: { temperature: 24, colorTemp: 3000, volume: 20 } },
+  { id: 'Cleanup', name: '打扫', icon: '🧹', desc: '关灯关空调+关窗帘+关音乐', type: 'Auto', params: { temperature: 26, colorTemp: 2700, volume: 0 } }
 ]
 
 const TYPE_LABELS = { Auto: '自动', Manual: '手动', Schedule: '定时' }
@@ -188,12 +189,13 @@ Page({
 
   resetParams: function() {
     var defaults = {
-      Welcome: { temperature: 24, colorTemp: 3000, volume: 40 },
+      Welcome: { temperature: 24, colorTemp: 3500, volume: 30 },
       TeaSession: { temperature: 24, colorTemp: 3000, volume: 40 },
       Meeting: { temperature: 24, colorTemp: 4000, volume: 0 },
       Karaoke: { temperature: 24, colorTemp: 3500, volume: 80 },
       EnergySave: { temperature: 26, colorTemp: 2700, volume: 0 },
-      PreOpen: { temperature: 24, colorTemp: 3000, volume: 20 }
+      PreOpen: { temperature: 24, colorTemp: 3000, volume: 20 },
+      Cleanup: { temperature: 26, colorTemp: 2700, volume: 0 }
     }
     var def = defaults[this.data.activeSceneId]
     if (def) {
