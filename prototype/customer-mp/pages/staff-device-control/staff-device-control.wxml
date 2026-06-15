@@ -1,15 +1,126 @@
-<view class="phone"><view class="page">
-  <view class="header"><text class="header-title">📡 设备控制面板</text></view>
-  <view class="room-select"><picker mode="selector" range="{{roomNames}}" bindchange="switchRoom"><view class="rs-trigger">{{currentRoomName}} ▾</view></picker></view>
-  <view class="device-list">
-    <view class="device-card" wx:for="{{devices}}" wx:key="deviceId">
-      <view class="dc-left">
-        <text class="dc-icon">{{item.typeIcon}}</text>
-        <view><text class="dc-name">{{item.typeLabel}}</text><text class="dc-status {{item.status}}">{{item.status=='Online'?'在线':'离线'}}</text></view>
+<view class="phone">
+  <view class="header">
+    <text class="header-title">📡 设备控制</text>
+  </view>
+  <view class="page">
+    <view class="room-select">
+      <picker mode="selector" range="{{roomNames}}" bindchange="switchRoom">
+        <view class="rs-trigger">{{currentRoomName}} ▾</view>
+      </picker>
+    </view>
+
+    <!-- ── 空调 ── -->
+    <view class="ctrl-section" wx:if="{{hasAC}}">
+      <view class="cs-header">
+        <text class="cs-title">❄️ 空调</text>
+        <switch checked="{{acOn}}" bindchange="toggleAC" color="#5D8A6B" />
       </view>
-      <switch checked="{{item.on}}" bindchange="toggleDevice" data-id="{{item.deviceId}}" wx:if="{{item.type!='AC'}}" />
-      <view wx:elif="{{item.type=='AC'}}" class="ac-mini"><text>{{item.temperature}}°</text><switch checked="{{item.mode=='cool'}}" bindchange="toggleDevice" data-id="{{item.deviceId}}" /></view>
+      <view wx:if="{{acOn}}">
+        <view class="param-row">
+          <text class="p-label">温度</text>
+          <view class="temp-chips">
+            <view class="t-chip {{acTemp==t?'active':''}}" wx:for="{{[20,22,24,26,28,30]}}" wx:key="*this" bindtap="setACTemp" data-temp="{{item}}">{{item}}°</view>
+          </view>
+        </view>
+        <view class="param-row">
+          <text class="p-label">模式</text>
+          <view class="mode-chips">
+            <view class="m-chip {{acMode=='cool'?'active':''}}" bindtap="setACMode" data-mode="cool">❄️ 制冷</view>
+            <view class="m-chip {{acMode=='heat'?'active':''}}" bindtap="setACMode" data-mode="heat">☀️ 制热</view>
+            <view class="m-chip {{acMode=='fan_only'?'active':''}}" bindtap="setACMode" data-mode="fan_only">🌀 送风</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── 灯光 ── -->
+    <view class="ctrl-section" wx:if="{{hasLight}}">
+      <view class="cs-header">
+        <text class="cs-title">💡 灯光</text>
+        <switch checked="{{lightOn}}" bindchange="toggleLight" color="#5D8A6B" />
+      </view>
+      <view wx:if="{{lightOn}}">
+        <view class="param-row">
+          <text class="p-label">亮度 {{lightBrightness}}%</text>
+          <slider min="10" max="100" value="{{lightBrightness}}" bindchange="setLightBrightness" block-size="18" activeColor="#5D8A6B" />
+        </view>
+        <view class="param-row">
+          <text class="p-label">色温</text>
+          <view class="color-chips">
+            <view class="c-chip {{lightColorTemp==2700?'active':''}}" bindtap="setLightColorTemp" data-temp="2700">🌅 暖光</view>
+            <view class="c-chip {{lightColorTemp==3000?'active':''}}" bindtap="setLightColorTemp" data-temp="3000">🌤 暖白</view>
+            <view class="c-chip {{lightColorTemp==4000?'active':''}}" bindtap="setLightColorTemp" data-temp="4000">☀️ 冷白</view>
+            <view class="c-chip {{lightColorTemp==5000?'active':''}}" bindtap="setLightColorTemp" data-temp="5000">💡 日光</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── 窗帘 ── -->
+    <view class="ctrl-section" wx:if="{{hasCurtain}}">
+      <view class="cs-header">
+        <text class="cs-title">🪟 窗帘</text>
+        <view class="curtain-btns">
+          <view class="cb-btn {{curtainOn?'close':'open'}}" bindtap="toggleCurtain">{{curtainOn?'✕ 关闭':'☰ 打开'}}</view>
+          <view class="cb-btn ghost" bindtap="stopCurtain">⏸ 停止</view>
+        </view>
+      </view>
+      <view class="param-row">
+        <text class="p-label">开合 {{curtainPosition}}%</text>
+        <slider min="0" max="100" value="{{curtainPosition}}" bindchange="setCurtainPosition" block-size="18" activeColor="#5D8A6B" />
+      </view>
+    </view>
+
+    <!-- ── 音响 ── -->
+    <view class="ctrl-section" wx:if="{{hasSpeaker}}">
+      <view class="cs-header">
+        <text class="cs-title">🔊 音响</text>
+        <switch checked="{{speakerOn}}" bindchange="toggleSpeaker" color="#5D8A6B" />
+      </view>
+      <view wx:if="{{speakerOn}}">
+        <view class="param-row">
+          <text class="p-label">音量 {{speakerVolume}}%</text>
+          <slider min="0" max="100" value="{{speakerVolume}}" bindchange="setSpeakerVolume" block-size="18" activeColor="#5D8A6B" />
+        </view>
+      </view>
+    </view>
+
+    <!-- ── 门锁 ── -->
+    <view class="ctrl-section" wx:if="{{hasLock}}">
+      <view class="cs-header">
+        <text class="cs-title">🔒 门锁</text>
+        <text class="lock-badge {{lockLocked?'locked':'open'}}">{{lockLocked?'已锁定':'已开启'}}</text>
+      </view>
+      <view class="lock-action">
+        <view class="unlock-btn" bindtap="unlockDoor" data-id="{{lockDeviceId}}">🔓 远程开门</view>
+      </view>
+    </view>
+
+    <!-- ── 风扇/换气扇 ── -->
+    <view class="ctrl-section" wx:if="{{hasFan}}">
+      <view class="cs-header">
+        <text class="cs-title">🌀 风扇</text>
+      </view>
+      <view class="fan-list">
+        <view class="fan-item" wx:for="{{devices}}" wx:key="deviceId" wx:if="{{item.type=='Fan' || item.type=='ExhaustFan'}}">
+          <text class="fi-name">{{item.typeLabel}}</text>
+          <switch checked="{{item.on}}" bindchange="toggleFan" data-id="{{item.deviceId}}" color="#5D8A6B" />
+        </view>
+      </view>
     </view>
   </view>
+
+  <!-- 门锁确认弹窗 -->
+  <view class="modal-overlay" wx:if="{{showLockConfirm}}" bindtap="cancelUnlock">
+    <view class="modal" catchtap>
+      <text class="modal-title">🔓 确认开门</text>
+      <text class="modal-desc">远程开门将解锁房间门锁，请确认客人已到店</text>
+      <view class="modal-actions">
+        <view class="ma-btn cancel" bindtap="cancelUnlock">取消</view>
+        <view class="ma-btn primary" bindtap="confirmUnlock">确认开门</view>
+      </view>
+    </view>
+  </view>
+
   <staff-bottom-nav active="device" />
 </view>

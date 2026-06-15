@@ -1,80 +1,109 @@
-<view class="phone"><view class="page">
-  <view class="header">
-    <text class="header-title">🏠 房态管理</text>
-    <text class="header-stats">{{stats.inUse}}使用 · {{stats.available}}空闲</text>
-  </view>
+<view class="phone">
+  <view class="page">
+    <view class="header">
+      <text class="header-title">🏠 房态管理</text>
+      <text class="header-stats">{{stats.inUse}}使用 · {{stats.booked}}预订 · {{stats.available}}空闲</text>
+    </view>
 
-  <view class="legend-bar">
-    <text class="legend-dot inuse"></text><text class="legend-label">使用中</text>
-    <text class="legend-dot booked"></text><text class="legend-label">已预订</text>
-    <text class="legend-dot free"></text><text class="legend-label">空闲</text>
-  </view>
+    <view class="legend-bar">
+      <text class="legend-dot inuse"></text><text class="legend-label">使用中</text>
+      <text class="legend-dot booked"></text><text class="legend-label">已预订</text>
+      <text class="legend-dot free"></text><text class="legend-label">空闲</text>
+    </view>
 
-  <view class="room-grid">
-    <view class="room-card {{item.statusClass}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="onRoomTap" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}" data-status="{{item.statusClass}}">
-      <view class="rc-top">
-        <text class="rc-dot {{item.statusClass}}"></text>
-        <text class="rc-name">{{item.name}}</text>
-        <text class="rc-type">{{item.capacity}}人 {{item.typeLabel}}</text>
-      </view>
-      <text class="rc-status {{item.statusClass}}">{{item.statusLabel}}</text>
-      <view class="rc-order" wx:if="{{item.currentOrder}}">
-        <text class="rc-customer">👤 {{item.currentOrder.customerName}}</text>
-        <text class="rc-time">{{item.currentOrder.start}}-{{item.currentOrder.end}}</text>
-      </view>
-      <view class="rc-actions">
-        <text class="rca-btn" wx:if="{{item.statusClass=='free'}}" bindtap="showBooking" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}">📝 代客预订</text>
-        <text class="rca-btn" wx:if="{{item.statusClass=='inuse'}}" bindtap="showRoomControl" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}">🔧 智控</text>
+    <view class="room-grid">
+      <view class="room-card {{item.statusClass}}" wx:for="{{rooms}}" wx:key="roomId"
+        bindtap="onRoomTap" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}"
+        data-status="{{item.statusClass}}" data-orderid="{{item.currentOrder.orderId||''}}">
+
+        <view class="rc-top">
+          <text class="rc-dot {{item.statusClass}}"></text>
+          <text class="rc-name">{{item.name}}</text>
+          <text class="rc-type">{{item.capacity}}人 {{item.typeLabel}}</text>
+        </view>
+        <text class="rc-status {{item.statusClass}}">{{item.statusLabel}}</text>
+
+        <!-- 使用中：显示客人和订单号 -->
+        <view class="rc-order" wx:if="{{item.currentOrder && item.statusClass=='inuse'}}">
+          <text class="rc-customer">👤 {{item.currentOrder.customerName}}</text>
+          <text class="rc-time">{{item.currentOrder.start}}-{{item.currentOrder.end}}</text>
+        </view>
+
+        <!-- 已预订：显示预订信息 -->
+        <view class="rc-order booked" wx:if="{{item.currentOrder && item.statusClass=='booked'}}">
+          <text class="rc-customer">👤 {{item.currentOrder.customerName}}</text>
+          <text class="rc-time">⏰ {{item.currentOrder.start}}-{{item.currentOrder.end}}</text>
+        </view>
+
+        <view class="rc-actions">
+          <text class="rca-btn primary" wx:if="{{item.statusClass=='free'}}" bindtap="showBooking" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}">📝 代客预订</text>
+          <text class="rca-btn primary" wx:if="{{item.statusClass=='inuse'}}" bindtap="showRoomControl" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}">🔧 智控</text>
+          <text class="rca-btn outline" wx:if="{{item.statusClass=='booked'}}" catchtap="onRoomTap" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}" data-status="{{item.statusClass}}">👤 确认到店</text>
+        </view>
       </view>
     </view>
-  </view>
 
-  <!-- 代客预订弹窗 -->
-  <view class="modal-overlay" wx:if="{{showBookingModal}}" bindtap="hideBookingModal">
-    <view class="modal" catchtap>
-      <text class="modal-title">📝 代客预订 — {{bookRoomName}}</text>
+    <!-- 操作弹窗（使用中/已预订） -->
+    <view class="modal-overlay" wx:if="{{showActionSheet}}" bindtap="hideActionSheet">
+      <view class="action-sheet" catchtap>
+        <!-- 使用中 -->
+        <view class="as-title" wx:if="{{actionType=='inuse'}}">{{actionRoomName}} — 使用中</view>
+        <view class="as-title" wx:if="{{actionType=='booked'}}">{{actionRoomName}} — 已预订</view>
 
-      <view class="form-section">
-        <text class="form-label">客人姓名</text>
-        <input class="form-input" placeholder="请输入客人姓名" value="{{bookName}}" bindinput="onBookName" />
+        <view class="as-item primary" wx:if="{{actionType=='inuse'}}" bindtap="showRoomControl" data-roomid="{{actionRoomId}}" data-roomname="{{actionRoomName}}">🔧 设备控制</view>
+        <view class="as-item" wx:if="{{actionType=='inuse'}}" bindtap="doExtend">⏱ 续订</view>
+        <view class="as-item danger" wx:if="{{actionType=='inuse'}}" bindtap="doForceCheckout">🏁 强制退房</view>
+
+        <view class="as-item primary" wx:if="{{actionType=='booked'}}" bindtap="doCheckIn">✅ 确认到店</view>
+        <view class="as-item danger" wx:if="{{actionType=='booked'}}" bindtap="doCancelBooking">✕ 取消预约</view>
+
+        <view class="as-item cancel" bindtap="hideActionSheet">取消</view>
       </view>
-      <view class="form-section">
-        <text class="form-label">联系电话</text>
-        <input class="form-input" placeholder="请输入手机号" value="{{bookPhone}}" bindinput="onBookPhone" type="number" maxlength="11" />
-      </view>
+    </view>
 
-      <view class="form-section">
-        <text class="form-label">预订日期</text>
-        <picker mode="date" value="{{bookDate}}" bindchange="onBookDate">
-          <view class="form-picker">{{bookDate}} ▾</view>
-        </picker>
-      </view>
+    <!-- 代客预订弹窗 -->
+    <view class="modal-overlay" wx:if="{{showBookingModal}}" bindtap="hideBookingModal">
+      <view class="modal" catchtap>
+        <text class="modal-title">📝 代客预订 — {{bookRoomName}}</text>
 
-      <view class="form-row">
-        <view class="form-section" style="flex:1;">
-          <text class="form-label">开始时间</text>
-          <picker mode="selector" range="{{timeOptions}}" bindchange="onBookStart">
-            <view class="form-picker">{{bookStart || '选择'}} ▾</view>
+        <view class="form-section">
+          <text class="form-label">客人姓名</text>
+          <input class="form-input" placeholder="请输入客人姓名" value="{{bookName}}" bindinput="onBookName" />
+        </view>
+        <view class="form-section">
+          <text class="form-label">联系电话</text>
+          <input class="form-input" placeholder="请输入手机号" value="{{bookPhone}}" bindinput="onBookPhone" type="number" maxlength="11" />
+        </view>
+        <view class="form-section">
+          <text class="form-label">预订日期</text>
+          <picker mode="date" value="{{bookDate}}" bindchange="onBookDate">
+            <view class="form-picker">{{bookDate}} ▾</view>
           </picker>
         </view>
-        <view class="form-section" style="flex:1;">
-          <text class="form-label">时长</text>
-          <picker mode="selector" range="{{durationOptions}}" bindchange="onBookDuration">
-            <view class="form-picker">{{bookDurationLabel || '2小时'}} ▾</view>
+        <view class="form-row">
+          <view class="form-section" style="flex:1;">
+            <text class="form-label">开始时间</text>
+            <picker mode="selector" range="{{timeOptions}}" bindchange="onBookStart">
+              <view class="form-picker">{{bookStart || '选择'}} ▾</view>
+            </picker>
+          </view>
+          <view class="form-section" style="flex:1;">
+            <text class="form-label">时长</text>
+            <picker mode="selector" range="{{durationOptions}}" bindchange="onBookDuration">
+              <view class="form-picker">{{bookDurationLabel || '2小时'}} ▾</view>
+            </picker>
+          </view>
+        </view>
+        <view class="form-section">
+          <text class="form-label">客户来源</text>
+          <picker mode="selector" range="{{sourceOptions}}" bindchange="onBookSource">
+            <view class="form-picker">{{bookSource || '请选择来源'}} ▾</view>
           </picker>
         </view>
-      </view>
-
-      <view class="form-section">
-        <text class="form-label">客户来源</text>
-        <picker mode="selector" range="{{sourceOptions}}" bindchange="onBookSource">
-          <view class="form-picker">{{bookSource || '请选择来源'}} ▾</view>
-        </picker>
-      </view>
-
-      <view class="modal-btns">
-        <view class="m-btn cancel" bindtap="hideBookingModal">取消</view>
-        <view class="m-btn primary" bindtap="confirmBooking">确认预订</view>
+        <view class="modal-btns">
+          <view class="m-btn cancel" bindtap="hideBookingModal">取消</view>
+          <view class="m-btn primary" bindtap="confirmBooking">确认预订</view>
+        </view>
       </view>
     </view>
   </view>
