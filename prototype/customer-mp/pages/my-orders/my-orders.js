@@ -153,18 +153,21 @@ Page({
         }
 
         // 取消规则（待使用订单）
-        var cancelFree = true, cancelMsg = ''
+        var cancelFree = true, canCancel = false, cancelMsg = ''
         if (status === 'Booked' && o.date && o.time) {
           var startParts2 = o.time.split('-')[0].split(':')
           var orderDate = new Date(o.date)
           var orderDT = new Date(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate(), parseInt(startParts2[0]), parseInt(startParts2[1]))
           var hoursUntil = (orderDT - now) / 3600000
           if (hoursUntil < 2 && hoursUntil > 0) {
+            canCancel = true
             cancelFree = false
             cancelMsg = '距开始不足2小时，取消将收取首小时费用50%'
           } else if (hoursUntil >= 2) {
+            canCancel = true
             cancelMsg = '距开始超过2小时，可免费取消'
           } else {
+            canCancel = false
             cancelMsg = '已超过预约时间，不可取消'
           }
         }
@@ -180,7 +183,7 @@ Page({
           status: status, statusClass: statusClass, statusLabel: statusLabel,
           timeStr: (o.date||'')+' '+(o.time||(o.start?o.start.slice(0,5)+'-'+o.end.slice(0,5):'')),
           amount: o.amount||0, doorCode: o.doorCode||'0000',
-          remaining: remaining, cancelFree: cancelFree, cancelMsg: cancelMsg,
+          remaining: remaining, canCancel: canCancel, cancelFree: cancelFree, cancelMsg: cancelMsg,
           logistics: log, payment: o.payment||'',
           doorCanOpen: doorCanOpen, doorHint: doorHint,
           isTeaOrder: o.isTeaOrder || false, items: o.items || [],

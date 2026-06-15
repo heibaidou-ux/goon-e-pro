@@ -1,70 +1,93 @@
-page { background:#f5f7fa; margin:0; padding:0; }
-.phone { width:100%; height:100vh; overflow:hidden; background:#f5f7fa; display:flex; flex-direction:column; }
+/* 高岸茶室 · 会员中心 — 温润质感 */
+page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif; }
+.phone { width:100%; height:100vh; overflow:hidden; background:#FAF8F5; display:flex; flex-direction:column; }
 .page { flex:1; overflow-y:auto; }
 
-/* 首充�?*/
-.promo-banner { background:linear-gradient(135deg,#B8860B,#f5a623); padding:14px 16px; color:#fff; display:flex; align-items:center; justify-content:space-between; }
-.promo-text { font-size:13px; font-weight:500; }
-.promo-em { font-size:16px; font-weight:600; }
-.promo-tag { background:rgba(255,255,255,.2); padding:4px 12px; border-radius:12px; font-size:11px; }
+/* ── 用户头部卡片 ── */
+.profile-header-card { background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; padding:24px 20px; display:flex; align-items:center; gap:16px; }
+.profile-avatar { width:60px; height:60px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:30px; border:2px solid rgba(255,255,255,.3); }
+.profile-info { flex:1; }
+.profile-name { font-size:18px; font-weight:700; display:block; letter-spacing:.5px; }
+.profile-level { font-size:12px; opacity:.85; margin-top:2px; display:block; }
+.profile-badge-row { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+.profile-badge { font-size:10px; padding:2px 10px; border-radius:10px; background:rgba(255,255,255,.15); display:inline-block; }
+.profile-edit-btn { font-size:11px; color:rgba(255,255,255,.7); padding:4px 8px; border-radius:6px; border:1px solid rgba(255,255,255,.2); }
 
-/* 会员�?�?品牌绿色 */
-.member-card { background:linear-gradient(135deg,#5D8A6B,#8bba94); padding:24px 16px; color:#fff; }
-.member-avatar { width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 12px; }
-.member-name { text-align:center; font-size:18px; font-weight:700; margin-bottom:4px; display:block; }
-.member-level { display:table; margin:0 auto; }
-.level-badge { display:inline-block; padding:4px 16px; border-radius:12px; background:rgba(255,255,255,.2); font-size:12px; color:#fff; }
-.member-balance { text-align:center; margin-top:16px; }
-.balance-icon-text { font-size:20px; }
-.balance-label-text { font-size:12px; opacity:.8; }
-.balance-amount-text { font-size:36px; font-weight:800; }
-.eye-icon { font-size:14px; cursor:pointer; opacity:.8; }
-.member-stats { display:flex; gap:12px; margin-top:16px; }
-.stat-item { flex:1; text-align:center; background:rgba(255,255,255,.15); border-radius:10px; padding:10px; }
-.stat-num { font-size:18px; font-weight:700; display:block; }
-.stat-label { font-size:10px; opacity:.8; margin-top:2px; display:block; }
+/* ── 余额卡片 ── */
+.balance-card { background:#fff; margin:0 16px 12px; border-radius:16px; padding:16px 20px; box-shadow:0 2px 12px rgba(0,0,0,.04); display:flex; align-items:center; justify-content:space-between; margin-top:-12px; position:relative; z-index:1; }
+.balance-left { flex:1; }
+.balance-label { font-size:11px; color:#999; display:block; }
+.balance-amount { font-size:28px; font-weight:800; color:#5D8A6B; display:block; margin-top:2px; }
+.balance-btn { padding:10px 20px; border-radius:14px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; font-size:13px; font-weight:600; box-shadow:0 4px 12px rgba(93,138,107,.25); }
+.balance-btn:active { transform:scale(.95); }
+.balance-btn.gold { background:linear-gradient(135deg,#B8860B,#D4A84B); box-shadow:0 4px 12px rgba(184,134,11,.25); }
 
-/* 功能菜单 */
-.actions-card { background:#fff; padding:16px 16px; margin:12px 0; }
-.action-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f5f5f5; font-size:14px; color:#333; }
-.action-row:last-child { border-bottom:none; }
-.action-row .arrow { color:#ccc; }
+/* ── 菜单列表 ── */
+.menu-section { background:#fff; border-radius:16px; margin:0 16px 12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.04); }
+.menu-item { display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid #f0ece6; transition:all .1s; }
+.menu-item:last-child { border-bottom:none; }
+.menu-item:active { background:#f9fafb; }
+.menu-icon { font-size:20px; margin-right:12px; width:28px; text-align:center; }
+.menu-label { flex:1; font-size:14px; color:#2C2C2C; font-weight:500; }
+.menu-value { font-size:12px; color:#999; }
+.menu-arrow { color:#ccc; font-size:14px; margin-left:6px; }
 
-/* 会员权益 */
-.benefits-card { background:#fff; padding:16px 16px; margin:0 0 12px; }
-.benefits-title { font-size:15px; font-weight:600; color:#333; margin-bottom:12px; display:block; }
-.benefit-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f5f5f5; font-size:13px; color:#666; }
-.benefit-row:last-child { border-bottom:none; }
-.benefit-icon { font-size:20px; width:28px; text-align:center; }
-
-/* 退�?*/
-.logout-wrap { padding:0 16px 20px; }
-.logout-btn { width:100%; padding:14px; background:#fff; color:#d54941; border:1.5px solid #d54941; border-radius:16px; font-size:15px; font-weight:600; text-align:center; }
-
-/* 充值弹�?*/
-.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
-.modal { background:#fff;border-radius:16px;padding:24px;width:320px;text-align:center; }
-.modal-h3 { font-size:18px;font-weight:700;color:#333;margin-bottom:8px;display:block; }
-.modal-promo { font-size:12px;color:#B8860B;background:#fff8e1;padding:6px 12px;border-radius:8px;display:inline-block;margin-bottom:12px; }
-.modal-label { font-size:13px;color:#666;display:block;margin:12px 0 8px;text-align:left; }
-.amount-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px; }
-.amount-btn { padding:12px;border:1.5px solid #e5e5e5;border-radius:16px;text-align:center;font-size:14px;font-weight:600; }
-.amount-btn.active { border-color:#5D8A6B;background:#f0fdf4;color:#5D8A6B; }
-.recharge-bonus-text { font-size:11px;color:#999;display:block;margin-bottom:8px; }
-.payment-option { padding:12px 14px;border:1.5px solid #e5e5e5;border-radius:16px;margin-bottom:8px;font-size:14px;text-align:left; }
-.payment-option.active { border-color:#5D8A6B;background:#f0fdf4;color:#5D8A6B; }
+/* ── 充值弹窗 ── */
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:99;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s; }
+.modal { background:#fff;border-radius:20px;padding:24px;width:320px;max-width:90vw;text-align:center;animation:scaleIn .25s; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes scaleIn { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
+.modal-h3 { font-size:17px;font-weight:700;display:block;margin-bottom:4px;color:#1a1a1a; }
+.modal-promo { font-size:12px;color:#B8860B;display:block;margin-bottom:16px; }
+.amount-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px; }
+.amount-btn { padding:14px;border-radius:14px;border:1.5px solid #e0d8d0;background:#fff;font-size:16px;font-weight:600;color:#333;transition:all .15s; }
+.amount-btn:active { border-color:#5D8A6B; }
+.amount-btn.active { border-color:#5D8A6B;background:#f0faf2;color:#5D8A6B; }
+.recharge-bonus-text { font-size:12px;color:#B8860B;display:block;margin-bottom:12px; }
+.modal-label { font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:8px;text-align:left; }
+.payment-option { display:flex;align-items:center;gap:8px;padding:12px;border-radius:12px;border:1.5px solid #e0d8d0;margin-bottom:6px;font-size:13px;font-weight:500; }
+.payment-option:active { border-color:#5D8A6B; }
+.payment-option.active { border-color:#5D8A6B;background:#f0faf2;color:#5D8A6B; }
 .modal-buttons { display:flex;gap:10px;margin-top:16px; }
-.modal-btn { flex:1;padding:12px;border-radius:16px;font-size:14px;font-weight:600;text-align:center;border:none; }
-.modal-btn.confirm { background:#5D8A6B;color:#fff; }
+.modal-btn { flex:1;padding:12px;border-radius:12px;font-size:14px;font-weight:600;text-align:center; }
 .modal-btn.cancel { background:#f5f5f5;color:#666; }
+.modal-btn.confirm { background:linear-gradient(135deg,#5D8A6B,#7BA88E);color:#fff; }
 
-/* 账户设置弹窗 */
-.settings-modal { text-align:left; width:340px; max-width:90vw; }
+/* ── 设置弹窗 ── */
+.settings-modal { text-align:left; }
 .settings-section { margin-bottom:16px; }
-.settings-section-title { font-size:13px; font-weight:600; color:#333; display:block; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid #f0f0f0; }
-.settings-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; }
-.settings-label { font-size:14px; color:#666; flex-shrink:0; }
-.settings-input { flex:1; text-align:right; height:36px; line-height:32px; padding:0 10px; border:1px solid #e5e5e5; border-radius:8px; font-size:14px; color:#333; margin-left:12px; }
-.settings-value { font-size:14px; color:#333; }
-.danger-text { color:#d54941; }
+.settings-section-title { font-size:13px;font-weight:600;color:#999;margin-bottom:8px;display:block;text-transform:uppercase;letter-spacing:1px; }
+.settings-row { display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #f5f5f5; }
+.settings-label { font-size:14px;color:#333;flex:1; }
+.settings-value { font-size:13px;color:#999; }
+.settings-input { flex:1;font-size:14px;border:none;outline:none;text-align:right;color:#5D8A6B; }
+.danger-text { color:#D54941; }
+.arrow { color:#ccc;font-size:16px; }
 
+/* ── 登录弹窗（在首页）── */
+.login-fullscreen { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99;display:flex;align-items:center;justify-content:center; }
+.login-bg { background:linear-gradient(135deg,#1a3a1a,#2d5a2d);color:#fff;padding:32px 24px;border-radius:24px;width:340px;box-shadow:0 16px 48px rgba(0,0,0,.3); }
+.login-card { background:#fff;color:#333;border-radius:16px;padding:24px; }
+.login-card-title { font-size:20px;font-weight:700;text-align:center;display:block; }
+.login-card-sub { font-size:12px;color:#999;text-align:center;margin-top:4px;display:block; }
+.login-tabs { display:flex;margin:16px 0;border-bottom:1px solid #f0ece6; }
+.login-tab { flex:1;text-align:center;padding:12px;font-size:14px;color:#999; }
+.login-tab.active { color:#5D8A6B;font-weight:600;border-bottom:2px solid #5D8A6B; }
+.login-type-tabs { display:flex;margin:0 0 16px;background:#f5f5f5;border-radius:10px;overflow:hidden; }
+.login-type-tab { flex:1;text-align:center;padding:10px;font-size:13px;color:#999; }
+.login-type-tab.active { background:#5D8A6B;color:#fff;font-weight:600; }
+.form-item { margin-bottom:10px; }
+.form-label { font-size:12px;color:#666;margin-bottom:6px;display:block; }
+.form-input { width:100%;height:48px;line-height:44px;padding:0 16px;border:1.5px solid #e0d8d0;border-radius:12px;font-size:14px;box-sizing:border-box; }
+.form-input:focus { border-color:#5D8A6B; }
+.code-row { display:flex;gap:8px; }
+.code-btn { padding:12px 16px;border-radius:12px;border:none;background:#5D8A6B;color:#fff;font-size:13px;font-weight:600;white-space:nowrap; }
+.form-btn { width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#5D8A6B,#7BA88E);color:#fff;font-size:16px;font-weight:600;text-align:center; }
+.form-switch { font-size:12px;color:#5D8A6B;text-align:center;display:block;margin-top:12px; }
+
+/* ── 充值成功弹窗 ── */
+.success-result { text-align:center; }
+.success-icon { font-size:48px;display:block;margin-bottom:12px; }
+.success-title { font-size:18px;font-weight:700;color:#333;display:block; }
+.success-detail { font-size:13px;color:#666;margin-top:8px;display:block; }
+.success-amount { font-size:32px;font-weight:800;color:#5D8A6B;display:block;margin:8px 0; }

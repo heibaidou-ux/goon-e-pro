@@ -98,7 +98,7 @@
       </view>
       <view class="big-actions">
         <view wx:if="{{item.doorCanOpen}}" class="big-action-btn primary" bindtap="openDoor" data-id="{{item.orderId}}">🚪 开门</view>
-        <view class="big-action-btn danger" bindtap="showCancel" data-id="{{item.orderId}}">取消预约</view>
+        <view wx:if="{{item.canCancel}}" class="big-action-btn danger" bindtap="showCancel" data-id="{{item.orderId}}">取消预约</view>
       </view>
       <text class="cancel-note" wx:if="{{item.cancelMsg}}">{{item.cancelMsg}}</text>
     </view>
