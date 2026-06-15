@@ -3,6 +3,7 @@
     <view class="tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">进行中</view>
     <view class="tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">待使用</view>
     <view class="tab {{tabIndex==2?'active':''}}" bindtap="switchTab" data-tab="2">已完成</view>
+    <view class="tab {{tabIndex==3?'active':''}}" bindtap="switchTab" data-tab="3">已失效</view>
   </view>
   <view class="page">
     <!-- 进行中 -->
@@ -140,6 +141,23 @@
       </view>
       <view class="big-actions">
         <view class="big-action-btn outline" bindtap="reBook" data-id="{{item.orderId}}">{{item.isTeaOrder ? '再次购买' : '再次预约'}}</view>
+        <view class="big-action-btn ghost" bindtap="goRoomDetail" data-id="{{item.orderId}}">查看详情</view>
+      </view>
+    </view>
+
+    <!-- 已失效 -->
+    <view class="order-card expired" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{item.status=='Expired'}}">
+      <view class="order-header">
+        <text class="order-room">{{item.roomName}}</text>
+        <view class="order-header-right">
+          <text class="order-status {{item.statusClass}}">{{item.statusLabel}}</text>
+        </view>
+      </view>
+      <text class="order-time">{{item.timeStr}}</text>
+      <text class="order-price">¥{{item.amount}}</text>
+      <view class="expired-notice">⏰ 已超过使用时间，预约自动失效</view>
+      <view class="big-actions">
+        <view class="big-action-btn outline" bindtap="reBook" data-id="{{item.orderId}}">再次预约</view>
         <view class="big-action-btn ghost" bindtap="goRoomDetail" data-id="{{item.orderId}}">查看详情</view>
       </view>
     </view>

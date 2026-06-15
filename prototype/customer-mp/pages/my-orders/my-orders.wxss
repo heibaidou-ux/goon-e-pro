@@ -17,6 +17,9 @@ page { background:#f5f7fa; margin:0; padding:0; }
 .status-inuse { background:#e8f5e9; color:#00a870; }
 .status-booked { background:#f3e5f5; color:#9c27b0; }
 .status-completed { background:#f5f5f5; color:#999; }
+.status-expired { background:#f5f5f5; color:#bbb; }
+.order-card.expired { opacity:.65; }
+.expired-notice { font-size:12px; color:#999; margin:8px 0; display:block; padding:8px 12px; background:#f9f9f9; border-radius:8px; }
 .order-time { font-size:13px; color:#666; margin-bottom:4px; display:block; }
 .order-price { font-size:14px; font-weight:600; color:#B8860B; margin-bottom:4px; display:block; }
 .order-remaining { font-size:12px; color:#00a870; font-weight:500; display:block; margin-bottom:8px; }

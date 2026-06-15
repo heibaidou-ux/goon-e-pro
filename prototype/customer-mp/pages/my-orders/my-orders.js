@@ -67,15 +67,26 @@ Page({
       var mapped = orders.map(function(o) {
         var status = o.status
         // 自动判断订单状态：根据当前时间
-        if (status === 'Booked' && o.date === todayStr && o.time) {
+        if (status === 'Booked' && o.date && o.time) {
           var parts = o.time.split('-')
           if (parts.length === 2) {
             var startParts = parts[0].split(':')
             var endParts = parts[1].split(':')
+            var orderDate = new Date(o.date)
+            var orderEndDT = new Date(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate(), parseInt(endParts[0]), parseInt(endParts[1]))
+            var orderStartDT = new Date(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate(), parseInt(startParts[0]), parseInt(startParts[1]))
             var startMin = parseInt(startParts[0])*60 + parseInt(startParts[1])
             var endMin = parseInt(endParts[0])*60 + parseInt(endParts[1])
-            if (curMin >= startMin && curMin < endMin) {
-              status = 'InUse'
+
+            if (o.date === todayStr) {
+              // 今天的订单
+              if (curMin >= startMin && curMin < endMin) {
+                status = 'InUse'  // 当前时段内，自动开始
+              } else if (curMin >= endMin) {
+                status = 'Expired'  // 已过结束时间，失效
+              }
+            } else if (orderEndDT < now) {
+              status = 'Expired'  // 过去日期的未使用订单，失效
             }
           }
         }
@@ -119,6 +130,7 @@ Page({
         var statusClass = 'status-completed', statusLabel = '已完成'
         if (status === 'InUse' || status === 'in_use') { statusClass = 'status-inuse'; statusLabel = '进行中' }
         else if (status === 'Booked') { statusClass = 'status-booked'; statusLabel = '待使用' }
+        else if (status === 'Expired') { statusClass = 'status-expired'; statusLabel = '已失效' }
         else if (status === 'PendingDelivery' || status === 'Shipped') {
           statusClass = 'status-inuse'
           if (status === 'Shipped') statusLabel = '运输中'
@@ -193,6 +205,7 @@ Page({
     if (tab === 0) list = list.filter(function(o) { return o.status === 'InUse' || o.status === 'in_use' || o.status === 'PendingDelivery' || o.status === 'Shipped' })
     else if (tab === 1) list = list.filter(function(o) { return o.status === 'Booked' })
     else if (tab === 2) list = list.filter(function(o) { return o.status === 'Completed' })
+    else if (tab === 3) list = list.filter(function(o) { return o.status === 'Expired' })
     this.setData({ filteredOrders: list })
   },
 
