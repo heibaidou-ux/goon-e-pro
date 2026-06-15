@@ -1,0 +1,41 @@
+# 高岸ERP — 生产部署
+# 使用: docker-compose up -d
+# 需要先创建 .env 文件（参考 .env.example）
+
+services:
+  erp-server:
+    build: .
+    container_name: gaoan-erp
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server/gaoan_erp.db:/app/gaoan_erp.db
+      - ./server/uploads:/app/uploads
+      - ./server/logs:/app/logs
+    env_file:
+      - .env
+    environment:
+      - DEBUG=false
+    networks:
+      - erp-network
+
+  # 可选：PostgreSQL（生产推荐替换SQLite）
+  # postgres:
+  #   image: postgres:16-alpine
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: gaoan_erp
+  #     POSTGRES_USER: erp
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   networks:
+  #     - erp-network
+
+networks:
+  erp-network:
+    driver: bridge
+
+# volumes:
+#   pgdata:
