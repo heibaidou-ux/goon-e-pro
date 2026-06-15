@@ -24,7 +24,7 @@ from schemas.brand import (
 )
 from services.auth_service import get_current_user
 
-router = APIRouter(prefix="/api/brand", tags=["品牌运营管理"])
+router = APIRouter(prefix="/api/brand", tags=["品牌运营管理"], dependencies=[Depends(get_current_user)])
 
 
 def _gen_id() -> str:

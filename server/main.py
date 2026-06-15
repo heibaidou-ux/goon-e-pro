@@ -1,16 +1,20 @@
 """
-高岸ERP API Server V1.0
-FastAPI backend with SQLite, JWT auth, image processing, IoT integration.
+高岸ERP API Server V1.1
+Production-ready FastAPI backend with security, logging, and IoT integration.
 """
 import sys
+import os
+import logging
+import time
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 # Ensure server/ is on the path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 
@@ -19,12 +23,34 @@ from database import init_db, close_db
 from routers import auth, products, rooms, scan, shop, iot, finance
 from routers import brand, store_dev, operations, marketing, finance_ext, hr, tech
 
+# ── Logging ──
+os.makedirs(Path(__file__).parent / "logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO if not settings.debug else logging.DEBUG,
+    format="%(asctime)s | %(levelname)-5s | %(name)s | %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(Path(__file__).parent / "logs" / "erp.log", encoding="utf-8"),
+    ],
+)
+logger = logging.getLogger("gaoan.erp")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Startup
+    os.makedirs(Path(settings.upload_dir), exist_ok=True)
+    logger.info("=" * 50)
+    logger.info(f"高岸ERP {settings.version} 启动")
+    logger.info(f"环境: {'开发' if settings.debug else '生产'}")
+    logger.info(f"HA模式: {'真实' if settings.ha_token else '模拟'}")
+    logger.info(f"CORS: {settings.cors_origins or '全开放(开发模式)'}")
+    if settings.debug:
+        logger.warning("⚠ Debug模式开启中，仅用于开发")
     await init_db()
     yield
     await close_db()
+    logger.info("高岸ERP 已关闭")
 
 
 app = FastAPI(
@@ -33,25 +59,56 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# ── CORS ──
+if settings.cors_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+        allow_headers=["Authorization", "Content-Type"],
+    )
+else:
+    # 开发模式：宽松
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    logger.warning("⚠ CORS全开放（开发模式），生产环境需设置 CORS_ORIGINS")
 
-# Static files for uploads
+# ── 请求日志中间件 ──
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.time()
+    body = None
+    if request.method in ("POST", "PUT", "PATCH"):
+        try:
+            body = await request.json()
+            # 脱敏敏感字段
+            if isinstance(body, dict):
+                for key in ("password", "token", "ha_token", "secret"):
+                    if key in body:
+                        body[key] = "***"
+        except Exception:
+            body = "(不可解析)"
+    response = await call_next(request)
+    elapsed = time.time() - start
+    logger.info(
+        f"{request.method:6s} {request.url.path:40s} | "
+        f"{response.status_code} | {elapsed*1000:5.0f}ms"
+        + (f" | body={body}" if body and settings.debug else "")
+    )
+    return response
+
+# ── Static files ──
 uploads_dir = Path(settings.upload_dir)
 uploads_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
 
-# Static file paths
-staff_mp_dir = Path(__file__).parent.parent / "prototype" / "staff-mp"
-admin_web_dist = Path(__file__).parent.parent / "prototype" / "admin-web-dist"
-
-# Routers
+# ── Routers ──
 app.include_router(auth.router)
 app.include_router(products.router)
 app.include_router(rooms.router)
@@ -69,37 +126,36 @@ app.include_router(tech.router)
 
 
 @app.get("/api/health")
-async def health():
+async def health(request: Request):
     return {"status": "ok", "version": settings.version, "app": settings.app_name}
 
 
-# SPA catch-all: serve frontend pages for any non-API route (must be last)
+# ── SPA catch-all ──
+staff_mp_dir = Path(__file__).parent.parent / "prototype" / "staff-mp"
+admin_web_dist = Path(__file__).parent.parent / "prototype" / "admin-web-dist"
+
 if staff_mp_dir.exists() or admin_web_dist.exists():
 
     @app.api_route("/{full_path:path}", methods=["GET"])
-    async def serve_spa(full_path: str):
+    async def serve_spa(request: Request, full_path: str):
         if full_path.startswith("api/") or full_path.startswith("uploads/"):
             return JSONResponse({"detail": "Not Found"}, status_code=404)
 
-        # Staff-mp pages (店员端)
-        if full_path.startswith("staff/") or full_path == "staff":
+        if full_path.startswith("staff/"):
             if staff_mp_dir.exists():
                 file_path = staff_mp_dir / "/".join(full_path.split("/")[1:])
                 if file_path.exists() and file_path.is_file():
                     return FileResponse(str(file_path))
                 return FileResponse(str(staff_mp_dir / "pages" / "dashboard" / "index.html"))
 
-        # Customer-mp pages (客人端)
-        if full_path.startswith("customer/") or full_path == "customer":
+        if full_path.startswith("customer/"):
             customer_mp_dir = Path(__file__).parent.parent / "prototype" / "customer-mp"
             if customer_mp_dir.exists():
                 file_path = customer_mp_dir / "/".join(full_path.split("/")[1:])
                 if file_path.exists() and file_path.is_file():
                     return FileResponse(str(file_path))
 
-        # Admin-web SPA (管理后台)
         if admin_web_dist.exists():
-            # Check if it's a static asset file
             asset_path = admin_web_dist / full_path
             if asset_path.exists() and asset_path.is_file():
                 return FileResponse(str(asset_path))
@@ -110,4 +166,5 @@ if staff_mp_dir.exists() or admin_web_dist.exists():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=settings.debug)
+    logger.info(f"启动服务器: http://0.0.0.0:{os.getenv('PORT', '8000')}")
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", "8000")), reload=settings.debug)

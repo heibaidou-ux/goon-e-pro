@@ -22,9 +22,9 @@ from schemas.finance import (
     DividendRecordOut,
     FixedAssetCreate, FixedAssetUpdate, FixedAssetOut, FixedAssetListOut,
 )
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 
-router = APIRouter(prefix="/api/finance", tags=["记账管理"])
+router = APIRouter(prefix="/api/finance", tags=["记账管理"], dependencies=[Depends(get_current_user)])
 
 
 def _gen_id() -> str:
@@ -44,6 +44,7 @@ async def list_revenue(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """List revenue flows with optional filters."""
     q = select(RevenueFlow)
@@ -105,6 +106,7 @@ async def revenue_stats(
     store_id: Optional[str] = Query(None, alias="storeId"),
     days: int = Query(30, ge=1, le=365),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """Revenue statistics grouped by day for charts."""
     from sqlalchemy import cast, Date
@@ -145,7 +147,11 @@ async def revenue_stats(
 
 
 @router.get("/revenue/{revenue_id}", response_model=RevenueFlowOut)
-async def get_revenue(revenue_id: str, db: AsyncSession = Depends(get_db)):
+async def get_revenue(
+    revenue_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
+):
     r = await db.execute(select(RevenueFlow).where(RevenueFlow.revenueId == revenue_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -199,6 +205,7 @@ async def list_expenses(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(ExpenseRecord)
     if store_id:
@@ -316,6 +323,7 @@ async def list_daily_settlements(
     store_id: Optional[str] = Query(None, alias="storeId"),
     status: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(DailySettlement)
     if store_id:
@@ -407,6 +415,7 @@ async def create_daily_settlement(
 async def list_monthly_settlements(
     store_id: Optional[str] = Query(None, alias="storeId"),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(MonthlySettlement)
     if store_id:
@@ -498,6 +507,7 @@ async def list_reconciliation_tickets(
     store_id: Optional[str] = Query(None, alias="storeId"),
     status: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(ReconciliationTicket)
     if store_id:
@@ -559,6 +569,7 @@ async def list_dividends(
     store_id: Optional[str] = Query(None, alias="storeId"),
     status: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(DividendRecord)
     if store_id:
@@ -598,6 +609,7 @@ async def list_fixed_assets(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(FixedAsset)
     if store_id:
@@ -645,7 +657,11 @@ async def list_fixed_assets(
 
 
 @router.get("/assets/{asset_id}", response_model=FixedAssetOut)
-async def get_fixed_asset(asset_id: str, db: AsyncSession = Depends(get_db)):
+async def get_fixed_asset(
+    asset_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
+):
     r = await db.execute(select(FixedAsset).where(FixedAsset.assetId == asset_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -737,6 +753,7 @@ async def update_fixed_asset(
 async def finance_dashboard(
     store_id: Optional[str] = Query(None, alias="storeId"),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """Aggregated finance stats for dashboard."""
     # Current month

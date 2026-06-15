@@ -7,6 +7,7 @@ from sqlalchemy import select, func, desc
 from datetime import datetime, date
 
 from database import get_db
+from services.auth_service import get_current_user
 from models.marketing import (
     Campaign, CouponTemplate, Coupon, Lead, Opportunity,
     MarketingList, CustomerSegment, ThirdPartyActivity, CampaignEffect, Channel,
@@ -25,7 +26,7 @@ from schemas.marketing import (
     ChannelCreate, ChannelUpdate, ChannelOut, ChannelListOut,
 )
 
-router = APIRouter(prefix="/api/marketing", tags=["市场营销管理"])
+router = APIRouter(prefix="/api/marketing", tags=["市场营销管理"], dependencies=[Depends(get_current_user)])
 
 
 def _gen_id() -> str:

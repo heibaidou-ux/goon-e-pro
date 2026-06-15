@@ -13,7 +13,7 @@ from models.operations import Order, OrderItem, Customer, ScanBill
 from models.store_dev import Room, Store, QrCodeAuditLog
 from models.supply_chain import Product, InventoryOnHand
 from models.user import User
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 from schemas.scan import (
     QrCodeOut, QrCodeBatchOut, QrCodeBatchItem, QrRenewOut,
     RoomScanInfo,
@@ -23,7 +23,7 @@ from schemas.scan import (
     CancelOut,
 )
 
-router = APIRouter(prefix="/api/scan", tags=["扫码消费"])
+router = APIRouter(prefix="/api/scan", tags=["扫码消费"], dependencies=[Depends(get_current_user)])
 
 
 # ── Helpers ──
@@ -66,6 +66,7 @@ def _build_scan_url(room_id: str, store_id: str, table_id: Optional[str] = None)
 async def get_room_qrcode(
     room_id: str,
     table_id: Optional[str] = Query(None, alias="tableId"),
+    current_user: Optional[User] = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -97,7 +98,7 @@ async def get_room_qrcode(
 async def batch_room_qrcodes(
     store_id: str = Query(..., alias="storeId"),
     room_ids: Optional[str] = Query(None, alias="roomIds"),  # comma-separated
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -228,6 +229,7 @@ async def renew_room_qrcode(
 @router.get("/room/{room_id}", response_model=RoomScanInfo)
 async def get_room_scan_status(
     room_id: str,
+    current_user: Optional[User] = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -533,6 +535,7 @@ async def cancel_scan_order(
 @router.get("/bill/{room_id}", response_model=ScanBillOut)
 async def get_room_bill(
     room_id: str,
+    current_user: Optional[User] = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
     """

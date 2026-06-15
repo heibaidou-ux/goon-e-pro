@@ -27,9 +27,9 @@ from schemas.operations import (
     InspectionItemResultCreate, InspectionItemResultUpdate, InspectionItemResultOut, InspectionItemResultListOut,
     RectificationTaskCreate, RectificationTaskUpdate, RectificationTaskOut, RectificationTaskListOut,
 )
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 
-router = APIRouter(prefix="/api/operations", tags=["门店运营管理"])
+router = APIRouter(prefix="/api/operations", tags=["门店运营管理"], dependencies=[Depends(get_current_user)])
 
 
 def _gen_id() -> str:
@@ -40,7 +40,7 @@ def _gen_id() -> str:
 # Customer 客户
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/customers/search", response_model=CustomerListOut)
+@router.get("/customers/search", response_model=CustomerListOut, dependencies=[Depends(get_optional_user)])
 async def search_customers(
     phone: Optional[str] = Query(None),
     name: Optional[str] = Query(None),
@@ -75,7 +75,7 @@ async def search_customers(
     return CustomerListOut(total=total, items=items, page=page, page_size=page_size)
 
 
-@router.get("/customers", response_model=CustomerListOut)
+@router.get("/customers", response_model=CustomerListOut, dependencies=[Depends(get_optional_user)])
 async def list_customers(
     member_level: Optional[str] = Query(None, alias="memberLevel"),
     register_store_id: Optional[str] = Query(None, alias="registerStoreId"),
@@ -109,7 +109,7 @@ async def list_customers(
     return CustomerListOut(total=total, items=items, page=page, page_size=page_size)
 
 
-@router.get("/customers/{customer_id}", response_model=CustomerOut)
+@router.get("/customers/{customer_id}", response_model=CustomerOut, dependencies=[Depends(get_optional_user)])
 async def get_customer(customer_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Customer).where(Customer.customerId == customer_id))
     item = r.scalar_one_or_none()
@@ -118,7 +118,7 @@ async def get_customer(customer_id: str, db: AsyncSession = Depends(get_db)):
     return CustomerOut.model_validate(item)
 
 
-@router.post("/customers", response_model=CustomerOut, status_code=201)
+@router.post("/customers", response_model=CustomerOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_customer(
     data: CustomerCreate,
     db: AsyncSession = Depends(get_db),
@@ -148,7 +148,7 @@ async def create_customer(
     return CustomerOut.model_validate(item)
 
 
-@router.put("/customers/{customer_id}", response_model=CustomerOut)
+@router.put("/customers/{customer_id}", response_model=CustomerOut, dependencies=[Depends(get_current_user)])
 async def update_customer(
     customer_id: str,
     data: CustomerUpdate,
@@ -185,7 +185,7 @@ async def update_customer(
 # CustomerTag 客户标签
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/customer-tags", response_model=CustomerTagListOut)
+@router.get("/customer-tags", response_model=CustomerTagListOut, dependencies=[Depends(get_optional_user)])
 async def list_customer_tags(
     customer_id: Optional[str] = Query(None, alias="customerId"),
     tag_type: Optional[str] = Query(None, alias="tagType"),
@@ -214,7 +214,7 @@ async def list_customer_tags(
     return CustomerTagListOut(total=total, items=items, page=page, page_size=page_size)
 
 
-@router.post("/customer-tags", response_model=CustomerTagOut, status_code=201)
+@router.post("/customer-tags", response_model=CustomerTagOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_customer_tag(
     data: CustomerTagCreate,
     db: AsyncSession = Depends(get_db),
@@ -237,7 +237,7 @@ async def create_customer_tag(
     return CustomerTagOut.model_validate(item)
 
 
-@router.delete("/customer-tags/{tag_id}", status_code=204)
+@router.delete("/customer-tags/{tag_id}", status_code=204, dependencies=[Depends(get_current_user)])
 async def delete_customer_tag(tag_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(CustomerTag).where(CustomerTag.tagId == tag_id))
     item = r.scalar_one_or_none()
@@ -251,7 +251,7 @@ async def delete_customer_tag(tag_id: str, db: AsyncSession = Depends(get_db)):
 # MemberCard 会员卡
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/member-cards/by-customer/{customer_id}", response_model=list[MemberCardOut])
+@router.get("/member-cards/by-customer/{customer_id}", response_model=list[MemberCardOut], dependencies=[Depends(get_optional_user)])
 async def get_customer_member_cards(
     customer_id: str,
     db: AsyncSession = Depends(get_db),
@@ -265,7 +265,7 @@ async def get_customer_member_cards(
     return [MemberCardOut.model_validate(item) for item in items]
 
 
-@router.get("/member-cards", response_model=MemberCardListOut)
+@router.get("/member-cards", response_model=MemberCardListOut, dependencies=[Depends(get_optional_user)])
 async def list_member_cards(
     customer_id: Optional[str] = Query(None, alias="customerId"),
     status: Optional[str] = None,
@@ -294,7 +294,7 @@ async def list_member_cards(
     return MemberCardListOut(total=total, items=items, page=page, page_size=page_size)
 
 
-@router.get("/member-cards/{card_id}", response_model=MemberCardOut)
+@router.get("/member-cards/{card_id}", response_model=MemberCardOut, dependencies=[Depends(get_optional_user)])
 async def get_member_card(card_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(MemberCard).where(MemberCard.cardId == card_id))
     item = r.scalar_one_or_none()
@@ -303,7 +303,7 @@ async def get_member_card(card_id: str, db: AsyncSession = Depends(get_db)):
     return MemberCardOut.model_validate(item)
 
 
-@router.post("/member-cards", response_model=MemberCardOut, status_code=201)
+@router.post("/member-cards", response_model=MemberCardOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_member_card(
     data: MemberCardCreate,
     db: AsyncSession = Depends(get_db),
@@ -333,7 +333,7 @@ async def create_member_card(
     return MemberCardOut.model_validate(item)
 
 
-@router.put("/member-cards/{card_id}", response_model=MemberCardOut)
+@router.put("/member-cards/{card_id}", response_model=MemberCardOut, dependencies=[Depends(get_current_user)])
 async def update_member_card(
     card_id: str,
     data: MemberCardUpdate,
@@ -362,7 +362,7 @@ async def update_member_card(
 # RechargeRecord 充值记录
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/recharge-records", response_model=RechargeRecordListOut)
+@router.get("/recharge-records", response_model=RechargeRecordListOut, dependencies=[Depends(get_optional_user)])
 async def list_recharge_records(
     card_id: Optional[str] = Query(None, alias="cardId"),
     store_id: Optional[str] = Query(None, alias="storeId"),
@@ -415,7 +415,7 @@ async def list_recharge_records(
     return RechargeRecordListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/recharge-records/{recharge_id}", response_model=RechargeRecordOut)
+@router.get("/recharge-records/{recharge_id}", response_model=RechargeRecordOut, dependencies=[Depends(get_optional_user)])
 async def get_recharge_record(recharge_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RechargeRecord).where(RechargeRecord.rechargeId == recharge_id))
     item = r.scalar_one_or_none()
@@ -439,7 +439,7 @@ async def get_recharge_record(recharge_id: str, db: AsyncSession = Depends(get_d
     )
 
 
-@router.post("/recharge-records", response_model=RechargeRecordOut, status_code=201)
+@router.post("/recharge-records", response_model=RechargeRecordOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_recharge_record(
     data: RechargeRecordCreate,
     db: AsyncSession = Depends(get_db),
@@ -489,7 +489,7 @@ async def create_recharge_record(
     )
 
 
-@router.put("/recharge-records/{recharge_id}", response_model=RechargeRecordOut)
+@router.put("/recharge-records/{recharge_id}", response_model=RechargeRecordOut, dependencies=[Depends(get_current_user)])
 async def update_recharge_record(
     recharge_id: str,
     data: RechargeRecordUpdate,
@@ -527,7 +527,7 @@ async def update_recharge_record(
 # RoomAppointment 房间预约
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/room-appointments", response_model=RoomAppointmentListOut)
+@router.get("/room-appointments", response_model=RoomAppointmentListOut, dependencies=[Depends(get_optional_user)])
 async def list_room_appointments(
     room_id: Optional[str] = Query(None, alias="roomId"),
     customer_id: Optional[str] = Query(None, alias="customerId"),
@@ -597,7 +597,7 @@ async def list_room_appointments(
     return RoomAppointmentListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/room-appointments/{appointment_id}", response_model=RoomAppointmentOut)
+@router.get("/room-appointments/{appointment_id}", response_model=RoomAppointmentOut, dependencies=[Depends(get_optional_user)])
 async def get_room_appointment(appointment_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RoomAppointment).where(RoomAppointment.appointmentId == appointment_id))
     item = r.scalar_one_or_none()
@@ -628,7 +628,7 @@ async def get_room_appointment(appointment_id: str, db: AsyncSession = Depends(g
     )
 
 
-@router.post("/room-appointments", response_model=RoomAppointmentOut, status_code=201)
+@router.post("/room-appointments", response_model=RoomAppointmentOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_room_appointment(
     data: RoomAppointmentCreate,
     db: AsyncSession = Depends(get_db),
@@ -676,7 +676,7 @@ async def create_room_appointment(
     )
 
 
-@router.put("/room-appointments/{appointment_id}", response_model=RoomAppointmentOut)
+@router.put("/room-appointments/{appointment_id}", response_model=RoomAppointmentOut, dependencies=[Depends(get_current_user)])
 async def update_room_appointment(
     appointment_id: str,
     data: RoomAppointmentUpdate,
@@ -732,7 +732,7 @@ async def update_room_appointment(
 # RoomStatus 房间状态
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/room-status/current/{room_id}", response_model=RoomStatusOut)
+@router.get("/room-status/current/{room_id}", response_model=RoomStatusOut, dependencies=[Depends(get_optional_user)])
 async def get_current_room_status(room_id: str, db: AsyncSession = Depends(get_db)):
     """Get the current (latest) status for a room."""
     r = await db.execute(
@@ -762,7 +762,7 @@ async def get_current_room_status(room_id: str, db: AsyncSession = Depends(get_d
     )
 
 
-@router.get("/room-status", response_model=RoomStatusListOut)
+@router.get("/room-status", response_model=RoomStatusListOut, dependencies=[Depends(get_optional_user)])
 async def list_room_statuses(
     room_id: Optional[str] = Query(None, alias="roomId"),
     status: Optional[str] = None,
@@ -810,7 +810,7 @@ async def list_room_statuses(
     return RoomStatusListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.post("/room-status", response_model=RoomStatusOut, status_code=201)
+@router.post("/room-status", response_model=RoomStatusOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_room_status(
     data: RoomStatusCreate,
     db: AsyncSession = Depends(get_db),
@@ -850,7 +850,7 @@ async def create_room_status(
 # CleaningTask 保洁任务
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/cleaning-tasks/today", response_model=CleaningTaskListOut)
+@router.get("/cleaning-tasks/today", response_model=CleaningTaskListOut, dependencies=[Depends(get_optional_user)])
 async def get_today_cleaning_tasks(
     store_id: str = Query(..., alias="storeId"),
     page: int = Query(1, ge=1),
@@ -909,7 +909,7 @@ async def get_today_cleaning_tasks(
     return CleaningTaskListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/cleaning-tasks", response_model=CleaningTaskListOut)
+@router.get("/cleaning-tasks", response_model=CleaningTaskListOut, dependencies=[Depends(get_optional_user)])
 async def list_cleaning_tasks(
     store_id: Optional[str] = Query(None, alias="storeId"),
     room_id: Optional[str] = Query(None, alias="roomId"),
@@ -976,7 +976,7 @@ async def list_cleaning_tasks(
     return CleaningTaskListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/cleaning-tasks/{task_id}", response_model=CleaningTaskOut)
+@router.get("/cleaning-tasks/{task_id}", response_model=CleaningTaskOut, dependencies=[Depends(get_optional_user)])
 async def get_cleaning_task(task_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(CleaningTask).where(CleaningTask.taskId == task_id))
     item = r.scalar_one_or_none()
@@ -1009,7 +1009,7 @@ async def get_cleaning_task(task_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/cleaning-tasks", response_model=CleaningTaskOut, status_code=201)
+@router.post("/cleaning-tasks", response_model=CleaningTaskOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_cleaning_task(
     data: CleaningTaskCreate,
     db: AsyncSession = Depends(get_db),
@@ -1057,7 +1057,7 @@ async def create_cleaning_task(
     )
 
 
-@router.put("/cleaning-tasks/{task_id}", response_model=CleaningTaskOut)
+@router.put("/cleaning-tasks/{task_id}", response_model=CleaningTaskOut, dependencies=[Depends(get_current_user)])
 async def update_cleaning_task(
     task_id: str,
     data: CleaningTaskUpdate,
@@ -1110,7 +1110,7 @@ async def update_cleaning_task(
 # InspectionTemplate 巡检模板
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/inspection-templates", response_model=InspectionTemplateListOut)
+@router.get("/inspection-templates", response_model=InspectionTemplateListOut, dependencies=[Depends(get_optional_user)])
 async def list_inspection_templates(
     store_id: Optional[str] = Query(None, alias="storeId"),
     frequency: Optional[str] = None,
@@ -1161,7 +1161,7 @@ async def list_inspection_templates(
     return InspectionTemplateListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/inspection-templates/{template_id}", response_model=InspectionTemplateOut)
+@router.get("/inspection-templates/{template_id}", response_model=InspectionTemplateOut, dependencies=[Depends(get_optional_user)])
 async def get_inspection_template(template_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(InspectionTemplate).where(InspectionTemplate.templateId == template_id))
     item = r.scalar_one_or_none()
@@ -1183,7 +1183,7 @@ async def get_inspection_template(template_id: str, db: AsyncSession = Depends(g
     )
 
 
-@router.post("/inspection-templates", response_model=InspectionTemplateOut, status_code=201)
+@router.post("/inspection-templates", response_model=InspectionTemplateOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_inspection_template(
     data: InspectionTemplateCreate,
     db: AsyncSession = Depends(get_db),
@@ -1215,7 +1215,7 @@ async def create_inspection_template(
     )
 
 
-@router.put("/inspection-templates/{template_id}", response_model=InspectionTemplateOut)
+@router.put("/inspection-templates/{template_id}", response_model=InspectionTemplateOut, dependencies=[Depends(get_current_user)])
 async def update_inspection_template(
     template_id: str,
     data: InspectionTemplateUpdate,
@@ -1257,7 +1257,7 @@ async def update_inspection_template(
 # InspectionTask 巡检任务
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/inspection-tasks/pending", response_model=InspectionTaskListOut)
+@router.get("/inspection-tasks/pending", response_model=InspectionTaskListOut, dependencies=[Depends(get_optional_user)])
 async def get_pending_inspection_tasks(
     store_id: str = Query(..., alias="storeId"),
     page: int = Query(1, ge=1),
@@ -1308,7 +1308,7 @@ async def get_pending_inspection_tasks(
     return InspectionTaskListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/inspection-tasks", response_model=InspectionTaskListOut)
+@router.get("/inspection-tasks", response_model=InspectionTaskListOut, dependencies=[Depends(get_optional_user)])
 async def list_inspection_tasks(
     store_id: Optional[str] = Query(None, alias="storeId"),
     template_id: Optional[str] = Query(None, alias="templateId"),
@@ -1372,7 +1372,7 @@ async def list_inspection_tasks(
     return InspectionTaskListOut(total=total, items=result, page=page, page_size=page_size)
 
 
-@router.get("/inspection-tasks/{inspection_id}", response_model=InspectionTaskOut)
+@router.get("/inspection-tasks/{inspection_id}", response_model=InspectionTaskOut, dependencies=[Depends(get_optional_user)])
 async def get_inspection_task(inspection_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(InspectionTask).where(InspectionTask.inspectionId == inspection_id))
     item = r.scalar_one_or_none()
@@ -1402,7 +1402,7 @@ async def get_inspection_task(inspection_id: str, db: AsyncSession = Depends(get
     )
 
 
-@router.post("/inspection-tasks", response_model=InspectionTaskOut, status_code=201)
+@router.post("/inspection-tasks", response_model=InspectionTaskOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_inspection_task(
     data: InspectionTaskCreate,
     db: AsyncSession = Depends(get_db),
@@ -1447,7 +1447,7 @@ async def create_inspection_task(
     )
 
 
-@router.put("/inspection-tasks/{inspection_id}", response_model=InspectionTaskOut)
+@router.put("/inspection-tasks/{inspection_id}", response_model=InspectionTaskOut, dependencies=[Depends(get_current_user)])
 async def update_inspection_task(
     inspection_id: str,
     data: InspectionTaskUpdate,
@@ -1497,7 +1497,7 @@ async def update_inspection_task(
 # InspectionItemResult 巡检项目结果
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/inspection-item-results", response_model=InspectionItemResultListOut)
+@router.get("/inspection-item-results", response_model=InspectionItemResultListOut, dependencies=[Depends(get_optional_user)])
 async def list_inspection_item_results(
     inspection_id: Optional[str] = Query(None, alias="inspectionId"),
     category: Optional[str] = None,
@@ -1531,7 +1531,7 @@ async def list_inspection_item_results(
     return InspectionItemResultListOut(total=total, items=items, page=page, page_size=page_size)
 
 
-@router.get("/inspection-item-results/{result_id}", response_model=InspectionItemResultOut)
+@router.get("/inspection-item-results/{result_id}", response_model=InspectionItemResultOut, dependencies=[Depends(get_optional_user)])
 async def get_inspection_item_result(result_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(InspectionItemResult).where(InspectionItemResult.resultId == result_id))
     item = r.scalar_one_or_none()
@@ -1540,7 +1540,7 @@ async def get_inspection_item_result(result_id: str, db: AsyncSession = Depends(
     return InspectionItemResultOut.model_validate(item)
 
 
-@router.post("/inspection-item-results", response_model=InspectionItemResultOut, status_code=201)
+@router.post("/inspection-item-results", response_model=InspectionItemResultOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_inspection_item_result(
     data: InspectionItemResultCreate,
     db: AsyncSession = Depends(get_db),
@@ -1565,7 +1565,7 @@ async def create_inspection_item_result(
     return InspectionItemResultOut.model_validate(item)
 
 
-@router.put("/inspection-item-results/{result_id}", response_model=InspectionItemResultOut)
+@router.put("/inspection-item-results/{result_id}", response_model=InspectionItemResultOut, dependencies=[Depends(get_current_user)])
 async def update_inspection_item_result(
     result_id: str,
     data: InspectionItemResultUpdate,
@@ -1592,7 +1592,7 @@ async def update_inspection_item_result(
 # RectificationTask 整改任务
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/rectification-tasks", response_model=RectificationTaskListOut)
+@router.get("/rectification-tasks", response_model=RectificationTaskListOut, dependencies=[Depends(get_optional_user)])
 async def list_rectification_tasks(
     inspection_id: Optional[str] = Query(None, alias="inspectionId"),
     assignee_id: Optional[str] = Query(None, alias="assigneeId"),
@@ -1626,7 +1626,7 @@ async def list_rectification_tasks(
     return RectificationTaskListOut(total=total, items=items, page=page, page_size=page_size)
 
 
-@router.get("/rectification-tasks/{rectification_id}", response_model=RectificationTaskOut)
+@router.get("/rectification-tasks/{rectification_id}", response_model=RectificationTaskOut, dependencies=[Depends(get_optional_user)])
 async def get_rectification_task(rectification_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(RectificationTask).where(RectificationTask.rectificationId == rectification_id))
     item = r.scalar_one_or_none()
@@ -1635,7 +1635,7 @@ async def get_rectification_task(rectification_id: str, db: AsyncSession = Depen
     return RectificationTaskOut.model_validate(item)
 
 
-@router.post("/rectification-tasks", response_model=RectificationTaskOut, status_code=201)
+@router.post("/rectification-tasks", response_model=RectificationTaskOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_rectification_task(
     data: RectificationTaskCreate,
     db: AsyncSession = Depends(get_db),
@@ -1667,7 +1667,7 @@ async def create_rectification_task(
     return RectificationTaskOut.model_validate(item)
 
 
-@router.put("/rectification-tasks/{rectification_id}", response_model=RectificationTaskOut)
+@router.put("/rectification-tasks/{rectification_id}", response_model=RectificationTaskOut, dependencies=[Depends(get_current_user)])
 async def update_rectification_task(
     rectification_id: str,
     data: RectificationTaskUpdate,
@@ -1706,7 +1706,7 @@ async def update_rectification_task(
 # Dashboard 运营总览
 # ═══════════════════════════════════════════════════════════════
 
-@router.get("/dashboard")
+@router.get("/dashboard", dependencies=[Depends(get_optional_user)])
 async def operations_dashboard(
     store_id: Optional[str] = Query(None, alias="storeId"),
     db: AsyncSession = Depends(get_db),

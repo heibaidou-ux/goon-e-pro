@@ -27,9 +27,15 @@ class UserOut(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    refresh_token: str = ""
     user: UserOut
 
 
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+
+class PhoneLoginRequest(BaseModel):
+    phone: str
+    code: str

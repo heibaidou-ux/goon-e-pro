@@ -10,13 +10,16 @@ from models.store_dev import Store, Room
 from models.operations import Order, OrderItem, Customer
 from models.user import User
 from schemas.order import StoreOut, RoomOut, RoomOrderOut, RoomOrderCreate
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 
 router = APIRouter(prefix="/api", tags=["房间管理"])
 
 
 @router.get("/stores", response_model=list[StoreOut])
-async def list_stores(db: AsyncSession = Depends(get_db)):
+async def list_stores(
+    db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
+):
     result = await db.execute(select(Store).where(Store.status != "Closed"))
     stores = result.scalars().all()
     out = []
@@ -45,6 +48,7 @@ async def list_rooms(
     store_id: Optional[str] = None,
     room_type: Optional[str] = Query(None, alias="type"),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(Room).where(Room.status == "Active")
     if store_id:
@@ -64,7 +68,11 @@ async def list_rooms(
 
 
 @router.get("/rooms/{room_id}", response_model=RoomOut)
-async def get_room(room_id: str, db: AsyncSession = Depends(get_db)):
+async def get_room(
+    room_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
+):
     result = await db.execute(select(Room).where(Room.roomId == room_id))
     room = result.scalar_one_or_none()
     if not room:
@@ -126,7 +134,10 @@ async def list_orders(
 
 
 @router.get("/orders/active", response_model=list[RoomOrderOut])
-async def get_active_orders(db: AsyncSession = Depends(get_db)):
+async def get_active_orders(
+    db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
+):
     result = await db.execute(
         select(Order).where(
             Order.orderType == "Room",
@@ -169,24 +180,58 @@ async def get_active_orders(db: AsyncSession = Depends(get_db)):
 async def create_order(
     data: RoomOrderCreate,
     db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
-    order_id = uuid.uuid4().hex[:12]
-    order = Order(
-        orderId=order_id,
-        orderNumber=f"ROOM{order_id[:8].upper()}",
-        storeId="",
-        customerId="",
-        roomId=data.room_id,
-        orderType="Room",
-        status="PendingUse",
-        totalAmount=data.total_amount,
-        paidAmount=data.total_amount,
-        platform=data.source or "Offline",
-        bookingStartTime=f"{data.date} {data.start_time}" if data.date else None,
-        bookingEndTime=f"{data.date} {data.end_time}" if data.date else None,
-    )
-    db.add(order)
-    await db.commit()
+    # ── 时段冲突检测 ──
+    if not data.date or not data.start_time or not data.end_time:
+        raise HTTPException(status_code=400, detail="请提供完整的预订日期和时段")
+
+    # 使用 select_for_update 加行锁，防并发双卖
+    async with db.begin():
+        # 查该房间该日期所有未取消的订单
+        result = await db.execute(
+            select(Order).where(
+                Order.roomId == data.room_id,
+                Order.orderType == "Room",
+                Order.status.in_(["PendingPay", "PendingUse", "InUse"]),
+                Order.bookingStartTime >= f"{data.date} 00:00:00",
+                Order.bookingStartTime <= f"{data.date} 23:59:59",
+            ).with_for_update()
+        )
+        existing = result.scalars().all()
+
+        # 检测时间重叠
+        new_start = data.start_time
+        new_end = data.end_time
+        for ex in existing:
+            if not ex.bookingStartTime or not ex.bookingEndTime:
+                continue
+            ex_start = ex.bookingStartTime.strftime("%H:%M")
+            ex_end = ex.bookingEndTime.strftime("%H:%M")
+            # 重叠条件：新开始 < 旧结束 AND 新结束 > 旧开始
+            if new_start < ex_end and new_end > ex_start:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"该时段已被占用 ({ex_start}-{ex_end})，请选择其他时段"
+                )
+
+        order_id = uuid.uuid4().hex[:12]
+        order = Order(
+            orderId=order_id,
+            orderNumber=f"ROOM{order_id[:8].upper()}",
+            storeId="",
+            customerId="",
+            roomId=data.room_id,
+            orderType="Room",
+            status="PendingPay",  # 先待支付，支付成功后才变为 PendingUse
+            totalAmount=data.total_amount,
+            paidAmount=0,
+            platform=data.source or "Offline",
+            bookingStartTime=f"{data.date} {data.start_time}",
+            bookingEndTime=f"{data.date} {data.end_time}",
+        )
+        db.add(order)
+
     await db.refresh(order)
     return RoomOrderOut(
         id=order.id, order_id=order.orderId, room_id=order.roomId or "",
@@ -194,6 +239,6 @@ async def create_order(
         date=data.date, start_time=data.start_time, end_time=data.end_time,
         duration=data.duration, total_amount=data.total_amount,
         status=order.status, scene=data.scene or "", door_code="",
-        source=data.source, payment_status="Paid",
+        source=data.source, payment_status="Unpaid",
         created_at=order.createdAt,
     )

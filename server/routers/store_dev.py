@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 
 from database import get_db
+from services.auth_service import get_current_user
 from models.store_dev import (
     LegalEntity, Territory, StoreSiteSelection, StoreConstruction,
     ConstructionCost, DesignDrawing, RoomPricing, RoomPersonPricing,
@@ -28,7 +29,7 @@ from schemas.store_dev import (
     NightPackageCreate, NightPackageUpdate, NightPackageOut, NightPackageListOut,
 )
 
-router = APIRouter(prefix="/api/store-dev", tags=["门店拓展管理"])
+router = APIRouter(prefix="/api/store-dev", tags=["门店拓展管理"], dependencies=[Depends(get_current_user)])
 
 
 def _gen_id() -> str:

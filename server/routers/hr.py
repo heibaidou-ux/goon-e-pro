@@ -33,7 +33,7 @@ from schemas.hr import (
 )
 from services.auth_service import get_current_user
 
-router = APIRouter(prefix="/api/hr", tags=["人力资源管理"])
+router = APIRouter(prefix="/api/hr", tags=["人力资源管理"], dependencies=[Depends(get_current_user)])
 
 
 def _gen_id() -> str:
@@ -138,7 +138,7 @@ async def get_department(department_id: str, db: AsyncSession = Depends(get_db))
     )
 
 
-@router.post("/departments", response_model=DepartmentOut, status_code=201)
+@router.post("/departments", response_model=DepartmentOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_department(
     data: DepartmentCreate,
     db: AsyncSession = Depends(get_db),
@@ -158,7 +158,7 @@ async def create_department(
     )
 
 
-@router.put("/departments/{department_id}", response_model=DepartmentOut)
+@router.put("/departments/{department_id}", response_model=DepartmentOut, dependencies=[Depends(get_current_user)])
 async def update_department(
     department_id: str,
     data: DepartmentUpdate,
@@ -186,7 +186,7 @@ async def update_department(
     )
 
 
-@router.delete("/departments/{department_id}")
+@router.delete("/departments/{department_id}", dependencies=[Depends(get_current_user)])
 async def delete_department(department_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Department).where(Department.departmentId == department_id))
     item = r.scalar_one_or_none()
@@ -285,7 +285,7 @@ async def get_position(position_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/positions", response_model=PositionOut, status_code=201)
+@router.post("/positions", response_model=PositionOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_position(
     data: PositionCreate,
     db: AsyncSession = Depends(get_db),
@@ -305,7 +305,7 @@ async def create_position(
     )
 
 
-@router.put("/positions/{position_id}", response_model=PositionOut)
+@router.put("/positions/{position_id}", response_model=PositionOut, dependencies=[Depends(get_current_user)])
 async def update_position(
     position_id: str,
     data: PositionUpdate,
@@ -333,7 +333,7 @@ async def update_position(
     )
 
 
-@router.delete("/positions/{position_id}")
+@router.delete("/positions/{position_id}", dependencies=[Depends(get_current_user)])
 async def delete_position(position_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Position).where(Position.positionId == position_id))
     item = r.scalar_one_or_none()
@@ -389,7 +389,7 @@ async def get_job(job_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/jobs", response_model=JobOut, status_code=201)
+@router.post("/jobs", response_model=JobOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_job(
     data: JobCreate,
     db: AsyncSession = Depends(get_db),
@@ -406,7 +406,7 @@ async def create_job(
     )
 
 
-@router.put("/jobs/{job_id}", response_model=JobOut)
+@router.put("/jobs/{job_id}", response_model=JobOut, dependencies=[Depends(get_current_user)])
 async def update_job(
     job_id: str,
     data: JobUpdate,
@@ -430,7 +430,7 @@ async def update_job(
     )
 
 
-@router.delete("/jobs/{job_id}")
+@router.delete("/jobs/{job_id}", dependencies=[Depends(get_current_user)])
 async def delete_job(job_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Job).where(Job.jobId == job_id))
     item = r.scalar_one_or_none()
@@ -486,7 +486,7 @@ async def get_salary_grade(grade_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/salary-grades", response_model=SalaryGradeOut, status_code=201)
+@router.post("/salary-grades", response_model=SalaryGradeOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_salary_grade(
     data: SalaryGradeCreate,
     db: AsyncSession = Depends(get_db),
@@ -504,7 +504,7 @@ async def create_salary_grade(
     )
 
 
-@router.put("/salary-grades/{grade_id}", response_model=SalaryGradeOut)
+@router.put("/salary-grades/{grade_id}", response_model=SalaryGradeOut, dependencies=[Depends(get_current_user)])
 async def update_salary_grade(
     grade_id: str,
     data: SalaryGradeUpdate,
@@ -530,7 +530,7 @@ async def update_salary_grade(
     )
 
 
-@router.delete("/salary-grades/{grade_id}")
+@router.delete("/salary-grades/{grade_id}", dependencies=[Depends(get_current_user)])
 async def delete_salary_grade(grade_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(SalaryGrade).where(SalaryGrade.gradeId == grade_id))
     item = r.scalar_one_or_none()
@@ -608,7 +608,7 @@ async def get_promotion(promotion_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/promotions", response_model=PromotionRecordOut, status_code=201)
+@router.post("/promotions", response_model=PromotionRecordOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_promotion(
     data: PromotionRecordCreate,
     db: AsyncSession = Depends(get_db),
@@ -789,7 +789,7 @@ async def get_employee(employee_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/employees", response_model=EmployeeOut, status_code=201)
+@router.post("/employees", response_model=EmployeeOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_employee(
     data: EmployeeCreate,
     db: AsyncSession = Depends(get_db),
@@ -832,7 +832,7 @@ async def create_employee(
     )
 
 
-@router.put("/employees/{employee_id}", response_model=EmployeeOut)
+@router.put("/employees/{employee_id}", response_model=EmployeeOut, dependencies=[Depends(get_current_user)])
 async def update_employee(
     employee_id: str,
     data: EmployeeUpdate,
@@ -896,7 +896,7 @@ async def update_employee(
     )
 
 
-@router.delete("/employees/{employee_id}")
+@router.delete("/employees/{employee_id}", dependencies=[Depends(get_current_user)])
 async def delete_employee(employee_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Employee).where(Employee.employeeId == employee_id))
     item = r.scalar_one_or_none()
@@ -974,7 +974,7 @@ async def get_external_staff(staff_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/external-staff", response_model=ExternalStaffOut, status_code=201)
+@router.post("/external-staff", response_model=ExternalStaffOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_external_staff(
     data: ExternalStaffCreate,
     db: AsyncSession = Depends(get_db),
@@ -999,7 +999,7 @@ async def create_external_staff(
     )
 
 
-@router.put("/external-staff/{staff_id}", response_model=ExternalStaffOut)
+@router.put("/external-staff/{staff_id}", response_model=ExternalStaffOut, dependencies=[Depends(get_current_user)])
 async def update_external_staff(
     staff_id: str,
     data: ExternalStaffUpdate,
@@ -1038,7 +1038,7 @@ async def update_external_staff(
     )
 
 
-@router.delete("/external-staff/{staff_id}")
+@router.delete("/external-staff/{staff_id}", dependencies=[Depends(get_current_user)])
 async def delete_external_staff(staff_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(ExternalStaff).where(ExternalStaff.staffId == staff_id))
     item = r.scalar_one_or_none()
@@ -1156,7 +1156,7 @@ async def get_schedule(schedule_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/schedules", response_model=ScheduleOut, status_code=201)
+@router.post("/schedules", response_model=ScheduleOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_schedule(
     data: ScheduleCreate,
     db: AsyncSession = Depends(get_db),
@@ -1181,7 +1181,7 @@ async def create_schedule(
     )
 
 
-@router.put("/schedules/{schedule_id}", response_model=ScheduleOut)
+@router.put("/schedules/{schedule_id}", response_model=ScheduleOut, dependencies=[Depends(get_current_user)])
 async def update_schedule(
     schedule_id: str,
     data: ScheduleUpdate,
@@ -1212,7 +1212,7 @@ async def update_schedule(
     )
 
 
-@router.delete("/schedules/{schedule_id}")
+@router.delete("/schedules/{schedule_id}", dependencies=[Depends(get_current_user)])
 async def delete_schedule(schedule_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Schedule).where(Schedule.scheduleId == schedule_id))
     item = r.scalar_one_or_none()
@@ -1290,7 +1290,7 @@ async def get_schedule_swap(swap_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/schedule-swaps", response_model=ScheduleSwapOut, status_code=201)
+@router.post("/schedule-swaps", response_model=ScheduleSwapOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_schedule_swap(
     data: ScheduleSwapCreate,
     db: AsyncSession = Depends(get_db),
@@ -1314,7 +1314,7 @@ async def create_schedule_swap(
     )
 
 
-@router.put("/schedule-swaps/{swap_id}", response_model=ScheduleSwapOut)
+@router.put("/schedule-swaps/{swap_id}", response_model=ScheduleSwapOut, dependencies=[Depends(get_current_user)])
 async def update_schedule_swap(
     swap_id: str,
     data: ScheduleSwapUpdate,
@@ -1341,7 +1341,7 @@ async def update_schedule_swap(
     )
 
 
-@router.delete("/schedule-swaps/{swap_id}")
+@router.delete("/schedule-swaps/{swap_id}", dependencies=[Depends(get_current_user)])
 async def delete_schedule_swap(swap_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(ScheduleSwap).where(ScheduleSwap.swapId == swap_id))
     item = r.scalar_one_or_none()
@@ -1456,7 +1456,7 @@ async def get_attendance(attendance_id: str, db: AsyncSession = Depends(get_db))
     )
 
 
-@router.post("/attendances", response_model=AttendanceOut, status_code=201)
+@router.post("/attendances", response_model=AttendanceOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_attendance(
     data: AttendanceCreate,
     db: AsyncSession = Depends(get_db),
@@ -1479,7 +1479,7 @@ async def create_attendance(
     )
 
 
-@router.put("/attendances/{attendance_id}", response_model=AttendanceOut)
+@router.put("/attendances/{attendance_id}", response_model=AttendanceOut, dependencies=[Depends(get_current_user)])
 async def update_attendance(
     attendance_id: str,
     data: AttendanceUpdate,
@@ -1509,7 +1509,7 @@ async def update_attendance(
     )
 
 
-@router.delete("/attendances/{attendance_id}")
+@router.delete("/attendances/{attendance_id}", dependencies=[Depends(get_current_user)])
 async def delete_attendance(attendance_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Attendance).where(Attendance.attendanceId == attendance_id))
     item = r.scalar_one_or_none()
@@ -1613,7 +1613,7 @@ async def get_leave_request(leave_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/leave-requests", response_model=LeaveRequestOut, status_code=201)
+@router.post("/leave-requests", response_model=LeaveRequestOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_leave_request(
     data: LeaveRequestCreate,
     db: AsyncSession = Depends(get_db),
@@ -1635,7 +1635,7 @@ async def create_leave_request(
     )
 
 
-@router.put("/leave-requests/{leave_id}", response_model=LeaveRequestOut)
+@router.put("/leave-requests/{leave_id}", response_model=LeaveRequestOut, dependencies=[Depends(get_current_user)])
 async def update_leave_request(
     leave_id: str,
     data: LeaveRequestUpdate,
@@ -1662,7 +1662,7 @@ async def update_leave_request(
     )
 
 
-@router.delete("/leave-requests/{leave_id}")
+@router.delete("/leave-requests/{leave_id}", dependencies=[Depends(get_current_user)])
 async def delete_leave_request(leave_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(LeaveRequest).where(LeaveRequest.leaveId == leave_id))
     item = r.scalar_one_or_none()
@@ -1799,7 +1799,7 @@ async def get_payroll(payroll_id: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/payrolls", response_model=PayrollOut, status_code=201)
+@router.post("/payrolls", response_model=PayrollOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_payroll(
     data: PayrollCreate,
     db: AsyncSession = Depends(get_db),
@@ -1841,7 +1841,7 @@ async def create_payroll(
     )
 
 
-@router.put("/payrolls/{payroll_id}", response_model=PayrollOut)
+@router.put("/payrolls/{payroll_id}", response_model=PayrollOut, dependencies=[Depends(get_current_user)])
 async def update_payroll(
     payroll_id: str,
     data: PayrollUpdate,
@@ -1877,7 +1877,7 @@ async def update_payroll(
     )
 
 
-@router.delete("/payrolls/{payroll_id}")
+@router.delete("/payrolls/{payroll_id}", dependencies=[Depends(get_current_user)])
 async def delete_payroll(payroll_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(Payroll).where(Payroll.payrollId == payroll_id))
     item = r.scalar_one_or_none()
@@ -1957,7 +1957,7 @@ async def get_performance_review(review_id: str, db: AsyncSession = Depends(get_
     )
 
 
-@router.post("/performance-reviews", response_model=PerformanceReviewOut, status_code=201)
+@router.post("/performance-reviews", response_model=PerformanceReviewOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_performance_review(
     data: PerformanceReviewCreate,
     db: AsyncSession = Depends(get_db),
@@ -1983,7 +1983,7 @@ async def create_performance_review(
     )
 
 
-@router.put("/performance-reviews/{review_id}", response_model=PerformanceReviewOut)
+@router.put("/performance-reviews/{review_id}", response_model=PerformanceReviewOut, dependencies=[Depends(get_current_user)])
 async def update_performance_review(
     review_id: str,
     data: PerformanceReviewUpdate,
@@ -2015,7 +2015,7 @@ async def update_performance_review(
     )
 
 
-@router.delete("/performance-reviews/{review_id}")
+@router.delete("/performance-reviews/{review_id}", dependencies=[Depends(get_current_user)])
 async def delete_performance_review(review_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(PerformanceReview).where(PerformanceReview.reviewId == review_id))
     item = r.scalar_one_or_none()
@@ -2096,7 +2096,7 @@ async def get_cleaner_assessment(assessment_id: str, db: AsyncSession = Depends(
     )
 
 
-@router.post("/cleaner-assessments", response_model=CleanerAssessmentOut, status_code=201)
+@router.post("/cleaner-assessments", response_model=CleanerAssessmentOut, status_code=201, dependencies=[Depends(get_current_user)])
 async def create_cleaner_assessment(
     data: CleanerAssessmentCreate,
     db: AsyncSession = Depends(get_db),
@@ -2124,7 +2124,7 @@ async def create_cleaner_assessment(
     )
 
 
-@router.put("/cleaner-assessments/{assessment_id}", response_model=CleanerAssessmentOut)
+@router.put("/cleaner-assessments/{assessment_id}", response_model=CleanerAssessmentOut, dependencies=[Depends(get_current_user)])
 async def update_cleaner_assessment(
     assessment_id: str,
     data: CleanerAssessmentUpdate,
@@ -2159,7 +2159,7 @@ async def update_cleaner_assessment(
     )
 
 
-@router.delete("/cleaner-assessments/{assessment_id}")
+@router.delete("/cleaner-assessments/{assessment_id}", dependencies=[Depends(get_current_user)])
 async def delete_cleaner_assessment(assessment_id: str, db: AsyncSession = Depends(get_db)):
     r = await db.execute(select(CleanerAssessment).where(CleanerAssessment.assessmentId == assessment_id))
     item = r.scalar_one_or_none()

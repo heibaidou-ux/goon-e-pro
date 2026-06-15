@@ -29,8 +29,10 @@ from schemas.finance_ext import (
     BankAccountCreate, BankAccountUpdate, BankAccountOut, BankAccountListOut,
     InvoiceCreate, InvoiceUpdate, InvoiceOut, InvoiceListOut,
 )
+from models.user import User
+from services.auth_service import get_current_user, get_optional_user
 
-router = APIRouter(prefix="/api/finance-ext", tags=["财务管理（扩展）"])
+router = APIRouter(prefix="/api/finance-ext", tags=["财务管理（扩展）"], dependencies=[Depends(get_current_user)])
 
 
 def _gen_id() -> str:
@@ -66,6 +68,7 @@ async def list_account_subjects(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(AccountSubject)
     if type:
@@ -110,6 +113,7 @@ async def list_account_subjects(
 async def get_account_subject_tree(
     type: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """Get account subject tree structure."""
     q = select(AccountSubject).order_by(AccountSubject.code.asc())
@@ -121,7 +125,8 @@ async def get_account_subject_tree(
 
 
 @router.get("/account-subjects/{subject_id}", response_model=AccountSubjectOut)
-async def get_account_subject(subject_id: str, db: AsyncSession = Depends(get_db)):
+async def get_account_subject(subject_id: str, db: AsyncSession = Depends(get_db),
+                              current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(AccountSubject).where(AccountSubject.subjectId == subject_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -214,6 +219,7 @@ async def list_fiscal_calendars(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(FiscalCalendar)
     if year is not None:
@@ -241,7 +247,8 @@ async def list_fiscal_calendars(
 
 
 @router.get("/fiscal-calendars/{calendar_id}", response_model=FiscalCalendarOut)
-async def get_fiscal_calendar(calendar_id: str, db: AsyncSession = Depends(get_db)):
+async def get_fiscal_calendar(calendar_id: str, db: AsyncSession = Depends(get_db),
+                              current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(FiscalCalendar).where(FiscalCalendar.calendarId == calendar_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -335,6 +342,7 @@ async def list_journal_entries(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(JournalEntry)
     if period_id:
@@ -394,7 +402,8 @@ async def list_journal_entries(
 
 
 @router.get("/journal-entries/{entry_id}", response_model=JournalEntryOut)
-async def get_journal_entry(entry_id: str, db: AsyncSession = Depends(get_db)):
+async def get_journal_entry(entry_id: str, db: AsyncSession = Depends(get_db),
+                            current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(JournalEntry).where(JournalEntry.entryId == entry_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -627,6 +636,7 @@ async def list_ledgers(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(Ledger)
     if subject_id:
@@ -654,7 +664,8 @@ async def list_ledgers(
 
 
 @router.get("/ledgers/{ledger_id}", response_model=LedgerOut)
-async def get_ledger(ledger_id: str, db: AsyncSession = Depends(get_db)):
+async def get_ledger(ledger_id: str, db: AsyncSession = Depends(get_db),
+                     current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(Ledger).where(Ledger.ledgerId == ledger_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -722,6 +733,7 @@ async def list_budgets(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(Budget)
     if store_id:
@@ -761,6 +773,7 @@ async def budget_comparison(
     store_id: Optional[str] = Query(None, alias="storeId"),
     year: int = Query(..., ge=2000, le=2100),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """Budget vs actual comparison for a store/year."""
     q = select(Budget).where(Budget.year == year)
@@ -797,7 +810,8 @@ async def budget_comparison(
 
 
 @router.get("/budgets/{budget_id}", response_model=BudgetOut)
-async def get_budget(budget_id: str, db: AsyncSession = Depends(get_db)):
+async def get_budget(budget_id: str, db: AsyncSession = Depends(get_db),
+                     current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(Budget).where(Budget.budgetId == budget_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -865,6 +879,7 @@ async def list_advance_requests(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(AdvanceRequest)
     if store_id:
@@ -908,6 +923,7 @@ async def list_advance_requests(
 async def get_pending_advance_requests(
     store_id: Optional[str] = Query(None, alias="storeId"),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """Get all pending advance requests for approval."""
     q = select(AdvanceRequest).where(AdvanceRequest.status == "Pending")
@@ -934,7 +950,8 @@ async def get_pending_advance_requests(
 
 
 @router.get("/advance-requests/{advance_id}", response_model=AdvanceRequestOut)
-async def get_advance_request(advance_id: str, db: AsyncSession = Depends(get_db)):
+async def get_advance_request(advance_id: str, db: AsyncSession = Depends(get_db),
+                              current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(AdvanceRequest).where(AdvanceRequest.advanceId == advance_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -1023,6 +1040,7 @@ async def list_reimbursements(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(Reimbursement)
     if store_id:
@@ -1068,7 +1086,8 @@ async def list_reimbursements(
 
 
 @router.get("/reimbursements/{reimbursement_id}", response_model=ReimbursementOut)
-async def get_reimbursement(reimbursement_id: str, db: AsyncSession = Depends(get_db)):
+async def get_reimbursement(reimbursement_id: str, db: AsyncSession = Depends(get_db),
+                            current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(Reimbursement).where(Reimbursement.reimbursementId == reimbursement_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -1166,6 +1185,7 @@ async def list_payments(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(Payment)
     if store_id:
@@ -1229,7 +1249,8 @@ async def list_payments(
 
 
 @router.get("/payments/{payment_id}", response_model=PaymentOut)
-async def get_payment(payment_id: str, db: AsyncSession = Depends(get_db)):
+async def get_payment(payment_id: str, db: AsyncSession = Depends(get_db),
+                      current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(Payment).where(Payment.paymentId == payment_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -1323,6 +1344,7 @@ async def list_accounts_payable(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(AccountsPayable)
     if store_id:
@@ -1380,6 +1402,7 @@ async def list_accounts_payable(
 async def get_accounts_payable_aging(
     store_id: Optional[str] = Query(None, alias="storeId"),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     """Aging analysis for accounts payable."""
     q = select(AccountsPayable)
@@ -1435,7 +1458,8 @@ async def get_accounts_payable_aging(
 
 
 @router.get("/accounts-payable/{payable_id}", response_model=AccountsPayableOut)
-async def get_accounts_payable(payable_id: str, db: AsyncSession = Depends(get_db)):
+async def get_accounts_payable(payable_id: str, db: AsyncSession = Depends(get_db),
+                               current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(AccountsPayable).where(AccountsPayable.payableId == payable_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -1536,6 +1560,7 @@ async def list_depreciation_records(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(DepreciationRecord)
     if asset_id:
@@ -1573,7 +1598,8 @@ async def list_depreciation_records(
 
 
 @router.get("/depreciation-records/{depreciation_id}", response_model=DepreciationRecordOut)
-async def get_depreciation_record(depreciation_id: str, db: AsyncSession = Depends(get_db)):
+async def get_depreciation_record(depreciation_id: str, db: AsyncSession = Depends(get_db),
+                                  current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(DepreciationRecord).where(DepreciationRecord.depreciationId == depreciation_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -1637,6 +1663,7 @@ async def list_bank_accounts(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(BankAccount)
     if legal_entity_id:
@@ -1678,7 +1705,8 @@ async def list_bank_accounts(
 
 
 @router.get("/bank-accounts/{account_id}", response_model=BankAccountOut)
-async def get_bank_account(account_id: str, db: AsyncSession = Depends(get_db)):
+async def get_bank_account(account_id: str, db: AsyncSession = Depends(get_db),
+                           current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(BankAccount).where(BankAccount.accountId == account_id))
     item = r.scalar_one_or_none()
     if not item:
@@ -1786,6 +1814,7 @@ async def list_invoices(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     q = select(Invoice)
     if store_id:
@@ -1839,7 +1868,8 @@ async def list_invoices(
 
 
 @router.get("/invoices/{invoice_id}", response_model=InvoiceOut)
-async def get_invoice(invoice_id: str, db: AsyncSession = Depends(get_db)):
+async def get_invoice(invoice_id: str, db: AsyncSession = Depends(get_db),
+                      current_user: Optional[User] = Depends(get_optional_user)):
     r = await db.execute(select(Invoice).where(Invoice.invoiceId == invoice_id))
     item = r.scalar_one_or_none()
     if not item:

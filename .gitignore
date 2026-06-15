@@ -16,15 +16,17 @@ server/*.db
 server/__pycache__/
 server/**/__pycache__/
 server/venv/
+server/logs/
 
 # Uploads (keep gitkeep)
 server/uploads/products/*.webp
 server/uploads/products/*.jpg
 server/uploads/products/*.png
 
-# Environment files
+# Environment files (keep .env.example)
 .env
-*.env
+.env.local
+.env.prod
 
 # Temp files
 temp_*

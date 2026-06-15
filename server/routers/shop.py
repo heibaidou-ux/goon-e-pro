@@ -10,9 +10,9 @@ from models.operations import Order, OrderItem
 from models.supply_chain import Product
 from models.user import User
 from schemas.order import ShopOrderCreate, ShopOrderOut
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 
-router = APIRouter(prefix="/api/shop", tags=["商城订单"])
+router = APIRouter(prefix="/api/shop", tags=["商城订单"], dependencies=[Depends(get_current_user)])
 
 
 @router.post("/orders", response_model=ShopOrderOut)
@@ -68,7 +68,7 @@ async def create_shop_order(
 async def list_shop_orders(
     status: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     query = select(Order).where(Order.orderType == "Retail")
     if status:
@@ -91,7 +91,7 @@ async def list_shop_orders(
 
 
 @router.get("/orders/{order_id}", response_model=ShopOrderOut)
-async def get_shop_order(order_id: str, db: AsyncSession = Depends(get_db)):
+async def get_shop_order(order_id: str, db: AsyncSession = Depends(get_db), user: Optional[User] = Depends(get_optional_user)):
     result = await db.execute(
         select(Order).where(Order.orderType == "Retail", Order.orderId == order_id)
     )

@@ -15,7 +15,7 @@ from schemas.iot import (
 from services.auth_service import get_current_user
 from services import ha_service
 
-router = APIRouter(prefix="/api/iot", tags=["IoT管理"])
+router = APIRouter(prefix="/api/iot", tags=["IoT管理"], dependencies=[Depends(get_current_user)])
 
 
 # ── Devices ──

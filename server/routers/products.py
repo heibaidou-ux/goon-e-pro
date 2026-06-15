@@ -46,7 +46,7 @@ from schemas.product import (
     StockCountCreate, StockCountUpdate, StockCountOut, StockCountListOut,
     StockCountLineOut,
 )
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, get_optional_user
 from services.image_service import image_service
 
 router = APIRouter(prefix="/api/products", tags=["商品管理"])
@@ -95,6 +95,7 @@ async def _product_to_out(db: AsyncSession, product: Product) -> ProductOut:
 async def list_categories(
     storeId: str = "",
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     """Get all categories as a tree."""
     query = select(ProductCategory).where(ProductCategory.status == "Active")
@@ -205,6 +206,7 @@ async def list_products(
     status: Optional[str] = None,
     storeId: str = "",
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user),
 ):
     # Build base filters (shared between count and data queries)
     base_filters = [Product.isActive == True]
