@@ -27,12 +27,12 @@ Page({
     var self = this
     // 角色重定向
     var role = API.getUserRole()
-    if (role === 'staff') { wx.reLaunch({ url: '/pages/staff-dashboard/staff-dashboard' }); return }
+    if (role === 'staff') { wx.reLaunch({ url: '/pages/staff/staff-dashboard/staff-dashboard' }); return }
     // 从"我的"跳转过来时自动弹出登录框
     if (e && e.showLogin == '1') {
       self.setData({ showLoginModal: true, pendingAction: 'profile' })
     }
-    if (role === 'shareholder') { wx.reLaunch({ url: '/pages/investor-workbench/investor-workbench' }); return }
+    if (role === 'shareholder') { wx.reLaunch({ url: '/pages/workbench/investor-workbench/investor-workbench' }); return }
     try { self.setData({ topPadding: (wx.getWindowInfo().statusBarHeight || 44) + 44 }) } catch(e) {}
     self.loadData(); self.checkActiveOrder()
   },
@@ -143,7 +143,7 @@ Page({
   goMyOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },
   goMemberCenter: function() { wx.navigateTo({ url: '/pages/member-center/member-center' }) },
   goCouponVerify: function() { wx.navigateTo({ url: '/pages/coupon-verify/coupon-verify' }) },
-  goStaffLogin: function() { wx.navigateTo({ url: '/pages/staff-login/staff-login' }) },
+  goStaffLogin: function() { wx.navigateTo({ url: '/pages/staff/staff-login/staff-login' }) },
   goCartPage: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?tab=cart' }) },
 
   goSmartControl: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', s = order.start || '', e = order.end || '', dur = order.duration || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&start='+s+'&end='+e+'&duration='+dur }) },

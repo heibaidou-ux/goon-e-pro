@@ -29,7 +29,7 @@ async function request(options) {
       data: options.data,
       header: header,
       success: res => {
-        if (res.statusCode === 401) { wx.reLaunch({ url: '/pages/staff-login/staff-login' }); return }
+        if (res.statusCode === 401) { wx.reLaunch({ url: '/pages/staff/staff-login/staff-login' }); return }
         if (res.statusCode >= 400) { reject(new Error((res.data && res.data.detail) || '请求失败')); return }
         resolve(res.data)
       },

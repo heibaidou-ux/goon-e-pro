@@ -15,10 +15,10 @@ Component({
       var key = e.currentTarget.dataset.key
       if (key === this.properties.active) return
       var urls = {
-        dashboard: '/pages/staff-dashboard/staff-dashboard',
-        orders: '/pages/staff-order-management/staff-order-management',
-        device: '/pages/staff-device-monitor/staff-device-monitor',
-        cleaning: '/pages/staff-cleaning-task/staff-cleaning-task'
+        dashboard: '/pages/staff/staff-dashboard/staff-dashboard',
+        orders: '/pages/staff/staff-order-management/staff-order-management',
+        device: '/pages/staff/staff-device-monitor/staff-device-monitor',
+        cleaning: '/pages/staff/staff-cleaning-task/staff-cleaning-task'
       }
       var url = urls[key]
       if (url) wx.switchTab ? wx.navigateTo({ url: url }) : wx.navigateTo({ url: url })
