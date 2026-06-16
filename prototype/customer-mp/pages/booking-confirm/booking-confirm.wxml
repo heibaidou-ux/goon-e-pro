@@ -172,5 +172,5 @@
     </view>
   </view>
 
-  <bottom-nav active="booking" />
+  <bottom-nav active="booking"></bottom-nav>
 </view>

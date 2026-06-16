@@ -149,5 +149,5 @@
     </view>
   </view>
 
-  <bottom-nav wx:if="{{!hideBottomNav}}" active="home" />
+  <bottom-nav wx:if="{{!hideBottomNav}}" active="home"></bottom-nav>
 </view>

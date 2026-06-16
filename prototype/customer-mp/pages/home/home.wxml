@@ -83,7 +83,7 @@
 
   <!-- 底部导航 -->
   </scroll-view>
-  <bottom-nav active="home" />
+  <bottom-nav active="home"></bottom-nav>
 </view>
 
 <!-- 门店选择弹窗 -->

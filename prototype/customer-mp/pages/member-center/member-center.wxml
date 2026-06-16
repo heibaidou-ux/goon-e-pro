@@ -98,5 +98,5 @@
   </view>
 
   <!-- 底部导航 -->
-  <bottom-nav active="profile" />
+  <bottom-nav active="profile"></bottom-nav>
 </view>

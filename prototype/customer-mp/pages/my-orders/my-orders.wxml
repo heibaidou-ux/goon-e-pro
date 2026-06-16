@@ -249,5 +249,5 @@
     </view>
   </view>
 
-  <bottom-nav active="orders" />
+  <bottom-nav active="orders"></bottom-nav>
 </view>

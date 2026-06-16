@@ -77,7 +77,7 @@
   </view>
 
   <!-- 底部导航 -->
-  <bottom-nav active="tea" />
+  <bottom-nav active="tea"></bottom-nav>
 </view>
 
 <!-- 配送方式选择弹窗 -->

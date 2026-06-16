@@ -121,7 +121,7 @@
     </view>
   </view>
 
-  <bottom-nav active="booking" />
+  <bottom-nav active="booking"></bottom-nav>
 </view>
 
 <view class="cal-modal-overlay" wx:if="{{showCalModal}}" bindtap="hideCalModal">

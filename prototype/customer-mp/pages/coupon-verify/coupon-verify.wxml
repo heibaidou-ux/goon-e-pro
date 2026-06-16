@@ -155,7 +155,7 @@
       </view>
     </view>
 
-    <bottom-nav wx:if="{{!isStaff}}" active="home" />
+    <bottom-nav wx:if="{{!isStaff}}" active="home"></bottom-nav>
   </view>
 </view>
 
