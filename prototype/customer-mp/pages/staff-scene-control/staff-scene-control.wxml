@@ -111,5 +111,5 @@
     </view>
   </view>
 
-  <staff-bottom-nav active="device" />
+  <staff-bottom-nav active="device"></staff-bottom-nav>
 </view>

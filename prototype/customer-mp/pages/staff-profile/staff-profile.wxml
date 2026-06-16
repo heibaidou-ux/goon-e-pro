@@ -1,1 +1,9 @@
-<view class="phone"><view class="page"><view class="profile-header"><view class="avatar">👤</view><text class="name">{{user.name || user.displayName || '店员'}}</text><text class="role">{{user.role === 'admin' ? '管理员' : user.role === 'staff' ? '店员' : user.role}}</text></view><view class="menu-list"><view class="menu-item" bindtap="goOrders">📋 订单管理  ›</view><view class="menu-item" bindtap="goAttendance">⏰ 考勤打卡  ›</view><view class="menu-item" bindtap="goScheduling">📅 我的排班  ›</view><view class="menu-item" bindtap="goReceivable">💰 应收款  ›</view><view class="menu-item" bindtap="goReconciliation">📊 对账  ›</view></view><button class="logout-btn" bindtap="doLogout">退出登录</button></view><staff-bottom-nav active="dashboard" /></view>
+<view class="phone">
+  <view class="page">
+  <view class="profile-header"><view class="avatar">👤</view><text class="name">{{user.name || user.displayName || '店员'}}</text><text class="role">{{user.role === 'admin' ? '管理员' : user.role === 'staff' ? '店员' : user.role}}</text></view><view class="menu-list"><view class="menu-item" bindtap="goOrders">📋 订单管理  ›</view>
+      <view class="menu-item" bindtap="goAttendance">⏰ 考勤打卡  ›</view>
+      <view class="menu-item" bindtap="goScheduling">📅 我的排班  ›</view>
+      <view class="menu-item" bindtap="goReceivable">💰 应收款  ›</view>
+      <view class="menu-item" bindtap="goReconciliation">📊 对账  ›</view></view>
+  <button class="logout-btn" bindtap="doLogout">退出登录</button></view>
+  <staff-bottom-nav active="dashboard"></staff-bottom-nav></view>

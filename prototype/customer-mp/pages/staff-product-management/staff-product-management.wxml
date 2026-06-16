@@ -1,4 +1,5 @@
-<view class="phone"><view class="page">
+<view class="phone">
+  <view class="page">
   <view class="header">
     <text class="header-title">📦 商品管理</text>
     <text class="header-stats">库存{{stats.total}} · 低{{stats.lowStock}}</text>
@@ -42,7 +43,7 @@
     </view>
   </view>
 </view>
-<staff-bottom-nav active="orders" /></view>
+<staff-bottom-nav active="orders"></staff-bottom-nav></view>
 
 <!-- 盘点弹窗 -->
 <view class="modal-overlay" wx:if="{{showStockModal}}" bindtap="hideStockModal">
