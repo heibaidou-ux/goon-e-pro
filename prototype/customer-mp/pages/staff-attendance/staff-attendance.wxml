@@ -15,8 +15,8 @@
         </view>
         <view class="checkin-btns">
           <button wx:if="{{!attendance.checkedIn}}" class="ci-btn signin" bindtap="doCheckIn">🕐 签到</button>
-          <button wx:elif="{{!attendance.checkedOut}}" class="ci-btn signout" bindtap="doCheckOut">🏁 签退</button>
-          <text wx:else class="ci-done">✅ 今日已签退</text>
+          <button wx:elif="{{!attendance.checkedOut && attendance.checkedIn}}" class="ci-btn signout" bindtap="doCheckOut">🏁 签退</button>
+          <button wx:elif="{{attendance.checkedOut}}" class="ci-btn done" disabled>✅ 今日已签退</button>
         </view>
       </view>
 
