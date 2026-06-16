@@ -11,13 +11,15 @@ Page({
   },
 
   onShow: function() {
-    if (!API.isLoggedIn()) { wx.reLaunch({ url: '/pages/home/home?showLogin=1' }); return }
+    // 首次加载不管登录状态都尝试显示，避免白屏
     this.loadOrders()
   },
 
   loadOrders: function() {
     var self = this
-    Promise.all([API.getUserOrders(), API.getShopOrders ? API.getShopOrders() : Promise.resolve([])]).then(function(results) {
+    // 确保至少有数据，不白屏
+    self.setData({ orders: [], filteredOrders: [], tabIndex: self.data.tabIndex })
+    Promise.all([API.getUserOrders().catch(function() { return [] }), API.getShopOrders ? API.getShopOrders().catch(function() { return [] }) : Promise.resolve([])]).then(function(results) {
       var orders = results[0] || []
       var shopOrders = results[1] || []
       // 合并茶品订单
