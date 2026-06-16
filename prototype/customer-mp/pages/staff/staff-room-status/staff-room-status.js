@@ -6,8 +6,8 @@ Page({
     showBookingModal: false, bookRoomId: '', bookRoomName: '',
     bookName: '', bookPhone: '', bookDate: '', bookStart: '', bookDuration: 120, bookDurationLabel: '2小时', bookSource: '',
     sourceOptions: ['到店','美团','抖音','大众点评','高德地图','小红书','会小二','老客户','电话预约','其他'],
-    timeOptions: [], durationOptions: ['1小时','2小时','3小时','4小时','6小时','8小时'],
-    durationValues: [60, 120, 180, 240, 360, 480],
+    timeOptions: [], durationOptions: ['2小时','3小时','4小时','6小时'],
+    durationValues: [120, 180, 240, 360],
     // 弹窗
     showActionSheet: false, actionRoomId: '', actionRoomName: '', actionType: '',
     actionOrderId: '',

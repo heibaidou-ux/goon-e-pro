@@ -28,9 +28,9 @@ Page({
     selectedTimeLabel: '',
     durationOptions: [
       { label: '2小时', value: 120 },
+      { label: '3小时', value: 180 },
       { label: '4小时', value: 240 },
-      { label: '6小时', value: 360 },
-      { label: '8小时', value: 480 }
+      { label: '6小时', value: 360 }
     ]
   },
 
