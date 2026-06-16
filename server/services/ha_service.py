@@ -61,16 +61,13 @@ DEVICE_TEMPLATES = [
     # Light - 吊灯 (switch实体)
     {"type": "Light", "name_template": "{room}吊灯", "protocol": "Modbus",
      "ha_entity_fn": lambda r: _ha_entity_prefix(r, "switch") + "diao_deng",
-     "attributes": {"power": False}},
-    # Light - 筒灯
+     "attributes": {"power": False, "channel": 1}},
     {"type": "Light", "name_template": "{room}筒灯", "protocol": "Modbus",
      "ha_entity_fn": lambda r: _ha_entity_prefix(r, "switch") + "tong_deng",
-     "attributes": {"power": False}},
-    # Light - 背景灯 (只有中茶室有)
+     "attributes": {"power": False, "channel": 2}},
     {"type": "Light", "name_template": "{room}背景灯", "protocol": "Modbus",
      "ha_entity_fn": lambda r: _ha_entity_prefix(r, "switch") + "bei_jing_deng",
-     "attributes": {"power": False}},
-    # Light - 主灯(input_boolean模拟)
+     "attributes": {"power": False, "channel": 3}},
     {"type": "Light", "name_template": "{room}主灯(sim)", "protocol": "Modbus",
      "ha_entity_fn": lambda r: f"input_boolean.sim_{r}_main",
      "attributes": {"power": False}},
@@ -96,13 +93,13 @@ SCENES = [
          {"sequence": 1, "device_type": "AC", "action": "Temperature", "params": {"temperature": 26}},
          {"sequence": 2, "device_type": "Lock", "action": "Unlock", "params": {}},
          {"sequence": 3, "device_type": "Curtain", "action": "Open", "params": {}},
-         {"sequence": 4, "device_type": "Light", "action": "On", "params": {"brightness": 80, "color_temp": 3500}},
+         {"sequence": 4, "device_type": "Light", "action": "On", "params": {}},
          {"sequence": 5, "device_type": "Speaker", "action": "On", "params": {"volume": 30, "source": "背景音乐"}},
      ]},
     {"scene_id": "SCN_TEA", "name": "TeaSession", "label": "品茶模式", "trigger_type": "Manual",
      "applicable_room_types": ["TeaRoom"],
      "rules": [
-         {"sequence": 1, "device_type": "Light", "action": "On", "params": {"brightness": 60, "color_temp": 3000}},
+         {"sequence": 1, "device_type": "Light", "action": "On", "params": {}},
          {"sequence": 2, "device_type": "Curtain", "action": "Open", "params": {}},
          {"sequence": 3, "device_type": "AC", "action": "Temperature", "params": {"temperature": 25}},
          {"sequence": 4, "device_type": "Speaker", "action": "On", "params": {"volume": 25, "source": "古筝曲"}},
@@ -110,14 +107,14 @@ SCENES = [
     {"scene_id": "SCN_MEETING", "name": "Meeting", "label": "会议模式", "trigger_type": "Manual",
      "applicable_room_types": ["MeetingRoom"],
      "rules": [
-         {"sequence": 1, "device_type": "Light", "action": "On", "params": {"brightness": 90, "color_temp": 5000}},
+         {"sequence": 1, "device_type": "Light", "action": "On", "params": {}},
          {"sequence": 2, "device_type": "Curtain", "action": "Open", "params": {}},
          {"sequence": 3, "device_type": "AC", "action": "Temperature", "params": {"temperature": 24}},
      ]},
     {"scene_id": "SCN_KARAOKE", "name": "Karaoke", "label": "K歌模式", "trigger_type": "Manual",
      "applicable_room_types": ["TeaRoom"],
      "rules": [
-         {"sequence": 1, "device_type": "Light", "action": "On", "params": {"brightness": 30, "color_temp": 2500}},
+         {"sequence": 1, "device_type": "Light", "action": "On", "params": {}},
          {"sequence": 2, "device_type": "Curtain", "action": "Close", "params": {}},
          {"sequence": 3, "device_type": "AC", "action": "Temperature", "params": {"temperature": 22}},
          {"sequence": 4, "device_type": "Speaker", "action": "On", "params": {"volume": 60, "source": "K歌"}},
@@ -358,14 +355,8 @@ def _mock_control(device_id: str, action: str, params: dict) -> dict:
     elif device["type"] == "Light":
         if action == "on":
             attrs["power"] = True
-            if "brightness" in params:
-                attrs["brightness"] = params["brightness"]
-            if "color_temp" in params:
-                attrs["color_temp"] = params["color_temp"]
         elif action == "off":
             attrs["power"] = False
-        elif action == "brightness":
-            attrs["brightness"] = params.get("brightness", 80)
             attrs["power"] = True
     elif device["type"] == "Curtain":
         if action == "open":

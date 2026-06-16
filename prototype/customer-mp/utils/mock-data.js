@@ -102,19 +102,19 @@ const customers = [
 // 场景
 const scenes = [
   { sceneId: "SC001", name: "迎宾模式", icon: "👋", color: "#07c160",
-    params: { curtain: "open", lights: { on: true, brightness: 80, colorTemp: 3500 }, ac: { on: true, temp: 26 }, music: { on: true, track: "bgm_welcome" } } },
+    params: { curtain: "open", lights: { on: true }, ac: { on: true, temp: 26 }, music: { on: true, track: "bgm_welcome" } } },
   { sceneId: "SC002", name: "茶艺模式", icon: "🍵", color: "#e37318",
-    params: { curtain: "open", lights: { on: true, brightness: 70, colorTemp: 3000 }, ac: { on: true, temp: 26 }, music: { on: true, track: "bgm_tea" } } },
+    params: { curtain: "open", lights: { on: true }, ac: { on: true, temp: 26 }, music: { on: true, track: "bgm_tea" } } },
   { sceneId: "SC003", name: "会议模式", icon: "💼", color: "#0052d9",
-    params: { curtain: "closed", lights: { on: true, brightness: 100, colorTemp: 5000 }, ac: { on: true, temp: 22 } } },
+    params: { curtain: "closed", lights: { on: true }, ac: { on: true, temp: 22 } } },
   { sceneId: "SC004", name: "娱乐模式", icon: "🎤", color: "#9c27b0",
-    params: { curtain: "closed", lights: { on: true, brightness: 60, colorTemp: 2500 }, ac: { on: true, temp: 24 }, music: { on: true, track: "bgm_karaoke" } } },
+    params: { curtain: "closed", lights: { on: true }, ac: { on: true, temp: 24 }, music: { on: true, track: "bgm_karaoke" } } },
   { sceneId: "SC005", name: "节能模式", icon: "💚", color: "#607d8b",
-    params: { curtain: "closed", lights: { on: false, brightness: 0 }, ac: { on: false } } },
+    params: { curtain: "closed", lights: { on: false }, ac: { on: false } } },
   { sceneId: "SC006", name: "营业前准备", icon: "🔧", color: "#ff5722",
-    params: { curtain: "open", lights: { on: true, brightness: 100, colorTemp: 5000 }, ac: { on: true, temp: 24 }, music: { on: true, track: "bgm_preopen" } } },
+    params: { curtain: "open", lights: { on: true }, ac: { on: true, temp: 24 }, music: { on: true, track: "bgm_preopen" } } },
   { sceneId: "SC007", name: "打扫完成", icon: "🧹", color: "#607d8b",
-    params: { curtain: "closed", lights: { on: false, brightness: 0 }, ac: { on: false }, music: { on: false } } }
+    params: { curtain: "closed", lights: { on: false }, ac: { on: false }, music: { on: false } } }
 ]
 
 // 商品

@@ -51,14 +51,14 @@ Page({
 
   _syncParams: function(devices) {
     var flat = { hasAC:false, acOn:false, acTemp:24, acMode:'cool',
-      hasLight:false, lightOn:false, lightBrightness:80, lightColorTemp:4000,
+      hasLight:false, lightOn:false,
       hasCurtain:false, curtainOn:false, curtainPosition:50,
       hasSpeaker:false, speakerOn:false, speakerVolume:30,
       hasLock:false, lockLocked:false, hasFan:false }
     for (var i = 0; i < devices.length; i++) {
       var d = devices[i], a = d.attributes || {}
       if (d.type === 'AC') { flat.hasAC = true; flat.acOn = d.on; flat.acTemp = a.target_temperature || a.temperature || 24; flat.acMode = a.mode || 'cool' }
-      if (d.type === 'Light') { flat.hasLight = true; flat.lightOn = d.on; flat.lightBrightness = a.brightness || 80; flat.lightColorTemp = a.color_temp || 4000 }
+      if (d.type === 'Light') { flat.hasLight = true; flat.lightOn = d.on }
       if (d.type === 'Curtain') { flat.hasCurtain = true; flat.curtainOn = d.on; flat.curtainPosition = a.current_position || (d.on ? 100 : 0) }
       if (d.type === 'Speaker' || d.type === 'BGM') { flat.hasSpeaker = true; flat.speakerOn = d.on; flat.speakerVolume = a.volume || 30 }
       if (d.type === 'Lock') { flat.hasLock = true; flat.lockLocked = a.locked !== false }

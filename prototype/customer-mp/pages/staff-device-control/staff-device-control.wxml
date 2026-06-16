@@ -33,26 +33,11 @@
       </view>
     </view>
 
-    <!-- ── 灯光 ── -->
+    <!-- ── 灯光（纯开关，不支持调光调色）── -->
     <view class="ctrl-section" wx:if="{{hasLight}}">
       <view class="cs-header">
         <text class="cs-title">💡 灯光</text>
         <switch checked="{{lightOn}}" bindchange="toggleLight" color="#5D8A6B" />
-      </view>
-      <view wx:if="{{lightOn}}">
-        <view class="param-row">
-          <text class="p-label">亮度 {{lightBrightness}}%</text>
-          <slider min="10" max="100" value="{{lightBrightness}}" bindchange="setLightBrightness" block-size="18" activeColor="#5D8A6B" />
-        </view>
-        <view class="param-row">
-          <text class="p-label">色温</text>
-          <view class="color-chips">
-            <view class="c-chip {{lightColorTemp==2700?'active':''}}" bindtap="setLightColorTemp" data-temp="2700">🌅 暖光</view>
-            <view class="c-chip {{lightColorTemp==3000?'active':''}}" bindtap="setLightColorTemp" data-temp="3000">🌤 暖白</view>
-            <view class="c-chip {{lightColorTemp==4000?'active':''}}" bindtap="setLightColorTemp" data-temp="4000">☀️ 冷白</view>
-            <view class="c-chip {{lightColorTemp==5000?'active':''}}" bindtap="setLightColorTemp" data-temp="5000">💡 日光</view>
-          </view>
-        </view>
       </view>
     </view>
 
