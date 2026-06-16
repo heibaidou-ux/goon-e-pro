@@ -231,10 +231,13 @@ Page({
       wx.showToast({ title: order.doorHint || '暂不能开门', icon: 'none' })
       return
     }
+    // 触发迎宾模式
+    var roomId = order.roomId || ''
+    if (roomId) { API.executeScene(roomId, 'Welcome').catch(function() {}) }
     var timeParts = (order.timeStr || '').split(' ').pop().split('-')
     var startStr = timeParts.length >= 1 ? timeParts[0].trim() : ''
     var endStr = timeParts.length >= 2 ? timeParts[1].trim() : ''
-    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+(order.roomId||'')+'&roomName='+encodeURIComponent(order.roomName||'')+'&start='+startStr+'&end='+endStr+'&duration='+(order.remaining ? Math.ceil(order.remaining/60) : 120) })
+    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(order.roomName||'')+'&start='+startStr+'&end='+endStr+'&duration='+(order.remaining ? Math.ceil(order.remaining/60) : 120) })
   },
 
   goRoomControl: function(e) {

@@ -142,7 +142,7 @@ Page({
   // ── 操作弹窗 ──
   hideActionSheet: function() { this.setData({ showActionSheet: false }) },
 
-  doCheckIn: function() { this.hideActionSheet(); wx.showToast({ title: '✅ 已确认到店', icon: 'none' }); this.loadRooms() },
+  doCheckIn: function() { this.hideActionSheet(); var api=require('../../../utils/api'); if(this.data.actionRoomId) api.executeScene(this.data.actionRoomId,'Welcome').catch(function(){}); wx.showToast({ title: '✅ 已确认到店', icon: 'none' }); this.loadRooms() },
   doCancelBooking: function() { this.hideActionSheet(); wx.showToast({ title: '预约已取消', icon: 'none' }); this.loadRooms() },
   doForceCheckout: function() { this.hideActionSheet(); wx.showToast({ title: '🏁 已强制退房', icon: 'none' }); this.loadRooms() },
   doExtend: function() {

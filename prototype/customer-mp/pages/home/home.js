@@ -146,8 +146,8 @@ Page({
   goStaffLogin: function() { wx.navigateTo({ url: '/pages/staff/staff-login/staff-login' }) },
   goCartPage: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?tab=cart' }) },
 
-  goSmartControl: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', s = order.start || '', e = order.end || '', dur = order.duration || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&start='+s+'&end='+e+'&duration='+dur }) },
-  openDoor: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', s = order.start || '', e = order.end || '', dur = order.duration || ''; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&start='+s+'&end='+e+'&duration='+dur }) },
+  goSmartControl: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', s = order.start || '', e = order.end || '', dur = order.duration || ''; if (roomId) { API.executeScene(roomId, 'Welcome').catch(function() {}) }; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&start='+s+'&end='+e+'&duration='+dur }) },
+  openDoor: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', s = order.start || '', e = order.end || '', dur = order.duration || ''; if (roomId) { API.executeScene(roomId, 'Welcome').catch(function() {}) }; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&start='+s+'&end='+e+'&duration='+dur }) },
   callService: function() { wx.showToast({ title: '📞 已通知店员', icon: 'none' }) },
   callPhone: function() {
     var self = this

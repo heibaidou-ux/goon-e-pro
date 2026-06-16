@@ -145,6 +145,11 @@ Page({
     })
   },
 
-  checkIn: function(e){wx.showToast({title:'已办理入住',icon:'success'})},
+  checkIn: function(e){
+    var id=e.currentTarget.dataset.id,orders=this.data.orders,roomId=''
+    for(var i=0;i<orders.length;i++){if(orders[i].orderId===id||orders[i].id===id){roomId=orders[i].roomId||'';break}}
+    if(roomId){var api=require('../../../utils/api');api.executeScene(roomId,'Welcome').catch(function(){})}
+    wx.showToast({title:'已办理入住',icon:'success'})
+  },
   completeOrder: function(e){wx.showToast({title:'订单已完成',icon:'success'})}
 })
