@@ -66,9 +66,9 @@
         <text class="section-label">选择时长</text>
         <view class="duration-grid">
           <view class="duration-chip {{!isCustomMode && selectedDuration==120 ? 'selected' : ''}}" bindtap="pickDuration" data-dur="120">2小时</view>
+          <view class="duration-chip {{!isCustomMode && selectedDuration==180 ? 'selected' : ''}}" bindtap="pickDuration" data-dur="180">3小时</view>
           <view class="duration-chip {{!isCustomMode && selectedDuration==240 ? 'selected' : ''}}" bindtap="pickDuration" data-dur="240">4小时</view>
           <view class="duration-chip {{!isCustomMode && selectedDuration==360 ? 'selected' : ''}}" bindtap="pickDuration" data-dur="360">6小时</view>
-          <view class="duration-chip {{!isCustomMode && selectedDuration==480 ? 'selected' : ''}}" bindtap="pickDuration" data-dur="480">8小时</view>
           <view class="duration-chip {{isCustomMode ? 'selected custom-input-chip' : ''}}" wx:if="{{!isCustomMode}}" bindtap="pickCustomDuration">自定义</view>
           <view class="duration-chip selected custom-input-chip" wx:else>
             <input class="custom-inline-input" type="text" value="{{customHours}}" bindinput="onCustomHoursInput" placeholder="" />
