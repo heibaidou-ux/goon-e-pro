@@ -102,7 +102,7 @@ const customers = [
 // 场景
 const scenes = [
   { sceneId: "SC001", name: "迎宾模式", icon: "👋", color: "#07c160",
-    params: { curtain: "open", lights: { on: true, brightness: 90, colorTemp: 3500 }, ac: { on: true, temp: 24 }, music: { on: true, track: "bgm_welcome" } } },
+    params: { curtain: "open", lights: { on: true, brightness: 80, colorTemp: 3500 }, ac: { on: true, temp: 26 }, music: { on: true, track: "bgm_welcome" } } },
   { sceneId: "SC002", name: "茶艺模式", icon: "🍵", color: "#e37318",
     params: { curtain: "open", lights: { on: true, brightness: 70, colorTemp: 3000 }, ac: { on: true, temp: 26 }, music: { on: true, track: "bgm_tea" } } },
   { sceneId: "SC003", name: "会议模式", icon: "💼", color: "#0052d9",

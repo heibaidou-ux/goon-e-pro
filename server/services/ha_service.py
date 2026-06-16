@@ -93,10 +93,10 @@ SCENES = [
     {"scene_id": "SCN_WELCOME", "name": "Welcome", "label": "迎宾模式", "trigger_type": "Auto",
      "applicable_room_types": ["MeetingRoom", "TeaRoom"],
      "rules": [
-         {"sequence": 1, "device_type": "AC", "action": "Temperature", "params": {"temperature": 24}},
+         {"sequence": 1, "device_type": "AC", "action": "Temperature", "params": {"temperature": 26}},
          {"sequence": 2, "device_type": "Lock", "action": "Unlock", "params": {}},
          {"sequence": 3, "device_type": "Curtain", "action": "Open", "params": {}},
-         {"sequence": 4, "device_type": "Light", "action": "On", "params": {"brightness": 90, "color_temp": 3500}},
+         {"sequence": 4, "device_type": "Light", "action": "On", "params": {"brightness": 80, "color_temp": 3500}},
          {"sequence": 5, "device_type": "Speaker", "action": "On", "params": {"volume": 30, "source": "背景音乐"}},
      ]},
     {"scene_id": "SCN_TEA", "name": "TeaSession", "label": "品茶模式", "trigger_type": "Manual",

@@ -2,7 +2,7 @@ var API = require('../../utils/api')
 var STAFF_API = require('../../utils/staff-api')
 
 const ALL_SCENES = [
-  { id: 'Welcome', name: '欢迎', icon: '🚪', desc: '空调预开+开门+灯光+音乐', type: 'Auto', params: { temperature: 24, colorTemp: 3500, volume: 30 } },
+  { id: 'Welcome', name: '欢迎', icon: '🚪', desc: '空调预开+开门+灯光+音乐', type: 'Auto', params: { temperature: 26, colorTemp: 3500, volume: 30 } },
   { id: 'TeaSession', name: '品茗', icon: '🍵', desc: '暖光+轻音乐', type: 'Manual', params: { temperature: 24, colorTemp: 3000, volume: 40 } },
   { id: 'Meeting', name: '会议', icon: '💡', desc: '冷白光+静音', type: 'Manual', params: { temperature: 24, colorTemp: 4000, volume: 0 } },
   { id: 'Karaoke', name: 'K歌', icon: '🎤', desc: '彩灯+音响', type: 'Manual', params: { temperature: 24, colorTemp: 3500, volume: 80 } },
@@ -189,7 +189,7 @@ Page({
 
   resetParams: function() {
     var defaults = {
-      Welcome: { temperature: 24, colorTemp: 3500, volume: 30 },
+      Welcome: { temperature: 26, colorTemp: 3500, volume: 30 },
       TeaSession: { temperature: 24, colorTemp: 3000, volume: 40 },
       Meeting: { temperature: 24, colorTemp: 4000, volume: 0 },
       Karaoke: { temperature: 24, colorTemp: 3500, volume: 80 },
