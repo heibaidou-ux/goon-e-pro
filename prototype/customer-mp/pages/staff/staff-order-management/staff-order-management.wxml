@@ -5,91 +5,87 @@
       <text class="header-search-btn" bindtap="toggleSearch">🔍</text>
     </view>
 
-    <!-- 搜索栏 -->
     <view class="search-bar" wx:if="{{showSearch}}">
-      <input class="search-input" placeholder="搜索：姓名 / 手机号 / 日期" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="doSearch" />
+      <input class="search-input" placeholder="搜索：姓名/手机号/日期" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="doSearch" />
       <text class="search-btn" bindtap="doSearch">搜索</text>
     </view>
 
-    <view class="order-tabs">
-      <view class="order-tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">进行中</view>
+    <!-- 一级分类：房间/茶品 -->
+    <view class="type-tabs">
+      <view class="type-tab {{orderType==0?'active':''}}" bindtap="switchOrderType" data-type="0">🏠 房间订单</view>
+      <view class="type-tab {{orderType==1?'active':''}}" bindtap="switchOrderType" data-type="1">🛍️ 茶品订单</view>
+    </view>
+
+    <!-- 二级Tab -->
+    <view class="order-tabs" wx:if="{{orderType==0}}">
+      <view class="order-tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">使用中</view>
       <view class="order-tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">已预订</view>
       <view class="order-tab {{tabIndex==2?'active':''}}" bindtap="switchTab" data-tab="2">已完成</view>
       <view class="order-tab {{tabIndex==3?'active':''}}" bindtap="switchTab" data-tab="3">已失效</view>
     </view>
+    <view class="order-tabs" wx:if="{{orderType==1}}">
+      <view class="order-tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">📬 快递</view>
+      <view class="order-tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">🚶 自取</view>
+      <view class="order-tab {{tabIndex==2?'active':''}}" bindtap="switchTab" data-tab="2">🏠 店内消费</view>
+      <view class="order-tab {{tabIndex==3?'active':''}}" bindtap="switchTab" data-tab="3">已完成</view>
+    </view>
 
     <view class="order-list">
+      <!-- 房间订单 -->
+      <block wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{orderType==0}}">
+        <view class="order-card {{item.statusClass}}">
+          <view class="oc-header">
+            <view class="oc-room-tag room">房间</view>
+            <text class="oc-room">{{item.roomName}}</text>
+            <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
+          </view>
+          <text class="oc-time">{{item.date}} {{item.time}}</text>
+          <text class="oc-amount">¥{{item.amount}}</text>
+          <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}} <text wx:if="{{item.phone}}">{{item.phone}}</text></text>
+          <text class="oc-source" wx:if="{{item.customerSource}}">📌 来源：{{item.customerSource}}</text>
 
-      <!-- 进行中 -->
-      <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{tabIndex==0}}">
-        <view class="oc-header">
-          <text class="oc-room">{{item.roomName}}</text>
-          <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
+          <view class="oc-actions" wx:if="{{item.status=='InUse'}}">
+            <view class="oc-btn primary" bindtap="completeOrder" data-id="{{item.orderId}}">完成订单</view>
+            <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+          </view>
+          <view class="oc-actions" wx:if="{{item.status=='Booked'}}">
+            <view class="oc-btn primary" bindtap="checkIn" data-id="{{item.orderId}}">办理入住</view>
+            <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+          </view>
+          <view class="oc-actions" wx:if="{{item.status=='Completed' || item.status=='Expired'}}">
+            <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+          </view>
         </view>
-        <text class="oc-time">{{item.date}} {{item.time}}</text>
-        <text class="oc-amount">¥{{item.amount}}</text>
-        <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}}</text>
-        <text class="oc-source" wx:if="{{item.customerSource}}">📌 来源：{{item.customerSource}}</text>
-        <view class="oc-actions" wx:if="{{item.isRoomOrder}}">
-          <view class="oc-btn primary" bindtap="completeOrder" data-id="{{item.orderId}}">完成订单</view>
-          <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
-        </view>
-        <view class="oc-actions" wx:if="{{item.isTeaOrder && item.deliveryMethod=='express'}}">
-          <view class="oc-btn primary" bindtap="shipOrder" data-id="{{item.orderId}}">📬 发货</view>
-          <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
-        </view>
-        <view class="oc-actions" wx:if="{{item.isTeaOrder && item.deliveryMethod!='express'}}">
-          <view class="oc-btn primary" bindtap="completeDelivery" data-id="{{item.orderId}}">{{item.deliveryMethod=='inroom'?'🏠 已送达':'📦 发货'}}</view>
-          <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
-        </view>
-      </view>
+      </block>
 
-      <!-- 已预订 -->
-      <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{tabIndex==1}}">
-        <view class="oc-header">
-          <text class="oc-room">{{item.roomName}}</text>
-          <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
-        </view>
-        <text class="oc-time">{{item.date}} {{item.time}}</text>
-        <text class="oc-amount">¥{{item.amount}}</text>
-        <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}}</text>
-        <text class="oc-phone" wx:if="{{item.phone}}">📞 {{item.phone}}</text>
-        <text class="oc-source" wx:if="{{item.customerSource}}">📌 来源：{{item.customerSource}}</text>
-        <view class="oc-actions">
-          <view class="oc-btn primary" bindtap="checkIn" data-id="{{item.orderId}}">办理入住</view>
-          <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
-        </view>
-      </view>
+      <!-- 茶品订单 -->
+      <block wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{orderType==1}}">
+        <view class="order-card">
+          <view class="oc-header">
+            <view class="oc-room-tag tea">茶品</view>
+            <text class="oc-room">{{item.deliveryLabel}}</text>
+            <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
+          </view>
+          <text class="oc-time">{{item.date}}</text>
+          <text class="oc-amount">¥{{item.amount}}</text>
+          <text class="oc-items" wx:if="{{item.items && item.items.length}}">
+            <text wx:for="{{item.items}}" wx:key="name">{{item.name}}×{{item.qty||1}} </text>
+          </text>
+          <text class="oc-tracking" wx:if="{{item.trackingNum}}">运单号：{{item.trackingNum}}</text>
 
-      <!-- 已完成 -->
-      <view class="order-card" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{tabIndex==2}}">
-        <view class="oc-header">
-          <text class="oc-room">{{item.roomName}}</text>
-          <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
+          <view class="oc-actions" wx:if="{{item.deliveryMethod=='express' && item.status!='Shipped' && item.status!='Completed'}}">
+            <view class="oc-btn primary" bindtap="shipOrder" data-id="{{item.orderId}}">📬 发货</view>
+            <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+          </view>
+          <view class="oc-actions" wx:if="{{(item.deliveryMethod=='pickup'||item.deliveryMethod=='inroom') && item.status!='Completed'}}">
+            <view class="oc-btn primary" bindtap="completeDelivery" data-id="{{item.orderId}}">确认取货</view>
+            <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+          </view>
+          <view class="oc-actions" wx:if="{{item.status=='Completed' || item.status=='Shipped'}}">
+            <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
+          </view>
         </view>
-        <text class="oc-time">{{item.date}} {{item.time}}</text>
-        <text class="oc-amount">¥{{item.amount}}</text>
-        <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}}</text>
-        <view class="oc-actions">
-          <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
-        </view>
-      </view>
-
-      <!-- 已失效 -->
-      <view class="order-card expired" wx:for="{{filteredOrders}}" wx:key="orderId" wx:if="{{tabIndex==3}}">
-        <view class="oc-header">
-          <text class="oc-room">{{item.roomName}}</text>
-          <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
-        </view>
-        <text class="oc-time">{{item.date}} {{item.time}}</text>
-        <text class="oc-amount">¥{{item.amount}}</text>
-        <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}}</text>
-        <text class="oc-phone" wx:if="{{item.phone}}">📞 {{item.phone}}</text>
-        <view class="expired-notice">⏰ 已超过使用时间，自动失效</view>
-        <view class="oc-actions">
-          <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
-        </view>
-      </view>
+      </block>
 
       <view class="empty" wx:if="{{filteredOrders.length==0}}">
         <text>📋 暂无订单</text>
@@ -102,14 +98,14 @@
         <text class="modal-title">📋 订单详情</text>
         <view wx:if="{{detailOrder}}">
           <view class="detail-row"><text class="dl">订单</text><text class="dv">{{detailOrder.orderId}}</text></view>
-          <view class="detail-row" wx:if="{{detailOrder.isTeaOrder}}"><text class="dl">类型</text><text class="dv">茶品订单</text></view>
-          <view class="detail-row" wx:if="{{!detailOrder.isTeaOrder}}"><text class="dl">房间</text><text class="dv">{{detailOrder.roomName}}</text></view>
-          <view class="detail-row"><text class="dl">时段</text><text class="dv">{{detailOrder.time}}</text></view>
+          <view class="detail-row"><text class="dl">类型</text><text class="dv">{{detailOrder.orderType=='room'?'房间':'茶品'}}</text></view>
+          <view class="detail-row"><text class="dl">状态</text><text class="dv">{{detailOrder.statusLabel}}</text></view>
+          <view class="detail-row" wx:if="{{detailOrder.roomName}}"><text class="dl">房间</text><text class="dv">{{detailOrder.roomName}}</text></view>
+          <view class="detail-row"><text class="dl">时段</text><text class="dv">{{detailOrder.date}} {{detailOrder.time}}</text></view>
           <view class="detail-row"><text class="dl">金额</text><text class="dv">¥{{detailOrder.amount}}</text></view>
-          <view class="detail-row"><text class="dl">姓名</text><text class="dv">{{detailOrder.customerName || '—'}}</text></view>
-          <view class="detail-row"><text class="dl">电话</text><text class="dv">{{detailOrder.phone || '—'}}</text></view>
-          <view wx:if="{{detailOrder.deliveryMethod}}"><text class="dl">配送</text><text class="dv">{{detailOrder.deliveryLabel}}</text></view>
-
+          <view wx:if="{{detailOrder.customerName}}"><text class="dl">姓名</text><text class="dv">{{detailOrder.customerName}}</text></view>
+          <view wx:if="{{detailOrder.phone}}"><text class="dl">电话</text><text class="dv">{{detailOrder.phone}}</text></view>
+          <view wx:if="{{detailOrder.trackingNum}}"><text class="dl">运单号</text><text class="dv">{{detailOrder.trackingNum}}</text></view>
           <view class="source-section">
             <text class="source-title">👤 客户来源</text>
             <picker mode="selector" range="{{sourceOptions}}" bindchange="onSourceChange">
@@ -128,7 +124,7 @@
     <view class="modal-overlay" wx:if="{{showShipModal}}" bindtap="hideShipModal">
       <view class="modal" catchtap>
         <text class="modal-title">📬 发货</text>
-        <input class="form-input" placeholder="快递公司（如顺丰速运）" value="{{shipCarrier}}" bindinput="onShipCarrier" />
+        <input class="form-input" placeholder="快递公司" value="{{shipCarrier}}" bindinput="onShipCarrier" />
         <input class="form-input" placeholder="运单号" value="{{shipTrackingNum}}" bindinput="onShipTrackingNum" />
         <view class="modal-buttons">
           <view class="modal-btn cancel" bindtap="hideShipModal">取消</view>
