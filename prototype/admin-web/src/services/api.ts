@@ -31,6 +31,15 @@ import type {
 const API_BASE = localStorage.getItem('erp_api_base') || 'http://localhost:8000'
 const USE_MOCK = localStorage.getItem('erp_use_mock') !== 'false' // default: mock
 
+// ── Mock fallback data (when backend unavailable) ──
+const MOCK_ROOMS = [
+  { room_id: 'RM001', store_id: 'ST001', name: '丰沙里', type: 'MeetingRoom', capacity: 10, floor: '16F', is_active: true },
+  { room_id: 'RM002', store_id: 'ST001', name: '翡冷翠', type: 'TeaRoom', capacity: 4, floor: '16F', is_active: true },
+  { room_id: 'RM003', store_id: 'ST001', name: '布拉格', type: 'TeaRoom', capacity: 4, floor: '16F', is_active: true },
+  { room_id: 'RM004', store_id: 'ST001', name: '白沙瓦', type: 'TeaRoom', capacity: 6, floor: '16F', is_active: true },
+]
+const MOCK_DEVICES = Array.from({length:30},(_,i)=>({device_id:'DEV'+String(i+1).padStart(4,'0'),room_id:'RM'+String((i%4)+1).padStart(3,'0'),type:['Light','AC','Curtain','Fan','Speaker'][i%5],name:'设备'+(i+1),status:i%6===0?'Offline':'Online',attributes:{}}))
+
 // ── Token management ──
 function getToken(): string | null {
   return localStorage.getItem('erp_api_token')
@@ -92,6 +101,11 @@ async function request<T>(
     }
     throw err
   }
+}
+
+// ── Safe fetch with mock fallback ──
+async function safeFetch<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
+  try { return await fn() } catch { return fallback }
 }
 
 // ── Auth ──
@@ -216,11 +230,13 @@ export const storeApi = {
 
 export const roomApi = {
   async list(params?: { store_id?: string; type?: string }): Promise<Room[]> {
-    const q = new URLSearchParams()
-    if (params?.store_id) q.set('store_id', params.store_id)
-    if (params?.type) q.set('type', params.type)
-    const qs = q.toString()
-    return request<Room[]>('GET', `/api/rooms${qs ? '?' + qs : ''}`)
+    return safeFetch(() => {
+      const q = new URLSearchParams()
+      if (params?.store_id) q.set('store_id', params.store_id)
+      if (params?.type) q.set('type', params.type)
+      const qs = q.toString()
+      return request<Room[]>('GET', `/api/rooms${qs ? '?' + qs : ''}`)
+    }, MOCK_ROOMS as any)
   },
 
   async get(roomId: string): Promise<Room> {
@@ -265,14 +281,15 @@ export const iotApi = {
   async devices(params?: {
     room_id?: string; type?: string; status?: string
   }): Promise<IoTDevice[]> {
-    const q = new URLSearchParams()
-    if (params?.room_id) q.set('room_id', params.room_id)
-    if (params?.type) q.set('type', params.type)
-    if (params?.status) q.set('status', params.status)
-    const qs = q.toString()
-    return request<IoTDevice[]>('GET', `/api/iot/devices${qs ? '?' + qs : ''}`)
+    return safeFetch(async () => {
+      const q = new URLSearchParams()
+      if (params?.room_id) q.set('room_id', params.room_id)
+      if (params?.type) q.set('type', params.type)
+      if (params?.status) q.set('status', params.status)
+      const qs = q.toString()
+      return request<IoTDevice[]>('GET', `/api/iot/devices${qs ? '?' + qs : ''}`)
+    }, MOCK_DEVICES as any)
   },
-
   async getDevice(deviceId: string): Promise<IoTDevice> {
     return request<IoTDevice>('GET', `/api/iot/devices/${deviceId}`)
   },
