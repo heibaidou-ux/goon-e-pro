@@ -260,19 +260,21 @@ const API = {
 
   getAllOrders() {
     return delay().then(() => {
+      var today = new Date()
+      var ds = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0')
+      var h = today.getHours(), m = today.getMinutes()
+      var startH = (h + 1) % 24, endH = (h + 3) % 24
+
       var bookings = lsGet('bookings', [])
-      // 如果没有任何订单，注入一些示例数据用于展示房态
-      if (bookings.length === 0) {
-        var today = new Date()
-        var ds = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0')
-        var h = today.getHours(), m = today.getMinutes()
-        var startH = (h + 1) % 24, endH = (h + 3) % 24
-        bookings = [
-          { orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', phone:'138****8888', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() },
-          { orderId:'ORD002', roomId:'RM002', roomName:'翡冷翠', customerName:'李女士', phone:'139****6666', status:'Booked', date:ds, time:String(startH).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', amount:160, doorCode:'7391', created: new Date().toISOString() },
-          { orderId:'ORD003', roomId:'RM003', roomName:'布拉格', customerName:'王先生', phone:'137****5555', status:'Booked', date:ds, time:String(startH+2).padStart(2,'0')+':00-'+String(endH+3).padStart(2,'0')+':00', amount:120, doorCode:'5123', created: new Date().toISOString() },
-        ]
+      var hasRM004 = false, hasRM002 = false, hasRM003 = false
+      for (var i = 0; i < bookings.length; i++) {
+        if (bookings[i].roomId === 'RM004' && (bookings[i].status === 'InUse' || bookings[i].status === 'Booked')) hasRM004 = true
+        if (bookings[i].roomId === 'RM002' && bookings[i].status === 'Booked') hasRM002 = true
+        if (bookings[i].roomId === 'RM003' && bookings[i].status === 'Booked') hasRM003 = true
       }
+      if (!hasRM004) bookings.push({ orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() })
+      if (!hasRM002) bookings.push({ orderId:'ORD002', roomId:'RM002', roomName:'翡冷翠', customerName:'李女士', status:'Booked', date:ds, time:String(startH).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', amount:160, doorCode:'7391', created: new Date().toISOString() })
+      if (!hasRM003) bookings.push({ orderId:'ORD003', roomId:'RM003', roomName:'布拉格', customerName:'王先生', status:'Booked', date:ds, time:String(startH+2).padStart(2,'0')+':00-'+String(endH+3).padStart(2,'0')+':00', amount:120, doorCode:'5123', created: new Date().toISOString() })
       return bookings
     })
   },
