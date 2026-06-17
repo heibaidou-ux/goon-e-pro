@@ -53,6 +53,5 @@
       </view>
     </view>
   </view>
-  <staff-bottom-nav active="orders"></staff-bottom-nav>
-</view>
+</view>  <staff-bottom-nav active="orders"></staff-bottom-nav>
 </view>

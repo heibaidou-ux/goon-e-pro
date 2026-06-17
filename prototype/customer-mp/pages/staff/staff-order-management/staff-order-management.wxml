@@ -132,6 +132,5 @@
         </view>
       </view>
     </view>
-  </view>
-  <staff-bottom-nav active="orders"></staff-bottom-nav>
+  </view>  <staff-bottom-nav active="orders"></staff-bottom-nav>
 </view>

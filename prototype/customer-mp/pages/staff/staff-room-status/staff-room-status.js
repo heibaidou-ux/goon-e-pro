@@ -108,15 +108,16 @@ Page({
     for (var ri = 0; ri < roomIds.length; ri++) {
       (function(rid) {
         API.getRoomDevices(rid).then(function(devices) {
-          var lightsOn = 0, lightsTotal = 0, acOn = false, curtainOpen = false, speakerOn = false
+          var lightsOn = 0, lightsTotal = 0, acOn = false, curtainOpen = false, speakerOn = false, fanOn = false
           for (var di = 0; di < devices.length; di++) {
             var d = devices[di], a = d.attributes || {}
-            if (d.type === 'Light') { lightsTotal++; if (a.power || a.brightness > 0) lightsOn++ }
-            if (d.type === 'AC') acOn = a.mode && a.mode !== 'off'
-            if (d.type === 'Curtain') curtainOpen = a.position !== 'closed'
-            if (d.type === 'Speaker' || d.type === 'BGM') speakerOn = a.playing
+            if (d.type === 'Light') { lightsTotal++; if (d.brightness > 0 || a.brightness > 0 || d.power || a.power) lightsOn++ }
+            if (d.type === 'AC') acOn = (d.mode && d.mode !== 'off') || (a.mode && a.mode !== 'off')
+            if (d.type === 'Curtain') curtainOpen = (d.position !== 'closed') && d.position !== undefined || (a.position !== 'closed')
+            if (d.type === 'Speaker' || d.type === 'BGM') speakerOn = d.playing || a.playing
+            if (d.type === 'Fan' || d.type === 'ExhaustFan') { if (d.speed > 0 || a.speed > 0) fanOn = true }
           }
-          deviceStatusMap[rid] = { lightsOn: lightsOn, lightsTotal: lightsTotal, acOn: acOn, curtainOpen: curtainOpen, speakerOn: speakerOn }
+          deviceStatusMap[rid] = { lightsOn: lightsOn, lightsTotal: lightsTotal, acOn: acOn, curtainOpen: curtainOpen, speakerOn: speakerOn, fanOn: fanOn }
           loaded++
           if (loaded >= roomIds.length) self.applyDeviceStatus(deviceStatusMap)
         }).catch(function(){loaded++;if(loaded>=roomIds.length)self.applyDeviceStatus(deviceStatusMap)})
@@ -134,6 +135,7 @@ Page({
       parts.push(ds.curtainOpen ? '🪟开' : '🪟关')
       parts.push(ds.acOn ? '❄️开' : '❄️关')
       parts.push(ds.speakerOn ? '🔊开' : '🔊关')
+      if (ds.fanOn) parts.push('🌀开')
       rooms[i].deviceStatus = parts.join(' ')
     }
     this.setData({ rooms: rooms })

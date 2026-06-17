@@ -114,6 +114,5 @@
       </view>
       <view class="rpm-item cancel" bindtap="hideRoomPicker">关闭</view>
     </view>
-  </view>
-  <staff-bottom-nav active="device"></staff-bottom-nav>
+  </view>  <staff-bottom-nav active="device"></staff-bottom-nav>
 </view>

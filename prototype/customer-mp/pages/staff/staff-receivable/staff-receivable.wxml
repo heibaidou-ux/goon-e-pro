@@ -28,6 +28,5 @@
     </view>
     <view class="empty" wx:if="{{bills.length==0}}"><text>✅ 暂无待收款</text></view>
   </view>
-  <staff-bottom-nav active="orders"></staff-bottom-nav>
-</view>
+</view>  <staff-bottom-nav active="orders"></staff-bottom-nav>
 </view>

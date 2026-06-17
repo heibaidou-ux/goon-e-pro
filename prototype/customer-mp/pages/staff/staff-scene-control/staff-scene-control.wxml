@@ -109,7 +109,5 @@
         <view class="ma-btn primary" bindtap="confirmScene">确认切换</view>
       </view>
     </view>
-  </view>
-
-  <staff-bottom-nav active="device"></staff-bottom-nav>
+  </view>  <staff-bottom-nav active="device"></staff-bottom-nav>
 </view>

@@ -49,6 +49,5 @@
       </view>
     </view>
   </view>
-  <staff-bottom-nav active="dashboard"></staff-bottom-nav>
-</view>
+</view>  <staff-bottom-nav active="dashboard"></staff-bottom-nav>
 </view>

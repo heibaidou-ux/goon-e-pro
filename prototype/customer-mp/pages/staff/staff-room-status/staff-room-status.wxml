@@ -111,6 +111,5 @@
         </view>
       </view>
     </view>
-  </view>
-  <staff-bottom-nav active="dashboard"></staff-bottom-nav>
+  </view>  <staff-bottom-nav active="dashboard"></staff-bottom-nav>
 </view>

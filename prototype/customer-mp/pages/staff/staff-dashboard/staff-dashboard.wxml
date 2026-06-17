@@ -115,6 +115,5 @@
       </view>
       <view class="door-menu-item cancel" bindtap="hideDoorMenu">取消</view>
     </view>
-  </view>
-
-  <staff-bottom-nav active="dashboard"></staff-bottom-nav></view>
+  </view>  <staff-bottom-nav active="dashboard"></staff-bottom-nav>
+</view>

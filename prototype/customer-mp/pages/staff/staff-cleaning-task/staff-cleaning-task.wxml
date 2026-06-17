@@ -34,6 +34,5 @@
         <text>✅ 暂无进行中</text>
       </view>
     </view>
-  </view>
-  <staff-bottom-nav active="todo"></staff-bottom-nav>
+  </view>  <staff-bottom-nav active="todo"></staff-bottom-nav>
 </view>

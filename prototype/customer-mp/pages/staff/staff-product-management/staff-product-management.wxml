@@ -43,7 +43,7 @@
     </view>
   </view>
 </view>
-<staff-bottom-nav active="orders"></staff-bottom-nav></view>
+</view>
 
 <!-- 盘点弹窗 -->
 <view class="modal-overlay" wx:if="{{showStockModal}}" bindtap="hideStockModal">
@@ -69,5 +69,5 @@
       <view class="m-btn cancel" bindtap="hideTransferModal">取消</view>
       <view class="m-btn primary" bindtap="confirmTransfer">提交申请</view>
     </view>
-  </view>
+  </view>  <staff-bottom-nav active="orders"></staff-bottom-nav>
 </view>
