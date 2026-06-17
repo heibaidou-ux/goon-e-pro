@@ -4,9 +4,14 @@
       <text class="header-title">📡 设备监控</text>
       <text class="header-stats">在线 {{stats.online}}/{{stats.total}} · {{stats.rate}}</text>
     </view>
-    <picker mode="selector" range="{{roomOptions}}" bindchange="onRoomChange">
-      <view class="picker-bar">当前：{{selectedRoomName}} ▼</view>
-    </picker>
+
+    <!-- 房间筛选（点击弹出居中菜单） -->
+    <view class="picker-bar" bindtap="showRoomPicker">
+      <text class="pb-label">当前：</text>
+      <text class="pb-value">{{selectedRoomName}}</text>
+      <text class="pb-arrow">▾</text>
+    </view>
+
     <view class="device-list">
       <view class="device-item" wx:for="{{devices}}" wx:key="deviceId">
         <text class="device-icon">{{item.typeIcon}}</text>
@@ -18,5 +23,18 @@
       </view>
     </view>
   </view>
+
+  <!-- 居中房间选择弹窗 -->
+  <view class="modal-overlay modal-center" wx:if="{{showRoomPicker}}" bindtap="hideRoomPicker">
+    <view class="room-picker-modal" catchtap>
+      <text class="rpm-title">选择房间</text>
+      <view class="rpm-item {{selectedRoomName==item?'active':''}}" wx:for="{{roomOptions}}" wx:key="*this" wx:for-index="idx" bindtap="selectRoom" data-idx="{{idx}}">
+        <text>{{item}}</text>
+        <text wx:if="{{selectedRoomName==item}}" class="rpm-check">✓</text>
+      </view>
+      <view class="rpm-item cancel" bindtap="hideRoomPicker">关闭</view>
+    </view>
+  </view>
+
   <staff-bottom-nav active="device"></staff-bottom-nav>
 </view>
