@@ -18,8 +18,8 @@
 
     <!-- 二级Tab -->
     <view class="order-tabs" wx:if="{{orderType==0}}">
-      <view class="order-tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">使用中</view>
-      <view class="order-tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">已预订</view>
+      <view class="order-tab {{tabIndex==0?'active':''}}" bindtap="switchTab" data-tab="0">使用中<text class="tab-badge" wx:if="{{tabCounts[0]>0}}">{{tabCounts[0]}}</text></view>
+      <view class="order-tab {{tabIndex==1?'active':''}}" bindtap="switchTab" data-tab="1">已预订<text class="tab-badge purple" wx:if="{{tabCounts[1]>0}}">{{tabCounts[1]}}</text></view>
       <view class="order-tab {{tabIndex==2?'active':''}}" bindtap="switchTab" data-tab="2">已完成</view>
       <view class="order-tab {{tabIndex==3?'active':''}}" bindtap="switchTab" data-tab="3">已失效</view>
     </view>
@@ -49,7 +49,7 @@
             <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
           </view>
           <view class="oc-actions" wx:if="{{item.status=='Booked'}}">
-            <view class="oc-btn primary" bindtap="checkIn" data-id="{{item.orderId}}">办理入住</view>
+            <view class="oc-btn primary" bindtap="checkIn" data-id="{{item.orderId}}">开始使用</view>
             <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
           </view>
           <view class="oc-actions" wx:if="{{item.status=='Completed' || item.status=='Expired'}}">

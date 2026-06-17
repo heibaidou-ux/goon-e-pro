@@ -186,7 +186,7 @@ Page({
     this.hideRoomMenu()
     var api=require('../../../utils/api')
     if(this.data.menuRoomId) api.executeScene(this.data.menuRoomId,'Welcome').catch(function(){})
-    wx.showToast({ title: '✅ 已确认到店', icon: 'none' })
+    wx.showToast({ title: '✅ 已开始使用', icon: 'none' })
     this.loadRooms()
   },
 

@@ -59,7 +59,7 @@
         <view class="rm-item" wx:if="{{menuStatus=='inuse'}}" bindtap="menuForceCheckout">🏁 强制退房</view>
 
         <!-- 已预订专有 -->
-        <view class="rm-item primary" wx:if="{{menuStatus=='booked'}}" bindtap="menuCheckIn">✅ 确认到店</view>
+        <view class="rm-item primary" wx:if="{{menuStatus=='booked'}}" bindtap="menuCheckIn">✅ 开始使用</view>
         <view class="rm-item danger" wx:if="{{menuStatus=='booked'}}" bindtap="menuCancelBooking">✕ 取消预约</view>
 
         <view class="rm-item cancel" bindtap="hideRoomMenu">关闭</view>

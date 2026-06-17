@@ -9,7 +9,8 @@ Page({
     showShipModal: false, shipOrder: null,
     shipName: '', shipAddress: '', shipCarrier: '', shipTrackingNum: '',
     sourceOptions: ['到店','美团','抖音','大众点评','高德地图','小红书','会小二','老客户','电话预约','其他'],
-    searchKeyword: '', showSearch: false
+    searchKeyword: '', showSearch: false,
+    tabCounts: [0,0,0,0]
   },
 
   onShow: function() { this.loadOrders() },
@@ -101,7 +102,23 @@ Page({
     var kw=this.data.searchKeyword.trim()
     if(kw)list=list.filter(function(o){return(o.customerName&&o.customerName.indexOf(kw)>=0)||(o.phone&&o.phone.indexOf(kw)>=0)||(o.date&&o.date.indexOf(kw)>=0)})
 
-    this.setData({filteredOrders:list})
+    // 计算各Tab统计（用于角标）
+    var type = this.data.orderType
+    var allList = this.data.orders.filter(function(o){return type===0 ? o.orderType==='room' : o.orderType==='tea'})
+    var counts = [0,0,0,0]
+    if(type===0){
+      for(var i=0;i<allList.length;i++){
+        var s=allList[i].status
+        if(s==='InUse')counts[0]++;else if(s==='Booked')counts[1]++;else if(s==='Completed')counts[2]++;else if(s==='Expired')counts[3]++
+      }
+    }else{
+      for(var i=0;i<allList.length;i++){
+        var m=allList[i].deliveryMethod
+        if(allList[i].status==='Completed')counts[3]++
+        else if(m==='express')counts[0]++;else if(m==='pickup')counts[1]++;else if(m==='inroom')counts[2]++
+      }
+    }
+    this.setData({filteredOrders:list,tabCounts:counts})
   },
 
   toggleSearch: function(){this.setData({showSearch:!this.data.showSearch,searchKeyword:''})},
