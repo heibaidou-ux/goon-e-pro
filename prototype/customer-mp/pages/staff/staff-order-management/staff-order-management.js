@@ -7,7 +7,9 @@ Page({
     showDetail: false, detailOrder: null, editSource: '',
     showShipModal: false, shipOrder: null,
     shipName: '', shipAddress: '', shipCarrier: '', shipTrackingNum: '',
-    sourceOptions: ['到店','美团','抖音','大众点评','高德地图','小红书','会小二','老客户','电话预约','其他']
+    sourceOptions: ['到店','美团','抖音','大众点评','高德地图','小红书','会小二','老客户','电话预约','其他'],
+    // 搜索
+    searchKeyword: '', searchDate: '', showSearch: false
   },
 
   onShow: function() {
@@ -25,38 +27,46 @@ Page({
       // 房间订单
       var roomOrders = orders.map(function(o) {
         var status = o.status||'Booked'
-        if(status==='Booked'&&o.date===todayStr&&o.time){
+        if(status==='Booked'&&o.date&&o.time){
           var p=o.time.split('-')
-          if(p.length===2){var sm=parseInt(p[0].split(':')[0])*60+parseInt(p[0].split(':')[1]),em=parseInt(p[1].split(':')[0])*60+parseInt(p[1].split(':')[1]);if(curMin>=sm&&curMin<em)status='InUse';else if(curMin>=em)status='Completed'}
+          if(p.length===2){
+            var sm=parseInt(p[0].split(':')[0])*60+parseInt(p[0].split(':')[1])
+            var em=parseInt(p[1].split(':')[0])*60+parseInt(p[1].split(':')[1])
+            if(o.date===todayStr){
+              if(curMin>=sm&&curMin<em)status='InUse'
+              else if(curMin>=em)status='Expired'
+            }else if(new Date(o.date)<new Date(todayStr)) status='Expired'
+          }
         }
+        var statusClass='status-completed',statusLabel='已完成'
+        if(status==='InUse'){statusClass='status-inuse';statusLabel='进行中'}
+        else if(status==='Booked'){statusClass='status-booked';statusLabel='已预订'}
+        else if(status==='Expired'){statusClass='status-expired';statusLabel='已失效'}
         return{
           orderId:o.orderId,roomName:o.roomName||'房间',roomId:o.roomId||'',status:status,
           date:o.date||'',time:o.time||'',amount:o.amount||0,customerName:o.customerName||'',
           phone:o.phone||'',customerSource:o.customerSource||'',isRoomOrder:true,isTeaOrder:false,
-          statusClass:status==='InUse'?'status-inuse':(status==='Booked'?'status-booked':'status-completed'),
-          statusLabel:status==='InUse'?'进行中':(status==='Booked'?'已预订':'已完成')
+          statusClass:statusClass,statusLabel:statusLabel
         }
       })
 
       // 茶品订单
       for(var si=0;si<shopOrders.length;si++){
         var so=shopOrders[si]
-        var storedStatus = so.status || 'PendingDelivery'
-        // 映射真实状态
-        var shopStatus = storedStatus
-        if (storedStatus === 'Shipped') shopStatus = 'Shipped'
-        else if (storedStatus === 'Completed') shopStatus = 'Completed'
-        else shopStatus = 'PendingDelivery'
-        var labelMap = { 'inroom':'配送中', 'express': shopStatus==='Shipped'?'已发货':'待发货', 'pickup':'待取货' }
+        var shopStatus = so.status||'PendingDelivery'
+        if(shopStatus==='Shipped')shopStatus='Shipped'
+        else if(shopStatus==='Completed')shopStatus='Completed'
+        else shopStatus='PendingDelivery'
+        var labelMap={'inroom':'配送中','express':shopStatus==='Shipped'?'已发货':'待发货','pickup':'待取货'}
         roomOrders.push({
           orderId:so.orderId,roomName:'茶品订单',roomId:'',status:shopStatus,isRoomOrder:false,isTeaOrder:true,
           date:so.created?so.created.slice(0,10):'',time:so.created?so.created.slice(11,16):'',
           amount:so.total||0,customerName:'',phone:'',customerSource:'',
           deliveryMethod:so.deliveryMethod||'',
-          deliveryLabel: so.deliveryMethod==='express' && shopStatus==='Shipped' ? '已发货' : (labelMap[so.deliveryMethod]||'处理中'),
+          deliveryLabel:so.deliveryMethod==='express'&&shopStatus==='Shipped'?'已发货':(labelMap[so.deliveryMethod]||'处理中'),
           trackingNum:so.trackingNum||'',
-          statusClass: shopStatus==='Shipped'||shopStatus==='Completed'?'status-completed':'status-inuse',
-          statusLabel: shopStatus==='Completed'?'已完成':(shopStatus==='Shipped'?'已发货':(shopStatus==='PendingDelivery'?'待处理':'处理中'))
+          statusClass:shopStatus==='Shipped'||shopStatus==='Completed'?'status-completed':'status-inuse',
+          statusLabel:shopStatus==='Completed'?'已完成':(shopStatus==='Shipped'?'已发货':(shopStatus==='PendingDelivery'?'待处理':'处理中'))
         })
       }
 
@@ -71,13 +81,31 @@ Page({
     if(tab===0)list=list.filter(function(o){return o.status==='InUse'||o.status==='PendingDelivery'})
     else if(tab===1)list=list.filter(function(o){return o.status==='Booked'})
     else if(tab===2)list=list.filter(function(o){return o.status==='Completed'||o.status==='Shipped'})
+    else if(tab===3)list=list.filter(function(o){return o.status==='Expired'})
+
+    // 搜索过滤
+    var kw = this.data.searchKeyword.trim()
+    if(kw){
+      list=list.filter(function(o){
+        var nameMatch = o.customerName && o.customerName.indexOf(kw)>=0
+        var phoneMatch = o.phone && o.phone.indexOf(kw)>=0
+        var dateMatch = o.date && o.date.indexOf(kw)>=0
+        return nameMatch||phoneMatch||dateMatch
+      })
+    }
+
     this.setData({filteredOrders:list})
   },
 
   switchTab: function(e) {
-    this.setData({tabIndex:parseInt(e.currentTarget.dataset.tab)})
+    this.setData({tabIndex:parseInt(e.currentTarget.dataset.tab),searchKeyword:''})
     this.filterOrders()
   },
+
+  // ── 搜索 ──
+  toggleSearch: function(){this.setData({showSearch:!this.data.showSearch,searchKeyword:''})},
+  onSearchInput: function(e){this.setData({searchKeyword:e.detail.value})},
+  doSearch: function(){this.filterOrders()},
 
   showOrderDetail: function(e) {
     var id=e.currentTarget.dataset.id,orders=this.data.orders
@@ -99,20 +127,11 @@ Page({
 
   // ── 发货 ──
   shipOrder: function(e) {
-    var id=e.currentTarget.dataset.id
-    var orders=this.data.orders
+    var id=e.currentTarget.dataset.id;var orders=this.data.orders
     for(var i=0;i<orders.length;i++){
-      if(orders[i].orderId===id){
-        this.setData({
-          showShipModal:true,shipOrder:orders[i],
-          shipCarrier:'',shipTrackingNum:'',
-          shipName:'',shipAddress:''
-        })
-        break
-      }
+      if(orders[i].orderId===id){this.setData({showShipModal:true,shipOrder:orders[i],shipCarrier:'',shipTrackingNum:'',shipName:'',shipAddress:''});break}
     }
   },
-
   onShipCarrier: function(e){this.setData({shipCarrier:e.detail.value})},
   onShipTrackingNum: function(e){this.setData({shipTrackingNum:e.detail.value})},
 
@@ -130,7 +149,6 @@ Page({
     this.setData({showShipModal:false})
     this.loadOrders()
   },
-
   hideShipModal: function(){this.setData({showShipModal:false})},
 
   // ── 配送完成 ──

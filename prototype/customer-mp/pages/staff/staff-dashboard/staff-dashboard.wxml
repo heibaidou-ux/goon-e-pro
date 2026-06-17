@@ -26,7 +26,7 @@
     <view class="stat-card" bindtap="goOrders">
       <text class="stat-icon">📦</text>
       <text class="stat-num">{{stats.orderStatus || stats.todayOrders}}</text>
-      <text class="stat-label">订单状态</text>
+      <text class="stat-label">今日订单</text>
     </view>
     <view class="stat-card {{stats.alerts > 0 ? 'alert' : ''}}" bindtap="goDeviceMonitor">
       <text class="stat-icon">{{stats.alerts > 0 ? '⚠️' : '✅'}}</text>
