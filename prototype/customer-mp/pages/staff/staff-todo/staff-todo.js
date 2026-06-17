@@ -52,11 +52,11 @@ Page({
   goTo: function(e) {
     var page = e.currentTarget.dataset.page
     var urls = {
-      cleaning: '/pages/staff-cleaning-task/staff-cleaning-task',
-      reconciliation: '/pages/staff-reconciliation/staff-reconciliation',
-      alerts: '/pages/staff-device-monitor/staff-device-monitor',
-      inspection: '/pages/staff-inspection/staff-inspection',
-      audit: '/pages/staff-reconciliation/staff-reconciliation'
+      cleaning: '/pages/staff/staff-cleaning-task/staff-cleaning-task',
+      reconciliation: '/pages/staff/staff-reconciliation/staff-reconciliation',
+      alerts: '/pages/staff/staff-device-monitor/staff-device-monitor',
+      inspection: '/pages/staff/staff-inspection/staff-inspection',
+      audit: '/pages/staff/staff-reconciliation/staff-reconciliation'
     }
     var url = urls[page]
     if (url) wx.navigateTo({ url: url })

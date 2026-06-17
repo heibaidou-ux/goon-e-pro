@@ -80,9 +80,9 @@ Page({
   },
 
   // 四宫格跳转
-  goTodo: function() { wx.navigateTo({ url: '/pages/staff-todo/staff-todo' }) },
-  goOrders: function() { wx.navigateTo({ url: '/pages/staff-order-management/staff-order-management' }) },
-  goDeviceMonitor: function() { wx.navigateTo({ url: '/pages/staff-device-monitor/staff-device-monitor' }) },
+  goTodo: function() { wx.navigateTo({ url: '/pages/staff/staff-todo/staff-todo' }) },
+  goOrders: function() { wx.navigateTo({ url: '/pages/staff/staff-order-management/staff-order-management' }) },
+  goDeviceMonitor: function() { wx.navigateTo({ url: '/pages/staff/staff-device-monitor/staff-device-monitor' }) },
 
   // 快捷按钮：验券、开门、监控、对账
   goCouponVerify: function() { wx.navigateTo({ url: '/pages/coupon-verify/coupon-verify' }) },
@@ -102,19 +102,19 @@ Page({
   },
 
   goReconciliation: function() {
-    wx.navigateTo({ url: '/pages/staff-reconciliation/staff-reconciliation' })
+    wx.navigateTo({ url: '/pages/staff/staff-reconciliation/staff-reconciliation' })
   },
 
   // 更多功能：考勤/商品管理/巡检/排班
-  goAttendance: function() { wx.navigateTo({ url: '/pages/staff-attendance/staff-attendance' }) },
-  goProducts: function() { wx.navigateTo({ url: '/pages/staff-product-management/staff-product-management' }) },
-  goInspection: function() { wx.navigateTo({ url: '/pages/staff-inspection/staff-inspection' }) },
-  goScheduling: function() { wx.navigateTo({ url: '/pages/staff-scheduling/staff-scheduling' }) },
+  goAttendance: function() { wx.navigateTo({ url: '/pages/staff/staff-attendance/staff-attendance' }) },
+  goProducts: function() { wx.navigateTo({ url: '/pages/staff/staff-product-management/staff-product-management' }) },
+  goInspection: function() { wx.navigateTo({ url: '/pages/staff/staff-inspection/staff-inspection' }) },
+  goScheduling: function() { wx.navigateTo({ url: '/pages/staff/staff-scheduling/staff-scheduling' }) },
 
   // 保留旧导航供其他引用
-  goRoomStatus: function() { wx.navigateTo({ url: '/pages/staff-room-status/staff-room-status' }) },
-  goCleaning: function() { wx.navigateTo({ url: '/pages/staff-cleaning-task/staff-cleaning-task' }) },
-  goProfile: function() { wx.navigateTo({ url: '/pages/staff-profile/staff-profile' }) },
+  goRoomStatus: function() { wx.navigateTo({ url: '/pages/staff/staff-room-status/staff-room-status' }) },
+  goCleaning: function() { wx.navigateTo({ url: '/pages/staff/staff-cleaning-task/staff-cleaning-task' }) },
+  goProfile: function() { wx.navigateTo({ url: '/pages/staff/staff-profile/staff-profile' }) },
 
   // 退出登录
   doLogout: function() {

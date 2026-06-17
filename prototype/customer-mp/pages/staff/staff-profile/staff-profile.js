@@ -12,11 +12,11 @@ Page({
     } catch(e) {}
   },
 
-  goOrders() { wx.navigateTo({ url: '/pages/staff-order-management/staff-order-management' }) },
-  goAttendance() { wx.navigateTo({ url: '/pages/staff-attendance/staff-attendance' }) },
-  goScheduling() { wx.navigateTo({ url: '/pages/staff-scheduling/staff-scheduling' }) },
-  goReceivable() { wx.navigateTo({ url: '/pages/staff-receivable/staff-receivable' }) },
-  goReconciliation() { wx.navigateTo({ url: '/pages/staff-reconciliation/staff-reconciliation' }) },
+  goOrders() { wx.navigateTo({ url: '/pages/staff/staff-order-management/staff-order-management' }) },
+  goAttendance() { wx.navigateTo({ url: '/pages/staff/staff-attendance/staff-attendance' }) },
+  goScheduling() { wx.navigateTo({ url: '/pages/staff/staff-scheduling/staff-scheduling' }) },
+  goReceivable() { wx.navigateTo({ url: '/pages/staff/staff-receivable/staff-receivable' }) },
+  goReconciliation() { wx.navigateTo({ url: '/pages/staff/staff-reconciliation/staff-reconciliation' }) },
 
   doLogout() {
     var self = this
