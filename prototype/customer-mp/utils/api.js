@@ -277,8 +277,8 @@ const API = {
       for (var i = 0; i < bookings.length; i++) {
         if (bookings[i].date !== ds) continue
         if (bookings[i].roomId === 'RM004' && (bookings[i].status === 'InUse' || bookings[i].status === 'Booked')) hasRM004 = true
-        if (bookings[i].roomId === 'RM002' && bookings[i].status === 'Booked') hasRM002 = true
-        if (bookings[i].roomId === 'RM003' && bookings[i].status === 'Booked') hasRM003 = true
+        if (bookings[i].roomId === 'RM002' && (bookings[i].status === 'InUse' || bookings[i].status === 'Booked')) hasRM002 = true
+        if (bookings[i].roomId === 'RM003' && (bookings[i].status === 'InUse' || bookings[i].status === 'Booked')) hasRM003 = true
       }
       // 始终注入mock确保所有房间有代表数据
       bookings.push({ orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() })
@@ -413,16 +413,17 @@ const API = {
       var room = null
       for (var i = 0; i < MOCK.rooms.length; i++) { if (MOCK.rooms[i].roomId === roomId) { room = MOCK.rooms[i]; break } }
       if (!room) throw new Error('房间不存在')
-      // 检查是否有进行中订单
+      // 检查是否有进行中订单（任何房间均可扫码）
       var hasActive = false
+      var activeId = ''
       try {
         var bookings = wx.getStorageSync('mp_bookings') || []
         var today = new Date(); var ds = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0')
         for (var i = 0; i < bookings.length; i++) {
-          if (bookings[i].roomId === roomId && bookings[i].date === ds && bookings[i].status === 'InUse') { hasActive = true; break }
+          if (bookings[i].roomId === roomId && bookings[i].date === ds && bookings[i].status === 'InUse') { hasActive = true; activeId = bookings[i].orderId; break }
         }
       } catch(e) {}
-      return { roomId, roomName: room.name, storeId: 'ST001', storeName: '盈隆店', status: 'Active', hasActiveOrder: hasActive || roomId === 'RM004', activeOrderId: 'ORD001', message: '欢迎使用 ' + room.name }
+      return { roomId, roomName: room.name, storeId: 'ST001', storeName: '盈隆店', status: 'Active', hasActiveOrder: true, activeOrderId: activeId || 'ORD001', message: '欢迎使用 ' + room.name }
     })
   },
 
