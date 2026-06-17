@@ -8,9 +8,8 @@ Page({
     sourceOptions: ['到店','美团','抖音','大众点评','高德地图','小红书','会小二','老客户','电话预约','其他'],
     timeOptions: [], durationOptions: ['2小时','3小时','4小时','6小时'],
     durationValues: [120, 180, 240, 360],
-    // 弹窗
-    showActionSheet: false, actionRoomId: '', actionRoomName: '', actionType: '',
-    actionOrderId: '',
+    // 菜单弹窗
+    showRoomMenu: false, menuRoomId: '', menuRoomName: '', menuStatus: '', menuOrderId: '',
   },
 
   onShow: function() {
@@ -117,19 +116,49 @@ Page({
     var roomId = e.currentTarget.dataset.roomid
     var roomName = e.currentTarget.dataset.roomname
     var orderId = e.currentTarget.dataset.orderid || ''
+    this.setData({ showRoomMenu: true, menuRoomId: roomId, menuRoomName: roomName, menuStatus: status, menuOrderId: orderId })
+  },
 
-    if (status === 'free') {
-      var now = new Date()
-      var dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
-      this.setData({
-        showBookingModal: true, bookRoomId: roomId, bookRoomName: roomName,
-        bookName: '', bookPhone: '', bookDate: dateStr, bookStart: '', bookDuration: 120, bookDurationLabel: '2小时', bookSource: ''
-      })
-    } else if (status === 'inuse') {
-      this.setData({ showActionSheet: true, actionType: 'inuse', actionRoomId: roomId, actionRoomName: roomName, actionOrderId: orderId })
-    } else if (status === 'booked') {
-      this.setData({ showActionSheet: true, actionType: 'booked', actionRoomId: roomId, actionRoomName: roomName, actionOrderId: orderId })
-    }
+  hideRoomMenu: function() { this.setData({ showRoomMenu: false }) },
+
+  menuBooking: function() {
+    this.hideRoomMenu()
+    var now = new Date()
+    var dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
+    this.setData({
+      showBookingModal: true, bookRoomId: this.data.menuRoomId, bookRoomName: this.data.menuRoomName,
+      bookName: '', bookPhone: '', bookDate: dateStr, bookStart: '', bookDuration: 120, bookDurationLabel: '2小时', bookSource: ''
+    })
+  },
+
+  menuClean: function() {
+    this.hideRoomMenu()
+    wx.showToast({ title: '🧹 已安排保洁', icon: 'none' })
+  },
+
+  menuDevice: function() {
+    this.hideRoomMenu()
+    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+this.data.menuRoomId+'&roomName='+encodeURIComponent(this.data.menuRoomName) })
+  },
+
+  menuCheckIn: function() {
+    this.hideRoomMenu()
+    var api=require('../../../utils/api')
+    if(this.data.menuRoomId) api.executeScene(this.data.menuRoomId,'Welcome').catch(function(){})
+    wx.showToast({ title: '✅ 已确认到店', icon: 'none' })
+    this.loadRooms()
+  },
+
+  menuCancelBooking: function() {
+    this.hideRoomMenu()
+    wx.showToast({ title: '预约已取消', icon: 'none' })
+    this.loadRooms()
+  },
+
+  menuForceCheckout: function() {
+    this.hideRoomMenu()
+    wx.showToast({ title: '🏁 已强制退房', icon: 'none' })
+    this.loadRooms()
   },
 
   showBooking: function(e) { this.onRoomTap(e) },
@@ -137,17 +166,6 @@ Page({
     var roomId = e.currentTarget.dataset.roomid
     var roomName = e.currentTarget.dataset.roomname || ''
     wx.navigateTo({ url: '/pages/room-control/room-control?roomId=' + roomId + '&roomName=' + encodeURIComponent(roomName) })
-  },
-
-  // ── 操作弹窗 ──
-  hideActionSheet: function() { this.setData({ showActionSheet: false }) },
-
-  doCheckIn: function() { this.hideActionSheet(); var api=require('../../../utils/api'); if(this.data.actionRoomId) api.executeScene(this.data.actionRoomId,'Welcome').catch(function(){}); wx.showToast({ title: '✅ 已确认到店', icon: 'none' }); this.loadRooms() },
-  doCancelBooking: function() { this.hideActionSheet(); wx.showToast({ title: '预约已取消', icon: 'none' }); this.loadRooms() },
-  doForceCheckout: function() { this.hideActionSheet(); wx.showToast({ title: '🏁 已强制退房', icon: 'none' }); this.loadRooms() },
-  doExtend: function() {
-    this.hideActionSheet()
-    wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+this.data.actionRoomId+'&roomName='+encodeURIComponent(this.data.actionRoomName) })
   },
 
   // ── 预订表单 ──

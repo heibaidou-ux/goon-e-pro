@@ -36,28 +36,30 @@
         </view>
 
         <view class="rc-actions">
-          <text class="rca-btn primary" wx:if="{{item.statusClass=='free'}}" bindtap="showBooking" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}">📝 代客预订</text>
-          <text class="rca-btn primary" wx:if="{{item.statusClass=='inuse'}}" bindtap="showRoomControl" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}">🔧 智控</text>
-          <text class="rca-btn outline" wx:if="{{item.statusClass=='booked'}}" catchtap="onRoomTap" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}" data-status="{{item.statusClass}}">👤 确认到店</text>
+          <text class="rca-btn primary" catchtap="onRoomTap" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}" data-status="{{item.statusClass}}" data-orderid="{{item.currentOrder.orderId||''}}">📋 操作</text>
         </view>
       </view>
     </view>
 
-    <!-- 操作弹窗（使用中/已预订） -->
-    <view class="modal-overlay" wx:if="{{showActionSheet}}" bindtap="hideActionSheet">
-      <view class="action-sheet" catchtap>
-        <!-- 使用中 -->
-        <view class="as-title" wx:if="{{actionType=='inuse'}}">{{actionRoomName}} — 使用中</view>
-        <view class="as-title" wx:if="{{actionType=='booked'}}">{{actionRoomName}} — 已预订</view>
+    <!-- 房间操作菜单（居中弹窗） -->
+    <view class="modal-overlay modal-center" wx:if="{{showRoomMenu}}" bindtap="hideRoomMenu">
+      <view class="room-menu" catchtap>
+        <text class="rm-title">{{menuRoomName}}</text>
+        <text class="rm-status {{menuStatus}}">{{menuStatus=='free'?'空闲':(menuStatus=='inuse'?'使用中':'已预订')}}</text>
 
-        <view class="as-item primary" wx:if="{{actionType=='inuse'}}" bindtap="showRoomControl" data-roomid="{{actionRoomId}}" data-roomname="{{actionRoomName}}">🔧 设备控制</view>
-        <view class="as-item" wx:if="{{actionType=='inuse'}}" bindtap="doExtend">⏱ 续订</view>
-        <view class="as-item danger" wx:if="{{actionType=='inuse'}}" bindtap="doForceCheckout">🏁 强制退房</view>
+        <!-- 通用 -->
+        <view class="rm-item" bindtap="menuBooking">📝 代客预订</view>
+        <view class="rm-item" bindtap="menuClean">🧹 打扫房间</view>
+        <view class="rm-item" bindtap="menuDevice">🔧 设备控制</view>
 
-        <view class="as-item primary" wx:if="{{actionType=='booked'}}" bindtap="doCheckIn">✅ 确认到店</view>
-        <view class="as-item danger" wx:if="{{actionType=='booked'}}" bindtap="doCancelBooking">✕ 取消预约</view>
+        <!-- 使用中专有 -->
+        <view class="rm-item" wx:if="{{menuStatus=='inuse'}}" bindtap="menuForceCheckout">🏁 强制退房</view>
 
-        <view class="as-item cancel" bindtap="hideActionSheet">取消</view>
+        <!-- 已预订专有 -->
+        <view class="rm-item primary" wx:if="{{menuStatus=='booked'}}" bindtap="menuCheckIn">✅ 确认到店</view>
+        <view class="rm-item danger" wx:if="{{menuStatus=='booked'}}" bindtap="menuCancelBooking">✕ 取消预约</view>
+
+        <view class="rm-item cancel" bindtap="hideRoomMenu">关闭</view>
       </view>
     </view>
 
