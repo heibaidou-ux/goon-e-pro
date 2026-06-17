@@ -18,58 +18,83 @@ Page({
   onShow: function() {
     this.updateTime()
     var self = this
-    STAFF_API.getDashboardStats().then(function(stats) { self.setData({ stats: stats }) })
-    STAFF_API.getTodos().then(function(todos) { self.setData({ todos: todos }) })
-    // 用真实订单数据覆盖mock统计数据
+
+    // 统一从订单数据计算所有统计
+    var roomNames = ['RM001', 'RM002', 'RM003', 'RM004']
+    var totalRooms = roomNames.length
+    var bookedCount = 0, inUseCount = 0
+    var todayStr = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0')
+    var todayRevenue = 0, todayOrderCount = 0
+
     API.getAllOrders().then(function(orders) {
-      if (!orders || !orders.length) return
-      var todayStr = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0')
-      var todayOrders = orders.filter(function(o) { return o.date === todayStr || (o.created && o.created.indexOf(todayStr) === 0) })
-      var inUse = 0, pending = 0
-      for (var i = 0; i < orders.length; i++) {
-        if (orders[i].status === 'InUse') inUse++
-        if (orders[i].status === 'Booked' || orders[i].status === 'InUse') pending++
+      var allOrders = orders || []
+      var todayOrders = allOrders.filter(function(o) { return o.date === todayStr || (o.created && o.created.indexOf(todayStr) === 0) })
+
+      for (var i = 0; i < allOrders.length; i++) {
+        var o = allOrders[i]
+        if (roomNames.indexOf(o.roomId) === -1) continue
+        if (o.status === 'Booked') bookedCount++
+        if (o.status === 'InUse') inUseCount++
       }
-      var revenue = 0
-      for (var i = 0; i < todayOrders.length; i++) revenue += todayOrders[i].amount || 0
-      self.setData({ stats: { roomCount: { inUse: inUse }, todayRevenue: revenue, todayOrders: todayOrders.length, pendingTasks: pending, orderStatus: pending, alerts: 0 } })
+      for (var i = 0; i < todayOrders.length; i++) todayRevenue += todayOrders[i].amount || 0
+      todayOrderCount = todayOrders.length
+
+      var idleCount = totalRooms - inUseCount - bookedCount
+      self.setData({
+        roomOverview: { idle: idleCount, inUse: inUseCount, booked: bookedCount, cleaning: 0 },
+        stats: {
+          roomCount: { inUse: inUseCount },
+          todayRevenue: todayRevenue,
+          todayOrders: todayOrderCount,
+          pendingTasks: inUseCount + bookedCount,
+          orderStatus: todayOrderCount,
+          alerts: 0
+        }
+      })
     })
-    // 加载房态总览
-    STAFF_API.getRoomStatusList().then(function(rooms) {
-      if (!rooms || !rooms.length) return
-      var idle = 0, inUse = 0, booked = 0, cleaning = 0
-      for (var i = 0; i < rooms.length; i++) {
-        var r = rooms[i]
-        if (r.roomId === 'RM005' || r.roomId === 'RM006') continue
-        if (r.status === 'Active' || r.statusLabel === '空闲') idle++
-        else if (r.status === 'InUse' || r.statusLabel === '使用中') inUse++
-        else if (r.status === 'Booked' || r.statusLabel === '已预订') booked++
-        else if (r.status === 'Cleaning' || r.statusLabel === '待打扫') cleaning++
-        else idle++
-      }
-      self.setData({ roomOverview: { idle: idle, inUse: inUse, booked: booked, cleaning: cleaning } })
-    })
-    // 从茶品订单中找出待发货的加入待办
-    API.getShopOrders().then(function(shopOrders) {
-      if (!shopOrders || !shopOrders.length) return
-      var shipTodos = []
-      for (var i = 0; i < shopOrders.length; i++) {
-        var so = shopOrders[i]
-        if (so.deliveryMethod === 'express' && (!so.status || so.status === 'PendingDelivery' || so.status === 'Paid')) {
-          shipTodos.push({
-            id: 'SHIP' + so.orderId,
-            title: '📦 发货 — 茶品订单',
-            type: 'shipping',
-            priority: 'high',
-            deadline: '尽快',
-            status: 'pending'
-          })
+
+    // 待办事项：从订单数据统一生成（与待办详情页同源）
+    API.getAllOrders().then(function(orders) {
+      var list = orders || []
+      var todos = []
+      var todayStr2 = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0')
+      var nowMin = new Date().getHours()*60 + new Date().getMinutes()
+
+      // 进行中订单
+      var inUseRooms = []
+      for (var i = 0; i < list.length; i++) {
+        var o = list[i]
+        if (o.status === 'InUse' && o.roomName && inUseRooms.indexOf(o.roomName) === -1) {
+          inUseRooms.push(o.roomName)
+          todos.push({ id:'IU'+o.orderId, title:'🟢 '+o.roomName+' 使用中', type:'active', priority:'high', deadline:'进行中' })
         }
       }
-      if (shipTodos.length > 0) {
-        self.setData({ todos: shipTodos.concat(self.data.todos) })
+      // 今日待入住
+      for (var i = 0; i < list.length; i++) {
+        var o = list[i]
+        if (o.status === 'Booked' && o.date === todayStr2 && o.time) {
+          var sp = o.time.split('-')[0].split(':')
+          var startMin = parseInt(sp[0])*60+parseInt(sp[1])
+          if (startMin > nowMin && startMin - nowMin < 120) {
+            todos.push({ id:'BK'+o.orderId, title:'📋 '+o.roomName+' 即将到店', type:'order', priority:'high', deadline:o.time })
+          }
+        }
       }
+      // 待发货
+      API.getShopOrders().then(function(shopOrders) {
+        if (shopOrders && shopOrders.length) {
+          for (var i = 0; i < shopOrders.length; i++) {
+            if (shopOrders[i].deliveryMethod === 'express' && (!shopOrders[i].status || shopOrders[i].status === 'PendingDelivery')) {
+              todos.push({ id:'SH'+shopOrders[i].orderId, title:'📦 茶品订单待发货', type:'shipping', priority:'high', deadline:'尽快' })
+            }
+          }
+        }
+        self.setData({ todos: todos.slice(0, 8) })
+      })
     })
+
+    // 房态总览背景数据：房间总数
+    self.setData({ roomOverview: { idle: totalRooms, inUse: 0, booked: 0, cleaning: 0 } })
   },
 
   updateTime: function() {

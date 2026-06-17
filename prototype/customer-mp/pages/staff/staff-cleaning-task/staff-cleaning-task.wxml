@@ -35,5 +35,5 @@
       </view>
     </view>
   </view>
-  <staff-bottom-nav active="cleaning"></staff-bottom-nav>
+  <staff-bottom-nav active="todo"></staff-bottom-nav>
 </view>

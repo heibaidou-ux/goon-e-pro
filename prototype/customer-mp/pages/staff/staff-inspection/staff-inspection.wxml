@@ -48,6 +48,6 @@
     </view>
     <view class="empty" wx:if="{{reports.length==0}}"><text>暂无巡检记录</text></view>
   </view>
-  <staff-bottom-nav active="cleaning"></staff-bottom-nav>
+  <staff-bottom-nav active="todo"></staff-bottom-nav>
 </view>
 </view>
