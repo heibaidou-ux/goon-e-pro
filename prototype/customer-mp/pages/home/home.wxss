@@ -1,7 +1,7 @@
 /* 高岸茶室 · 首页 — 温润茶绿质感 */
 page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif; }
 .phone { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
-.page { flex:1; overflow-x:hidden; }
+.page {min-height:0; flex:1; overflow-x:hidden; }
 
 /* ── 门店头部 ── */
 .store-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:#fff; border-bottom:1px solid #f0ece6; }

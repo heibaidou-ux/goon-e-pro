@@ -1,5 +1,5 @@
 .phone { height:100vh; overflow:hidden; display:flex; flex-direction:column; background:#f5f7fa; }
-.page { flex:1; overflow-y:auto; }
+.page {min-height:0; flex:1; overflow-y:auto; }
 .header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
 .header-title { font-size:18px; font-weight:700; }
 .header-total { font-size:12px; color:#999; }
