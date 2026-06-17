@@ -99,10 +99,6 @@
     </view>
   </view>
 
-  <!-- 退出登录 -->
-  <view class="logout-section" bindtap="doLogout">
-    <text class="logout-text">退出登录 → 回到客人端</text>
-  </view>
 </view>
   <!-- 开门菜单 -->
   <view class="modal-overlay modal-center" wx:if="{{showDoorMenu}}" bindtap="hideDoorMenu">

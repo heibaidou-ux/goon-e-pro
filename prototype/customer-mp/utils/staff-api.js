@@ -101,7 +101,7 @@ const STAFF_API = {
 
   // ── 巡检 ──
   getInspectionRooms() {
-    return delay().then(() => MOCK.rooms.filter(r => r.bookable !== false).map(r => ({
+    return delay().then(() => MOCK.rooms.filter(function(r){return r.roomId!=='RM006'}).map(function(r){return{
       roomId: r.roomId, name: r.name, status: r.status||'Active', lastInspection: '2026-06-10',
       items: [{ name:'门锁',ok:true },{ name:'空调',ok:true },{ name:'灯光',ok:r.roomId!=='RM003' },{ name:'窗帘',ok:true },{ name:'音响',ok:r.roomId!=='RM002' },{ name:'卫生',ok:true }]
     })))

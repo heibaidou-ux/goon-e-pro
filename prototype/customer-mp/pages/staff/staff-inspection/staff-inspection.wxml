@@ -10,8 +10,8 @@
 
   <view class="content" wx:if="{{tabIndex==0}}">
     <view class="section-title" wx:if="{{!selectedRoom}}">选择房间</view>
-    <view class="room-tabs" wx:if="{{!selectedRoom}}">
-      <view class="room-tab {{item.status=='Active'?'online':'off'}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="selectRoom" data-roomid="{{item.roomId}}">
+    <view class="room-grid-inspect" wx:if="{{!selectedRoom}}">
+      <view class="room-grid-item {{item.status=='Active'?'online':'off'}}" wx:for="{{rooms}}" wx:key="roomId" bindtap="selectRoom" data-roomid="{{item.roomId}}">
         <text class="rt-name">{{item.name}}</text>
         <text class="rt-status">{{item.status=='Active'?'在线':'离线'}}</text>
       </view>

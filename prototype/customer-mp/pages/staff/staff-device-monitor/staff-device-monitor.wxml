@@ -5,11 +5,13 @@
       <text class="header-stats">在线 {{stats.online}}/{{stats.total}} · {{stats.rate}}</text>
     </view>
 
-    <!-- 房间筛选（点击弹出居中菜单） -->
-    <view class="picker-bar" bindtap="showRoomPicker">
-      <text class="pb-label">当前：</text>
-      <text class="pb-value">{{selectedRoomName}}</text>
-      <text class="pb-arrow">▾</text>
+    <!-- 5个房间按钮 -->
+    <view class="room-bar">
+      <view class="rbar-item {{selectedRoomId==''?'active':''}}" bindtap="selectRoom" data-idx="0">全部</view>
+      <view class="rbar-item {{selectedRoomId=='RM004'?'active':''}}" bindtap="selectRoom" data-idx="1">白沙瓦</view>
+      <view class="rbar-item {{selectedRoomId=='RM003'?'active':''}}" bindtap="selectRoom" data-idx="2">布拉格</view>
+      <view class="rbar-item {{selectedRoomId=='RM002'?'active':''}}" bindtap="selectRoom" data-idx="3">翡冷翠</view>
+      <view class="rbar-item {{selectedRoomId=='RM001'?'active':''}}" bindtap="selectRoom" data-idx="4">丰沙里</view>
     </view>
 
     <view class="device-list">
@@ -23,16 +25,5 @@
       </view>
     </view>
   </view>
-
-  <!-- 居中房间选择弹窗 -->
-  <view class="modal-overlay modal-center" wx:if="{{showRoomPicker}}" bindtap="hideRoomPicker">
-    <view class="room-picker-modal" catchtap>
-      <text class="rpm-title">选择房间</text>
-      <view class="rpm-item {{selectedRoomName==item?'active':''}}" wx:for="{{roomOptions}}" wx:key="*this" wx:for-index="idx" bindtap="selectRoom" data-idx="{{idx}}">
-        <text>{{item}}</text>
-        <text wx:if="{{selectedRoomName==item}}" class="rpm-check">✓</text>
-      </view>
-      <view class="rpm-item cancel" bindtap="hideRoomPicker">关闭</view>
-    </view>
-  </view>  <staff-bottom-nav active="device"></staff-bottom-nav>
+  <staff-bottom-nav active="device"></staff-bottom-nav>
 </view>

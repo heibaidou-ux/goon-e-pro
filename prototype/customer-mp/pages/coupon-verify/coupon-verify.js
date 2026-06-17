@@ -50,7 +50,8 @@ Page({
     showBookingConfirm: false,
     myCoupons: [],
     verifiedCoupons: [],
-    isStaff: false
+    isStaff: false,
+    _verifying: false
   },
 
   onLoad: function(e) {

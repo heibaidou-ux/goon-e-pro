@@ -3,39 +3,37 @@
     <view class="header">
       <text class="header-title">📅 考勤</text>
     </view>
-
     <view class="content">
       <view class="checkin-card">
         <view class="checkin-top">
-          <text class="checkin-status-icon">{{attendance.checkedIn ? '✅' : '⏰'}}</text>
+          <text class="checkin-status-icon">{{checkedIn ? (checkedOut ? '✅' : '🕒') : '⏰'}}</text>
           <view class="checkin-info">
-            <text class="checkin-status-text">{{attendance.todayStatus}}</text>
-            <text class="checkin-time">签到 {{attendance.checkInTime}} · 签退 {{attendance.checkOutTime || '—'}}</text>
+            <text class="checkin-status-text">{{todayStatus}}</text>
+            <text class="checkin-time">签到 {{checkInTime||'—'}}  · 签退 {{checkOutTime||'—'}}</text>
           </view>
         </view>
         <view class="checkin-btns">
-          <button wx:if="{{!attendance.checkedIn}}" class="ci-btn signin" bindtap="doCheckIn">🕐 签到</button>
-          <button wx:elif="{{!attendance.checkedOut && attendance.checkedIn}}" class="ci-btn signout" bindtap="doCheckOut">🏁 签退</button>
-          <button wx:elif="{{attendance.checkedOut}}" class="ci-btn done" disabled>✅ 今日已签退</button>
+          <button wx:if="{{!checkedIn}}" bindtap="doCheckIn" class="ci-btn signin">🕐 签到</button>
+          <button wx:if="{{checkedIn && !checkedOut}}" bindtap="doCheckOut" class="ci-btn signout">🏁 签退</button>
+          <text wx:if="{{checkedIn && checkedOut}}" class="ci-done">✅ 今日已签退</text>
         </view>
       </view>
 
-      <view class="stats-row">
-        <view class="s-item"><text class="s-num">22</text><text class="s-label">出勤(天)</text></view>
-        <view class="s-item"><text class="s-num">{{attendance.workHours || 0}}h</text><text class="s-label">今日工时</text></view>
-        <view class="s-item"><text class="s-num">0</text><text class="s-label">迟到</text></view>
-        <view class="s-item"><text class="s-num">2</text><text class="s-label">休息</text></view>
+      <view class="query-tabs">
+        <text class="qtab {{queryType=='week'?'active':''}}" bindtap="switchQuery" data-type="week">📅 本周</text>
+        <text class="qtab {{queryType=='month'?'active':''}}" bindtap="switchQuery" data-type="month">📆 本月</text>
+        <text class="qtab {{queryType=='year'?'active':''}}" bindtap="switchQuery" data-type="year">📅 全年</text>
       </view>
 
-      <view class="section-title">打卡记录</view>
       <view class="record-list">
-        <view class="record-item" wx:for="{{attendance.records}}" wx:key="index">
+        <view class="record-item" wx:for="{{weekRecords}}" wx:key="index">
           <text class="rec-date">{{item.date}}</text>
           <text class="rec-in">{{item.checkIn}}</text>
           <text class="rec-out">{{item.checkOut}}</text>
-          <text class="rec-status {{item.status == '正常' ? 'normal' : (item.status == '在岗' ? 'active' : '')}}">{{item.status}}</text>
+          <text class="rec-status {{item.status=='正常'?'normal':(item.status=='在岗'?'active':'')}}">{{item.status}}</text>
         </view>
       </view>
     </view>
-</view>  <staff-bottom-nav active="dashboard"></staff-bottom-nav>
+  </view>
+  <staff-bottom-nav active="dashboard"></staff-bottom-nav>
 </view>

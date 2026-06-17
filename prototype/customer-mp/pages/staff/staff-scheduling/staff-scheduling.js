@@ -40,6 +40,20 @@ Page({
     var self = this
     var name = self.data.editName, day = self.data.editDay, newShift = self.data.editNewShift
     var schedule = self.data.schedule
+    
+    // 验证：检查将此人改为休息后该班次是否还有人
+    if (newShift === '休息') {
+      var hasEarly = false, hasLate = false, hasAllDay = false
+      for (var i = 0; i < schedule.staff.length; i++) {
+        if (schedule.staff[i].name === name) continue
+        var s = schedule.staff[i].schedule[day]
+        if (s === '早班' || s === '全天') hasEarly = true
+        if (s === '晚班' || s === '全天') hasLate = true
+      }
+      if (!hasEarly) { wx.showToast({ title: '早班至少需1人在岗', icon: 'none' }); return }
+      if (!hasLate) { wx.showToast({ title: '晚班至少需1人在岗', icon: 'none' }); return }
+    }
+    
     for (var i = 0; i < schedule.staff.length; i++) {
       if (schedule.staff[i].name === name) { schedule.staff[i].schedule[day] = newShift; break }
     }

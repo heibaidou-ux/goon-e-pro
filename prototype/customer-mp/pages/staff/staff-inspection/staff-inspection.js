@@ -27,7 +27,8 @@ Page({
     var rooms = this.data.rooms
     for (var i = 0; i < rooms.length; i++) {
       if (rooms[i].roomId === roomId) {
-        this.setData({ selectedRoom: roomId, selectedRoomName: rooms[i].name, inspectionItems: rooms[i].items.map(function(item) { return { name: item.name, ok: item.ok } }) })
+        var items = rooms[i].items.map(function(item) { return { name: item.name, ok: item.ok } })
+        this.setData({ selectedRoom: roomId, selectedRoomName: rooms[i].name, inspectionItems: items })
         break
       }
     }
@@ -44,8 +45,7 @@ Page({
     STAFF_API.submitInspection(self.data.selectedRoom, self.data.inspectionItems).then(function(res) {
       wx.showToast({ title: res.message || '已提交', icon: 'success' })
       self.setData({ selectedRoom: '', selectedRoomName: '', inspectionItems: [] })
-      self.loadRooms()
-      self.loadReports()
+      self.loadRooms(); self.loadReports()
     })
   },
 
