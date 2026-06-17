@@ -1,12 +1,16 @@
 var STAFF_API = require('../../../utils/staff-api')
+var API = require('../../../utils/api')
 var PAY_LABELS = { WeChat:'微信支付', Alipay:'支付宝', Balance:'会员余额', Coupon:'验券', Other:'其他' }
 
 Page({
-  data: { dateStr:'', data:{totalRevenue:0,roomRevenue:0,productRevenue:0,orderCount:0,couponDiscount:0,pendingPayment:0,paymentBreakdown:{},anomalies:[]}, payBreakdownList:[] },
+  data: {
+    dateStr: '', data: { totalRevenue:0, roomRevenue:0, productRevenue:0, orderCount:0, couponDiscount:0, pendingPayment:0, paymentBreakdown:{}, anomalies:[] },
+    payBreakdownList: [], pendingTasks: [], historyMode: false
+  },
 
   onLoad: function() {
     var now=new Date(); var dateStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
-    this.setData({dateStr:dateStr}); this.loadData(dateStr)
+    this.setData({dateStr:dateStr}); this.loadData(dateStr); this.loadPendingTasks()
   },
 
   loadData: function(dateStr) {
@@ -17,7 +21,32 @@ Page({
     })
   },
 
-  pickDate: function(e) { var dateStr=e.detail.value; this.setData({dateStr:dateStr}); this.loadData(dateStr) },
+  loadPendingTasks: function() {
+    var self = this
+    API.getAllOrders().then(function(orders) {
+      var tasks = []
+      // 找出未结算的订单
+      for (var i = 0; i < orders.length; i++) {
+        var o = orders[i]
+        if (o.status === 'Booked' || o.status === 'InUse') {
+          tasks.push({
+            roomName: o.roomName || '房间',
+            customerName: o.customerName || '—',
+            date: o.date || '',
+            time: o.time || '',
+            amount: o.amount || 0,
+            status: o.status === 'InUse' ? '使用中' : '待入住'
+          })
+        }
+      }
+      self.setData({ pendingTasks: tasks.slice(0, 20) })
+    })
+  },
+
+  pickDate: function(e) {
+    var dateStr=e.detail.value; this.setData({dateStr:dateStr, historyMode: true})
+    this.loadData(dateStr)
+  },
 
   resolveAnomaly: function(e) {
     var self=this

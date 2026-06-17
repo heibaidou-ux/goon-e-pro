@@ -100,11 +100,24 @@ const STAFF_API = {
   checkOut() { return delay(300).then(() => { var n=new Date(); return { success:true, time:String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'), status:'已下班' } }) },
 
   // ── 巡检 ──
-  getInspectionRooms() {
-    return delay().then(() => MOCK.rooms.filter(function(r){return r.roomId!=='RM006'}).map(function(r){return{
-      roomId: r.roomId, name: r.name, status: r.status||'Active', lastInspection: '2026-06-10',
-      items: [{ name:'门锁',ok:true },{ name:'空调',ok:true },{ name:'灯光',ok:r.roomId!=='RM003' },{ name:'窗帘',ok:true },{ name:'音响',ok:r.roomId!=='RM002' },{ name:'卫生',ok:true }]
-    })))
+  getInspectionRooms: function() {
+    return delay().then(function() {
+      var filtered = []
+      for (var i = 0; i < MOCK.rooms.length; i++) {
+        if (MOCK.rooms[i].roomId !== 'RM006') filtered.push(MOCK.rooms[i])
+      }
+      return filtered.map(function(r) {
+        return {
+          roomId: r.roomId, name: r.name, status: r.status || 'Active',
+          lastInspection: '2026-06-10',
+          items: [
+            { name:'门锁', ok:true }, { name:'空调', ok:true },
+            { name:'灯光', ok:true }, { name:'窗帘', ok:true },
+            { name:'音响', ok:true }, { name:'卫生', ok:true }
+          ]
+        }
+      })
+    })
   },
   submitInspection(roomId, results) {
     return delay(300).then(() => {
