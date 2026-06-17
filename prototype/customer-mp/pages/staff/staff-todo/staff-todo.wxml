@@ -110,7 +110,7 @@
         </view>
         <view class="sb-empty">
           <text wx:if="{{audit.count == 0}}">✅ 暂无待审核</text>
-          <text wx:if="{{audit.count > 0}}" wx:for="{{audit.items}}" wx:for-item="a" wx:key="*this">{{a.title}}</text>
+          <text wx:if="{{audit.count > 0}}" wx:for="{{audit.items}}" wx:for-item="a" wx:key="*this" data-page="audit" bindtap="goTo">{{a.title}}</text>
         </view>
       </view>
     </view>

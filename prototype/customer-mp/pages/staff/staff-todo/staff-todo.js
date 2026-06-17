@@ -67,7 +67,7 @@ Page({
       reconciliation: '/pages/staff/staff-reconciliation/staff-reconciliation',
       alerts: '/pages/staff/staff-device-monitor/staff-device-monitor',
       inspection: '/pages/staff/staff-inspection/staff-inspection',
-      audit: '/pages/staff/staff-reconciliation/staff-reconciliation'
+      audit: '/pages/staff/staff-order-management/staff-order-management'
     }
     var url = urls[page]
     if (url) wx.navigateTo({ url: url })

@@ -189,5 +189,18 @@ Page({
     }})
   },
 
-  completeOrder: function(e){wx.showToast({title:'订单已完成',icon:'success'})}
+  completeOrder: function(e){
+    var self=this,id=e.currentTarget.dataset.id
+    wx.showModal({title:'完成订单',content:'确认此订单已完成？',
+      success:function(res){if(!res.confirm)return
+        try{
+          var bk=wx.getStorageSync('mp_bookings')||[]
+          for(var i=0;i<bk.length;i++){if(bk[i].orderId===id||bk[i].id===id){bk[i].status='Completed';break}}
+          wx.setStorageSync('mp_bookings',bk)
+        }catch(e){}
+        wx.showToast({title:'订单已完成',icon:'success'})
+        self.loadOrders()
+      }
+    })
+  }
 })

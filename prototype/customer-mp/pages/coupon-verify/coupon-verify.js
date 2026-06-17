@@ -232,6 +232,21 @@ Page({
 
   confirmBooking: function() {
     this.setData({ showBookingConfirm: false })
+    var code = this.data.pendingCode
+    var info = COUPON_DB[code]
+    if (!info) { wx.showToast({ title: '请先验券', icon: 'none' }); return }
+    var now = new Date()
+    var dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
+    var booking = {
+      orderId: 'ORD'+String(Date.now()).slice(-6),
+      roomId: this.data.selectedRoom, roomName: this.data.selectedRoomName,
+      customerName: '', phone: '',
+      date: dateStr, time: this.data.selectedTime || '',
+      amount: info.price, status: 'Booked',
+      created: new Date().toISOString(),
+      doorCode: String(Math.floor(1000+Math.random()*9000))
+    }
+    try { var bookings = wx.getStorageSync('mp_bookings') || []; bookings.push(booking); wx.setStorageSync('mp_bookings', bookings) } catch(e) {}
     wx.showToast({ title: '✅ 预约成功！', icon: 'success' })
     setTimeout(function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) }, 1000)
   },

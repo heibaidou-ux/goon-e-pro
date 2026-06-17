@@ -6,10 +6,10 @@
   <view class="success-state" wx:elif="{{verified}}">
     <view class="verify-icon">✅</view>
     <text class="room-name-text">🏠 {{roomName}}</text>
-    <view class="bill-preview" wx:if="{{billTotal > 0}}">
+    <view class="bill-preview" wx:if="{{billSummary.roomCharge > 0 || billSummary.scanTotal > 0}}">
       <text class="bill-title">📋 当前账单</text>
-      <view class="bill-row"><text class="label">房费</text><text class="value">¥{{roomCharge}}</text></view>
-      <view class="bill-row"><text class="label">加购挂账</text><text class="value">¥{{scanTotal}}</text></view>
+      <view class="bill-row"><text class="label">房费</text><text class="value">¥{{billSummary.roomCharge}}</text></view>
+      <view class="bill-row"><text class="label">加购挂账</text><text class="value">¥{{billSummary.scanTotal}}</text></view>
     </view>
     <view class="action-btns">
       <button class="btn-primary" bindtap="goOrder">🛒 点单加购</button>
