@@ -3,10 +3,8 @@
     <text class="header-title">📡 设备控制</text>
   </view>
   <view class="page">
-    <view class="room-select">
-      <picker mode="selector" range="{{roomNames}}" bindchange="switchRoom">
-        <view class="rs-trigger">{{currentRoomName}} ▾</view>
-      </picker>
+    <view class="room-select" bindtap="showRoomPicker">
+      <view class="rs-trigger">{{currentRoomName}} ▾</view>
     </view>
 
     <!-- ── 空调 ── -->
@@ -107,5 +105,15 @@
     </view>
   </view>
 
+  <view class="modal-overlay modal-center" wx:if="{{showRoomPicker}}" bindtap="hideRoomPicker">
+    <view class="room-picker-modal" catchtap>
+      <text class="rpm-title">选择房间</text>
+      <view class="rpm-item {{currentRoomName==item?'active':''}}" wx:for="{{roomNames}}" wx:key="*this" wx:for-index="idx" bindtap="selectRoom" data-idx="{{idx}}">
+        <text>{{item}}</text>
+        <text wx:if="{{currentRoomName==item}}" class="rpm-check">✓</text>
+      </view>
+      <view class="rpm-item cancel" bindtap="hideRoomPicker">关闭</view>
+    </view>
+  </view>
   <staff-bottom-nav active="device"></staff-bottom-nav>
 </view>

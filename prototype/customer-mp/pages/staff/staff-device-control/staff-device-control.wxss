@@ -53,6 +53,15 @@
 .fan-item:last-child { border-bottom:none; }
 .fi-name { font-size:13px; color:#333; }
 
+/* Room picker modal */
+.room-picker-modal { background:#fff;border-radius:20px;width:280px;max-width:85vw;overflow:hidden; }
+.rpm-title { font-size:16px;font-weight:700;padding:16px 20px 12px;text-align:center;color:#333;border-bottom:1px solid #f0ece6; }
+.rpm-item { display:flex;align-items:center;justify-content:space-between;padding:14px 20px;font-size:14px;border-bottom:1px solid #f5f5f5; }
+.rpm-item:active { background:#f0faf2; }
+.rpm-item.active { color:#5D8A6B;font-weight:600; }
+.rpm-check { color:#5D8A6B;font-weight:700; }
+.rpm-item.cancel { justify-content:center;color:#999;border-bottom:none; }
+
 /* Lock modal */
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:99;display:flex;align-items:center;justify-content:center; }
 .modal { background:#fff;border-radius:20px;padding:24px;width:300px;text-align:center; }
