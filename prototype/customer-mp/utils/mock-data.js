@@ -114,7 +114,9 @@ const scenes = [
   { sceneId: "SC006", name: "营业前准备", icon: "🔧", color: "#ff5722",
     params: { curtain: "open", lights: { on: true }, ac: { on: true, temp: 24 }, music: { on: true, track: "bgm_preopen" } } },
   { sceneId: "SC007", name: "打扫完成", icon: "🧹", color: "#607d8b",
-    params: { curtain: "closed", lights: { on: false }, ac: { on: false }, music: { on: false } } }
+    params: { curtain: "closed", lights: { on: false }, ac: { on: false }, music: { on: false } } },
+  { sceneId: "PreOpen", name: "空调预开", icon: "⏰", color: "#5D8A6B",
+    params: { ac: { on: true, temp: 26 }, music: { on: true, track: "bgm_light" } } }
 ]
 
 // 商品
