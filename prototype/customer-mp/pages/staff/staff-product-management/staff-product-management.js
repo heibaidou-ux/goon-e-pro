@@ -3,13 +3,15 @@ var API = require('../../../utils/api')
 Page({
   data: {
     selectedCat: '',
+    isLowFilter: false,
     allProducts: [],
     products: [],
     stats: { total: 0, onShelf: 0, lowStock: 0 },
     showStockModal: false, stockProduct: null, stockQty: 0,
     showTransferModal: false, transferProduct: null,
     transferReason: '', transferQty: 1,
-    transferLog: []
+    transferLog: [],
+    showDiscrepancyModal: false, discrepancyInfo: ''
   },
 
   onShow: function() {
@@ -22,19 +24,21 @@ Page({
     API.getProducts().then(function(products) {
       var list = products.map(function(p) {
         return Object.assign({}, p, {
-          status: '上架',
-          stock: Math.floor(Math.random() * 50) + 5,
-          lowStock: Math.floor(Math.random() * 10) === 0
+          status: Math.random() > 0.3 ? '上架' : '下架',
+          stock: Math.floor(Math.random() * 50) + 1,
+          lowStock: Math.floor(Math.random() * 5) === 0,
+          unit: '件'
         })
       })
-      var onShelf = 0, lowStock = 0
+      var onShelf = 0, lowStock = 0, totalQty = 0
       for (var i = 0; i < list.length; i++) {
         if (list[i].status === '上架') onShelf++
         if (list[i].lowStock) lowStock++
+        totalQty += list[i].stock || 0
       }
       self.setData({
         allProducts: list, products: list,
-        stats: { total: list.length, onShelf: onShelf, lowStock: lowStock }
+        stats: { total: list.length, onShelf: onShelf, lowStock: lowStock, totalQty: totalQty, onShelfQty: totalQty }
       })
     })
   },
@@ -45,29 +49,41 @@ Page({
 
   filterCat: function(e) {
     var cat = e.currentTarget.dataset.cat
-    this.setData({ selectedCat: cat })
-    if (!cat) this.setData({ products: this.data.allProducts })
-    else this.setData({ products: this.data.allProducts.filter(function(p) { return p.category === cat }) })
+    this.setData({ selectedCat: cat, isLowFilter: false })
+    this._applyFilters()
+  },
+
+  filterLowStock: function() {
+    this.setData({ isLowFilter: !this.data.isLowFilter, selectedCat: '' })
+    this._applyFilters()
+  },
+
+  _applyFilters: function() {
+    var list = this.data.allProducts
+    if (this.data.selectedCat) list = list.filter(function(p) { return p.category === this.data.selectedCat }.bind(this))
+    if (this.data.isLowFilter) list = list.filter(function(p) { return p.lowStock })
+    this.setData({ products: list })
   },
 
   // ── 上架/下架 ──
   toggleStatus: function(e) {
     var id = e.currentTarget.dataset.id
-    var products = this.data.products
+    var products = this.data.allProducts
     for (var i = 0; i < products.length; i++) {
       if (products[i].productId === id || products[i].id === id) {
         products[i].status = products[i].status === '上架' ? '下架' : '上架'
         break
       }
     }
-    this.setData({ products: products })
+    this.setData({ allProducts: products })
+    this._applyFilters()
     wx.showToast({ title: '状态已更新', icon: 'success' })
   },
 
   // ── 盘点 ──
   showStock: function(e) {
     var id = e.currentTarget.dataset.id
-    var products = this.data.products
+    var products = this.data.allProducts
     for (var i = 0; i < products.length; i++) {
       if (products[i].productId === id || products[i].id === id) {
         this.setData({ showStockModal: true, stockProduct: products[i], stockQty: products[i].stock || 0 })
@@ -82,16 +98,38 @@ Page({
     var self = this
     var p = self.data.stockProduct
     if (!p) return
+    var oldStock = p.stock
+    var newStock = self.data.stockQty
+
+    if (oldStock !== newStock) {
+      // 生成对账工单
+      var discrepancy = {
+        type: '盘点差异',
+        productName: p.name,
+        oldQty: oldStock, newQty: newStock,
+        diff: newStock - oldStock,
+        reason: '',
+        status: '待审核', time: new Date().toLocaleString()
+      }
+      var discList = []
+      try { discList = wx.getStorageSync('mp_stock_discrepancies') || [] } catch(e) {}
+      discList.unshift(discrepancy)
+      try { wx.setStorageSync('mp_stock_discrepancies', discList) } catch(e) {}
+      self.setData({ discrepancyInfo: '盘点差异：' + oldStock + '→' + newStock + '，差异' + (newStock - oldStock > 0 ? '+' : '') + (newStock - oldStock) + '，已生成对账工单，待店长审核',
+      showDiscrepancyModal: true })
+    }
+
     var products = self.data.allProducts
     for (var i = 0; i < products.length; i++) {
       if (products[i].productId === p.productId || products[i].id === p.id) {
-        products[i].stock = self.data.stockQty
+        products[i].stock = newStock
+        products[i].lowStock = newStock < 10
         break
       }
     }
     self.setData({ allProducts: products, showStockModal: false })
-    self.filterCat({ currentTarget: { dataset: { cat: self.data.selectedCat } } })
-    wx.showToast({ title: '盘点已更新', icon: 'success' })
+    self._applyFilters()
+    wx.showToast({ title: '盘点完成', icon: 'success' })
   },
 
   hideStockModal: function() { this.setData({ showStockModal: false }) },
@@ -99,7 +137,7 @@ Page({
   // ── 调货申请 ──
   showTransfer: function(e) {
     var id = e.currentTarget.dataset.id
-    var products = this.data.products
+    var products = this.data.allProducts
     for (var i = 0; i < products.length; i++) {
       if (products[i].productId === id || products[i].id === id) {
         this.setData({ showTransferModal: true, transferProduct: products[i], transferQty: 1, transferReason: '' })
@@ -118,19 +156,18 @@ Page({
     var log = self.data.transferLog
     log.unshift({
       id: 'TR' + String(Date.now()).slice(-6),
-      productName: p.name,
-      qty: self.data.transferQty,
+      productName: p.name, qty: self.data.transferQty,
       reason: self.data.transferReason,
-      from: '盈隆店',
-      status: '待审批',
+      from: '总部仓库', status: '待总部确认', to: '盈隆店',
       time: new Date().toLocaleString()
     })
     try { wx.setStorageSync('mp_stock_transfers', log) } catch(e) {}
     self.setData({ showTransferModal: false, transferLog: log })
-    wx.showToast({ title: '调货申请已提交', icon: 'success' })
+    wx.showToast({ title: '调货申请已提交，等待总部确认', icon: 'success' })
   },
 
   hideTransferModal: function() { this.setData({ showTransferModal: false }) },
+  closeDiscrepancy: function() { this.setData({ showDiscrepancyModal: false }) },
 
   goBack: function() { wx.navigateBack() }
 })

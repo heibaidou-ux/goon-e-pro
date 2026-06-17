@@ -1,48 +1,52 @@
 <view class="phone">
   <view class="page">
-  <view class="header">
-    <text class="header-title">📦 商品管理</text>
-    <text class="header-stats">库存{{stats.total}} · 低{{stats.lowStock}}</text>
-  </view>
+    <view class="header">
+      <text class="header-title">📦 商品管理</text>
+      <text class="header-stats">低{{stats.lowStock}}</text>
+    </view>
 
-  <view class="stats-bar">
-    <view class="s-item"><text class="s-n">{{stats.total}}</text><text class="s-l">总商品</text></view>
-    <view class="s-item"><text class="s-n">{{stats.onShelf}}</text><text class="s-l">已上架</text></view>
-    <view class="s-item warn"><text class="s-n">{{stats.lowStock}}</text><text class="s-l">需补货</text></view>
-  </view>
+    <!-- 统计栏：显示*种*件 -->
+    <view class="stats-bar">
+      <view class="s-item"><text class="s-n">{{stats.total}}</text><text class="s-l">总商品</text><text class="s-unit">{{stats.totalQty}}件</text></view>
+      <view class="s-item"><text class="s-n">{{stats.onShelf}}</text><text class="s-l">已上架</text><text class="s-unit">{{stats.onShelfQty}}件</text></view>
+      <view class="s-item warn {{isLowFilter?'active':''}}" bindtap="filterLowStock"><text class="s-n">{{stats.lowStock}}</text><text class="s-l">需补货</text></view>
+    </view>
 
-  <view class="cat-tabs">
-    <view class="cat-tab {{selectedCat==''?'active':''}}" bindtap="filterCat" data-cat="">全部</view>
-    <view class="cat-tab {{selectedCat=='Tea'?'active':''}}" bindtap="filterCat" data-cat="Tea">茶品</view>
-    <view class="cat-tab {{selectedCat=='Snack'?'active':''}}" bindtap="filterCat" data-cat="Snack">茶点</view>
-    <view class="cat-tab {{selectedCat=='Ware'?'active':''}}" bindtap="filterCat" data-cat="Ware">茶具</view>
-  </view>
+    <!-- 分类Tab增加"需补货"筛选 -->
+    <view class="cat-tabs">
+      <view class="cat-tab {{selectedCat=='' && !isLowFilter?'active':''}}" bindtap="filterCat" data-cat="">全部</view>
+      <view class="cat-tab {{selectedCat=='Tea'?'active':''}}" bindtap="filterCat" data-cat="Tea">茶品</view>
+      <view class="cat-tab {{selectedCat=='Snack'?'active':''}}" bindtap="filterCat" data-cat="Snack">茶点</view>
+      <view class="cat-tab {{selectedCat=='Ware'?'active':''}}" bindtap="filterCat" data-cat="Ware">茶具</view>
+    </view>
 
-  <view class="product-list">
-    <view class="p-card" wx:for="{{products}}" wx:key="productId">
-      <view class="pc-top">
-        <text class="pc-icon">{{item.image}}</text>
-        <view><text class="pc-name">{{item.name}}</text><text class="pc-desc">{{item.desc}}</text></view>
-        <text class="pc-stock {{item.lowStock?'low':''}}">库存{{item.stock}}</text>
+    <view class="product-list">
+      <view class="p-card" wx:for="{{products}}" wx:key="productId">
+        <view class="pc-top">
+          <text class="pc-icon">{{item.image}}</text>
+          <view><text class="pc-name">{{item.name}}</text><text class="pc-desc">{{item.desc}}</text></view>
+          <text class="pc-stock {{item.lowStock?'low':''}}">{{item.stock}}{{item.unit}}</text>
+        </view>
+        <view class="pc-actions">
+          <text class="pa-btn" bindtap="toggleStatus" data-id="{{item.productId||item.id}}">{{item.status=='上架'?'⬇ 下架':'⬆ 上架'}}</text>
+          <text class="pa-btn" bindtap="showStock" data-id="{{item.productId||item.id}}">📊 盘点</text>
+          <text class="pa-btn" bindtap="showTransfer" data-id="{{item.productId||item.id}}">📦 调货</text>
+        </view>
       </view>
-      <view class="pc-actions">
-        <text class="pa-btn" bindtap="toggleStatus" data-id="{{item.productId||item.id}}">{{item.status=='上架'?'⬆ 下架':'⬇ 上架'}}</text>
-        <text class="pa-btn" bindtap="showStock" data-id="{{item.productId||item.id}}">📊 盘点</text>
-        <text class="pa-btn" bindtap="showTransfer" data-id="{{item.productId||item.id}}">📦 调货</text>
+    </view>
+
+    <!-- 调货记录 -->
+    <view class="transfer-section" wx:if="{{transferLog.length>0}}">
+      <text class="section-title">调货记录</text>
+      <view class="t-item" wx:for="{{transferLog}}" wx:key="id">
+        <text class="ti-name">{{item.productName}} ×{{item.qty}}</text>
+        <text class="ti-from">← {{item.from}}</text>
+        <text class="ti-status">{{item.status}}</text>
+        <text class="ti-time">{{item.time}}</text>
       </view>
     </view>
   </view>
-
-  <!-- 调货记录 -->
-  <view class="transfer-section" wx:if="{{transferLog.length>0}}">
-    <text class="section-title">调货记录</text>
-    <view class="t-item" wx:for="{{transferLog}}" wx:key="id">
-      <text class="ti-name">{{item.productName}} ×{{item.qty}}</text>
-      <text class="ti-status">{{item.status}}</text>
-      <text class="ti-time">{{item.time}}</text>
-    </view>
-  </view>
-</view>
+  <staff-bottom-nav active="orders"></staff-bottom-nav>
 </view>
 
 <!-- 盘点弹窗 -->
@@ -51,6 +55,7 @@
     <text class="modal-title">📊 盘点 — {{stockProduct.name}}</text>
     <text class="modal-hint">当前库存：{{stockProduct.stock}}</text>
     <input class="modal-input" type="number" value="{{stockQty}}" bindinput="onStockQty" />
+    <text class="modal-note">系统记录：{{stockProduct.stock}}，盘点差异将生成对账工单</text>
     <view class="modal-btns">
       <view class="m-btn cancel" bindtap="hideStockModal">取消</view>
       <view class="m-btn primary" bindtap="saveStock">确认盘点</view>
@@ -64,10 +69,21 @@
     <text class="modal-title">📦 调货申请 — {{transferProduct.name}}</text>
     <input class="modal-input" type="number" value="{{transferQty}}" bindinput="onTransferQty" placeholder="数量" />
     <input class="modal-input" placeholder="调货原因（如：缺货、客人预定）" value="{{transferReason}}" bindinput="onTransferReason" />
-    <text class="modal-hint">从盈隆店调货，需店长审批</text>
+    <text class="modal-hint">向总部/其他门店申请调货，需总部审批确认</text>
     <view class="modal-btns">
       <view class="m-btn cancel" bindtap="hideTransferModal">取消</view>
       <view class="m-btn primary" bindtap="confirmTransfer">提交申请</view>
     </view>
-  </view>  <staff-bottom-nav active="orders"></staff-bottom-nav>
+  </view>
+</view>
+
+<!-- 盘点差异提示 -->
+<view class="modal-overlay" wx:if="{{showDiscrepancyModal}}" bindtap="closeDiscrepancy">
+  <view class="modal" catchtap>
+    <text class="modal-title">📋 盘点差异</text>
+    <text class="modal-desc">{{discrepancyInfo}}</text>
+    <view class="modal-btns">
+      <view class="m-btn primary" bindtap="closeDiscrepancy">知道了</view>
+    </view>
+  </view>
 </view>
