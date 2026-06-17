@@ -58,8 +58,8 @@ const STAFF_API = {
 
   getTodos() {
     return delay().then(() => [
-      { id:'TD001', title:'保洁 — 大茶室C', type:'cleaning', priority:'high', deadline:'10:30', status:'pending' },
-      { id:'TD002', title:'巡检 — 中茶室A智能设备', type:'inspection', priority:'normal', deadline:'11:00', status:'pending' },
+      { id:'TD001', title:'保洁 — 白沙瓦', type:'cleaning', priority:'high', deadline:'10:30', status:'pending' },
+      { id:'TD002', title:'巡检 — 翡冷翠智能设备', type:'inspection', priority:'normal', deadline:'11:00', status:'pending' },
       { id:'TD003', title:'确认 — 下午会议接待', type:'order', priority:'high', deadline:'12:00', status:'pending' },
       { id:'TD004', title:'补货 — 茶品展示柜', type:'restock', priority:'normal', deadline:'14:00', status:'pending' },
       { id:'TD005', title:'对账 — 昨日营收', type:'finance', priority:'normal', deadline:'18:00', status:'pending' }
@@ -145,8 +145,8 @@ const STAFF_API = {
   },
   _mockCleaning() {
     return delay().then(() => ({
-      pending: [{taskId:'CT001',roomName:'大茶室C',roomId:'RM004',type:'FullClean',priority:'High',deadline:'10:30'},{taskId:'CT002',roomName:'中茶室A',roomId:'RM002',type:'QuickClean',priority:'Normal',deadline:'11:00'}],
-      inProgress: [{taskId:'CT003',roomName:'大会议室',roomId:'RM001',type:'FullClean',priority:'Normal',deadline:'10:00'}]
+      pending: [{taskId:'CT001',roomName:'白沙瓦',roomId:'RM004',type:'FullClean',priority:'High',deadline:'10:30'},{taskId:'CT002',roomName:'翡冷翠',roomId:'RM002',type:'QuickClean',priority:'Normal',deadline:'11:00'}],
+      inProgress: [{taskId:'CT003',roomName:'丰沙里',roomId:'RM001',type:'FullClean',priority:'Normal',deadline:'10:00'}]
     }))
   },
   acceptCleaningTask(taskId) { return delay(200).then(() => ({ success:true })) },

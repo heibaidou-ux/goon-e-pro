@@ -34,13 +34,13 @@
 
   // ── 房间 ──
   MOCK.rooms = [
-    { roomId: "RM001", name: "大会议室", type: "MeetingRoom", capacity: 10, area: 30,
+    { roomId: "RM001", name: "丰沙里", type: "MeetingRoom", capacity: 10, area: 30,
       facilities: ["投影","会议桌","K歌设备","落地窗"], pricePerHour: 200, pricePerHalfHour: 120, status: "Active", bookable: true },
-    { roomId: "RM002", name: "中茶室A", type: "TeaRoom", capacity: 4, area: 18,
+    { roomId: "RM002", name: "翡冷翠", type: "TeaRoom", capacity: 4, area: 18,
       facilities: ["茶台","落地窗","茶具套装"], pricePerHour: 80, pricePerHalfHour: 50, status: "Active", bookable: true },
-    { roomId: "RM003", name: "中茶室B", type: "TeaRoom", capacity: 4, area: 18,
+    { roomId: "RM003", name: "布拉格", type: "TeaRoom", capacity: 4, area: 18,
       facilities: ["茶台","落地窗","茶具套装"], pricePerHour: 80, pricePerHalfHour: 50, status: "Active", bookable: true },
-    { roomId: "RM004", name: "大茶室C", type: "TeaRoom", capacity: 6, area: 25,
+    { roomId: "RM004", name: "白沙瓦", type: "TeaRoom", capacity: 6, area: 25,
       facilities: ["茶台","K歌","投影","落地窗"], pricePerHour: 120, pricePerHalfHour: 75, status: "Active", bookable: true },
     { roomId: "RM005", name: "展厅", type: "Exhibition", capacity: 20, area: 40,
       facilities: ["前台","收银","茶具展示","休闲区"], status: "Active", bookable: false },
@@ -97,16 +97,16 @@
 
   // ── 订单 ──
   MOCK.orders = [
-    { orderId:"ORD001", customerName:"张先生", roomId:"RM004", roomName:"大茶室C",
+    { orderId:"ORD001", customerName:"张先生", roomId:"RM004", roomName:"白沙瓦",
       status:"InUse", start:"2026-05-16T10:00:00", end:"2026-05-16T11:30:00",
       duration:90, amount:180, paymentMethod:"WeChat", phone:"138****8888" },
-    { orderId:"ORD002", customerName:"李女士", roomId:"RM002", roomName:"中茶室A",
+    { orderId:"ORD002", customerName:"李女士", roomId:"RM002", roomName:"翡冷翠",
       status:"Booked", start:"2026-05-16T14:00:00", end:"2026-05-16T16:00:00",
       duration:120, amount:160, paymentMethod:"Balance", phone:"139****6666" },
-    { orderId:"ORD003", customerName:"王先生", roomId:"RM003", roomName:"中茶室B",
+    { orderId:"ORD003", customerName:"王先生", roomId:"RM003", roomName:"布拉格",
       status:"Completed", start:"2026-05-16T08:00:00", end:"2026-05-16T09:30:00",
       duration:90, amount:120, paymentMethod:"WeChat", phone:"137****5555" },
-    { orderId:"ORD004", customerName:"赵总", roomId:"RM001", roomName:"大会议室",
+    { orderId:"ORD004", customerName:"赵总", roomId:"RM001", roomName:"丰沙里",
       status:"Completed", start:"2026-05-15T15:00:00", end:"2026-05-15T17:00:00",
       duration:120, amount:400, paymentMethod:"Alipay", phone:"136****7777" }
   ];
@@ -165,18 +165,18 @@
   // ── 清洁/巡检/告警 ──
   MOCK.cleaningTasks = {
     pending: [
-      { taskId:"CL001", roomId:"RM003", roomName:"中茶室B", type:"FullClean",
+      { taskId:"CL001", roomId:"RM003", roomName:"布拉格", type:"FullClean",
         priority:"High", created:"2026-05-16T09:00:00",
         checklist:["擦拭桌面","拖地","清洗茶具","更换垃圾袋","检查设备"] }
     ],
     inProgress: [
-      { taskId:"CL002", roomId:"RM002", roomName:"中茶室A", type:"QuickClean",
+      { taskId:"CL002", roomId:"RM002", roomName:"翡冷翠", type:"QuickClean",
         priority:"Normal", created:"2026-05-16T08:30:00",
         checklist:["擦拭桌面","拖地","清洗茶具","更换垃圾袋"],
         progress:["擦拭桌面","拖地"] }
     ],
     completed: [
-      { taskId:"CL003", roomId:"RM001", roomName:"大会议室", type:"FullClean",
+      { taskId:"CL003", roomId:"RM001", roomName:"丰沙里", type:"FullClean",
         priority:"Normal", created:"2026-05-16T07:00:00",
         checklist:["擦拭桌面","拖地","清洗茶具","更换垃圾袋","检查设备","消毒"] }
     ]
@@ -202,8 +202,8 @@
   ];
 
   MOCK.alerts = [
-    { alertId:"ALT001", level:"warning",  message:"中茶室B T-6715 网络功放通讯超时", time:"10:23", status:"Active" },
-    { alertId:"ALT002", level:"error",    message:"大会议室 Speaker L 声道音量异常",  time:"09:45", status:"Active" },
+    { alertId:"ALT001", level:"warning",  message:"布拉格 T-6715 网络功放通讯超时", time:"10:23", status:"Active" },
+    { alertId:"ALT002", level:"error",    message:"丰沙里 Speaker L 声道音量异常",  time:"09:45", status:"Active" },
     { alertId:"ALT003", level:"info",     message:"走廊485面板固件更新可用",         time:"08:30", status:"Resolved" }
   ];
 
@@ -697,7 +697,7 @@
     return delay().then(function() {
       return {
         roomId: roomId,
-        roomName: roomId === 'RM004' ? '大茶室C' : '中茶室A',
+        roomName: roomId === 'RM004' ? '白沙瓦' : '翡冷翠',
         activeOrderId: 'ORD001',
         billId: 'BILL001',
         billStatus: 'Active',

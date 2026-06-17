@@ -3,8 +3,8 @@ var API = require('../../../utils/api')
 Page({
   data: {
     currentRoomId: "RM001",
-    currentRoomName: "大会议室",
-    roomNames: ["大会议室", "中茶室A", "中茶室B", "大茶室C"],
+    currentRoomName: "丰沙里",
+    roomNames: ["丰沙里", "翡冷翠", "布拉格", "白沙瓦"],
     roomIds: ["RM001", "RM002", "RM003", "RM004"],
     devices: [],
     showLockConfirm: false, lockDeviceId: "",

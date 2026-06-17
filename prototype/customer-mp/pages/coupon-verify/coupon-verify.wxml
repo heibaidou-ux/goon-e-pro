@@ -70,25 +70,25 @@
           <view class="ticket-card" bindtap="selectDemoCoupon" data-code="MT001298">
             <view class="ticket-card-header"><text class="ticket-source">🟡 美团</text></view>
             <text class="ticket-title">茶室双人体验套餐</text>
-            <text class="ticket-desc">适用大茶室C/中茶室A · 含2小时+茶饮</text>
+            <text class="ticket-desc">适用白沙瓦/翡冷翠 · 含2小时+茶饮</text>
             <text class="ticket-expiry">有效期至 2026-06-30</text>
           </view>
           <view class="ticket-card" bindtap="selectDemoCoupon" data-code="DY003456">
             <view class="ticket-card-header"><text class="ticket-source">🎵 抖音</text></view>
             <text class="ticket-title">商务会议3小时套餐</text>
-            <text class="ticket-desc">适用大会议室 · 含投影+茶歇</text>
+            <text class="ticket-desc">适用丰沙里 · 含投影+茶歇</text>
             <text class="ticket-expiry">有效期至 2026-06-15</text>
           </view>
           <view class="ticket-card" bindtap="selectDemoCoupon" data-code="DP007891">
             <view class="ticket-card-header"><text class="ticket-source">⭐ 大众点评</text></view>
             <text class="ticket-title">中茶室休闲体验</text>
-            <text class="ticket-desc">适用中茶室A/中茶室B · 含1壶茶</text>
+            <text class="ticket-desc">适用翡冷翠/布拉格 · 含1壶茶</text>
             <text class="ticket-expiry">有效期至 2026-07-01</text>
           </view>
           <view class="ticket-card" bindtap="selectDemoCoupon" data-code="GD009876">
             <view class="ticket-card-header"><text class="ticket-source">🗺️ 高德</text></view>
             <text class="ticket-title">茶室双人体验套餐</text>
-            <text class="ticket-desc">适用大茶室C/中茶室A · 含2小时+茶饮</text>
+            <text class="ticket-desc">适用白沙瓦/翡冷翠 · 含2小时+茶饮</text>
             <text class="ticket-expiry">有效期至 2026-12-31</text>
           </view>
         </view>

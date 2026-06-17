@@ -11,13 +11,13 @@ const stores = [{
 
 // 房间
 const rooms = [
-  { roomId: "RM001", name: "大会议室", type: "MeetingRoom", capacity: 10, area: 30,
+  { roomId: "RM001", name: "丰沙里", type: "MeetingRoom", capacity: 10, area: 30,
     facilities: ["投影", "会议桌", "K歌设备", "落地窗"], pricePerHour: 200, pricePerHalfHour: 120, status: "Active", bookable: true },
-  { roomId: "RM002", name: "中茶室A", type: "TeaRoom", capacity: 4, area: 18,
+  { roomId: "RM002", name: "翡冷翠", type: "TeaRoom", capacity: 4, area: 18,
     facilities: ["茶台", "落地窗", "茶具套装"], pricePerHour: 80, pricePerHalfHour: 50, status: "Active", bookable: true },
-  { roomId: "RM003", name: "中茶室B", type: "TeaRoom", capacity: 4, area: 18,
+  { roomId: "RM003", name: "布拉格", type: "TeaRoom", capacity: 4, area: 18,
     facilities: ["茶台", "落地窗", "茶具套装"], pricePerHour: 80, pricePerHalfHour: 50, status: "Active", bookable: true },
-  { roomId: "RM004", name: "大茶室C", type: "TeaRoom", capacity: 6, area: 25,
+  { roomId: "RM004", name: "白沙瓦", type: "TeaRoom", capacity: 6, area: 25,
     facilities: ["茶台", "K歌", "投影", "落地窗"], pricePerHour: 120, pricePerHalfHour: 75, status: "Active", bookable: true },
   { roomId: "RM005", name: "展厅", type: "Exhibition", capacity: 20, area: 40,
     facilities: ["前台", "收银", "茶具展示", "休闲区"], status: "Active", bookable: false },
@@ -43,7 +43,7 @@ const devices = [
   { deviceId: "DEV012", roomId: "RM002", type: "Fan", label: "风扇", protocol: "RS485", status: "Online", speed: 0 },
   { deviceId: "DEV013", roomId: "RM002", type: "Curtain", label: "窗帘", protocol: "RS485", status: "Online", position: "closed" },
   { deviceId: "DEV014", roomId: "RM002", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: false, volume: 50 },
-  // ── 中茶室B RM003 ──
+  // ── 布拉格 RM003 ──
   { deviceId: "DEV016", roomId: "RM003", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 0 },
   { deviceId: "DEV017", roomId: "RM003", type: "Light", label: "筒灯", protocol: "RS485", status: "Online", brightness: 0 },
   { deviceId: "DEV018", roomId: "RM003", type: "Light", label: "背景灯", protocol: "RS485", status: "Online", brightness: 0 },
@@ -52,7 +52,7 @@ const devices = [
   { deviceId: "DEV022", roomId: "RM003", type: "Curtain", label: "窗帘中", protocol: "RS485", status: "Online", position: "open" },
   { deviceId: "DEV023", roomId: "RM003", type: "Curtain", label: "窗帘右", protocol: "RS485", status: "Online", position: "closed" },
   { deviceId: "DEV024", roomId: "RM003", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: false, volume: 50 },
-  // ── 大茶室C RM004 ──
+  // ── 白沙瓦 RM004 ──
   { deviceId: "DEV025", roomId: "RM004", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 80 },
   { deviceId: "DEV026", roomId: "RM004", type: "Light", label: "筒灯", protocol: "RS485", status: "Online", brightness: 80 },
   { deviceId: "DEV027", roomId: "RM004", type: "Light", label: "背景灯", protocol: "RS485", status: "Online", brightness: 80 },
@@ -77,16 +77,16 @@ const deviceTypes = {
 
 // 订单
 const orders = [
-  { orderId: "ORD001", customerName: "张先生", roomId: "RM004", roomName: "大茶室C",
+  { orderId: "ORD001", customerName: "张先生", roomId: "RM004", roomName: "白沙瓦",
     status: "InUse", start: "2026-06-06T10:00:00", end: "2026-06-06T11:30:00",
     duration: 90, amount: 180, paymentMethod: "WeChat", phone: "138****8888" },
-  { orderId: "ORD002", customerName: "李女士", roomId: "RM002", roomName: "中茶室A",
+  { orderId: "ORD002", customerName: "李女士", roomId: "RM002", roomName: "翡冷翠",
     status: "Booked", start: "2026-06-06T14:00:00", end: "2026-06-06T16:00:00",
     duration: 120, amount: 160, paymentMethod: "Balance", phone: "139****6666" },
-  { orderId: "ORD003", customerName: "王先生", roomId: "RM003", roomName: "中茶室B",
+  { orderId: "ORD003", customerName: "王先生", roomId: "RM003", roomName: "布拉格",
     status: "Completed", start: "2026-06-06T08:00:00", end: "2026-06-06T09:30:00",
     duration: 90, amount: 120, paymentMethod: "WeChat", phone: "137****5555" },
-  { orderId: "ORD004", customerName: "赵总", roomId: "RM001", roomName: "大会议室",
+  { orderId: "ORD004", customerName: "赵总", roomId: "RM001", roomName: "丰沙里",
     status: "Completed", start: "2026-06-05T15:00:00", end: "2026-06-05T17:00:00",
     duration: 120, amount: 400, paymentMethod: "Alipay", phone: "136****7777" }
 ]

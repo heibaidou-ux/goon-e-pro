@@ -55,7 +55,7 @@ Page({
 
     // 开门菜单的房间列表
     self.setData({
-      doorRooms: ['大茶室C', '中茶室A', '中茶室B', '大会议室'],
+      doorRooms: ['白沙瓦', '翡冷翠', '布拉格', '丰沙里'],
       doorRoomIds: ['RM004', 'RM002', 'RM003', 'RM001']
     })
   },

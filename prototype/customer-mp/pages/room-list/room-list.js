@@ -9,10 +9,10 @@ Page({
     wx.pageScrollTo({ scrollTop: 0, duration: 0 })
     // 原型内置4间房，优先展示
     var embedded = [
-      { roomId:'RM001', name:'大会议室', type:'MeetingRoom', capacity:10, area:30, facilities:['投影','会议桌','K歌设备','落地窗'], pricePerHour:200 },
-      { roomId:'RM002', name:'中茶室A', type:'TeaRoom', capacity:4, area:18, facilities:['茶台','落地窗','茶具套装'], pricePerHour:80 },
-      { roomId:'RM003', name:'中茶室B', type:'TeaRoom', capacity:4, area:18, facilities:['茶台','落地窗','茶具套装'], pricePerHour:80 },
-      { roomId:'RM004', name:'大茶室C', type:'TeaRoom', capacity:6, area:25, facilities:['茶台','K歌','投影','落地窗'], pricePerHour:120 },
+      { roomId:'RM001', name:'丰沙里', type:'MeetingRoom', capacity:10, area:30, facilities:['投影','会议桌','K歌设备','落地窗'], pricePerHour:200 },
+      { roomId:'RM002', name:'翡冷翠', type:'TeaRoom', capacity:4, area:18, facilities:['茶台','落地窗','茶具套装'], pricePerHour:80 },
+      { roomId:'RM003', name:'布拉格', type:'TeaRoom', capacity:4, area:18, facilities:['茶台','落地窗','茶具套装'], pricePerHour:80 },
+      { roomId:'RM004', name:'白沙瓦', type:'TeaRoom', capacity:6, area:25, facilities:['茶台','K歌','投影','落地窗'], pricePerHour:120 },
     ]
     self.renderRooms(embedded)
 

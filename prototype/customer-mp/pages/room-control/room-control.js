@@ -39,7 +39,7 @@ Page({
 
   onLoad: function(e) {
     var roomId = e.roomId || 'RM004'
-    var roomName = e.roomName ? decodeURIComponent(e.roomName) : '大茶室C'
+    var roomName = e.roomName ? decodeURIComponent(e.roomName) : '白沙瓦'
     var duration = parseInt(e.duration) || 120
     var endStr = e.end || ''
     var startStr = e.start || ''

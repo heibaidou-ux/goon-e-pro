@@ -16,10 +16,10 @@ var COUPON_DB = {
 }
 
 var ROOM_DATA = {
-  RM004: { name:'大茶室C', capacity:6, icon:'🍵' },
-  RM001: { name:'大会议室', capacity:10, icon:'💼' },
-  RM002: { name:'中茶室A', capacity:4, icon:'🍵' },
-  RM003: { name:'中茶室B', capacity:4, icon:'🍵' },
+  RM004: { name:'白沙瓦', capacity:6, icon:'🍵' },
+  RM001: { name:'丰沙里', capacity:10, icon:'💼' },
+  RM002: { name:'翡冷翠', capacity:4, icon:'🍵' },
+  RM003: { name:'布拉格', capacity:4, icon:'🍵' },
 }
 
 var PLATFORM_HINTS = {

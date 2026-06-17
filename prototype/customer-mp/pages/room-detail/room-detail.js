@@ -1,10 +1,10 @@
 var API = require('../../utils/api')
 
 var ROOMS_DATA = [
-  { roomId:"RM004", name:"大茶室C", type:"茶室", capacity:6, area:25, facilities:["茶台","K歌","投影","落地窗"], pricePerHour:120, bookable:true },
-  { roomId:"RM001", name:"大会议室", type:"会议室", capacity:10, area:30, facilities:["投影","会议桌","K歌设备","落地窗"], pricePerHour:200, bookable:true },
-  { roomId:"RM002", name:"中茶室A", type:"茶室", capacity:4, area:18, facilities:["茶台","落地窗","茶具套装"], pricePerHour:80, bookable:true },
-  { roomId:"RM003", name:"中茶室B", type:"茶室", capacity:4, area:18, facilities:["茶台","落地窗","茶具套装"], pricePerHour:80, bookable:true },
+  { roomId:"RM004", name:"白沙瓦", type:"茶室", capacity:6, area:25, facilities:["茶台","K歌","投影","落地窗"], pricePerHour:120, bookable:true },
+  { roomId:"RM001", name:"丰沙里", type:"会议室", capacity:10, area:30, facilities:["投影","会议桌","K歌设备","落地窗"], pricePerHour:200, bookable:true },
+  { roomId:"RM002", name:"翡冷翠", type:"茶室", capacity:4, area:18, facilities:["茶台","落地窗","茶具套装"], pricePerHour:80, bookable:true },
+  { roomId:"RM003", name:"布拉格", type:"茶室", capacity:4, area:18, facilities:["茶台","落地窗","茶具套装"], pricePerHour:80, bookable:true },
   { roomId:"RM005", name:"展厅", type:"展厅", capacity:20, area:40, facilities:["前台","收银","茶具展示","休闲区"], bookable:false },
   { roomId:"RM006", name:"工作间", type:"工作间", capacity:2, area:12, facilities:["储物","机柜"], bookable:false },
 ]

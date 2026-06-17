@@ -20,7 +20,7 @@ Page({
   data: {
     rooms: [],
     roomIndex: 0,
-    roomName: '大茶室C',
+    roomName: '白沙瓦',
     roomBookable: true,
     activeSceneId: 'Welcome',
     activeSceneName: '欢迎模式',
@@ -82,7 +82,7 @@ Page({
     var room = this.data.rooms[idx]
     this.setData({
       roomIndex: idx,
-      roomName: room ? room.name : '大茶室C',
+      roomName: room ? room.name : '白沙瓦',
       showRoomPicker: false,
       activeSceneId: 'Welcome',
       isManualOverride: false
