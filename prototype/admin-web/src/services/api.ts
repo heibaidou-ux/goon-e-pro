@@ -60,18 +60,38 @@ async function request<T>(
     if (token) headers['Authorization'] = `Bearer ${token}`
   }
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: opts?.formData ?? (body ? JSON.stringify(body) : undefined),
-  })
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: opts?.formData ?? (body ? JSON.stringify(body) : undefined),
+    })
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => 'Unknown error')
-    throw new Error(`API ${method} ${path}: ${res.status} ${text}`)
+    if (res.status === 401) {
+      clearToken()
+      localStorage.removeItem('erp_logged_in')
+      localStorage.removeItem('erp_user')
+      window.location.hash = '#/login'
+      throw new Error('登录已过期')
+    }
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      try {
+        const json = JSON.parse(text)
+        throw new Error(json.detail || json.message || `请求失败 (${res.status})`)
+      } catch (e: any) {
+        if (!e.message.startsWith('请求失败')) throw e
+        throw new Error(`请求失败: ${res.status}`)
+      }
+    }
+    return res.json()
+  } catch (err: any) {
+    if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
+      throw new Error('无法连接后端服务 (' + API_BASE + ')，请确认服务已启动')
+    }
+    throw err
   }
-
-  return res.json()
 }
 
 // ── Auth ──

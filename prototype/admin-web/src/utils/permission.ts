@@ -30,12 +30,15 @@ export interface UserRole {
 
 // Get the current user's role from localStorage
 export function getCurrentUserRoles(): string[] {
-  const userJson = localStorage.getItem('erp_user')
-  if (!userJson) return []
-
-  const userRoles = (permissions.userRoles as UserRole[])
-  const found = userRoles.find(u => u.name === userJson)
-  return found?.roles || []
+  const role = localStorage.getItem('erp_user_role') || 'guest'
+  const roleMap: Record<string, string[]> = {
+    admin: ['role_admin'],
+    staff: ['role_staff'],
+    finance: ['role_finance'],
+    manager: ['role_manager'],
+    guest: [],
+  }
+  return roleMap[role] || []
 }
 
 // Check if current user has a specific permission (resourceId)
