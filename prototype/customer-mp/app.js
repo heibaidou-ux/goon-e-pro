@@ -51,29 +51,30 @@ App({
     var curMin = now.getHours()*60 + now.getMinutes()
     var checked = {}
 
-    // 从全局存储中读取订单
+    // 从API获取所有订单（含mock数据）
+    var ctx = this
     try {
-      var bookings = wx.getStorageSync('mp_bookings') || []
-      for (var i = 0; i < bookings.length; i++) {
-        var b = bookings[i]
-        if (b.status !== 'Booked' || b.date !== todayStr || !b.time) continue
-        // 去重：同一房间只触发一次
-        if (checked[b.roomId]) continue
+      var utilApi = require('./utils/api')
+      utilApi.getAllOrders().then(function(bookings) {
+        if (!bookings || !bookings.length) return
+        for (var i = 0; i < bookings.length; i++) {
+          var b = bookings[i]
+          if (b.status !== 'Booked' || b.date !== todayStr || !b.time) continue
+          if (checked[b.roomId]) continue
 
-        var parts = b.time.split('-')
-        if (parts.length < 2) continue
-        var sp = parts[0].split(':')
-        var startMin = parseInt(sp[0])*60 + parseInt(sp[1])
+          var parts = b.time.split('-')
+          if (parts.length < 2) continue
+          var sp = parts[0].split(':')
+          var startMin = parseInt(sp[0])*60 + parseInt(sp[1])
 
-        // 距开始还有1-5分钟时触发
-        var diff = startMin - curMin
-        if (diff >= 1 && diff <= 5) {
-          checked[b.roomId] = true
-          console.log('[预开] ' + b.roomName + ' 将在' + diff + '分钟后开始，触发空调预开')
-          // 触发预开场景（只开空调+轻音乐，不动门锁灯光）
-          try { API.executeScene(b.roomId, 'PreOpen').catch(function(){}) } catch(e) {}
+          var diff = startMin - curMin
+          // 距开始1-2分钟才触发，避免过早开空调
+          if (diff >= 1 && diff <= 2) {
+            checked[b.roomId] = true
+            try { utilApi.executeScene(b.roomId, 'PreOpen').catch(function(){}) } catch(e) {}
+          }
         }
-      }
+      }).catch(function() {})
     } catch(e) {}
   },
 

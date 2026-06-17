@@ -157,10 +157,32 @@ const STAFF_API = {
     return this._mockCleaning()
   },
   _mockCleaning() {
-    return delay().then(() => ({
-      pending: [{taskId:'CT001',roomName:'白沙瓦',roomId:'RM004',type:'FullClean',priority:'High',deadline:'10:30'},{taskId:'CT002',roomName:'翡冷翠',roomId:'RM002',type:'QuickClean',priority:'Normal',deadline:'11:00'}],
-      inProgress: [{taskId:'CT003',roomName:'丰沙里',roomId:'RM001',type:'FullClean',priority:'Normal',deadline:'10:00'}]
-    }))
+    var self = this
+    return delay().then(function() {
+      var now = new Date()
+      var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
+      var curMin = now.getHours()*60+now.getMinutes()
+      var needClean = []
+      try {
+        var bookings = wx.getStorageSync('mp_bookings') || []
+        for (var i = 0; i < bookings.length; i++) {
+          var b = bookings[i]
+          if (b.date === todayStr && b.time && b.roomId) {
+            var ep = b.time.split('-')[1].split(':'); var endMin = parseInt(ep[0])*60+parseInt(ep[1])
+            if (curMin >= endMin && (b.status === 'InUse' || b.status === 'Expired' || b.status === 'Completed')) {
+              var rmName = b.roomName || '房间'
+              var dup = false
+              for (var j = 0; j < needClean.length; j++) { if (needClean[j].roomId === b.roomId) { dup = true; break } }
+              if (!dup) needClean.push({taskId:'CT'+b.roomId,roomName:rmName,roomId:b.roomId,type:'FullClean',priority:'Normal',deadline:'尽快'})
+            }
+          }
+        }
+      } catch(e) {}
+      if (needClean.length === 0) {
+        needClean = [{taskId:'CT001',roomName:'白沙瓦',roomId:'RM004',type:'FullClean',priority:'High',deadline:'尽快'}]
+      }
+      return { pending: needClean.slice(0,3), inProgress: [] }
+    })
   },
   acceptCleaningTask(taskId) { return delay(200).then(() => ({ success:true })) },
   completeCleaningTask(taskId) { return delay(200).then(() => ({ success:true })) },

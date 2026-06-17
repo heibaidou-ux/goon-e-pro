@@ -51,13 +51,20 @@ Page({
     // 查询该房间当前订单状态
     var todayStr = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0')
     API.getAllOrders().then(function(orders) {
+      var curMin = new Date().getHours()*60+new Date().getMinutes()
       var list = orders || []
       var activeOrder = null
       for (var i = 0; i < list.length; i++) {
         var o = list[i]
         if (o.roomId !== roomId) continue
-        if (o.status === 'InUse' && o.date === todayStr) { activeOrder = o; break }
-        if (o.status === 'Booked' && o.date === todayStr && !activeOrder) { activeOrder = o }
+        if (o.status === 'InUse' && o.date === todayStr && o.time) {
+          var ep = o.time.split('-')[1].split(':'); var endMin = parseInt(ep[0])*60+parseInt(ep[1])
+          if (curMin < endMin) { activeOrder = o; break }
+        }
+        if (!activeOrder && o.status === 'Booked' && o.date === todayStr && o.time) {
+          var sp = o.time.split('-')[0].split(':'); var sm = parseInt(sp[0])*60+parseInt(sp[1])
+          if (curMin < sm) { activeOrder = o }
+        }
       }
 
       if (activeOrder && activeOrder.status === 'InUse') {
