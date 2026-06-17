@@ -19,22 +19,34 @@ Page({
     this.updateTime()
     var self = this
 
-    // 从房间列表+订单数据计算房态统计
+    // 从房间列表+订单数据计算房态统计（与房态管理页逻辑一致）
     API.getRooms(true).then(function(rooms) {
       var totalRooms = rooms.length
       var todayStr = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0')
+      var curMin = new Date().getHours()*60+new Date().getMinutes()
 
       API.getAllOrders().then(function(orders) {
         var list = orders || []
         var todayOrders = list.filter(function(o) { return o.date === todayStr || (o.created && o.created.indexOf(todayStr) === 0) })
 
         var inUse = 0, booked = 0, revenue = 0
-        var countedRooms = {}
-        for (var i = 0; i < list.length; i++) {
-          var o = list[i]
-          if (!o.roomId || countedRooms[o.roomId]) continue
-          if (o.status === 'InUse') { inUse++; countedRooms[o.roomId] = true }
-          else if (o.status === 'Booked' && o.date === todayStr) { booked++; countedRooms[o.roomId] = true }
+
+        for (var ri = 0; ri < rooms.length; ri++) {
+          var r = rooms[ri]
+          var foundInUse = false, foundBooked = false
+          for (var i = 0; i < list.length; i++) {
+            var o = list[i]
+            if (o.roomId !== r.roomId || o.status === 'Cancelled') continue
+            if (o.status === 'InUse' && o.date === todayStr && o.time) {
+              var ep = o.time.split('-')[1].split(':'); var endMin = parseInt(ep[0])*60+parseInt(ep[1])
+              if (curMin < endMin) { foundInUse = true; break }
+            }
+            if (o.status === 'Booked' && o.date === todayStr && o.time) {
+              var sp = o.time.split('-')[0].split(':'); var sm = parseInt(sp[0])*60+parseInt(sp[1])
+              if (curMin < sm) { foundBooked = true; break }
+            }
+          }
+          if (foundInUse) inUse++; else if (foundBooked) booked++
         }
         for (var i = 0; i < todayOrders.length; i++) revenue += todayOrders[i].amount || 0
 
