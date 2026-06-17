@@ -11,6 +11,7 @@ Page({
     showTransferModal: false, transferProduct: null,
     transferReason: '', transferQty: 1,
     transferLog: [],
+    showShelfModal: false, shelfProduct: null, shelfQty: 1,
     showDiscrepancyModal: false, discrepancyInfo: ''
   },
 
@@ -65,19 +66,39 @@ Page({
     this.setData({ products: list })
   },
 
-  // ── 上架/下架 ──
-  toggleStatus: function(e) {
+  // ── 上架（强制输入数量）──
+  showShelfForm: function(e) {
     var id = e.currentTarget.dataset.id
     var products = this.data.allProducts
     for (var i = 0; i < products.length; i++) {
       if (products[i].productId === id || products[i].id === id) {
-        products[i].status = products[i].status === '上架' ? '下架' : '上架'
+        this.setData({ showShelfModal: true, shelfProduct: products[i], shelfQty: 1 })
         break
       }
     }
-    this.setData({ allProducts: products })
-    this._applyFilters()
-    wx.showToast({ title: '状态已更新', icon: 'success' })
+  },
+  onShelfQty: function(e) { this.setData({ shelfQty: parseInt(e.detail.value) || 1 }) },
+  confirmShelf: function() {
+    var self = this
+    var p = self.data.shelfProduct; if (!p || !self.data.shelfQty) return
+    var products = self.data.allProducts
+    for (var i = 0; i < products.length; i++) {
+      if (products[i].productId === p.productId || products[i].id === p.id) {
+        products[i].status = '上架'; products[i].stock = (products[i].stock || 0) + self.data.shelfQty; break
+      }
+    }
+    self.setData({ allProducts: products, showShelfModal: false }); self._applyFilters()
+    wx.showToast({ title: '已上架 +' + self.data.shelfQty, icon: 'success' })
+  },
+  hideShelfModal: function() { this.setData({ showShelfModal: false }) },
+  // ── 下架 ──
+  unshelf: function(e) {
+    var id = e.currentTarget.dataset.id; var products = this.data.allProducts
+    for (var i = 0; i < products.length; i++) {
+      if (products[i].productId === id || products[i].id === id) { products[i].status = '下架'; break }
+    }
+    this.setData({ allProducts: products }); this._applyFilters()
+    wx.showToast({ title: '已下架', icon: 'success' })
   },
 
   // ── 盘点 ──

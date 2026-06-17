@@ -28,7 +28,9 @@
           <text class="pc-stock {{item.lowStock?'low':''}}">{{item.stock}}{{item.unit}}</text>
         </view>
         <view class="pc-actions">
-          <text class="pa-btn" bindtap="toggleStatus" data-id="{{item.productId||item.id}}">{{item.status=='上架'?'⬇ 下架':'⬆ 上架'}}</text>
+          <text class="pa-btn primary" bindtap="showShelfForm" data-id="{{item.productId||item.id}}" wx:if="{{item.status!='上架'}}">⬆ 上架</text>
+          <text class="pa-btn primary" bindtap="showShelfForm" data-id="{{item.productId||item.id}}" wx:if="{{item.status=='上架'}}">⬆ 补货</text>
+          <text class="pa-btn" bindtap="unshelf" data-id="{{item.productId||item.id}}" wx:if="{{item.status=='上架'}}">⬇ 下架</text>
           <text class="pa-btn" bindtap="showStock" data-id="{{item.productId||item.id}}">📊 盘点</text>
           <text class="pa-btn" bindtap="showTransfer" data-id="{{item.productId||item.id}}">📦 调货</text>
         </view>
@@ -47,6 +49,19 @@
     </view>
   </view>
   <staff-bottom-nav active="orders"></staff-bottom-nav>
+</view>
+
+<!-- 上架弹窗 -->
+<view class="modal-overlay" wx:if="{{showShelfModal}}" bindtap="hideShelfModal">
+  <view class="modal" catchtap>
+    <text class="modal-title">⬆ 上架 — {{shelfProduct.name}}</text>
+    <text class="modal-hint">输入上架数量</text>
+    <input class="modal-input" type="number" value="{{shelfQty}}" bindinput="onShelfQty" />
+    <view class="modal-btns">
+      <view class="m-btn cancel" bindtap="hideShelfModal">取消</view>
+      <view class="m-btn primary" bindtap="confirmShelf">确认上架</view>
+    </view>
+  </view>
 </view>
 
 <!-- 盘点弹窗 -->
