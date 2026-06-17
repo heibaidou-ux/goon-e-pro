@@ -69,14 +69,14 @@ async def seed():
 
         # ── Rooms (new model: camelCase) ──
         rooms_data = [
-            {"roomId": "RM001", "name": "大茶室C", "type": "TeaRoom", "capacity": 6,
-             "floor": "16F", "description": "宽敞大茶室，适合商务洽谈和小型聚会"},
-            {"roomId": "RM002", "name": "中茶室A", "type": "TeaRoom", "capacity": 4,
+            {"roomId": "RM001", "name": "丰沙里", "type": "MeetingRoom", "capacity": 10,
+             "floor": "16F", "description": "专业会议室，配备投影和会议设备"},
+            {"roomId": "RM002", "name": "翡冷翠", "type": "TeaRoom", "capacity": 4,
              "floor": "16F", "description": "温馨中茶室，适合朋友小聚"},
-            {"roomId": "RM003", "name": "中茶室B", "type": "TeaRoom", "capacity": 4,
+            {"roomId": "RM003", "name": "布拉格", "type": "TeaRoom", "capacity": 4,
              "floor": "16F", "description": "优雅中茶室，适合品茶休闲"},
-            {"roomId": "RM004", "name": "VIP房", "type": "TeaRoom", "capacity": 8,
-             "floor": "16F", "description": "豪华VIP房，配备顶级音响和独立洗手间"},
+            {"roomId": "RM004", "name": "白沙瓦", "type": "TeaRoom", "capacity": 6,
+             "floor": "16F", "description": "宽敞大茶室，适合商务洽谈和小型聚会"},
         ]
         for r in rooms_data:
             room = Room(

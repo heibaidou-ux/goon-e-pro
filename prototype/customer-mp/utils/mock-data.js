@@ -27,7 +27,7 @@ const rooms = [
 
 // 设备（客人端可见设备，隐藏继电器等基础设施）
 const devices = [
-  // ── 会议室 RM001 ──
+  // ── 丰沙里 RM001 ──
   { deviceId: "DEV001", roomId: "RM001", type: "Light", label: "筒灯1", protocol: "RS485", status: "Online", brightness: 80 },
   { deviceId: "DEV002", roomId: "RM001", type: "Light", label: "筒灯2", protocol: "RS485", status: "Online", brightness: 80 },
   { deviceId: "DEV003", roomId: "RM001", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 80 },
@@ -36,7 +36,7 @@ const devices = [
   { deviceId: "DEV006", roomId: "RM001", type: "Fan", label: "风扇3", protocol: "RS485", status: "Online", speed: 0 },
   { deviceId: "DEV007", roomId: "RM001", type: "AC", label: "空调", protocol: "RS485", status: "Online", temperature: 24, mode: "cool" },
   { deviceId: "DEV008", roomId: "RM001", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: false, volume: 50 },
-  // ── 小茶室 RM002 ──
+  // ── 翡冷翠 RM002 ──
   { deviceId: "DEV009", roomId: "RM002", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 60 },
   { deviceId: "DEV010", roomId: "RM002", type: "Light", label: "筒灯", protocol: "RS485", status: "Online", brightness: 60 },
   { deviceId: "DEV011", roomId: "RM002", type: "ExhaustFan", label: "换气扇", protocol: "RS485", status: "Online", speed: 0 },
