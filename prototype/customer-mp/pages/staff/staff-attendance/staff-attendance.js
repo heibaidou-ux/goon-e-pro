@@ -27,7 +27,7 @@ Page({
     var self = this
     STAFF_API.checkIn().then(function(r) {
       self.setData({ checkedIn: true, checkedOut: false, todayStatus: '在岗', checkInTime: r.time })
-      wx.showToast({ title: '✅ 签到成功 ' + r.time, icon: 'none' })
+      wx.showToast({ title: '签到成功 ' + r.time, icon: 'none' })
       self.loadAttendance()
     })
   },
@@ -37,7 +37,7 @@ Page({
     if (!this.data.checkedIn) return
     STAFF_API.checkOut().then(function(r) {
       self.setData({ checkedOut: true, todayStatus: '已签退', checkOutTime: r.time })
-      wx.showToast({ title: '🏁 签退成功 ' + r.time, icon: 'none' })
+      wx.showToast({ title: '签退成功 ' + r.time, icon: 'none' })
       self.loadAttendance()
     })
   },
@@ -49,4 +49,4 @@ Page({
     else if (type === 'month') this.setData({ weekRecords: this.data.records.slice(0, 30) })
     else this.setData({ weekRecords: this.data.records })
   }
-}
+})
