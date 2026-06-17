@@ -31,8 +31,8 @@ Page({
 
       // 根据角色跳转不同首页
       var homePage = ''
-      if (user.role === 'staff') homePage = '/pages/staff-dashboard/staff-dashboard'
-      else if (user.role === 'shareholder') homePage = '/pages/investor-workbench/investor-workbench'
+      if (user.role === 'staff') homePage = '/pages/staff/staff-dashboard/staff-dashboard'
+      else if (user.role === 'shareholder') homePage = '/pages/workbench/investor-workbench/investor-workbench'
 
       wx.reLaunch({ url: homePage })
     }).catch(function(err) {
