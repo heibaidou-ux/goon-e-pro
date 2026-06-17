@@ -116,14 +116,16 @@ Page({
   hideConfirmModal: function() { this.setData({ showConfirmModal: false, pendingCode: '' }) },
 
   confirmCouponUse: function() {
-    this.setData({ showConfirmModal: false })
-    // 记录核销记录
+    if (this.data._verifying) return
+    this.setData({ _verifying: true, showConfirmModal: false })
     var code = this.data.pendingCode
     var info = COUPON_DB[code]
     if (info) {
       try {
         var verified = wx.getStorageSync('mp_verified_coupons') || []
-        verified.unshift({
+        var dup = false
+        for (var i = 0; i < verified.length; i++) { if (verified[i].code === code) { dup = true; break } }
+        if (!dup) verified.unshift({
           code: code, platform: info.source, title: info.title, price: info.price,
           time: new Date().toLocaleString(), room: ''
         })
@@ -131,6 +133,8 @@ Page({
       } catch(e) {}
     }
     this.doVerify(code)
+    var self = this
+    setTimeout(function() { self.setData({ _verifying: false }) }, 1000)
   },
 
   // 店员端：加载已核销记录
