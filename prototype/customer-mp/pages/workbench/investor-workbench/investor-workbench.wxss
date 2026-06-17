@@ -1,1 +1,17 @@
-/* pages/workbench/investor-workbench/investor-workbench.wxss */
+.phone { height:100vh; overflow:hidden; display:flex; flex-direction:column; background:#FAF8F5; }
+.header { padding:14px 16px; background:#fff; border-bottom:1px solid #f0ece6; display:flex; justify-content:space-between; align-items:center; }
+.header-title { font-size:18px; font-weight:700; }
+.header-link { font-size:13px; color:#5D8A6B; font-weight:500; }
+.page { flex:1; overflow-y:auto; }
+.stats-grid { display:flex; gap:8px; padding:16px; }
+.stat-card { flex:1; text-align:center; background:#fff; border-radius:14px; padding:16px 8px; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+.stat-value { display:block; font-size:20px; font-weight:700; color:#5D8A6B; }
+.stat-label { display:block; font-size:11px; color:#999; margin-top:4px; }
+.empty-state { text-align:center; padding:60px 20px; color:#999; }
+.empty-icon { font-size:56px; display:block; margin-bottom:12px; }
+.empty-title { font-size:16px; font-weight:600; color:#666; display:block; }
+.empty-desc { font-size:13px; color:#bbb; margin-top:6px; display:block; }
+.action-bar { display:flex; gap:10px; padding:0 16px 30px; }
+.action-btn { flex:1; padding:14px; border-radius:14px; font-size:14px; font-weight:600; text-align:center; background:#5D8A6B; color:#fff; }
+.action-btn.outline { background:#fff; color:#5D8A6B; border:1.5px solid #5D8A6B; }
+.action-btn:active { opacity:.8; }

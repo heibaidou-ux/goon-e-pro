@@ -1,2 +1,22 @@
-<!--pages/workbench/investor-workbench/investor-workbench.wxml-->
-<text>pages/workbench/investor-workbench/investor-workbench.wxml</text>
+<view class="phone">
+  <view class="header">
+    <text class="header-title">📈 投资人工作台</text>
+    <text class="header-link" bindtap="goHome">← 返回首页</text>
+  </view>
+  <view class="page">
+    <view class="stats-grid">
+      <view class="stat-card"><text class="stat-value">¥0</text><text class="stat-label">本月分红</text></view>
+      <view class="stat-card"><text class="stat-value">¥0</text><text class="stat-label">累计收益</text></view>
+      <view class="stat-card"><text class="stat-value">0%</text><text class="stat-label">投资回报率</text></view>
+    </view>
+    <view class="empty-state">
+      <text class="empty-icon">📊</text>
+      <text class="empty-title">股东端功能开发中</text>
+      <text class="empty-desc">门店经营数据、分红记录等将在后续版本上线</text>
+    </view>
+    <view class="action-bar">
+      <view class="action-btn" bindtap="goHome">🏠 返回客人首页</view>
+      <view class="action-btn outline" bindtap="goStaffLogin">🔐 切换为店员登录</view>
+    </view>
+  </view>
+</view>
