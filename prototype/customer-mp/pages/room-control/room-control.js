@@ -27,7 +27,8 @@ var FAN_LABELS = { 'DEV004':'风扇1','DEV005':'风扇2','DEV006':'风扇3','DEV
 Page({
   data: {
     roomId: '', roomName: '房间',
-    countdown: '--:--', endTime: '--:--', orderSlot: '', orderStart: '',
+    roomStatus: 'idle', roomStatusLabel: '', orderSlot: '',
+    countdown: '--:--', endTime: '--:--', orderStart: '',
     balance: 0, hideBottomNav: false,
     devKeys: [], acModeLabel: '',
     acDevice: null, curtainDevices: [], bgmDevice: null,
@@ -42,11 +43,43 @@ Page({
     var duration = parseInt(e.duration) || 120
     var endStr = e.end || ''
     var startStr = e.start || ''
-    try { if (wx.getStorageSync('mp_user_role') === 'staff') this.setData({ hideBottomNav: true }) } catch(e) {}
-    this.setData({ roomId: roomId, roomName: roomName, orderStart: startStr })
-    this.loadDevices()
-    this.startCountdown(duration, endStr)
     var self = this
+    try { if (wx.getStorageSync('mp_user_role') === 'staff') self.setData({ hideBottomNav: true }) } catch(e) {}
+
+    self.setData({ roomId: roomId, roomName: roomName, orderStart: startStr })
+
+    // 查询该房间当前订单状态
+    var todayStr = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0')
+    API.getAllOrders().then(function(orders) {
+      var list = orders || []
+      var activeOrder = null
+      for (var i = 0; i < list.length; i++) {
+        var o = list[i]
+        if (o.roomId !== roomId) continue
+        if (o.status === 'InUse' && o.date === todayStr) { activeOrder = o; break }
+        if (o.status === 'Booked' && o.date === todayStr && !activeOrder) { activeOrder = o }
+      }
+
+      if (activeOrder && activeOrder.status === 'InUse') {
+        var timeStr = activeOrder.time || ''
+        var slot = ''
+        if (timeStr) {
+          var parts = timeStr.split('-')
+          if (parts.length >= 2) {
+            slot = parts[0] + ' - ' + parts[1]
+            self.startCountdown(duration, parts[1])
+          }
+        }
+        self.setData({ roomStatus: 'inuse', roomStatusLabel: '使用中', orderSlot: slot })
+      } else if (activeOrder && activeOrder.status === 'Booked') {
+        self.setData({ roomStatus: 'booked', roomStatusLabel: '已预订', orderSlot: activeOrder.time || '' })
+      } else {
+        self.setData({ roomStatus: 'idle', roomStatusLabel: '当前无订单', orderSlot: '' })
+      }
+    })
+
+    self.loadDevices()
+    if (endStr) self.startCountdown(duration, endStr)
     API.getBalance().then(function(b) { self.setData({ balance: b || 0 }) })
   },
 

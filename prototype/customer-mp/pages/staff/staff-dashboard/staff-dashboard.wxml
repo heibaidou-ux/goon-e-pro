@@ -99,21 +99,22 @@
     </view>
   </view>
 
-  <!-- 待办事项预览 -->
-  <view class="section-title">待办事项</view>
-  <view class="todo-list">
-    <view class="todo-item {{item.priority === 'high' ? 'high' : ''}} {{item.type === 'shipping' ? 'ship' : ''}}" wx:for="{{todos}}" wx:key="id" bindtap="goTodo">
-      <view class="todo-body">
-        <text class="todo-title">{{item.title}}</text>
-        <text class="todo-meta">{{item.type}} · 截止 {{item.deadline}}</text>
-      </view>
-      <text class="todo-arrow">›</text>
-    </view>
-  </view>
-
   <!-- 退出登录 -->
   <view class="logout-section" bindtap="doLogout">
     <text class="logout-text">退出登录 → 回到客人端</text>
   </view>
 </view>
+  <!-- 开门菜单 -->
+  <view class="modal-overlay modal-center" wx:if="{{showDoorMenu}}" bindtap="hideDoorMenu">
+    <view class="door-menu" catchtap>
+      <text class="door-menu-title">🚪 选择房间开门</text>
+      <view class="door-menu-item {{idx==0?'first':''}}" wx:for="{{doorRooms}}" wx:for-index="idx" wx:key="*this" bindtap="selectDoorRoom" data-idx="{{idx}}">
+        <text class="dmi-icon">🚪</text>
+        <text class="dmi-name">{{item}}</text>
+        <text class="dmi-arrow">›</text>
+      </view>
+      <view class="door-menu-item cancel" bindtap="hideDoorMenu">取消</view>
+    </view>
+  </view>
+
   <staff-bottom-nav active="dashboard"></staff-bottom-nav></view>

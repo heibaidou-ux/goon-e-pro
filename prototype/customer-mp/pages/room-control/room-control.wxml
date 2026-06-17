@@ -3,13 +3,15 @@
     <text class="nav-title">{{roomName}}</text>
   </view>
   <view class="page">
-    <!-- 订单时间+剩余时间 -->
-    <view class="room-info-bar">
+    <!-- 房间状态栏 -->
+    <view class="room-info-bar {{roomStatus}}">
       <view class="room-info-left">
         <text class="room-info-name">{{roomName}}</text>
-        <text class="room-info-slot">当前预订时段 {{orderSlot}}</text>
+        <text class="room-info-slot" wx:if="{{roomStatus=='inuse'}}">当前预订时段 {{orderSlot}}</text>
+        <text class="room-info-slot" wx:if="{{roomStatus=='idle'}}">{{roomStatusLabel}}</text>
+        <text class="room-info-slot" wx:if="{{roomStatus=='booked'}}">已预订 {{orderSlot}}</text>
       </view>
-      <view class="room-info-right">
+      <view class="room-info-right" wx:if="{{roomStatus=='inuse'}}">
         <text class="countdown">{{countdown}}</text>
         <text class="room-info-end">剩余</text>
       </view>

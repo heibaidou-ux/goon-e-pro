@@ -59,3 +59,16 @@
 .rov-item.booked .rov-num { color:#9c27b0; }
 .rov-item.cleaning { background:#fff7ed; }
 .rov-item.cleaning .rov-num { color:#e37318; }
+
+/* ── 开门菜单 ── */
+.modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:99;display:flex;align-items:center;justify-content:center; }
+.modal-center { align-items:center; }
+.door-menu { background:#fff;border-radius:20px;width:280px;max-width:85vw;overflow:hidden; }
+.door-menu-title { padding:16px 20px 12px;font-size:16px;font-weight:700;color:#333;text-align:center;border-bottom:1px solid #f0ece6; }
+.door-menu-item { display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid #f5f5f5; }
+.door-menu-item:active { background:#f0faf2; }
+.door-menu-item.first { border-top:none; }
+.dmi-icon { font-size:18px;margin-right:10px; }
+.dmi-name { flex:1;font-size:14px;color:#333;font-weight:500; }
+.dmi-arrow { color:#ccc;font-size:16px; }
+.door-menu-item.cancel { justify-content:center;color:#999;font-size:14px;border-bottom:none; }
