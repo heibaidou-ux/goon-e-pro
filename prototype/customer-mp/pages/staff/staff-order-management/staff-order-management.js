@@ -169,10 +169,12 @@ Page({
   },
 
   checkIn: function(e){
-    var id=e.currentTarget.dataset.id,orders=this.data.orders,roomId=''
+    var self=this,id=e.currentTarget.dataset.id,orders=self.data.orders,roomId=''
     for(var i=0;i<orders.length;i++){if(orders[i].orderId===id||orders[i].id===id){roomId=orders[i].roomId||'';break}}
+    try{var bk=wx.getStorageSync('mp_bookings')||[];for(var i=0;i<bk.length;i++){if(bk[i].orderId===id||bk[i].id===id){bk[i].status='InUse';break}};wx.setStorageSync('mp_bookings',bk)}catch(e){}
     if(roomId){var api=require('../../../utils/api');api.executeScene(roomId,'Welcome').catch(function(){})}
     wx.showToast({title:'已开始使用',icon:'success'})
+    self.loadOrders()
   },
 
   cancelBooking: function(e){

@@ -413,7 +413,16 @@ const API = {
       var room = null
       for (var i = 0; i < MOCK.rooms.length; i++) { if (MOCK.rooms[i].roomId === roomId) { room = MOCK.rooms[i]; break } }
       if (!room) throw new Error('房间不存在')
-      return { roomId, roomName: room.name, storeId: 'ST001', storeName: '盈隆店', status: room.status === 'Active' ? 'Active' : 'Inactive', hasActiveOrder: roomId === 'RM004' || roomId === 'RM002', activeOrderId: 'ORD001', message: '欢迎使用 ' + room.name }
+      // 检查是否有进行中订单
+      var hasActive = false
+      try {
+        var bookings = wx.getStorageSync('mp_bookings') || []
+        var today = new Date(); var ds = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0')
+        for (var i = 0; i < bookings.length; i++) {
+          if (bookings[i].roomId === roomId && bookings[i].date === ds && bookings[i].status === 'InUse') { hasActive = true; break }
+        }
+      } catch(e) {}
+      return { roomId, roomName: room.name, storeId: 'ST001', storeName: '盈隆店', status: 'Active', hasActiveOrder: hasActive || roomId === 'RM004', activeOrderId: 'ORD001', message: '欢迎使用 ' + room.name }
     })
   },
 

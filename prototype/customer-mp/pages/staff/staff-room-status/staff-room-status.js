@@ -47,7 +47,7 @@ Page({
                 currentOrder = {
                   orderId: o.orderId,
                   customerName: o.customerName || o.phone || '客人',
-                  start: o.time.split('-')[0], end: o.time.split('-')[1]
+                  start: o.time.split('-')[0], end: o.time.split('-')[1], date: o.date||''
                 }
                 break
               }
@@ -65,7 +65,7 @@ Page({
                   currentOrder = {
                     orderId: o.orderId,
                     customerName: o.customerName || o.phone || '客人',
-                    start: parts[0], end: parts[1],
+                    start: parts[0], end: parts[1], date: o.date||'',
                     upcoming: true
                   }
                 }
@@ -186,10 +186,13 @@ Page({
 
   menuCheckIn: function() {
     this.hideRoomMenu()
+    var self=this
+    var id=self.data.menuOrderId,roomId=self.data.menuRoomId
+    try{var bk=wx.getStorageSync('mp_bookings')||[];for(var i=0;i<bk.length;i++){if((bk[i].orderId===id||bk[i].id===id)||(bk[i].roomId===roomId&&bk[i].status==='Booked')){bk[i].status='InUse';break}};wx.setStorageSync('mp_bookings',bk)}catch(e){}
     var api=require('../../../utils/api')
-    if(this.data.menuRoomId) api.executeScene(this.data.menuRoomId,'Welcome').catch(function(){})
+    if(roomId) api.executeScene(roomId,'Welcome').catch(function(){})
     wx.showToast({ title: '✅ 已开始使用', icon: 'none' })
-    this.loadRooms()
+    self.loadRooms()
   },
 
   menuCancelBooking: function() {
