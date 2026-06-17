@@ -29,7 +29,7 @@ Page({
           var p=o.time.split('-')
           if(p.length===2){
             var sm=parseInt(p[0].split(':')[0])*60+parseInt(p[0].split(':')[1]),em=parseInt(p[1].split(':')[0])*60+parseInt(p[1].split(':')[1])
-            if(o.date===todayStr){if(curMin>=sm&&curMin<em)status='InUse';else if(curMin>=em)status='Expired'}
+            if(o.date===todayStr){if(curMin>=em)status='Expired'}
             else if(new Date(o.date)<new Date(todayStr)) status='Expired'
           }
         }

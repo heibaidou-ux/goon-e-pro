@@ -59,15 +59,6 @@ Page({
               if (parts.length >= 2) {
                 var sp = parts[0].split(':'), ep = parts[1].split(':')
                 var sm = parseInt(sp[0])*60+parseInt(sp[1]), em = parseInt(ep[0])*60+parseInt(ep[1])
-                if (curMin >= sm && curMin < em) {
-                  // 当前时段已预订，视为使用中
-                  currentOrder = {
-                    orderId: o.orderId,
-                    customerName: o.customerName || o.phone || '客人',
-                    start: parts[0], end: parts[1]
-                  }
-                  break
-                }
                 if (curMin < sm && (!currentOrder || sm < parseInt(currentOrder.start.split(':')[0])*60+parseInt(currentOrder.start.split(':')[1]))) {
                   // 将来有预订
                   hasBookedLater = true
@@ -78,6 +69,7 @@ Page({
                     upcoming: true
                   }
                 }
+                // 已到时段/已过时段不自动转为InUse，等店员手动确认
               }
             }
           }

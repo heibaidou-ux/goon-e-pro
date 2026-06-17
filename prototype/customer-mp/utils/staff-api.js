@@ -162,6 +162,20 @@ const STAFF_API = {
   },
 
   // ── IoT ──
+  getDeviceList(roomId) {
+    if (!USE_MOCK) return request({ url: '/api/iot/devices' + (roomId ? '?room_id=' + roomId : '') })
+    return delay().then(function() {
+      var list = MOCK.devices
+      if (roomId) list = list.filter(function(d) { return d.roomId === roomId })
+      var typeLabelMap = {Lock:'门锁',AC:'空调',Light:'灯光',Curtain:'窗帘',Speaker:'音响'}
+      var typeIconMap = {Lock:'🔒',AC:'❄️',Light:'💡',Curtain:'🪟',Speaker:'🔊'}
+      return list.map(function(d) {
+        return { roomId: d.roomId, deviceId: d.deviceId, type: d.type, status: d.status,
+          typeLabel: typeLabelMap[d.type] || d.type, typeIcon: typeIconMap[d.type] || '📡' }
+      })
+    })
+  },
+
   getDeviceStats() {
     if (!USE_MOCK) return request({ url: '/api/iot/stats' })
     return delay().then(() => {
