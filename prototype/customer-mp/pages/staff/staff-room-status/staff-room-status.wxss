@@ -36,6 +36,9 @@
 .rc-customer { font-size:12px; color:#333; font-weight:500; }
 .rc-time { font-size:11px; color:#999; }
 
+/* Device status */
+.rc-devstatus { font-size:10px; color:#999; margin-top:6px; padding:4px 0; display:block; letter-spacing:1px; }
+
 /* Action buttons */
 .rc-actions { display:flex; gap:6px; margin-top:8px; }
 .rca-btn { padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; }

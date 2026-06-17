@@ -4,10 +4,9 @@ Page({
   data: {
     rooms: [], stats: { inUse: 0, available: 0, booked: 0, cleaning: 0 },
     showBookingModal: false, bookRoomId: '', bookRoomName: '',
-    bookName: '', bookPhone: '', bookDate: '', bookStart: '', bookDuration: 120, bookDurationLabel: '2小时', bookSource: '',
+    bookName: '', bookPhone: '', bookDate: '', bookStart: '', bookEnd: '', bookSource: '',
     sourceOptions: ['到店','美团','抖音','大众点评','高德地图','小红书','会小二','老客户','电话预约','其他'],
-    timeOptions: [], durationOptions: ['2小时','3小时','4小时','6小时'],
-    durationValues: [120, 180, 240, 360],
+    timeOptions: [],
     // 菜单弹窗
     showRoomMenu: false, menuRoomId: '', menuRoomName: '', menuStatus: '', menuOrderId: '',
   },
@@ -39,14 +38,20 @@ Page({
             var o = orders[i]
             if (o.roomId !== r.roomId || o.status === 'Cancelled') continue
 
-            if (o.status === 'InUse') {
-              currentOrder = {
-                orderId: o.orderId,
-                customerName: o.customerName || o.phone || '客人',
-                start: o.time ? o.time.split('-')[0] : '',
-                end: o.time ? o.time.split('-')[1] : ''
+            // ── InUse订单：检查是否真的还在使用中（时间未过期）──
+            if (o.status === 'InUse' && o.date === todayStr && o.time) {
+              var ep = o.time.split('-')[1].split(':')
+              var endMin = parseInt(ep[0])*60+parseInt(ep[1])
+              if (curMin < endMin) {
+                // 还没结束
+                currentOrder = {
+                  orderId: o.orderId,
+                  customerName: o.customerName || o.phone || '客人',
+                  start: o.time.split('-')[0], end: o.time.split('-')[1]
+                }
+                break
               }
-              break
+              // 已过结束时间，当作无订单处理
             }
 
             if (o.date === todayStr && o.status === 'Booked' && o.time) {
@@ -93,12 +98,53 @@ Page({
             roomId: r.roomId, name: r.name, capacity: r.capacity,
             typeLabel: typeLabels[r.type] || '',
             statusClass: statusClass, statusLabel: statusLabel,
-            currentOrder: currentOrder
+            currentOrder: currentOrder, deviceStatus: ''
           }
         })
         self.setData({ rooms: roomList, stats: { inUse: inUse, available: available, booked: booked, cleaning: cleaning } })
+        // 异步加载设备状态
+        self.loadDeviceStatus()
       })
     })
+  },
+
+  loadDeviceStatus: function() {
+    var self = this
+    var roomIds = self.data.rooms.map(function(r){return r.roomId})
+    var deviceStatusMap = {}
+    var loaded = 0
+    for (var ri = 0; ri < roomIds.length; ri++) {
+      (function(rid) {
+        API.getRoomDevices(rid).then(function(devices) {
+          var lightsOn = 0, lightsTotal = 0, acOn = false, curtainOpen = false, speakerOn = false
+          for (var di = 0; di < devices.length; di++) {
+            var d = devices[di], a = d.attributes || {}
+            if (d.type === 'Light') { lightsTotal++; if (a.power || a.brightness > 0) lightsOn++ }
+            if (d.type === 'AC') acOn = a.mode && a.mode !== 'off'
+            if (d.type === 'Curtain') curtainOpen = a.position !== 'closed'
+            if (d.type === 'Speaker' || d.type === 'BGM') speakerOn = a.playing
+          }
+          deviceStatusMap[rid] = { lightsOn: lightsOn, lightsTotal: lightsTotal, acOn: acOn, curtainOpen: curtainOpen, speakerOn: speakerOn }
+          loaded++
+          if (loaded >= roomIds.length) self.applyDeviceStatus(deviceStatusMap)
+        }).catch(function(){loaded++;if(loaded>=roomIds.length)self.applyDeviceStatus(deviceStatusMap)})
+      })(roomIds[ri])
+    }
+  },
+
+  applyDeviceStatus: function(map) {
+    var rooms = this.data.rooms
+    for (var i = 0; i < rooms.length; i++) {
+      var ds = map[rooms[i].roomId]
+      if (!ds) continue
+      var parts = []
+      if (ds.lightsTotal > 0) parts.push('💡' + (ds.lightsOn > 0 ? '开' : '关'))
+      parts.push(ds.curtainOpen ? '🪟开' : '🪟关')
+      parts.push(ds.acOn ? '❄️开' : '❄️关')
+      parts.push(ds.speakerOn ? '🔊开' : '🔊关')
+      rooms[i].deviceStatus = parts.join(' ')
+    }
+    this.setData({ rooms: rooms })
   },
 
   generateTimeOptions: function() {
@@ -125,9 +171,12 @@ Page({
     this.hideRoomMenu()
     var now = new Date()
     var dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
+    var h = now.getHours(), m = Math.ceil(now.getMinutes()/30)*30
+    if (m >= 60) { h++; m = 0 }
+    var startTime = String(h%24).padStart(2,'0')+':'+String(m).padStart(2,'0')
     this.setData({
       showBookingModal: true, bookRoomId: this.data.menuRoomId, bookRoomName: this.data.menuRoomName,
-      bookName: '', bookPhone: '', bookDate: dateStr, bookStart: '', bookDuration: 120, bookDurationLabel: '2小时', bookSource: ''
+      bookName: '', bookPhone: '', bookDate: dateStr, bookStart: startTime, bookEnd: '', bookSource: ''
     })
   },
 
@@ -174,28 +223,19 @@ Page({
   onBookDate: function(e) { this.setData({ bookDate: e.detail.value }) },
   onBookSource: function(e) { this.setData({ bookSource: this.data.sourceOptions[e.detail.value] }) },
   onBookStart: function(e) { this.setData({ bookStart: this.data.timeOptions[e.detail.value] }) },
-  onBookDuration: function(e) {
-    var idx = e.detail.value
-    this.setData({ bookDuration: this.data.durationValues[idx], bookDurationLabel: this.data.durationOptions[idx] })
-  },
+  onBookEnd: function(e) { this.setData({ bookEnd: this.data.timeOptions[e.detail.value] }) },
 
   confirmBooking: function() {
     var self = this
-    if (!self.data.bookName || !self.data.bookStart || !self.data.bookSource) {
+    if (!self.data.bookName || !self.data.bookStart || !self.data.bookEnd || !self.data.bookSource) {
       wx.showToast({ title: '请填写完整信息', icon: 'none' }); return
     }
-    var sp = self.data.bookStart.split(':')
-    var startMin = parseInt(sp[0])*60+parseInt(sp[1])
-    var endMin = startMin + self.data.bookDuration
-    var endStr = String(Math.floor(endMin/60)%24).padStart(2,'0')+':'+String(endMin%60).padStart(2,'0')
-
     var booking = {
       orderId: 'ORD'+String(Date.now()).slice(-6),
       roomId: self.data.bookRoomId, roomName: self.data.bookRoomName,
       customerName: self.data.bookName, phone: self.data.bookPhone || '',
-      date: self.data.bookDate, time: self.data.bookStart + '-' + endStr,
-      amount: Math.round(120 * self.data.bookDuration / 60),
-      status: 'Booked', customerSource: self.data.bookSource,
+      date: self.data.bookDate, time: self.data.bookStart + '-' + self.data.bookEnd,
+      amount: 0, status: 'Booked', customerSource: self.data.bookSource,
       created: new Date().toISOString(),
       doorCode: String(Math.floor(1000+Math.random()*9000))
     }

@@ -35,6 +35,9 @@
           <text class="rc-time">⏰ {{item.currentOrder.start}}-{{item.currentOrder.end}}</text>
         </view>
 
+        <!-- 设备状态摘要 -->
+        <view class="rc-devstatus" wx:if="{{item.deviceStatus}}">{{item.deviceStatus}}</view>
+
         <view class="rc-actions">
           <text class="rca-btn primary" catchtap="onRoomTap" data-roomid="{{item.roomId}}" data-roomname="{{item.name}}" data-status="{{item.statusClass}}" data-orderid="{{item.currentOrder.orderId||''}}">📋 操作</text>
         </view>
@@ -90,9 +93,9 @@
             </picker>
           </view>
           <view class="form-section" style="flex:1;">
-            <text class="form-label">时长</text>
-            <picker mode="selector" range="{{durationOptions}}" bindchange="onBookDuration">
-              <view class="form-picker">{{bookDurationLabel || '2小时'}} ▾</view>
+            <text class="form-label">结束时间</text>
+            <picker mode="selector" range="{{timeOptions}}" bindchange="onBookEnd">
+              <view class="form-picker">{{bookEnd || '选择'}} ▾</view>
             </picker>
           </view>
         </view>
