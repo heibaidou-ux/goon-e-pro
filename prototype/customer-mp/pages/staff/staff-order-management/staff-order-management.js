@@ -172,7 +172,22 @@ Page({
     var id=e.currentTarget.dataset.id,orders=this.data.orders,roomId=''
     for(var i=0;i<orders.length;i++){if(orders[i].orderId===id||orders[i].id===id){roomId=orders[i].roomId||'';break}}
     if(roomId){var api=require('../../../utils/api');api.executeScene(roomId,'Welcome').catch(function(){})}
-    wx.showToast({title:'已办理入住',icon:'success'})
+    wx.showToast({title:'已开始使用',icon:'success'})
   },
+
+  cancelBooking: function(e){
+    var self=this,id=e.currentTarget.dataset.id
+    wx.showModal({title:'取消订单',content:'确定取消此预订？取消后将转为已失效',success:function(res){
+      if(!res.confirm)return
+      try{
+        var bk=wx.getStorageSync('mp_bookings')||[]
+        for(var i=0;i<bk.length;i++){if(bk[i].orderId===id||bk[i].id===id){bk[i].status='Expired';break}}
+        wx.setStorageSync('mp_bookings',bk)
+      }catch(e){}
+      wx.showToast({title:'已取消',icon:'success'})
+      self.loadOrders()
+    }})
+  },
+
   completeOrder: function(e){wx.showToast({title:'订单已完成',icon:'success'})}
 })

@@ -45,8 +45,19 @@ Page({
       self.setData({ inspection: { count: todoInsp, items: todoInsp > 0 ? [{ title: todoInsp + '个巡检任务' }] : [] } })
     })
 
-    // 待审核（mock）
-    self.setData({ audit: { count: 0, items: [] } })
+    // 客人取消申请
+    try {
+      var requests = wx.getStorageSync('mp_cancel_requests') || []
+      var pendingReqs = []
+      for (var i = 0; i < requests.length; i++) {
+        if (requests[i].status === 'pending') pendingReqs.push(requests[i])
+      }
+      if (pendingReqs.length > 0) {
+        self.setData({
+          audit: { count: pendingReqs.length, items: pendingReqs.map(function(r) { return { title: '📋 取消申请·' + r.orderId, data: r } }) }
+        })
+      }
+    } catch(e) {}
   },
 
   goTo: function(e) {

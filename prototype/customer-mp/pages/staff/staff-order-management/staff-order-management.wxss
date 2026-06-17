@@ -48,6 +48,7 @@
 .oc-btn { flex:1; padding:10px; border-radius:12px; font-size:13px; font-weight:600; text-align:center; }
 .oc-btn.primary { background:#5D8A6B; color:#fff; border:none; }
 .oc-btn.outline { background:#fff; color:#5D8A6B; border:1.5px solid #5D8A6B; }
+.oc-btn.danger { background:#fff; color:#D54941; border:1.5px solid #D54941; }
 .empty { text-align:center; padding:60px 20px; color:#ccc; }
 .empty-icon { font-size:48px; display:block; margin-bottom:12px; }
 

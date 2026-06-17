@@ -297,28 +297,22 @@ Page({
     var id = e.currentTarget.dataset.id
     var order = this.findOrder(id)
     if (!order) return
-    this.setData({ showCancelModal: true, cancelOrderId: id, cancelMsg: order.cancelMsg || '确定要取消此订单？' })
+    this.setData({ showCancelModal: true, cancelOrderId: id, cancelMsg: '确定要申请取消此订单？店员确认后将转为已失效' })
   },
 
   confirmCancel: function() {
     var self = this
     var id = this.data.cancelOrderId
     if (!id) return
-    API.cancelOrder(id).then(function() {
-      wx.showToast({ title: '已取消', icon: 'success' })
-      self.setData({ showCancelModal: false, cancelOrderId: null })
-      self.loadOrders()
-    }).catch(function() {
-      // fallback: local cancel
-      var orders = self.data.orders
-      for (var i = 0; i < orders.length; i++) {
-        if (orders[i].orderId === id) { orders.splice(i, 1); break }
-      }
-      self.setData({ orders: orders })
-      self.filterOrders()
-      wx.showToast({ title: '已取消', icon: 'success' })
-      self.setData({ showCancelModal: false, cancelOrderId: null })
-    })
+    try {
+      var requests = wx.getStorageSync('mp_cancel_requests') || []
+      var found = false
+      for (var i = 0; i < requests.length; i++) { if (requests[i].orderId === id) { found = true; break } }
+      if (!found) requests.push({ orderId: id, time: new Date().toISOString(), status: 'pending' })
+      wx.setStorageSync('mp_cancel_requests', requests)
+    } catch(e) {}
+    wx.showToast({ title: '取消申请已提交，等待店员确认', icon: 'none' })
+    self.setData({ showCancelModal: false, cancelOrderId: null })
   },
 
   hideCancelModal: function() { this.setData({ showCancelModal: false }) },

@@ -50,6 +50,7 @@
           </view>
           <view class="oc-actions" wx:if="{{item.status=='Booked'}}">
             <view class="oc-btn primary" bindtap="checkIn" data-id="{{item.orderId}}">开始使用</view>
+            <view class="oc-btn danger" bindtap="cancelBooking" data-id="{{item.orderId}}">取消</view>
             <view class="oc-btn outline" bindtap="showOrderDetail" data-id="{{item.orderId}}">详情</view>
           </view>
           <view class="oc-actions" wx:if="{{item.status=='Completed' || item.status=='Expired'}}">

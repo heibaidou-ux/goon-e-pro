@@ -194,8 +194,18 @@ Page({
 
   menuCancelBooking: function() {
     this.hideRoomMenu()
-    wx.showToast({ title: '预约已取消', icon: 'none' })
-    this.loadRooms()
+    var self = this
+    wx.showModal({title:'取消订单',content:'确定取消此预订？',
+      success:function(res){if(res.confirm){
+        try{
+          var bk=wx.getStorageSync('mp_bookings')||[]
+          for(var i=0;i<bk.length;i++){if(bk[i].roomId===self.data.menuRoomId&&bk[i].status==='Booked'){bk[i].status='Expired';break}}
+          wx.setStorageSync('mp_bookings',bk)
+        }catch(e){}
+        wx.showToast({title:'已取消',icon:'success'})
+        self.loadRooms()
+      }}
+    })
   },
 
   menuForceCheckout: function() {
