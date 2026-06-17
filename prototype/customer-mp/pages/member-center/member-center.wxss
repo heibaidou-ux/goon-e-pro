@@ -4,13 +4,13 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .page { flex:1; overflow-y:auto; }
 
 /* ── 首充特惠横幅 ── */
-.promo-banner { background:linear-gradient(135deg,#B8860B,#D4A84B); padding:14px 16px; color:#fff; display:flex; align-items:center; justify-content:space-between; }
+.promo-banner { background:linear-gradient(135deg,#B8860B,#D4A84B); padding:14px 20px; color:#fff; display:flex; align-items:center; justify-content:space-between; }
 .promo-text { font-size:13px; font-weight:500; }
 .promo-em { font-weight:700; }
 .promo-tag { font-size:12px; background:rgba(255,255,255,.2); padding:4px 12px; border-radius:16px; flex-shrink:0; }
 
 /* ── 会员卡片 ── */
-.member-card { background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; margin:0 16px; border-radius:20px; padding:24px 20px; margin-top:-8px; position:relative; z-index:1; box-shadow:0 8px 24px rgba(93,138,107,.3); }
+.member-card { background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; margin:0; border-radius:0; padding:24px 20px; box-shadow:0 8px 24px rgba(93,138,107,.3); }
 .member-avatar { width:56px; height:56px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 8px; border:2px solid rgba(255,255,255,.25); }
 .member-name { font-size:18px; font-weight:700; display:block; text-align:center; letter-spacing:.5px; }
 .member-level { display:block; text-align:center; margin-top:2px; }
@@ -28,22 +28,25 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .stat-num { font-size:18px; font-weight:700; display:block; }
 .stat-label { font-size:10px; opacity:.7; display:block; margin-top:2px; }
 
+/* ── 板块分隔 ── */
+.block-divider { height:8px; background:#f0ece6; margin:0; }
+
 /* ── 功能菜单 ── */
-.actions-card { background:#fff; border-radius:16px; margin:12px 16px; padding:4px 0; box-shadow:0 2px 12px rgba(0,0,0,.04); }
-.action-row { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid #f0ece6; font-size:14px; color:#2C2C2C; }
+.actions-card { background:#fff; margin:0; padding:4px 0; }
+.action-row { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid #f0ece6; font-size:14px; color:#2C2C2C; }
 .action-row:last-child { border-bottom:none; }
 .action-row:active { background:#f9fafb; }
 .arrow { color:#ccc; font-size:16px; }
 
 /* ── 会员权益 ── */
-.benefits-card { background:#fff; border-radius:16px; margin:0 16px 12px; padding:16px; box-shadow:0 2px 12px rgba(0,0,0,.04); }
+.benefits-card { background:#fff; margin:0; padding:16px 20px; }
 .benefits-title { font-size:15px; font-weight:600; color:#333; display:block; margin-bottom:12px; }
 .benefit-row { display:flex; align-items:center; gap:8px; padding:8px 0; font-size:13px; color:#666; border-bottom:1px solid #f5f5f5; }
 .benefit-row:last-child { border-bottom:none; }
 .benefit-icon { font-size:16px; width:24px; text-align:center; }
 
 /* ── 退出登录 ── */
-.logout-wrap { padding:16px; }
+.logout-wrap { padding:16px 20px; }
 .logout-btn { width:100%; padding:14px; border-radius:14px; border:1.5px solid #D54941; background:#fff; color:#D54941; font-size:15px; font-weight:600; text-align:center; }
 .logout-btn:active { background:#fff5f5; }
 
