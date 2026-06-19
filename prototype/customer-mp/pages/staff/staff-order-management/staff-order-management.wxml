@@ -40,6 +40,7 @@
             <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
           </view>
           <text class="oc-time">{{item.date}} {{item.time}}</text>
+          <text class="oc-booked" wx:if="{{item.bookedTime && item.bookedTime!=item.time}}">预订 {{item.bookedTime}}</text>
           <text class="oc-amount">¥{{item.amount}}</text>
           <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}} <text wx:if="{{item.phone}}">{{item.phone}}</text></text>
           <text class="oc-source" wx:if="{{item.customerSource}}">📌 来源：{{item.customerSource}}</text>

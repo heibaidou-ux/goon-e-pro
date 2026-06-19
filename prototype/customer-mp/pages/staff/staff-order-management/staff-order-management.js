@@ -40,7 +40,7 @@ Page({
         else if(status==='Expired'){sc='status-expired';sl='已失效'}
         return{
           orderId:o.orderId,roomName:o.roomName||'房间',roomId:o.roomId||'',status:status,
-          date:o.date||'',time:o.time||'',amount:o.amount||0,customerName:o.customerName||'',
+          date:o.date||'',time:o.time||'',bookedTime:o.bookedTime||'',amount:o.amount||0,customerName:o.customerName||'',
           phone:o.phone||'',customerSource:o.customerSource||'',orderType:'room',
           statusClass:sc,statusLabel:sl
         }
@@ -180,7 +180,7 @@ Page({
     var bookStartMin=parseInt(sp[0])*60+parseInt(sp[1])
     if(curMin<bookStartMin){var ep=parts[1].split(':');orderDuration=(parseInt(ep[0])*60+parseInt(ep[1]))-bookStartMin;if(orderDuration<30)orderDuration=90
     var newEndMin=curMin+orderDuration;var newEndH=Math.floor(newEndMin/60)%24;var newEndM=newEndMin%60;var newEndStr=String(newEndH).padStart(2,'0')+':'+String(newEndM).padStart(2,'0')
-    try{var bk=wx.getStorageSync('mp_bookings')||[];for(var i=0;i<bk.length;i++){if(bk[i].orderId===id||bk[i].id===id){bk[i].status='InUse';bk[i].time=String(Math.floor(curMin/60)%24).padStart(2,'0')+':'+String(curMin%60).padStart(2,'0')+'-'+newEndStr;break}};wx.setStorageSync('mp_bookings',bk)}catch(e){}
+    try{var bk=wx.getStorageSync('mp_bookings')||[];for(var i=0;i<bk.length;i++){if(bk[i].orderId===id||bk[i].id===id){bk[i].status='InUse';if(!bk[i].bookedTime)bk[i].bookedTime=bk[i].time;bk[i].time=String(Math.floor(curMin/60)%24).padStart(2,'0')+':'+String(curMin%60).padStart(2,'0')+'-'+newEndStr;break}};wx.setStorageSync('mp_bookings',bk)}catch(e){}
     wx.showToast({title:'提前开始,新时段至'+newEndStr,icon:'none'})}
     else{try{var bk=wx.getStorageSync('mp_bookings')||[];for(var i=0;i<bk.length;i++){if(bk[i].orderId===id||bk[i].id===id){bk[i].status='InUse';break}};wx.setStorageSync('mp_bookings',bk)}catch(e){};wx.showToast({title:'已开始使用',icon:'success'})}}}
     else{try{var bk=wx.getStorageSync('mp_bookings')||[];for(var i=0;i<bk.length;i++){if(bk[i].orderId===id||bk[i].id===id){bk[i].status='InUse';break}};wx.setStorageSync('mp_bookings',bk)}catch(e){};wx.showToast({title:'已开始使用',icon:'success'})}

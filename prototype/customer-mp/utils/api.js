@@ -172,10 +172,10 @@ const API = {
     var ds = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
     var h = now.getHours(), m = now.getMinutes()
     var endH = (h + 3) % 24
-    lsSet('bookings', [
+    lsSet('_db_ver', '1.9.43');lsSet('bookings', [
       { orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() },
       { orderId:'ORD002', roomId:'RM002', roomName:'翡冷翠', customerName:'李女士', status:'Booked', date:ds, time:String((h+1)%24).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', amount:160, doorCode:'7391', created: new Date().toISOString() },
-      { orderId:'ORD003', roomId:'RM003', roomName:'布拉格', customerName:'王先生', status:'Booked', date:ds, time:String((h+2)%24).padStart(2,'0')+':00-'+String(endH+1).padStart(2,'0')+':00', amount:120, doorCode:'5123', created: new Date().toISOString() },
+      { orderId:'ORD003', roomId:'RM003', roomName:'布拉格', customerName:'王先生', status:'Booked', date:ds, time:String((h+2)%24).padStart(2,'0')+':00-'+String(endH+1).padStart(2,'0')+':00', bookedTime:String((h+2)%24).padStart(2,'0')+':00-'+String(endH+1).padStart(2,'0')+':00', amount:120, doorCode:'5123', created: new Date().toISOString() },
     ])
   },
 

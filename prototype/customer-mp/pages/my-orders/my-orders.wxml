@@ -15,6 +15,7 @@
         </view>
       </view>
       <text class="order-time">{{item.timeStr}}</text>
+      <text class="order-booked" wx:if="{{item.bookedTime && item.timeStr.indexOf(item.bookedTime)<0}}">📋 原预订 {{item.bookedTime}}</text>
       <text class="order-price">¥{{item.amount}}</text>
       <text class="order-remaining" wx:if="{{item.remaining!=null}}">剩余 {{item.remaining}} 分钟</text>
       <!-- 茶品订单：显示商品明细+配送信息 -->
@@ -81,6 +82,7 @@
         </view>
       </view>
       <text class="order-time">{{item.timeStr}}</text>
+      <text class="order-booked" wx:if="{{item.bookedTime && item.timeStr.indexOf(item.bookedTime)<0}}">📋 原预订 {{item.bookedTime}}</text>
       <text class="order-price">¥{{item.amount}}</text>
       <!-- 茶品订单：显示商品明细 -->
       <view wx:if="{{item.isTeaOrder}}" class="tea-order-items">
@@ -112,6 +114,7 @@
         </view>
       </view>
       <text class="order-time">{{item.timeStr}}</text>
+      <text class="order-booked" wx:if="{{item.bookedTime && item.timeStr.indexOf(item.bookedTime)<0}}">📋 原预订 {{item.bookedTime}}</text>
       <text class="order-price">¥{{item.amount}}</text>
       <!-- 茶品订单：显示商品明细 -->
       <view wx:if="{{item.isTeaOrder}}" class="tea-order-items">
@@ -154,6 +157,7 @@
         </view>
       </view>
       <text class="order-time">{{item.timeStr}}</text>
+      <text class="order-booked" wx:if="{{item.bookedTime && item.timeStr.indexOf(item.bookedTime)<0}}">📋 原预订 {{item.bookedTime}}</text>
       <text class="order-price">¥{{item.amount}}</text>
       <view class="expired-notice">⏰ 已超过使用时间，预约自动失效</view>
       <view class="big-actions">

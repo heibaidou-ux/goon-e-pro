@@ -185,7 +185,7 @@ Page({
           status: status, statusClass: statusClass, statusLabel: statusLabel,
           timeStr: (o.date||'')+' '+(o.time||(o.start?o.start.slice(0,5)+'-'+o.end.slice(0,5):'')),
           amount: o.amount||0, doorCode: o.doorCode||'0000',
-          remaining: remaining, canCancel: canCancel, cancelFree: cancelFree, cancelMsg: cancelMsg,
+          bookedTime: o.bookedTime||'',remaining: remaining, canCancel: canCancel, cancelFree: cancelFree, cancelMsg: cancelMsg,
           logistics: log, payment: o.payment||'',
           doorCanOpen: doorCanOpen, doorHint: doorHint,
           isTeaOrder: o.isTeaOrder || false, items: o.items || [],

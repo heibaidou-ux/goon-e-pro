@@ -47,7 +47,7 @@ Page({
                 currentOrder = {
                   orderId: o.orderId,
                   customerName: o.customerName || o.phone || '客人',
-                  start: o.time.split('-')[0], end: o.time.split('-')[1], date: o.date||''
+                  start: o.time.split('-')[0], end: o.time.split('-')[1], date: o.date||'', bookedTime: o.bookedTime||''
                 }
                 break
               }
@@ -65,7 +65,7 @@ Page({
                   currentOrder = {
                     orderId: o.orderId,
                     customerName: o.customerName || o.phone || '客人',
-                    start: parts[0], end: parts[1], date: o.date||'',
+                    start: parts[0], end: parts[1], date: o.date||'', bookedTime: o.bookedTime||'',
                     upcoming: true
                   }
                 }
@@ -197,8 +197,8 @@ Page({
       if(parts.length>=2&&curMin<parseInt(parts[0].split(':')[0])*60+parseInt(parts[0].split(':')[1])){
         var sp=parts[0].split(':');var ep=parts[1].split(':');var dur=(parseInt(ep[0])*60+parseInt(ep[1]))-(parseInt(sp[0])*60+parseInt(sp[1]));if(dur<30)dur=90
         var newEndMin=curMin+dur;var newEndH=Math.floor(newEndMin/60)%24;var newEndM=newEndMin%60
-        bk[i].status='InUse';bk[i].time=String(Math.floor(curMin/60)%24).padStart(2,'0')+':'+String(curMin%60).padStart(2,'0')+'-'+String(newEndH).padStart(2,'0')+':'+String(newEndM).padStart(2,'0')
-      }else{bk[i].status='InUse'}
+        bk[i].status='InUse';if(!bk[i].bookedTime)bk[i].bookedTime=bk[i].time;bk[i].time=String(Math.floor(curMin/60)%24).padStart(2,'0')+':'+String(curMin%60).padStart(2,'0')+'-'+String(newEndH).padStart(2,'0')+':'+String(newEndM).padStart(2,'0')
+      }else{if(!bk[i].bookedTime)bk[i].bookedTime=bk[i].time;bk[i].status='InUse'}
       break}};wx.setStorageSync('mp_bookings',bk)}catch(e){}
     var api=require('../../../utils/api')
     if(roomId) api.executeScene(roomId,'Welcome').catch(function(){})

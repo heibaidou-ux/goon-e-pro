@@ -37,7 +37,7 @@
 .oc-amount { font-size:16px; font-weight:700; color:#B8860B; display:block; margin:4px 0; }
 .oc-customer { font-size:12px; color:#666; display:block; }
 .oc-source { font-size:11px; color:#5D8A6B; display:block; margin-top:2px; }
-.oc-phone { font-size:12px; color:#5D8A6B; display:block; margin-top:2px; }
+.oc-phone { font-size:12px; color:#5D8A6B; display:block; margin-top:2px; }.oc-booked { font-size:10px; color:#999; display:block; margin-top:1px; }
 .header-search-btn { font-size:18px; position:absolute; right:16px; top:14px; padding:4px 8px; }
 .header { position:relative; }
 .search-bar { display:flex; gap:8px; padding:10px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
