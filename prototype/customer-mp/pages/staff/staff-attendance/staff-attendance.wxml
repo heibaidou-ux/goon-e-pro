@@ -13,7 +13,7 @@
           </view>
         </view>
         <view class="checkin-btns">
-          <button wx:if="{{!checkedIn}}" bindtap="doCheckIn" class="ci-btn signin">🕐 签到</button>
+          <button wx:if="{{!checkedIn && !checkedOut}}" bindtap="doCheckIn" class="ci-btn signin">🕐 签到</button>
           <button wx:if="{{checkedIn && !checkedOut}}" bindtap="doCheckOut" class="ci-btn signout">🏁 签退</button>
           <text wx:if="{{checkedIn && checkedOut}}" class="ci-done">✅ 今日已签退</text>
         </view>
@@ -26,13 +26,14 @@
       </view>
 
       <view class="record-list">
-        <view class="record-item" wx:for="{{weekRecords}}" wx:key="index">
+        <view class="record-item" wx:for="{{displayRecords}}" wx:key="date">
           <text class="rec-date">{{item.date}}</text>
           <text class="rec-in">{{item.checkIn}}</text>
           <text class="rec-out">{{item.checkOut}}</text>
-          <text class="rec-status {{item.status=='正常'?'normal':(item.status=='在岗'?'active':'')}}">{{item.status}}</text>
+          <text class="rec-status {{item.status=='正常'?'normal':(item.status=='在岗'?'active':'late')}}">{{item.status}}</text>
         </view>
       </view>
+      <view class="empty" wx:if="{{displayRecords.length==0}}"><text>暂无记录</text></view>
     </view>
   </view>
   <staff-bottom-nav active="dashboard"></staff-bottom-nav>

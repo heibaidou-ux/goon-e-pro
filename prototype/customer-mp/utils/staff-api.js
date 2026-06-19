@@ -83,15 +83,44 @@ const STAFF_API = {
   getAttendance() {
     return delay().then(() => {
       var now = new Date(), h = now.getHours(), m = now.getMinutes()
+      var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
       return {
-        checkedIn: h >= 8, checkInTime: h >= 8 ? '08:'+String(m).padStart(2,'0') : '—', checkOutTime: h >= 18 ? '18:'+String(m).padStart(2,'0') : '',
-        todayStatus: h < 8 ? '未打卡' : (h < 18 ? '在岗' : '已下班'), workHours: Math.min(h - 8, 8),
+        checkedIn: h >= 8, checkInTime: h >= 8 ? String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : '—', checkOutTime: h >= 18 ? String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : '',
+        todayStatus: h >= 18 ? '已签退' : (h >= 8 ? '在岗' : '未打卡'), workHours: Math.min(h - 8, 8),
         records: [
-          { date:'2026-06-13', checkIn:'08:32', checkOut:'18:10', status:'正常' },
-          { date:'2026-06-12', checkIn:'08:25', checkOut:'17:55', status:'正常' },
-          { date:'2026-06-11', checkIn:'08:40', checkOut:'18:20', status:'正常' },
-          { date:'2026-06-10', checkIn:'08:15', checkOut:'18:30', status:'正常' },
-          { date:'2026-06-09', checkIn:'08:50', checkOut:'17:40', status:'迟到' }
+    { date:'2026-06-19', checkIn:'08:15', checkOut:'', status:'在岗' },
+    { date:'2026-06-18', checkIn:'08:05', checkOut:'17:39', status:'正常' },
+    { date:'2026-06-17', checkIn:'09:03', checkOut:'18:04', status:'迟到' },
+    { date:'2026-06-16', checkIn:'08:07', checkOut:'17:50', status:'正常' },
+    { date:'2026-06-15', checkIn:'09:04', checkOut:'18:11', status:'迟到' },
+    { date:'2026-06-12', checkIn:'08:22', checkOut:'17:55', status:'正常' },
+    { date:'2026-06-11', checkIn:'09:13', checkOut:'18:13', status:'迟到' },
+    { date:'2026-06-10', checkIn:'08:21', checkOut:'18:18', status:'正常' },
+    { date:'2026-06-09', checkIn:'08:16', checkOut:'17:37', status:'正常' },
+    { date:'2026-06-08', checkIn:'08:24', checkOut:'17:40', status:'正常' },
+    { date:'2026-06-05', checkIn:'08:19', checkOut:'17:52', status:'正常' },
+    { date:'2026-06-04', checkIn:'08:19', checkOut:'18:17', status:'正常' },
+    { date:'2026-06-03', checkIn:'08:11', checkOut:'17:47', status:'正常' },
+    { date:'2026-06-02', checkIn:'09:12', checkOut:'17:49', status:'迟到' },
+    { date:'2026-06-01', checkIn:'09:03', checkOut:'17:30', status:'迟到' },
+    { date:'2026-05-29', checkIn:'09:07', checkOut:'17:42', status:'迟到' },
+    { date:'2026-05-28', checkIn:'08:12', checkOut:'17:40', status:'正常' },
+    { date:'2026-05-27', checkIn:'08:12', checkOut:'18:00', status:'正常' },
+    { date:'2026-05-26', checkIn:'08:07', checkOut:'17:41', status:'正常' },
+    { date:'2026-05-25', checkIn:'09:06', checkOut:'17:34', status:'迟到' },
+    { date:'2026-05-22', checkIn:'08:08', checkOut:'18:10', status:'正常' },
+    { date:'2026-05-21', checkIn:'09:06', checkOut:'18:02', status:'迟到' },
+    { date:'2026-05-20', checkIn:'08:14', checkOut:'17:51', status:'正常' },
+    { date:'2026-05-19', checkIn:'08:20', checkOut:'18:02', status:'正常' },
+    { date:'2026-05-18', checkIn:'08:20', checkOut:'18:16', status:'正常' },
+    { date:'2026-05-15', checkIn:'08:18', checkOut:'18:06', status:'正常' },
+    { date:'2026-05-14', checkIn:'08:22', checkOut:'17:44', status:'正常' },
+    { date:'2026-05-13', checkIn:'08:16', checkOut:'17:50', status:'正常' },
+    { date:'2026-05-12', checkIn:'08:20', checkOut:'18:01', status:'正常' },
+    { date:'2026-05-11', checkIn:'09:08', checkOut:'18:03', status:'迟到' },
+    { date:'2026-05-08', checkIn:'08:22', checkOut:'18:15', status:'正常' },
+    { date:'2026-05-07', checkIn:'08:17', checkOut:'18:11', status:'正常' },
+    { date:'2026-05-06', checkIn:'08:08', checkOut:'17:30', status:'正常' }
         ]
       }
     })
