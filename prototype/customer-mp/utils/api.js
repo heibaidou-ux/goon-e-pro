@@ -47,7 +47,6 @@ async function request(options) {
       header: header,
       success: res => {
         if (res.statusCode === 401) {
-          // Token过期，清除登录态
           setToken(null)
           lsSet('logged_in', false)
           wx.reLaunch({ url: '/pages/home/home?showLogin=1' })
@@ -159,6 +158,21 @@ const API = {
     return role === requiredRoles
   },
 
+  // ── 种子数据（仅在完全无数据时注入一次）──
+  _ensureSeedData: function() {
+    var bookings = lsGet('bookings', [])
+    if (bookings.length > 0) return
+    var now = new Date()
+    var ds = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
+    var h = now.getHours(), m = now.getMinutes()
+    var endH = (h + 3) % 24
+    lsSet('bookings', [
+      { orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() },
+      { orderId:'ORD002', roomId:'RM002', roomName:'翡冷翠', customerName:'李女士', status:'Booked', date:ds, time:String((h+1)%24).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', amount:160, doorCode:'7391', created: new Date().toISOString() },
+      { orderId:'ORD003', roomId:'RM003', roomName:'布拉格', customerName:'王先生', status:'Booked', date:ds, time:String((h+2)%24).padStart(2,'0')+':00-'+String(endH+1).padStart(2,'0')+':00', amount:120, doorCode:'5123', created: new Date().toISOString() },
+    ])
+  },
+
   // ── 房间 ──
   getRooms(bookableOnly) {
     if (!USE_MOCK) return request({ url: '/api/rooms' })
@@ -239,7 +253,7 @@ const API = {
     })
   },
 
-  // ── 订单 ──
+  // ── 订单（仅读写storage，不注入mock）──
   createBooking(booking) {
     if (!USE_MOCK) return request({ url: '/api/orders', method: 'POST', data: booking })
     return delay(500).then(() => {
@@ -259,30 +273,14 @@ const API = {
   },
 
   getAllOrders() {
+    this._ensureSeedData()
     return delay().then(() => {
-      var today = new Date()
-      var ds = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0')
-      var h = today.getHours(), m = today.getMinutes()
-      var startH = (h + 1) % 24, endH = (h + 3) % 24
-
       var bookings = lsGet('bookings', [])
-      // 更新旧数据中的房间名
+      // 只更新房间名，不注入任何mock数据
       var nameMap = {'中茶室A':'翡冷翠','中茶室B':'布拉格','大茶室C':'白沙瓦','大会议室':'丰沙里'}
       for (var i = 0; i < bookings.length; i++) {
         if (nameMap[bookings[i].roomName]) bookings[i].roomName = nameMap[bookings[i].roomName]
-        bookings[i].date = bookings[i].date || ds  // 确保有日期
       }
-      // 只检查今天的订单
-      var hasRM004 = false, hasRM002 = false, hasRM003 = false
-      for (var i = 0; i < bookings.length; i++) {
-        if (bookings[i].date !== ds) continue
-        if (bookings[i].roomId === 'RM004' && (bookings[i].status === 'InUse' || bookings[i].status === 'Booked')) hasRM004 = true
-        if (bookings[i].roomId === 'RM002' && (bookings[i].status === 'InUse' || bookings[i].status === 'Booked')) hasRM002 = true
-        if (bookings[i].roomId === 'RM003' && (bookings[i].status === 'InUse' || bookings[i].status === 'Booked')) hasRM003 = true
-      }
-      if (!hasRM004) bookings.push({ orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() })
-      if (!hasRM002) bookings.push({ orderId:'ORD002', roomId:'RM002', roomName:'翡冷翠', customerName:'李女士', status:'Booked', date:ds, time:String(startH).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', amount:160, doorCode:'7391', created: new Date().toISOString() })
-      if (!hasRM003) bookings.push({ orderId:'ORD003', roomId:'RM003', roomName:'布拉格', customerName:'王先生', status:'Booked', date:ds, time:String(startH+2).padStart(2,'0')+':00-'+String(endH+3).padStart(2,'0')+':00', amount:120, doorCode:'5123', created: new Date().toISOString() })
       return bookings
     })
   },
@@ -307,7 +305,6 @@ const API = {
 
   // ── 商品 ──
   getProducts(category) {
-    if (!USE_MOCK) return request({ url: '/api/products?category=' + (category || '') })
     if (!USE_MOCK) return request({ url: '/api/products' + (category ? '?categoryId=' + category : '') })
     return delay().then(() => {
       if (category) return MOCK.products.filter(p => p.category === category)
@@ -412,17 +409,7 @@ const API = {
       var room = null
       for (var i = 0; i < MOCK.rooms.length; i++) { if (MOCK.rooms[i].roomId === roomId) { room = MOCK.rooms[i]; break } }
       if (!room) throw new Error('房间不存在')
-      // 检查是否有进行中订单（任何房间均可扫码）
-      var hasActive = false
-      var activeId = ''
-      try {
-        var bookings = wx.getStorageSync('mp_bookings') || []
-        var today = new Date(); var ds = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0')
-        for (var i = 0; i < bookings.length; i++) {
-          if (bookings[i].roomId === roomId && bookings[i].date === ds && bookings[i].status === 'InUse') { hasActive = true; activeId = bookings[i].orderId; break }
-        }
-      } catch(e) {}
-      return { roomId, roomName: room.name, storeId: 'ST001', storeName: '盈隆店', status: 'Active', hasActiveOrder: true, activeOrderId: activeId || 'ORD001', message: '欢迎使用 ' + room.name }
+      return { roomId, roomName: room.name, storeId: 'ST001', storeName: '盈隆店', status: 'Active', hasActiveOrder: true, activeOrderId: 'ORD001', message: '欢迎使用 ' + room.name }
     })
   },
 
