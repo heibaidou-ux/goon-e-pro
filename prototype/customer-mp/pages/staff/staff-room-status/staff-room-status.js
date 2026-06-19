@@ -94,7 +94,8 @@ Page({
           }
         })
         self.setData({ rooms: roomList, stats: { inUse: inUse, available: available, booked: booked, cleaning: cleaning } })
-        // 异步加载设备状态
+      }).catch(function(e) { self.loadRooms() })
+    }).catch(function(e) { self.loadRooms() })        // 异步加载设备状态
         self.loadDeviceStatus()
       })
     })
