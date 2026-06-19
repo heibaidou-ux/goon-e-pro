@@ -160,6 +160,12 @@ const API = {
 
   // ── 种子数据（仅在完全无数据时注入一次）──
   _ensureSeedData: function() {
+    // 版本检查: 清除1.9.41之前残留的旧数据（曾被重复注入的假订单）
+    var ver = lsGet('_db_ver', '')
+    if (ver !== '1.9.41') {
+      lsRemove('bookings'); lsRemove('shop_orders')
+      lsSet('_db_ver', '1.9.41')
+    }
     var bookings = lsGet('bookings', [])
     if (bookings.length > 0) return
     var now = new Date()
