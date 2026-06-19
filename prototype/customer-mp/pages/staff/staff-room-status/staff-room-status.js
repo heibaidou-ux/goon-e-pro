@@ -188,7 +188,18 @@ Page({
     this.hideRoomMenu()
     var self=this
     var id=self.data.menuOrderId,roomId=self.data.menuRoomId
-    try{var bk=wx.getStorageSync('mp_bookings')||[];for(var i=0;i<bk.length;i++){if((bk[i].orderId===id||bk[i].id===id)||(bk[i].roomId===roomId&&bk[i].status==='Booked')){bk[i].status='InUse';break}};wx.setStorageSync('mp_bookings',bk)}catch(e){}
+    try{var allBk=wx.getStorageSync('mp_bookings')||[];var today=new Date();var ds=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0')
+    for(var i=0;i<allBk.length;i++){if(allBk[i].roomId===roomId&&allBk[i].date===ds&&allBk[i].status==='InUse'&&allBk[i].orderId!==id){wx.showToast({title:'该房间正在使用中',icon:'none'});self.loadRooms();return}}}
+    catch(e){}
+    var now=new Date();var curMin=now.getHours()*60+now.getMinutes()
+    try{var bk=wx.getStorageSync('mp_bookings')||[];for(var i=0;i<bk.length;i++){if((bk[i].orderId===id||bk[i].id===id)||(bk[i].roomId===roomId&&bk[i].status==='Booked')){
+      var orderTime=bk[i].time||'';var parts=orderTime.split('-')
+      if(parts.length>=2&&curMin<parseInt(parts[0].split(':')[0])*60+parseInt(parts[0].split(':')[1])){
+        var sp=parts[0].split(':');var ep=parts[1].split(':');var dur=(parseInt(ep[0])*60+parseInt(ep[1]))-(parseInt(sp[0])*60+parseInt(sp[1]));if(dur<30)dur=90
+        var newEndMin=curMin+dur;var newEndH=Math.floor(newEndMin/60)%24;var newEndM=newEndMin%60
+        bk[i].status='InUse';bk[i].time=String(Math.floor(curMin/60)%24).padStart(2,'0')+':'+String(curMin%60).padStart(2,'0')+'-'+String(newEndH).padStart(2,'0')+':'+String(newEndM).padStart(2,'0')
+      }else{bk[i].status='InUse'}
+      break}};wx.setStorageSync('mp_bookings',bk)}catch(e){}
     var api=require('../../../utils/api')
     if(roomId) api.executeScene(roomId,'Welcome').catch(function(){})
     wx.showToast({ title: '✅ 已开始使用', icon: 'none' })
