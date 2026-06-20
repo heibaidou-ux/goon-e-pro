@@ -30,10 +30,23 @@
 
       <view class="record-list">
         <view class="record-item" wx:for="{{displayRecords}}" wx:key="date">
-          <text class="rec-date">{{item.date}}</text>
-          <text class="rec-in">{{item.checkIn}}</text>
-          <text class="rec-out">{{item.checkOut}}</text>
-          <text class="rec-status {{item.status=='正常'?'normal':(item.status=='在岗'?'active':'late')}}">{{item.status}}</text>
+          <view class="rec-left">
+            <text class="rec-date">{{item.date}}</text>
+            <text class="rec-status {{item.status=='正常'?'normal':(item.status=='在岗'?'active':'late')}}">{{item.status}}</text>
+          </view>
+          <view class="rec-events">
+            <view wx:if="{{item.eventSummary}}" class="rec-events-chain">
+              <text class="rec-ev" wx:for="{{item.events}}" wx:for-item="ev" wx:key="index">
+                <text class="rec-ev-time">{{ev.time}}</text>
+                <text class="rec-ev-icon {{ev.type}}">{{ev.type=='in'?'↑':'↓'}}</text>
+              </text>
+            </view>
+            <view wx:else class="rec-simple">
+              <text class="rec-in">{{item.checkIn||'—'}}</text>
+              <text class="rec-sep">~</text>
+              <text class="rec-out">{{item.checkOut||'—'}}</text>
+            </view>
+          </view>
         </view>
       </view>
       <view class="empty" wx:if="{{displayRecords.length==0}}"><text>暂无记录</text></view>
