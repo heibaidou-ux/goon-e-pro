@@ -248,12 +248,13 @@ Page({
     if (!self.data.bookName || !self.data.bookStart || !self.data.bookEnd || !self.data.bookSource) {
       wx.showToast({ title: '请填写完整信息', icon: 'none' }); return
     }
+    var timeSlot = self.data.bookStart + '-' + self.data.bookEnd
     var booking = {
       orderId: 'ORD'+String(Date.now()).slice(-6),
       roomId: self.data.bookRoomId, roomName: self.data.bookRoomName,
       customerName: self.data.bookName, phone: self.data.bookPhone || '',
-      date: self.data.bookDate, time: self.data.bookStart + '-' + self.data.bookEnd,
-      amount: 0, status: 'Booked', customerSource: self.data.bookSource,
+      date: self.data.bookDate, time: timeSlot,
+      bookedTime: timeSlot, amount: 0, status: 'Booked', customerSource: self.data.bookSource,
       created: new Date().toISOString(),
       doorCode: String(Math.floor(1000+Math.random()*9000))
     }

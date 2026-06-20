@@ -32,6 +32,28 @@ function setToken(token) {
   else lsRemove('token')
 }
 
+// ── 验证函数 ──
+function validatePhone(phone) {
+  if (!phone) return true // 可以为空
+  // 手机号11位 或 带区号的座机(区号3-4位+号码7-8位)
+  return /^1\d{10}$/.test(phone) || /^0\d{2,3}-?\d{7,8}$/.test(phone)
+}
+
+function validateTime(start, end) {
+  if (!start || !end) return true
+  var sp = start.split(':'), ep = end.split(':')
+  var sm = parseInt(sp[0])*60+parseInt(sp[1]), em = parseInt(ep[0])*60+parseInt(ep[1])
+  return em > sm
+}
+
+function isPastTime(timeStr) {
+  if (!timeStr) return false
+  var now = new Date()
+  var curMin = now.getHours()*60+now.getMinutes()
+  var sp = timeStr.split(':')
+  return parseInt(sp[0])*60+parseInt(sp[1]) <= curMin
+}
+
 async function request(options) {
   if (USE_MOCK) return Promise.reject(new Error('MOCK_MODE'))
 
@@ -79,8 +101,14 @@ const MOCK_ACCOUNTS = {
   }
 }
 
+// ── 当前数据版本 ──
+const DB_VERSION = '1.9.44'
+
 const API = {
   ROLES,
+  validatePhone: validatePhone,
+  validateTime: validateTime,
+  isPastTime: isPastTime,
 
   // ── 认证 ──
   async login(phone, code) {
@@ -158,13 +186,12 @@ const API = {
     return role === requiredRoles
   },
 
-  // ── 种子数据（仅在完全无数据时注入一次）──
+  // ── 种子数据（版本升级时清空一次，之后不再动）──
   _ensureSeedData: function() {
-    // 版本检查: 清除1.9.41之前残留的旧数据（曾被重复注入的假订单）
     var ver = lsGet('_db_ver', '')
-    if (ver !== '1.9.41') {
-      lsRemove('bookings'); lsRemove('shop_orders')
-      lsSet('_db_ver', '1.9.41')
+    // 版本号不同则清空旧数据重新播种
+    if (ver !== DB_VERSION) {
+      lsRemove('bookings'); lsRemove('shop_orders'); lsSet('_db_ver', DB_VERSION)
     }
     var bookings = lsGet('bookings', [])
     if (bookings.length > 0) return
@@ -172,9 +199,9 @@ const API = {
     var ds = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
     var h = now.getHours(), m = now.getMinutes()
     var endH = (h + 3) % 24
-    lsSet('_db_ver', '1.9.43');lsSet('bookings', [
-      { orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() },
-      { orderId:'ORD002', roomId:'RM002', roomName:'翡冷翠', customerName:'李女士', status:'Booked', date:ds, time:String((h+1)%24).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', amount:160, doorCode:'7391', created: new Date().toISOString() },
+    lsSet('bookings', [
+      { orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', bookedTime:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() },
+      { orderId:'ORD002', roomId:'RM002', roomName:'翡冷翠', customerName:'李女士', status:'Booked', date:ds, time:String((h+1)%24).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', bookedTime:String((h+1)%24).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', amount:160, doorCode:'7391', created: new Date().toISOString() },
       { orderId:'ORD003', roomId:'RM003', roomName:'布拉格', customerName:'王先生', status:'Booked', date:ds, time:String((h+2)%24).padStart(2,'0')+':00-'+String(endH+1).padStart(2,'0')+':00', bookedTime:String((h+2)%24).padStart(2,'0')+':00-'+String(endH+1).padStart(2,'0')+':00', amount:120, doorCode:'5123', created: new Date().toISOString() },
     ])
   },
@@ -259,7 +286,7 @@ const API = {
     })
   },
 
-  // ── 订单（仅读写storage，不注入mock）──
+  // ── 订单 ──
   createBooking(booking) {
     if (!USE_MOCK) return request({ url: '/api/orders', method: 'POST', data: booking })
     return delay(500).then(() => {
@@ -267,8 +294,10 @@ const API = {
       var id = 'ORD' + String(Date.now()).slice(-6)
       var b = Object.assign({
         orderId: id, status: 'Booked', doorCode: String(Math.floor(1000 + Math.random() * 9000)),
-        created: new Date().toISOString(), phone: (lsGet('user', {}) || {}).phone || ''
+        bookedTime: booking.time || '', created: new Date().toISOString(),
+        phone: (lsGet('user', {}) || {}).phone || ''
       }, booking)
+      b.bookedTime = booking.time || b.time || ''
       bookings.push(b); lsSet('bookings', bookings)
       var user = lsGet('user', {})
       if (booking.paymentMethod === 'Balance' && user.balance !== undefined) {
@@ -282,7 +311,6 @@ const API = {
     this._ensureSeedData()
     return delay().then(() => {
       var bookings = lsGet('bookings', [])
-      // 只更新房间名，不注入任何mock数据
       var nameMap = {'中茶室A':'翡冷翠','中茶室B':'布拉格','大茶室C':'白沙瓦','大会议室':'丰沙里'}
       for (var i = 0; i < bookings.length; i++) {
         if (nameMap[bookings[i].roomName]) bookings[i].roomName = nameMap[bookings[i].roomName]
