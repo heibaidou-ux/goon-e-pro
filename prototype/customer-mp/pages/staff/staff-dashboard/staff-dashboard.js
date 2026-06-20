@@ -7,7 +7,8 @@ Page({
     timeStr: '',
     roomOverview: { idle: 0, inUse: 0, booked: 0, cleaning: 0 },
     stats: { roomCount: { inUse: 0 }, todayRevenue: 0, todayOrders: 0, pendingTasks: 0, orderStatus: 0, alerts: 0 },
-    showDoorMenu: false, doorRooms: [], doorRoomIds: []
+    showDoorMenu: false, doorRooms: [], doorRoomIds: [],
+    serviceCalls: [], serviceCallCount: 0
   },
 
   onLoad: function() {
@@ -63,11 +64,26 @@ Page({
       })
     })
 
+    // 查询客服呼叫请求
+    var calls = []; try { calls = JSON.parse(wx.getStorageSync('mp_service_calls') || '[]') } catch(e) {}
+    var pendingCalls = calls.filter(function(c) { return c.status === 'pending' })
+    self.setData({ serviceCalls: pendingCalls, serviceCallCount: pendingCalls.length })
+
     // 开门菜单的房间列表
     self.setData({
       doorRooms: ['白沙瓦', '翡冷翠', '布拉格', '丰沙里'],
       doorRoomIds: ['RM004', 'RM002', 'RM003', 'RM001']
     })
+  },
+
+  resolveServiceCall: function(e) {
+    var id = e.currentTarget.dataset.id
+    var calls = []; try { calls = JSON.parse(wx.getStorageSync('mp_service_calls') || '[]') } catch(e) {}
+    for (var i = 0; i < calls.length; i++) { if (calls[i].id === id || calls[i].id === id) { calls[i].status = 'resolved'; break } }
+    try { wx.setStorageSync('mp_service_calls', JSON.stringify(calls)) } catch(e) {}
+    var pendingCalls = calls.filter(function(c) { return c.status === 'pending' })
+    this.setData({ serviceCalls: pendingCalls, serviceCallCount: pendingCalls.length })
+    wx.showToast({ title: '已处理', icon: 'none' })
   },
 
   updateTime: function() {

@@ -247,6 +247,11 @@ Page({
   },
 
   callService: function(e) {
+    var id = e.currentTarget.dataset.id
+    var order = this.findOrder(id)
+    var calls = []; try { calls = JSON.parse(wx.getStorageSync('mp_service_calls') || '[]') } catch(e) {}
+    calls.push({ id:'SV'+String(Date.now()).slice(-6), roomName: order ? order.roomName : '', roomId: order ? order.roomId : '', time: new Date().toLocaleString(), status: 'pending' })
+    try { wx.setStorageSync('mp_service_calls', JSON.stringify(calls)) } catch(e) {}
     wx.showToast({ title: '📞 已通知店员', icon: 'none' })
   },
 

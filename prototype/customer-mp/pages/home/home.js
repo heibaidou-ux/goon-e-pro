@@ -150,7 +150,12 @@ Page({
 
   goSmartControl: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', s = order.start || '', e = order.end || '', dur = order.duration || ''; if (roomId) { API.executeScene(roomId, 'Welcome').catch(function() {}) }; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&start='+s+'&end='+e+'&duration='+dur }) },
   openDoor: function() { var order = this.data.activeOrder; var roomId = order.roomId || '', roomName = order.roomName || '', s = order.start || '', e = order.end || '', dur = order.duration || ''; if (roomId) { API.executeScene(roomId, 'Welcome').catch(function() {}) }; wx.navigateTo({ url: '/pages/room-control/room-control?roomId='+roomId+'&roomName='+encodeURIComponent(roomName)+'&start='+s+'&end='+e+'&duration='+dur }) },
-  callService: function() { wx.showToast({ title: '📞 已通知店员', icon: 'none' }) },
+  callService: function() {
+    var calls = []; try { calls = JSON.parse(wx.getStorageSync('mp_service_calls') || '[]') } catch(e) {}
+    calls.push({ id:'SV'+String(Date.now()).slice(-6), roomName: this.data.activeOrder.roomName || '', roomId: this.data.activeOrder.roomId || '', time: new Date().toLocaleString(), status: 'pending' })
+    try { wx.setStorageSync('mp_service_calls', JSON.stringify(calls)) } catch(e) {}
+    wx.showToast({ title: '📞 已通知店员', icon: 'none' })
+  },
   callPhone: function() {
     var self = this
     wx.showActionSheet({

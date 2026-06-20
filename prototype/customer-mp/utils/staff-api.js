@@ -79,48 +79,37 @@ const STAFF_API = {
 
   resolveAnomaly(anomalyId) { return delay(200).then(() => ({ success: true })) },
 
-  // ── 考勤（从localStorage读写真实状态）──
+  // ── 考勤（从localStorage读写真实状态，支持多次签到签退）──
+  // storage: attendance_2026-06-21 = [{type:'in',time:'08:15'},{type:'out',time:'12:00'},{type:'in',time:'13:00'}]
   getAttendance() {
     return delay().then(() => {
       var now = new Date(), h = now.getHours(), m = now.getMinutes()
       var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
       var curTime = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')
 
-      // 从localStorage读今日签到记录
-      var today = lsGet('attendance_'+todayStr, {})
-      var checkInTime = today.checkInTime || ''
-      var checkOutTime = today.checkOutTime || ''
-      var checkedIn = !!checkInTime
-      var checkedOut = !!checkOutTime
+      // 从localStorage读今日事件数组
+      var events = lsGet('attendance_'+todayStr, [])
+      if (!Array.isArray(events)) events = []  // 兼容旧格式
 
-      // 读历史记录
+      // 当前状态：根据最近事件确定
+      var lastEvent = events.length > 0 ? events[events.length - 1] : null
+      var checkedIn = lastEvent && lastEvent.type === 'in'
+      var checkedOut = lastEvent && lastEvent.type === 'out'
+
+      // 首次签到时间 / 最后签退时间
+      var firstIn = null, lastOut = null
+      for (var ei = 0; ei < events.length; ei++) {
+        if (events[ei].type === 'in' && !firstIn) firstIn = events[ei].time
+        if (events[ei].type === 'out') lastOut = events[ei].time
+      }
+      var checkInTime = firstIn || ''
+      var checkOutTime = lastOut || ''
+
+      // 读历史记录（持久化的完整考勤历史）
       var allHistory = []
       try { allHistory = JSON.parse(wx.getStorageSync('mp_attendance_history') || '[]') } catch(e) {}
-      // 用签到时间判断是否迟到（9:00前签到算正常）
-      var checkInH = checkInTime ? parseInt(checkInTime.split(':')[0]) : 24
-      var isLate = checkInH >= 9
-      // 如果今日有记录，保持同步
-      if (checkedIn) {
-        var foundIdx = -1
-        for (var i = 0; i < allHistory.length; i++) {
-          if (allHistory[i].date === todayStr) { foundIdx = i; break }
-        }
-        var todayRecord = {
-          date: todayStr,
-          checkIn: checkInTime,
-          checkOut: checkOutTime || '',
-          status: checkedOut ? (isLate ? '迟到' : '正常') : '在岗'
-        }
-        if (foundIdx >= 0) {
-          allHistory[foundIdx] = todayRecord
-        } else {
-          allHistory.unshift(todayRecord)
-        }
-        try { wx.setStorageSync('mp_attendance_history', JSON.stringify(allHistory)) } catch(e) {}
-      }
-
-      // 没有历史mock记录时注入默认数据
-      if (allHistory.length === 0) {
+      if (!Array.isArray(allHistory) || allHistory.length === 0) {
+        // 首次使用：注入默认mock历史
         allHistory = [
     { date:'2026-06-19', checkIn:'08:15', checkOut:'', status:'在岗' },
     { date:'2026-06-18', checkIn:'08:05', checkOut:'17:39', status:'正常' },
@@ -156,14 +145,45 @@ const STAFF_API = {
     { date:'2026-05-07', checkIn:'08:17', checkOut:'18:11', status:'正常' },
     { date:'2026-05-06', checkIn:'08:08', checkOut:'17:30', status:'正常' }
         ]
+        try { wx.setStorageSync('mp_attendance_history', JSON.stringify(allHistory)) } catch(e) {}
+      }
+
+      // 用签到时间判断是否迟到（9:00前签到算正常）
+      var checkInH = checkInTime ? parseInt(checkInTime.split(':')[0]) : 24
+      var isLate = checkInH >= 9
+
+      // 今日有打卡记录 → 同步到allHistory
+      if (checkedIn || checkedOut) {
+        var foundIdx = -1
+        for (var i = 0; i < allHistory.length; i++) {
+          if (allHistory[i].date === todayStr) { foundIdx = i; break }
+        }
+        var eventSummary = ''
+        for (var ei = 0; ei < events.length; ei++) {
+          eventSummary += (ei > 0 ? '/' : '') + events[ei].time + (events[ei].type === 'in' ? '↑' : '↓')
+        }
+        var todayRecord = {
+          date: todayStr,
+          checkIn: checkInTime,
+          checkOut: checkOutTime || '',
+          status: checkedOut ? (isLate ? '迟到' : '正常') : '在岗',
+          events: events,
+          eventSummary: eventSummary
+        }
+        if (foundIdx >= 0) {
+          allHistory[foundIdx] = todayRecord
+        } else {
+          allHistory.unshift(todayRecord)
+        }
+        try { wx.setStorageSync('mp_attendance_history', JSON.stringify(allHistory)) } catch(e) {}
       }
 
       return {
         checkedIn: checkedIn,
-        checkInTime: checkInTime || '—',
         checkOutTime: checkOutTime || '',
         todayStatus: checkedOut ? '已签退' : (checkedIn ? '在岗' : '未打卡'),
-        workHours: checkedIn ? Math.round(((checkedOut ? (parseInt(checkOutTime.split(':')[0])*60+parseInt(checkOutTime.split(':')[1])) : (h*60+m)) - (parseInt(checkInTime.split(':')[0])*60+parseInt(checkInTime.split(':')[1]))) / 60 * 10) / 10 : 0,
+        checkInTime: checkInTime || '—',
+        workHours: checkedIn ? Math.round((checkedOut ? (parseInt(checkOutTime.split(':')[0])*60+parseInt(checkOutTime.split(':')[1])) : (h*60+m) - (parseInt(checkInTime.split(':')[0])*60+parseInt(checkInTime.split(':')[1]))) / 60 * 10) / 10 : 0,
         records: allHistory
       }
     })
@@ -172,7 +192,11 @@ const STAFF_API = {
     return delay(300).then(() => {
       var n=new Date(); var time=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')
       var todayStr = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')
-      lsSet('attendance_'+todayStr, { checkInTime: time, checkOutTime: '' })
+      // 追加签到事件到数组
+      var events = lsGet('attendance_'+todayStr, [])
+      if (!Array.isArray(events)) events = []
+      events.push({type:'in', time:time})
+      lsSet('attendance_'+todayStr, events)
       return { success:true, time:time, status:'在岗' }
     })
   },
@@ -180,9 +204,11 @@ const STAFF_API = {
     return delay(300).then(() => {
       var n=new Date(); var time=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')
       var todayStr = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')
-      var today = lsGet('attendance_'+todayStr, {})
-      today.checkOutTime = time
-      lsSet('attendance_'+todayStr, today)
+      // 追加签退事件到数组
+      var events = lsGet('attendance_'+todayStr, [])
+      if (!Array.isArray(events)) events = []
+      events.push({type:'out', time:time})
+      lsSet('attendance_'+todayStr, events)
       return { success:true, time:time, status:'已下班' }
     })
   },

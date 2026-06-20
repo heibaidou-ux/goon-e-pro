@@ -3,7 +3,23 @@ const API = require('../../../utils/api')
 Page({
   data: { pending: [], inProgress: [] },
   onShow() { STAFF_API.getCleaningTasks().then(t => this.setData({ pending: t.pending, inProgress: t.inProgress })) },
-  acceptTask(e) { STAFF_API.acceptCleaningTask(e.currentTarget.dataset.id).then(() => this.onShow()) },
+  acceptTask(e) {
+    var self = this
+    var taskId = e.currentTarget.dataset.id
+    var task = null
+    for (var i = 0; i < self.data.pending.length; i++) {
+      if (self.data.pending[i].taskId === taskId) { task = self.data.pending[i]; break }
+    }
+    if (!task) return
+    STAFF_API.acceptCleaningTask(taskId).then(function() {
+      var p = self.data.pending.filter(function(t) { return t.taskId !== taskId })
+      task.status = 'inProgress'
+      var ip = self.data.inProgress
+      ip.push(task)
+      self.setData({ pending: p, inProgress: ip })
+      wx.showToast({ title: '已接单', icon: 'none' })
+    })
+  },
   completeTask(e) {
     var self = this
     var taskId = e.currentTarget.dataset.id

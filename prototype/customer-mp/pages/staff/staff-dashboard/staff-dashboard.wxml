@@ -71,6 +71,17 @@
   </view>
 
   <!-- 功能入口 -->
+  <!-- 客服呼叫通知 -->
+  <view class="service-call-section" wx:if="{{serviceCalls && serviceCalls.length>0}}">
+    <text class="section-title" style="color:#d54941;">📞 客服呼叫 ({{serviceCallCount}})</text>
+    <view class="service-call-card" wx:for="{{serviceCalls}}" wx:key="id">
+      <text class="sc-icon">🔔</text>
+      <text class="sc-info">{{item.roomName}} · {{item.time}}</text>
+      <text class="sc-resolve" bindtap="resolveServiceCall" data-id="{{item.id}}">已处理</text>
+    </view>
+  </view>
+
+  <!-- 功能介绍 -->
   <view class="section-title">更多功能</view>
   <view class="feature-grid">
     <view class="feature-item" bindtap="goDeviceMonitor">

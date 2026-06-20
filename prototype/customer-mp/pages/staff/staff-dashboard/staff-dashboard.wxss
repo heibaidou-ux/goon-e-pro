@@ -62,7 +62,7 @@
 
 /* ── 开门菜单 ── */
 .modal-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:99;display:flex;align-items:center;justify-content:center; }
-.modal-center { align-items:center; }
+.modal-center { align-items:flex-start; padding-top:18vh; }
 .door-menu { background:#fff;border-radius:20px;width:280px;max-width:85vw;overflow:hidden; }
 .door-menu-title { padding:16px 20px 12px;font-size:16px;font-weight:700;color:#333;text-align:center;border-bottom:1px solid #f0ece6; }
 .door-menu-item { display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid #f5f5f5; }
@@ -72,3 +72,8 @@
 .dmi-name { flex:1;font-size:14px;color:#333;font-weight:500; }
 .dmi-arrow { color:#ccc;font-size:16px; }
 .door-menu-item.cancel { justify-content:center;color:#999;font-size:14px;border-bottom:none; }
+.service-call-section { padding:0 16px 12px; }
+.service-call-card { display:flex;align-items:center;background:#fff;padding:12px 14px;border-radius:12px;margin-bottom:6px;box-shadow:0 1px 4px rgba(0,0,0,.05); }
+.sc-icon { font-size:16px;margin-right:8px; }
+.sc-info { flex:1;font-size:13px;color:#333; }
+.sc-resolve { padding:6px 12px;border-radius:8px;background:#5D8A6B;color:#fff;font-size:12px;font-weight:600; }
