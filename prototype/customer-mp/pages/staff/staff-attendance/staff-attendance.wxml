@@ -15,7 +15,10 @@
         <view class="checkin-btns">
           <button wx:if="{{!checkedIn && !checkedOut}}" bindtap="doCheckIn" class="ci-btn signin">🕐 签到</button>
           <button wx:if="{{checkedIn && !checkedOut}}" bindtap="doCheckOut" class="ci-btn signout">🏁 签退</button>
-          <text wx:if="{{checkedIn && checkedOut}}" class="ci-done">✅ 今日已签退</text>
+          <view wx:if="{{checkedIn && checkedOut}}" class="ci-signedout">
+            <text class="ci-done">✅ 今日已签退</text>
+            <button bindtap="doCheckIn" class="ci-btn signin ci-reentry">🕐 再次签到</button>
+          </view>
         </view>
       </view>
 
