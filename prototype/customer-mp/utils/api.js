@@ -102,7 +102,7 @@ const MOCK_ACCOUNTS = {
 }
 
 // ── 当前数据版本 ──
-const DB_VERSION = '1.9.44'
+const DB_VERSION = '1.9.45'
 
 const API = {
   ROLES,
@@ -203,6 +203,7 @@ const API = {
       { orderId:'ORD001', roomId:'RM004', roomName:'白沙瓦', customerName:'张先生', status:'InUse', date:ds, time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', bookedTime:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'-'+String(endH).padStart(2,'0')+':00', amount:180, doorCode:'8264', created: new Date().toISOString() },
       { orderId:'ORD002', roomId:'RM002', roomName:'翡冷翠', customerName:'李女士', status:'Booked', date:ds, time:String((h+1)%24).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', bookedTime:String((h+1)%24).padStart(2,'0')+':00-'+String(endH).padStart(2,'0')+':00', amount:160, doorCode:'7391', created: new Date().toISOString() },
       { orderId:'ORD003', roomId:'RM003', roomName:'布拉格', customerName:'王先生', status:'Booked', date:ds, time:String((h+2)%24).padStart(2,'0')+':00-'+String(endH+1).padStart(2,'0')+':00', bookedTime:String((h+2)%24).padStart(2,'0')+':00-'+String(endH+1).padStart(2,'0')+':00', amount:120, doorCode:'5123', created: new Date().toISOString() },
+      { orderId:'ORD004', roomId:'RM001', roomName:'丰沙里', customerName:'赵先生', status:'Booked', date:ds, time:'23:30-01:30', bookedTime:'23:30-01:30', amount:200, doorCode:'6688', created: new Date().toISOString() },
     ])
   },
 
@@ -288,54 +289,86 @@ const API = {
   },
 
   // ── 订单到期自动清理（每次读订单前调用，同步全局状态）──
+  // 辅助：解析时间段，返回 {startMin, endMin, crossDay}，跨日时endMin+1440
+  _parseTimeSlot: function(timeStr) {
+    if (!timeStr) return null
+    var parts = timeStr.split('-')
+    if (parts.length < 2) return null
+    var sp = parts[0].split(':'), ep = parts[1].split(':')
+    if (sp.length < 2 || ep.length < 2) return null
+    var sm = parseInt(sp[0])*60+parseInt(sp[1])
+    var em = parseInt(ep[0])*60+parseInt(ep[1])
+    var crossDay = em <= sm
+    if (crossDay) em += 1440
+    return { startMin: sm, endMin: em, crossDay: crossDay }
+  },
+
   _cleanExpiredOrders: function() {
     var bookings = lsGet('bookings', [])
     var now = new Date()
     var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
+    var yesterday = new Date(now); yesterday.setDate(now.getDate()-1)
+    var yesterdayStr = yesterday.getFullYear()+'-'+String(yesterday.getMonth()+1).padStart(2,'0')+'-'+String(yesterday.getDate()).padStart(2,'0')
     var curMin = now.getHours()*60+now.getMinutes()
     var changed = false
 
     for (var i = 0; i < bookings.length; i++) {
       var b = bookings[i]
       if (b.status === 'Cancelled' || b.status === 'Completed' || b.status === 'Expired') continue
+      if (!b.date || !b.time) continue
 
-      // 解析结束时间
-      var endMin = null
-      if (b.time) {
-        var parts = b.time.split('-')
-        if (parts.length >= 2) {
-          var ep = parts[1].split(':')
-          if (ep.length >= 2) endMin = parseInt(ep[0])*60+parseInt(ep[1])
-        }
-      }
+      var t = this._parseTimeSlot(b.time)
+      if (!t) continue
+
+      var isToday = b.date === todayStr
+      var isYesterday = b.date === yesterdayStr
 
       if (b.status === 'InUse') {
-        // InUse：时间已过结束时间 → Completed
-        if (b.date === todayStr && endMin !== null && curMin >= endMin + 15) {
-          b.status = 'Completed'
-          changed = true
+        // InUse：过了结束时间（+15分钟宽限）→ Completed
+        // 跨日订单：结束时间在第二天
+
+        // 今天的订单非跨日
+        if (isToday && !t.crossDay && curMin >= t.endMin + 15) {
+          b.status = 'Completed'; changed = true
         }
-        // 过期日期 → Completed
-        if (b.date && b.date < todayStr) {
-          b.status = 'Completed'
-          changed = true
+        // 今天的订单跨日（结束在次日）
+        if (isToday && t.crossDay && curMin >= t.endMin) {  // endMin已+1440
+          b.status = 'Completed'; changed = true
+        }
+        // 昨天的跨日订单（当前时间在第二天）
+        if (isYesterday && t.crossDay && curMin >= t.endMin - 1440 + 15) {
+          b.status = 'Completed'; changed = true
+        }
+        // 昨天非跨日订单
+        if (isYesterday && !t.crossDay) {
+          b.status = 'Completed'; changed = true
+        }
+        // 更早的日期
+        if (b.date && b.date < yesterdayStr) {
+          b.status = 'Completed'; changed = true
         }
       } else if (b.status === 'Booked') {
-        // Booked：今天的订单且开始时间已过 → Expired
-        if (b.date === todayStr && b.time) {
-          var sp = b.time.split('-')[0].split(':')
-          if (sp.length >= 2) {
-            var startMin = parseInt(sp[0])*60+parseInt(sp[1])
-            if (curMin >= startMin + 15) {
-              b.status = 'Expired'
-              changed = true
-            }
+        // Booked：到了结束时间还没签到（没转为InUse）→ Expired
+        // 跨日Booked：当前时间过了跨日调整后的结束时间
+        if (isToday) {
+          if (!t.crossDay && curMin >= t.endMin) {
+            b.status = 'Expired'; changed = true
+          }
+          if (t.crossDay && curMin >= t.endMin) {  // endMin已+1440, curMin不会>=1440除非过了一天
+            b.status = 'Expired'; changed = true
           }
         }
-        // 过期日期 → Expired
-        if (b.date && b.date < todayStr) {
-          b.status = 'Expired'
-          changed = true
+        // 昨天的跨日订单
+        if (isYesterday && t.crossDay && curMin >= t.endMin - 1440) {
+          b.status = 'Expired'; changed = true
+        }
+        // 昨天非跨日
+        if (isYesterday && !t.crossDay) {
+          b.status = 'Expired'; changed = true
+        }
+        // 更早日期
+        if (b.date && b.date < yesterdayStr) {
+          b.status = 'Expired'; changed = true
         }
       }
     }
@@ -365,6 +398,30 @@ const API = {
     })
   },
 
+  // ── 给订单添加跨日标注 ──
+  _annotateOrder: function(order) {
+    if (!order.time) return order
+    var parts = order.time.split('-')
+    if (parts.length < 2) return order
+    var sp = parts[0].split(':'), ep = parts[1].split(':')
+    if (sp.length < 2 || ep.length < 2) return order
+    var sm = parseInt(sp[0])*60+parseInt(sp[1])
+    var em = parseInt(ep[0])*60+parseInt(ep[1])
+    var crossDay = em <= sm
+    if (crossDay) {
+      order.crossDay = true
+      // 计算结束日期
+      if (order.date) {
+        var d = new Date(order.date)
+        d.setDate(d.getDate() + 1)
+        var m = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0')
+        order.endDate = d.getFullYear()+'-'+m+'-'+dd
+        order._timeDisplay = order.date.slice(5) + ' ' + parts[0] + ' → ' + order.endDate.slice(5) + ' ' + parts[1]
+      }
+    }
+    return order
+  },
+
   getAllOrders() {
     this._ensureSeedData()
     this._cleanExpiredOrders()
@@ -373,6 +430,7 @@ const API = {
       var nameMap = {'中茶室A':'翡冷翠','中茶室B':'布拉格','大茶室C':'白沙瓦','大会议室':'丰沙里'}
       for (var i = 0; i < bookings.length; i++) {
         if (nameMap[bookings[i].roomName]) bookings[i].roomName = nameMap[bookings[i].roomName]
+        this._annotateOrder(bookings[i])
       }
       return bookings
     })
@@ -383,6 +441,7 @@ const API = {
     return delay().then(() => {
       var bookings = lsGet('bookings', [])
       var user = lsGet('user', null)
+      for (var i = 0; i < bookings.length; i++) this._annotateOrder(bookings[i])
       if (user) return bookings.filter(b => b.phone === user.phone || b.customerName === user.name).sort((a, b) => new Date(b.created) - new Date(a.created))
       return []
     })

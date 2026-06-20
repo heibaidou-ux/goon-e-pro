@@ -234,7 +234,7 @@
       <view class="detail-info" wx:if="{{detailOrder}}">
         <view class="detail-row"><text class="dl">订单编号</text><text class="dv">{{detailOrder.orderId}}</text></view>
         <view class="detail-row"><text class="dl">状态</text><text class="dv">{{detailOrder.statusLabel}}</text></view>
-        <view class="detail-row"><text class="dl">时间</text><text class="dv">{{detailOrder.timeStr}}</text></view>
+        <view class="detail-row"><text class="dl">时间</text><text class="dv">{{detailOrder._timeDisplay || detailOrder.timeStr}}</text></view>
         <view class="detail-row"><text class="dl">金额</text><text class="dv">¥{{detailOrder.amount}}</text></view>
         <view class="detail-row" wx:if="{{detailOrder.payment}}"><text class="dl">支付方式</text><text class="dv">{{detailOrder.payLabel}}</text></view>
         <view class="detail-row" wx:if="{{detailOrder.deliveryMethod}}"><text class="dl">配送方式</text><text class="dv">{{detailOrder.deliveryLabel}}</text></view>

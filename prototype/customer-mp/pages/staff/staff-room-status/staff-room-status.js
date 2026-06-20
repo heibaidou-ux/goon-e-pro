@@ -47,7 +47,7 @@ Page({
                 currentOrder = {
                   orderId: o.orderId,
                   customerName: o.customerName || o.phone || '客人',
-                  start: o.time.split('-')[0], end: o.time.split('-')[1], date: o.date||'', bookedTime: o.bookedTime||''
+                  start: o.time.split('-')[0], end: o.time.split('-')[1], date: o.date||'', bookedTime: o.bookedTime||'', _timeDisplay: o._timeDisplay||''
                 }
                 break
               }
@@ -66,7 +66,7 @@ Page({
                     orderId: o.orderId,
                     customerName: o.customerName || o.phone || '客人',
                     start: parts[0], end: parts[1], date: o.date||'', bookedTime: o.bookedTime||'',
-                    upcoming: true
+                    upcoming: true, _timeDisplay: o._timeDisplay||''
                   }
                 }
                 // 已到时段/已过时段不自动转为InUse，等店员手动确认

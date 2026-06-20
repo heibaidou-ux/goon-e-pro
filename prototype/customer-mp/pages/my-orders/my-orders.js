@@ -183,7 +183,7 @@ Page({
         return {
           orderId: o.orderId, roomName: o.roomName || '房间', roomId: o.roomId || '',
           status: status, statusClass: statusClass, statusLabel: statusLabel,
-          timeStr: (o.date||'')+' '+(o.time||(o.start?o.start.slice(0,5)+'-'+o.end.slice(0,5):'')),
+          timeStr: o._timeDisplay || (o.date||'')+' '+(o.time||(o.start?o.start.slice(0,5)+'-'+o.end.slice(0,5):'')),
           amount: o.amount||0, doorCode: o.doorCode||'0000',
           bookedTime: o.bookedTime||'',remaining: remaining, canCancel: canCancel, cancelFree: cancelFree, cancelMsg: cancelMsg,
           logistics: log, payment: o.payment||'',

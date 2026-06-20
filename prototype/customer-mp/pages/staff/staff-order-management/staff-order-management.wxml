@@ -39,7 +39,7 @@
             <text class="oc-room">{{item.roomName}}</text>
             <text class="oc-status {{item.statusClass}}">{{item.statusLabel}}</text>
           </view>
-          <text class="oc-time">{{item.date}} {{item.time}}</text>
+          <text class="oc-time">{{item._timeDisplay || (item.date+" "+item.time)}}</text>
           <text class="oc-booked" wx:if="{{item.bookedTime && item.bookedTime!=item.time}}">预订 {{item.bookedTime}}</text>
           <text class="oc-amount">¥{{item.amount}}</text>
           <text class="oc-customer" wx:if="{{item.customerName}}">👤 {{item.customerName}} <text wx:if="{{item.phone}}">{{item.phone}}</text></text>
@@ -103,7 +103,7 @@
           <view class="detail-row"><text class="dl">类型</text><text class="dv">{{detailOrder.orderType=='room'?'房间':'茶品'}}</text></view>
           <view class="detail-row"><text class="dl">状态</text><text class="dv">{{detailOrder.statusLabel}}</text></view>
           <view class="detail-row" wx:if="{{detailOrder.roomName}}"><text class="dl">房间</text><text class="dv">{{detailOrder.roomName}}</text></view>
-          <view class="detail-row"><text class="dl">时段</text><text class="dv">{{detailOrder.date}} {{detailOrder.time}}</text></view>
+          <view class="detail-row"><text class="dl">时段</text><text class="dv">{{detailOrder._timeDisplay || (detailOrder.date+" "+detailOrder.time)}}</text></view>
           <view class="detail-row"><text class="dl">金额</text><text class="dv">¥{{detailOrder.amount}}</text></view>
           <view wx:if="{{detailOrder.customerName}}"><text class="dl">姓名</text><text class="dv">{{detailOrder.customerName}}</text></view>
           <view wx:if="{{detailOrder.phone}}"><text class="dl">电话</text><text class="dv">{{detailOrder.phone}}</text></view>
