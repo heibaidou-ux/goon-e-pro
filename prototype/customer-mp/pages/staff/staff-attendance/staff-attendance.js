@@ -51,39 +51,40 @@ Page({
   },
 
   switchQuery: function(e) {
+    var self = this
     var type = e.currentTarget.dataset.type
-    var records = this.data.records
-    // 按日期排序（由近到远）
-    var filtered = []
-    var now = new Date()
-    var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
+    self.setData({ queryType: type })
+    // 从API重新获取最新记录（含签到后的新数据）
+    STAFF_API.getAttendance().then(function(a) {
+      var records = a.records || []
+      var filtered = []
+      var now = new Date()
+      var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
 
-    if (type === 'week') {
-      // 近7天
-      var weekAgo = new Date(now)
-      weekAgo.setDate(now.getDate() - 7)
-      for (var i = 0; i < records.length; i++) {
-        if (records[i].date >= weekAgo.toISOString().slice(0,10) && records[i].date <= todayStr) {
-          filtered.push(records[i])
+      if (type === 'week') {
+        var weekAgo = new Date(now)
+        weekAgo.setDate(now.getDate() - 7)
+        var weekStart = weekAgo.getFullYear()+'-'+String(weekAgo.getMonth()+1).padStart(2,'0')+'-'+String(weekAgo.getDate()).padStart(2,'0')
+        for (var i = 0; i < records.length; i++) {
+          if (records[i].date >= weekStart && records[i].date <= todayStr) {
+            filtered.push(records[i])
+          }
         }
-      }
-    } else if (type === 'month') {
-      // 近30天
-      var monthAgo = new Date(now)
-      monthAgo.setDate(now.getDate() - 30)
-      for (var i = 0; i < records.length; i++) {
-        if (records[i].date >= monthAgo.toISOString().slice(0,10) && records[i].date <= todayStr) {
-          filtered.push(records[i])
+      } else if (type === 'month') {
+        var monthAgo = new Date(now)
+        monthAgo.setDate(now.getDate() - 30)
+        var monthStart = monthAgo.getFullYear()+'-'+String(monthAgo.getMonth()+1).padStart(2,'0')+'-'+String(monthAgo.getDate()).padStart(2,'0')
+        for (var i = 0; i < records.length; i++) {
+          if (records[i].date >= monthStart && records[i].date <= todayStr) {
+            filtered.push(records[i])
+          }
         }
+      } else {
+        filtered = records.slice()
       }
-    } else {
-      // 全年（全部记录）
-      filtered = records.slice()
-    }
 
-    // 限制最多显示条数避免太长
-    if (filtered.length > 60) filtered = filtered.slice(0, 60)
-
-    this.setData({ queryType: type, displayRecords: filtered })
+      if (filtered.length > 60) filtered = filtered.slice(0, 60)
+      self.setData({ displayRecords: filtered })
+    })
   }
 })
