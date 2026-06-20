@@ -91,9 +91,11 @@ const STAFF_API = {
       var events = lsGet('attendance_'+todayStr, [])
       if (!Array.isArray(events)) events = []  // 兼容旧格式
 
-      // 当前状态：根据最近事件确定
+      // 当前状态：只要有签到就算checkedIn,最后事件是签退才算checkedOut
       var lastEvent = events.length > 0 ? events[events.length - 1] : null
-      var checkedIn = lastEvent && lastEvent.type === 'in'
+      var hasIn = false
+      for (var ei = 0; ei < events.length; ei++) { if (events[ei].type === 'in') hasIn = true }
+      var checkedIn = hasIn
       var checkedOut = lastEvent && lastEvent.type === 'out'
 
       // 首次签到时间 / 最后签退时间
