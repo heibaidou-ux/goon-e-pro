@@ -96,21 +96,27 @@ const STAFF_API = {
       // 读历史记录
       var allHistory = []
       try { allHistory = JSON.parse(wx.getStorageSync('mp_attendance_history') || '[]') } catch(e) {}
-      // 如果今日有记录但不在历史里，补进去
+      // 用签到时间判断是否迟到（9:00前签到算正常）
+      var checkInH = checkInTime ? parseInt(checkInTime.split(':')[0]) : 24
+      var isLate = checkInH >= 9
+      // 如果今日有记录，保持同步
       if (checkedIn) {
-        var found = false
+        var foundIdx = -1
         for (var i = 0; i < allHistory.length; i++) {
-          if (allHistory[i].date === todayStr) { found = true; break }
+          if (allHistory[i].date === todayStr) { foundIdx = i; break }
         }
-        if (!found) {
-          allHistory.unshift({
-            date: todayStr,
-            checkIn: checkInTime,
-            checkOut: checkOutTime || '',
-            status: checkedOut ? (h < 9 ? '正常' : '迟到') : '在岗'
-          })
-          try { wx.setStorageSync('mp_attendance_history', JSON.stringify(allHistory)) } catch(e) {}
+        var todayRecord = {
+          date: todayStr,
+          checkIn: checkInTime,
+          checkOut: checkOutTime || '',
+          status: checkedOut ? (isLate ? '迟到' : '正常') : '在岗'
         }
+        if (foundIdx >= 0) {
+          allHistory[foundIdx] = todayRecord
+        } else {
+          allHistory.unshift(todayRecord)
+        }
+        try { wx.setStorageSync('mp_attendance_history', JSON.stringify(allHistory)) } catch(e) {}
       }
 
       // 没有历史mock记录时注入默认数据
