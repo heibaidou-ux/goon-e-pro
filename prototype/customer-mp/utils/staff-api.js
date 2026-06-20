@@ -79,15 +79,43 @@ const STAFF_API = {
 
   resolveAnomaly(anomalyId) { return delay(200).then(() => ({ success: true })) },
 
-  // ── 考勤 ──
+  // ── 考勤（从localStorage读写真实状态）──
   getAttendance() {
     return delay().then(() => {
       var now = new Date(), h = now.getHours(), m = now.getMinutes()
       var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
-      return {
-        checkedIn: h >= 8, checkInTime: h >= 8 ? String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : '—', checkOutTime: h >= 18 ? String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : '',
-        todayStatus: h >= 18 ? '已签退' : (h >= 8 ? '在岗' : '未打卡'), workHours: Math.min(h - 8, 8),
-        records: [
+      var curTime = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')
+
+      // 从localStorage读今日签到记录
+      var today = lsGet('attendance_'+todayStr, {})
+      var checkInTime = today.checkInTime || ''
+      var checkOutTime = today.checkOutTime || ''
+      var checkedIn = !!checkInTime
+      var checkedOut = !!checkOutTime
+
+      // 读历史记录
+      var allHistory = []
+      try { allHistory = JSON.parse(wx.getStorageSync('mp_attendance_history') || '[]') } catch(e) {}
+      // 如果今日有记录但不在历史里，补进去
+      if (checkedIn) {
+        var found = false
+        for (var i = 0; i < allHistory.length; i++) {
+          if (allHistory[i].date === todayStr) { found = true; break }
+        }
+        if (!found) {
+          allHistory.unshift({
+            date: todayStr,
+            checkIn: checkInTime,
+            checkOut: checkOutTime || '',
+            status: checkedOut ? (h < 9 ? '正常' : '迟到') : '在岗'
+          })
+          try { wx.setStorageSync('mp_attendance_history', JSON.stringify(allHistory)) } catch(e) {}
+        }
+      }
+
+      // 没有历史mock记录时注入默认数据
+      if (allHistory.length === 0) {
+        allHistory = [
     { date:'2026-06-19', checkIn:'08:15', checkOut:'', status:'在岗' },
     { date:'2026-06-18', checkIn:'08:05', checkOut:'17:39', status:'正常' },
     { date:'2026-06-17', checkIn:'09:03', checkOut:'18:04', status:'迟到' },
@@ -123,10 +151,35 @@ const STAFF_API = {
     { date:'2026-05-06', checkIn:'08:08', checkOut:'17:30', status:'正常' }
         ]
       }
+
+      return {
+        checkedIn: checkedIn,
+        checkInTime: checkInTime || '—',
+        checkOutTime: checkOutTime || '',
+        todayStatus: checkedOut ? '已签退' : (checkedIn ? '在岗' : '未打卡'),
+        workHours: checkedIn ? Math.round(((checkedOut ? (parseInt(checkOutTime.split(':')[0])*60+parseInt(checkOutTime.split(':')[1])) : (h*60+m)) - (parseInt(checkInTime.split(':')[0])*60+parseInt(checkInTime.split(':')[1]))) / 60 * 10) / 10 : 0,
+        records: allHistory
+      }
     })
   },
-  checkIn() { return delay(300).then(() => { var n=new Date(); return { success:true, time:String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'), status:'在岗' } }) },
-  checkOut() { return delay(300).then(() => { var n=new Date(); return { success:true, time:String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'), status:'已下班' } }) },
+  checkIn() {
+    return delay(300).then(() => {
+      var n=new Date(); var time=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')
+      var todayStr = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')
+      lsSet('attendance_'+todayStr, { checkInTime: time, checkOutTime: '' })
+      return { success:true, time:time, status:'在岗' }
+    })
+  },
+  checkOut() {
+    return delay(300).then(() => {
+      var n=new Date(); var time=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')
+      var todayStr = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')
+      var today = lsGet('attendance_'+todayStr, {})
+      today.checkOutTime = time
+      lsSet('attendance_'+todayStr, today)
+      return { success:true, time:time, status:'已下班' }
+    })
+  },
 
   // ── 巡检 ──
   getInspectionRooms: function() {
