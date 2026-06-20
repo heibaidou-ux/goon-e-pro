@@ -1,4 +1,4 @@
-<view class="phone"><scroll-view class="page" scroll-y show-scrollbar="{{false}}" style="padding-top:{{topPadding}}px;">
+<view wx:if="{{!_checkingRole}}" class="phone"><scroll-view class="page" scroll-y show-scrollbar="{{false}}" style="padding-top:{{topPadding}}px;">
 
   <!-- 门店头部 -->
   <view class="store-header">

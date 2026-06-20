@@ -25,7 +25,8 @@ Page({
 
   onLoad: function(e) {
     var self = this
-    // 角色重定向
+    this.setData({ _checkingRole: true })
+    // 角色重定向（在渲染任何UI前完成）
     var role = API.getUserRole()
     if (role === 'staff') { wx.reLaunch({ url: '/pages/staff/staff-dashboard/staff-dashboard' }); return }
     // 从"我的"跳转过来时自动弹出登录框
@@ -34,6 +35,7 @@ Page({
     }
     if (role === 'shareholder') { wx.reLaunch({ url: '/pages/workbench/investor-workbench/investor-workbench' }); return }
     try { self.setData({ topPadding: (wx.getWindowInfo().statusBarHeight || 44) + 44 }) } catch(e) {}
+    self.setData({ _checkingRole: false })
     self.loadData(); self.checkActiveOrder()
   },
   onShow: function() { this.loadData(); this.checkActiveOrder() },

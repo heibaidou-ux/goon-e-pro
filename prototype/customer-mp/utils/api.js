@@ -228,6 +228,7 @@ const API = {
 
   getRoomBookings(roomId, date) {
     if (!USE_MOCK) return request({ url: '/api/orders/active' })
+    this._cleanExpiredOrders()
     return delay().then(() => {
       const bookings = lsGet('bookings', [])
       return bookings.filter(b => b.roomId === roomId && b.date === date && b.status !== 'Cancelled')
@@ -286,6 +287,63 @@ const API = {
     })
   },
 
+  // ── 订单到期自动清理（每次读订单前调用，同步全局状态）──
+  _cleanExpiredOrders: function() {
+    var bookings = lsGet('bookings', [])
+    var now = new Date()
+    var todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')
+    var curMin = now.getHours()*60+now.getMinutes()
+    var changed = false
+
+    for (var i = 0; i < bookings.length; i++) {
+      var b = bookings[i]
+      if (b.status === 'Cancelled' || b.status === 'Completed' || b.status === 'Expired') continue
+
+      // 解析结束时间
+      var endMin = null
+      if (b.time) {
+        var parts = b.time.split('-')
+        if (parts.length >= 2) {
+          var ep = parts[1].split(':')
+          if (ep.length >= 2) endMin = parseInt(ep[0])*60+parseInt(ep[1])
+        }
+      }
+
+      if (b.status === 'InUse') {
+        // InUse：时间已过结束时间 → Completed
+        if (b.date === todayStr && endMin !== null && curMin >= endMin + 15) {
+          b.status = 'Completed'
+          changed = true
+        }
+        // 过期日期 → Completed
+        if (b.date && b.date < todayStr) {
+          b.status = 'Completed'
+          changed = true
+        }
+      } else if (b.status === 'Booked') {
+        // Booked：今天的订单且开始时间已过 → Expired
+        if (b.date === todayStr && b.time) {
+          var sp = b.time.split('-')[0].split(':')
+          if (sp.length >= 2) {
+            var startMin = parseInt(sp[0])*60+parseInt(sp[1])
+            if (curMin >= startMin + 15) {
+              b.status = 'Expired'
+              changed = true
+            }
+          }
+        }
+        // 过期日期 → Expired
+        if (b.date && b.date < todayStr) {
+          b.status = 'Expired'
+          changed = true
+        }
+      }
+    }
+
+    if (changed) lsSet('bookings', bookings)
+    return bookings
+  },
+
   // ── 订单 ──
   createBooking(booking) {
     if (!USE_MOCK) return request({ url: '/api/orders', method: 'POST', data: booking })
@@ -309,6 +367,7 @@ const API = {
 
   getAllOrders() {
     this._ensureSeedData()
+    this._cleanExpiredOrders()
     return delay().then(() => {
       var bookings = lsGet('bookings', [])
       var nameMap = {'中茶室A':'翡冷翠','中茶室B':'布拉格','大茶室C':'白沙瓦','大会议室':'丰沙里'}
@@ -320,6 +379,7 @@ const API = {
   },
 
   getUserOrders() {
+    this._cleanExpiredOrders()
     return delay().then(() => {
       var bookings = lsGet('bookings', [])
       var user = lsGet('user', null)
