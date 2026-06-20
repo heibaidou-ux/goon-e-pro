@@ -26,7 +26,7 @@
         <!-- 使用中：显示客人和订单号 -->
         <view class="rc-order" wx:if="{{item.currentOrder && item.statusClass=='inuse'}}">
           <text class="rc-customer">👤 {{item.currentOrder.customerName}}</text>
-          <text class="rc-time">{{item.currentOrder._timeDisplay || (item.currentOrder.date+" "+item.currentOrder.start+"-"+item.currentOrder.end)<text class="rc-time-mini" wx:if="{{item.currentOrder.bookedTime && item.currentOrder.bookedTime!=(item.currentOrder.start+'-'+item.currentOrder.end)}}"> 原{{item.currentOrder.bookedTime}}</text></text>
+          <text class="rc-time">{{item.currentOrder._timeDisplay || (item.currentOrder.date+" "+item.currentOrder.start+"-"+item.currentOrder.end)}}<text class="rc-time-mini" wx:if="{{item.currentOrder.bookedTime && item.currentOrder.bookedTime!=(item.currentOrder.start+'-'+item.currentOrder.end)}}"> 原{{item.currentOrder.bookedTime}}</text></text>
         </view>
 
         <!-- 已预订：显示预订信息 -->
