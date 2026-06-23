@@ -139,6 +139,38 @@ const API = {
       return user
     })
   },
+  // ── 微信一键登录 ──
+  async wechatLogin(code, userInfo) {
+    if (!USE_MOCK) {
+      const data = await request({ url: '/api/auth/wechat-login', method: 'POST', data: { code, nickname: (userInfo && userInfo.nickName) || '', avatar: (userInfo && userInfo.avatarUrl) || '' } })
+      setToken(data.access_token)
+      lsSet('logged_in', true)
+      const user = data.user
+      user.role = ROLES.GUEST
+      lsSet('user', user)
+      lsSet('user_role', ROLES.GUEST)
+      return user
+    }
+    return delay().then(() => {
+      var nickname = (userInfo && userInfo.nickName) || '微信用户'
+      var openid = 'mock_wx_' + code.slice(-8)
+      var users = lsGet('users', {})
+      var user = null
+      for (var k in users) { if (users[k].wechat_openid === openid) { user = users[k]; break } }
+      if (!user) {
+        user = {
+          phone: '', name: nickname, memberLevel: 'Silver', balance: 280,
+          totalSpent: 0, visitCount: 0, wechat_openid: openid,
+          wechat_nickname: nickname, wechat_avatar: (userInfo && userInfo.avatarUrl) || '',
+          role: ROLES.GUEST, created: new Date().toISOString(), tags: []
+        }
+        users['wx_' + openid.slice(-6)] = user; lsSet('users', users)
+      }
+      user.role = ROLES.GUEST
+      lsSet('logged_in', true); lsSet('user', user); lsSet('user_role', ROLES.GUEST)
+      return user
+    })
+  },
 
   loginWithRole(account, password, role) {
     if (!USE_MOCK) {

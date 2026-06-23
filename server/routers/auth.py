@@ -2,9 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
+import httpx
+import uuid
+
 from database import get_db
 from models.user import User
-from schemas.user import UserCreate, UserOut, Token, LoginRequest, PhoneLoginRequest
+from schemas.user import UserCreate, UserOut, Token, LoginRequest, PhoneLoginRequest, WeChatLoginRequest
 from config import settings
 from services.auth_service import (
     hash_password, verify_password, create_access_token,
@@ -90,6 +93,67 @@ async def phone_login(request: Request, data: PhoneLoginRequest, db: AsyncSessio
     access_token = create_access_token({"sub": user.username, "role": user.role})
     refresh_token = create_refresh_token({"sub": user.username})
     return Token(access_token=access_token, refresh_token=refresh_token, user=UserOut.model_validate(user))
+
+
+@router.post("/wechat-login", response_model=Token)
+async def wechat_login(request: Request, data: WeChatLoginRequest, db: AsyncSession = Depends(get_db), _: bool = Depends(rate_limit(10, 60))):
+    """微信一键登录：前端 wx.login() 获取 code，后端换取 openid，自动创建/登录用户"""
+    openid = ""
+    nickname = data.nickname or "微信用户"
+    avatar = data.avatar or ""
+
+    if settings.wechat_secret and not settings.debug:
+        url = (
+            f"https://api.weixin.qq.com/sns/jscode2session"
+            f"?appid={settings.wechat_appid}"
+            f"&secret={settings.wechat_secret}"
+            f"&js_code={data.code}&grant_type=authorization_code"
+        )
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get(url)
+            if resp.status_code != 200:
+                raise HTTPException(status_code=502, detail="微信登录服务不可用")
+            wx_data = resp.json()
+            if "errcode" in wx_data and wx_data["errcode"] != 0:
+                raise HTTPException(status_code=401, detail=f"微信登录失败: {wx_data.get('errmsg', '未知错误')}")
+            openid = wx_data.get("openid", "")
+            if not openid:
+                raise HTTPException(status_code=401, detail="微信登录失败：未获取到openid")
+    else:
+        openid = "dev_" + data.code[-12:] if len(data.code) > 12 else "dev_" + uuid.uuid4().hex[:12]
+
+    result = await db.execute(select(User).where(User.wechat_openid == openid))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        username = "wx_" + openid[-12:] if len(openid) > 12 else "wx_" + uuid.uuid4().hex[:12]
+        user = User(
+            username=username,
+            hashed_password=hash_password(uuid.uuid4().hex),
+            display_name=nickname,
+            role="guest",
+            wechat_openid=openid,
+            wechat_nickname=nickname,
+            wechat_avatar=avatar,
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+    else:
+        if nickname:
+            user.wechat_nickname = nickname
+        if avatar:
+            user.wechat_avatar = avatar
+        if nickname and (not user.display_name or user.display_name.startswith("wx_")):
+            user.display_name = nickname
+        await db.commit()
+
+    if not user.is_active:
+        raise HTTPException(status_code=401, detail="用户已被禁用")
+
+    access_token = create_access_token({"sub": user.username, "role": user.role})
+    refresh_token_out = create_refresh_token({"sub": user.username})
+    return Token(access_token=access_token, refresh_token=refresh_token_out, user=UserOut.model_validate(user))
 
 
 @router.post("/refresh", response_model=Token)

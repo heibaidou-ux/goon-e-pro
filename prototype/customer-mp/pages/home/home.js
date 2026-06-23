@@ -187,6 +187,39 @@ Page({
   goCartWithRoom: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?room_id='+this.data.qrRoomId }) },
   switchLoginTab: function(e) { this.setData({ loginMode: e.currentTarget.dataset.mode }) },
   switchLoginType: function(e) { this.setData({ loginType: e.currentTarget.dataset.type }) },
+  // ── 微信一键登录 ──
+  onWechatLogin: function(e) {
+    if (e.detail && e.detail.errMsg && e.detail.errMsg.indexOf('fail') >= 0) {
+      // 用户拒绝授权
+      wx.showToast({ title: '已取消微信登录', icon: 'none' })
+      return
+    }
+    var self = this
+    var userInfo = e.detail.userInfo || {}
+    wx.showLoading({ title: '微信登录中...' })
+    wx.login({
+      success: function(r) {
+        if (!r.code) {
+          wx.hideLoading()
+          wx.showToast({ title: '微信登录失败', icon: 'none' })
+          return
+        }
+        API.wechatLogin(r.code, userInfo).then(function(u) {
+          wx.hideLoading()
+          self.setData({ isLoggedIn: true, showLoginModal: false })
+          wx.showToast({ title: '登录成功', icon: 'success' })
+          self.handlePendingAction()
+        }).catch(function(err) {
+          wx.hideLoading()
+          wx.showToast({ title: err.message || '微信登录失败', icon: 'none' })
+        })
+      },
+      fail: function() {
+        wx.hideLoading()
+        wx.showToast({ title: '微信登录失败', icon: 'none' })
+      }
+    })
+  },
   onLoginPhone: function(e) { this.setData({ loginPhone: e.detail.value }) }, onLoginCode: function(e) { this.setData({ loginCode: e.detail.value }) },
   onLoginPassword: function(e) { this.setData({ loginPassword: e.detail.value }) },
   onRegPhone: function(e) { this.setData({ regPhone: e.detail.value }) },

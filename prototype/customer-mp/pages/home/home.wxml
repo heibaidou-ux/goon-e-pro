@@ -102,6 +102,12 @@
     <view class="login-card">
       <text class="login-card-title">{{loginMode=='login'?'登录':'注册'}}</text>
       <text class="login-card-sub">高岸茶室 · 会员中心</text>
+      <!-- 微信一键登录按钮 -->
+      <button class="wechat-login-btn" open-type="getUserInfo" bindgetuserinfo="onWechatLogin">
+        <text class="wechat-icon">💚</text>
+        <text>微信一键登录</text>
+      </button>
+      <view class="divider-text"><text>或使用手机号</text></view>
       <view class="login-tabs"><text class="login-tab {{loginMode=='login'?'active':''}}" bindtap="switchLoginTab" data-mode="login">登录</text><text class="login-tab {{loginMode=='register'?'active':''}}" bindtap="switchLoginTab" data-mode="register">注册</text></view>
       <view wx:if="{{loginMode=='login'}}">
         <view class="login-type-tabs">

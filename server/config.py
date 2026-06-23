@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     max_upload_size_mb: int = 10
     thumbnail_sizes: list[int] = [240, 480, 800]
 
+    # WeChat Mini Program
+    wechat_appid: str = "wx181568857908b5ae"
+    wechat_secret: str = ""
+
     # Home Assistant
     ha_url: str = "http://localhost:8123"
     ha_token: str = ""

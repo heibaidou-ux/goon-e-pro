@@ -2,8 +2,22 @@
   <view class="page">
     <view class="page-header">
       <text class="title">可预约包间</text>
-      <text class="sub">选择包间，即刻预订</text>
+      <text class="sub">选择日期，即刻预订</text>
     </view>
+    <!-- 日期横向选择 -->
+    <scroll-view class="date-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="date-bar">
+        <view class="date-chip {{selectedDateIdx==index?'active':''}}" wx:for="{{dateOptions}}" wx:key="index" bindtap="selectDate" data-idx="{{index}}">
+          <text class="date-week">{{item.week}}</text>
+          <text class="date-num">{{item.date}}</text>
+          <text class="date-month">{{item.month}}</text>
+        </view>
+        <view class="date-chip more-btn" bindtap="showMoreDates">
+          <text class="date-more-text">更多</text>
+          <text class="date-more-icon">▸</text>
+        </view>
+      </view>
+    </scroll-view>
     <view class="room-section">
       <view class="room-card" wx:for="{{rooms}}" wx:key="roomId" bindtap="goRoom" data-roomid="{{item.roomId}}">
         <view class="room-card-img" style="background:{{item.bgColor}}">{{item.icon}}</view>

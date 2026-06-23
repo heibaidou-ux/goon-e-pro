@@ -17,3 +17,20 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .room-card-price .unit { font-size:12px; font-weight:400; color:#999; }
 .room-card-book-btn { padding:8px 18px; border-radius:14px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; font-size:13px; font-weight:600; box-shadow:0 2px 8px rgba(93,138,107,.25); transition:all .15s; }
 .room-card-book-btn:active { transform:scale(.95); }
+
+/* ── 日期横向选择条 ── */
+.date-scroll { background:#fff; border-bottom:1px solid #f0ece6; white-space:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.date-scroll::-webkit-scrollbar { display:none; }
+.date-bar { display:flex; padding:12px 16px; gap:8px; }
+.date-chip { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; min-width:56px; padding:10px 14px; border-radius:14px; background:#f5f5f5; border:1.5px solid transparent; transition:all .15s; cursor:pointer; flex-shrink:0; }
+.date-chip:active { transform:scale(.95); }
+.date-chip.active { background:#5D8A6B; border-color:#5D8A6B; }
+.date-chip.active .date-week { color:#fff; }
+.date-chip.active .date-num { color:#fff; }
+.date-chip.active .date-month { color:rgba(255,255,255,.7); }
+.date-week { font-size:12px; color:#666; font-weight:500; display:block; }
+.date-num { font-size:20px; font-weight:700; color:#333; display:block; line-height:1.2; }
+.date-month { font-size:10px; color:#999; display:block; }
+.date-chip.more-btn { background:transparent; border-color:#ddd; min-width:auto; padding:10px 12px; flex-direction:row; gap:4px; }
+.date-more-text { font-size:12px; color:#666; }
+.date-more-icon { font-size:12px; color:#999; }

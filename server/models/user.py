@@ -12,6 +12,9 @@ class User(Base):
     display_name = Column(String(100), nullable=False)
     role = Column(String(30), default="staff")  # admin | staff | cleaner | finance | etc.
     phone = Column(String(20))
+    wechat_openid = Column(String(100), unique=True, index=True, nullable=True)
+    wechat_nickname = Column(String(100))
+    wechat_avatar = Column(String(500))
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

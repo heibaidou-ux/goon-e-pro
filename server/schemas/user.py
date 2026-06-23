@@ -17,6 +17,9 @@ class UserOut(BaseModel):
     display_name: str
     role: str
     phone: Optional[str] = None
+    wechat_openid: Optional[str] = None
+    wechat_nickname: Optional[str] = None
+    wechat_avatar: Optional[str] = None
     is_active: bool
     created_at: Optional[datetime] = None
 
@@ -39,3 +42,9 @@ class LoginRequest(BaseModel):
 class PhoneLoginRequest(BaseModel):
     phone: str
     code: str
+
+
+class WeChatLoginRequest(BaseModel):
+    code: str
+    nickname: Optional[str] = ""
+    avatar: Optional[str] = ""
