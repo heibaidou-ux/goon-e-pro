@@ -2,11 +2,14 @@
 import json
 import uuid
 from typing import Optional, List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import selectinload
 from datetime import datetime
+from pathlib import Path
+import io, os
 
 from database import get_db
 from models.operations import Order, OrderItem, Customer, ScanBill
@@ -14,16 +17,18 @@ from models.store_dev import Room, Store, QrCodeAuditLog
 from models.supply_chain import Product, InventoryOnHand
 from models.user import User
 from services.auth_service import get_current_user, get_optional_user
+from services.qrcode_service import generate_local_qrcode, generate_room_qrcode_data, generate_wechat_miniprogram_code, save_qrcode_file
+from config import settings
 from schemas.scan import (
-    QrCodeOut, QrCodeBatchOut, QrCodeBatchItem, QrRenewOut,
+    QrCodeOut, QrCodeBatchOut, QrCodeBatchItem, QrRenewOut, QrCodeImageOut,
     RoomScanInfo,
     ScanOrderCreate, ScanOrderOut, ScanOrderItemOut,
     ScanBillOut, ScanBillSummary, ScanBillOrder, ScanBillOrderItem,
     SettleRequest, SettleOut,
     CancelOut,
 )
-
 router = APIRouter(prefix="/api/scan", tags=["扫码消费"], dependencies=[Depends(get_current_user)])
+QR_IMAGE_DIR = Path(__file__).parent.parent / "uploads" / "qrcodes"
 
 
 # ── Helpers ──
@@ -214,16 +219,89 @@ async def renew_room_qrcode(
     await db.commit()
 
     return QrRenewOut(
-        roomId=room_id,
-        oldRoomCode=old_code or "",
-        newRoomCode=new_code,
+        roomId=room_id, oldRoomCode=old_code or "", newRoomCode=new_code,
         qrPayload=_build_qr_payload(room_id, room.storeId),
         scanUrl=_build_scan_url(room_id, room.storeId),
     )
 
 
 # ═══════════════════════════════════════════
-# 4. Room Status (防误扫验证)
+# 4. QR Code Image Generation (二维码图片)
+# ═══════════════════════════════════════════
+
+@router.get("/qrcode/{room_id}/image")
+async def get_room_qrcode_image(
+    room_id: str, table_id: Optional[str] = Query(None, alias="tableId"),
+    width: int = Query(400, alias="w"),
+    current_user: Optional[User] = Depends(get_optional_user),
+    db: AsyncSession = Depends(get_db),
+):
+    import qrcode as qrlib
+    r = await db.execute(select(Room).where(Room.roomId == room_id))
+    room = r.scalar_one_or_none()
+    if not room: raise HTTPException(404, "房间不存在")
+    sid = room.storeId or "ST001"
+    page = "pages/scan-landing/scan-landing"
+    params = "room_id=%s&store_id=%s" % (room_id, sid)
+    if table_id: params += "&table_id=%s" % table_id
+    img_bytes = None
+    if settings.wechat_secret and not settings.debug:
+        try: img_bytes = await generate_wechat_miniprogram_code(page=page, scene=params, appid=settings.wechat_appid, secret=settings.wechat_secret, width=min(width, 430))
+        except: pass
+    if img_bytes is None:
+        q = qrlib.QRCode(version=None, error_correction=qrlib.constants.ERROR_CORRECT_M, box_size=10, border=2)
+        q.add_data(page + "?" + params)
+        q.make(fit=True)
+        im = q.make_image(fill_color="black", back_color="white")
+        b = io.BytesIO(); im.save(b, format="PNG"); img_bytes = b.getvalue()
+    return Response(content=img_bytes, media_type="image/png",
+        headers={"Content-Disposition": 'inline; filename="room_%s.png"' % room_id})
+
+
+@router.get("/qrcode/{room_id}/image-info", response_model=QrCodeImageOut)
+async def get_room_qrcode_info(
+    room_id: str, table_id: Optional[str] = Query(None, alias="tableId"),
+    current_user: Optional[User] = Depends(get_optional_user), db: AsyncSession = Depends(get_db),
+):
+    r = await db.execute(select(Room).where(Room.roomId == room_id))
+    room = r.scalar_one_or_none()
+    if not room: raise HTTPException(404, "房间不存在")
+    sid = room.storeId or "ST001"
+    return QrCodeImageOut(roomId=room_id, roomName=room.name, storeId=sid,
+        scanUrl=_build_scan_url(room_id, sid, table_id),
+        qrPayload=_build_qr_payload(room_id, sid, table_id),
+        imageUrl="/api/scan/qrcode/%s/image?tableId=%s" % (room_id, table_id or ""))
+
+
+@router.get("/qrcode/batch/download")
+async def batch_download_qrcodes(
+    store_id: str = Query(..., alias="storeId"),
+    room_ids: Optional[str] = Query(None, alias="roomIds"),
+    current_user: Optional[User] = Depends(get_optional_user), db: AsyncSession = Depends(get_db),
+):
+    import zipfile, qrcode as qrlib
+    q = select(Room).where(Room.storeId == store_id, Room.status == "Active")
+    if room_ids:
+        ids = [r.strip() for r in room_ids.split(",") if r.strip()]
+        q = q.where(Room.roomId.in_(ids))
+    rooms = (await db.execute(q)).scalars().all()
+    if not rooms: raise HTTPException(404, "未找到房间")
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for room in rooms:
+            qd = "pages/scan-landing/scan-landing?room_id=%s&store_id=%s" % (room.roomId, store_id)
+            qr = qrlib.QRCode(version=None, error_correction=qrlib.constants.ERROR_CORRECT_M, box_size=10, border=2)
+            qr.add_data(qd); qr.make(fit=True)
+            im = qr.make_image(fill_color="black", back_color="white")
+            ib = io.BytesIO(); im.save(ib, format="PNG")
+            zf.writestr("qrcode_%s.png" % room.roomId, ib.getvalue())
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="application/zip",
+        headers={"Content-Disposition": "attachment; filename=qrcodes_%s.zip" % store_id})
+
+
+# ═══════════════════════════════════════════
+# 5. Room Status (防误扫验证)
 # ═══════════════════════════════════════════
 
 @router.get("/room/{room_id}", response_model=RoomScanInfo)

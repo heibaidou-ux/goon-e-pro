@@ -35,6 +35,15 @@ class QrRenewOut(BaseModel):
     scanUrl: str
 
 
+class QrCodeImageOut(BaseModel):
+    roomId: str
+    roomName: str
+    storeId: str
+    scanUrl: str
+    qrPayload: str
+    imageUrl: str
+
+
 # ── Room Scan Status ──
 
 class RoomScanInfo(BaseModel):
