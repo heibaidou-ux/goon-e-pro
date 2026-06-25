@@ -10,13 +10,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Python依赖
 COPY server/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
 
-# 复制代码
-COPY server/ .
+# 复制全项目（prototype前端页面 + server后端）
+COPY server/ ./server/
+COPY prototype/ ./prototype/
+COPY index.html .
+COPY .nojekyll .
 
 # 创建数据目录
 RUN mkdir -p uploads logs
+
+WORKDIR /app/server
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
@@ -24,5 +29,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 EXPOSE 8000
 
-# 生产启动（非reload模式）
+# 生产启动
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
