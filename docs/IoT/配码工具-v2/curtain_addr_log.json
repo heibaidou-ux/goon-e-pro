@@ -1,0 +1,51 @@
+{
+  "1": {
+    "addr_hex": "0x14",
+    "addr_dec": 20,
+    "room": "A组-电机1",
+    "success": true,
+    "time": "2026-06-25 13:55:40"
+  },
+  "2": {
+    "addr_hex": "0x15",
+    "addr_dec": 21,
+    "room": "A组-电机2",
+    "success": true,
+    "time": "2026-06-25 14:02:12"
+  },
+  "3": {
+    "addr_hex": "0x16",
+    "addr_dec": 22,
+    "room": "A组-电机3",
+    "success": true,
+    "time": "2026-06-25 14:08:30"
+  },
+  "4": {
+    "addr_hex": "0x17",
+    "addr_dec": 23,
+    "room": "B组-电机1",
+    "success": true,
+    "time": "2026-06-25 14:13:16"
+  },
+  "5": {
+    "addr_hex": "0x18",
+    "addr_dec": 24,
+    "room": "B组-电机2",
+    "success": true,
+    "time": "2026-06-25 14:16:20"
+  },
+  "6": {
+    "addr_hex": "0x19",
+    "addr_dec": 25,
+    "room": "B组-电机3",
+    "success": true,
+    "time": "2026-06-25 14:18:28"
+  },
+  "7": {
+    "addr_hex": "0x1A",
+    "addr_dec": 26,
+    "room": "C组-电机1",
+    "success": true,
+    "time": "2026-06-25 14:24:34"
+  }
+}

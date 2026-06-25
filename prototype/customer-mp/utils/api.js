@@ -6,8 +6,8 @@
 const MOCK = require('./mock-data')
 
 // ── 后端配置 ──
-const API_BASE = 'http://localhost:8000'
-const USE_MOCK = true  // false = 连后端
+const API_BASE = 'http://106.55.183.146:8000'
+const USE_MOCK = false  // false = 连后端
 
 // ── 通用HTTP请求（带认证）──
 const LS_PREFIX = 'mp_'
