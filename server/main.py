@@ -131,14 +131,28 @@ async def health(request: Request):
 
 
 # ── SPA catch-all ──
-staff_mp_dir = Path(__file__).parent.parent / "prototype" / "staff-mp"
-admin_web_dist = Path(__file__).parent.parent / "prototype" / "admin-web-dist"
+PROTOTYPE_DIR = Path(__file__).parent.parent / "prototype"
+staff_mp_dir = PROTOTYPE_DIR / "staff-mp"
+customer_mp_dir = PROTOTYPE_DIR / "customer-mp"
+admin_web_dist = PROTOTYPE_DIR / "admin-web-dist"
 
-if staff_mp_dir.exists() or admin_web_dist.exists():
+if PROTOTYPE_DIR.exists():
 
     @app.api_route("/{full_path:path}", methods=["GET"])
     async def serve_spa(request: Request, full_path: str):
         if full_path.startswith("api/") or full_path.startswith("uploads/"):
+            return JSONResponse({"detail": "Not Found"}, status_code=404)
+
+        # Serve prototype files: /prototype/<module>/<path>
+        if full_path.startswith("prototype/"):
+            rel_path = full_path[len("prototype/"):]
+            file_path = PROTOTYPE_DIR / rel_path
+            if file_path.exists() and file_path.is_file():
+                return FileResponse(str(file_path))
+            parent_dir = file_path.parent if not file_path.suffix else file_path.parent
+            dir_index = parent_dir / "index.html"
+            if dir_index.exists():
+                return FileResponse(str(dir_index))
             return JSONResponse({"detail": "Not Found"}, status_code=404)
 
         if full_path.startswith("staff/"):
@@ -149,7 +163,6 @@ if staff_mp_dir.exists() or admin_web_dist.exists():
                 return FileResponse(str(staff_mp_dir / "pages" / "dashboard" / "index.html"))
 
         if full_path.startswith("customer/"):
-            customer_mp_dir = Path(__file__).parent.parent / "prototype" / "customer-mp"
             if customer_mp_dir.exists():
                 file_path = customer_mp_dir / "/".join(full_path.split("/")[1:])
                 if file_path.exists() and file_path.is_file():
