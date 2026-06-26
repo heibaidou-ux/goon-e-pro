@@ -1,4 +1,29 @@
-.page { min-height:100vh; background:#f5f5f5; }
-.header { display:flex; align-items:center; padding:14px 0; background:#fff; border-bottom:1px solid #f0f0f0; }
-.header-title { font-size:18px; font-weight:700; }
-.content { padding:16px 0; }
+.page { min-height:100vh; background:#f5f5f5; padding-bottom:30px; }
+.header { display:flex; align-items:center; padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; position:sticky; top:0; z-index:10; }
+.header-back { font-size:24px; font-weight:300; color:#666; padding-right:12px; cursor:pointer; width:36px; }
+.header-title { font-size:18px; font-weight:700; color:#1a1a1a; }
+
+.banner { background:linear-gradient(135deg,#2d5a2d,#5D8A6B); color:#fff; padding:24px 20px; text-align:center; }
+.banner-icon { font-size:48px; display:block; margin-bottom:8px; }
+.banner-title { font-size:20px; font-weight:700; display:block; }
+.banner-sub { font-size:13px; opacity:.85; margin-top:4px; display:block; }
+
+.section { display:flex; margin:12px 16px; padding:16px; background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,.04); gap:12px; }
+.section-icon { font-size:24px; width:32px; text-align:center; flex-shrink:0; padding-top:2px; }
+.section-body { flex:1; }
+.section-title { font-size:15px; font-weight:600; color:#1a1a1a; display:block; }
+.section-desc { font-size:13px; color:#666; margin-top:4px; display:block; line-height:1.5; }
+.tag-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.tag { font-size:11px; padding:4px 10px; background:#f0fdf4; color:#5D8A6B; border-radius:8px; }
+
+.tip-card { display:flex; margin:16px; padding:16px; background:#fff8e1; border-radius:16px; gap:10px; border:1px solid #f0e8c8; }
+.tip-icon { font-size:20px; flex-shrink:0; }
+.tip-body { flex:1; }
+.tip-title { font-size:14px; font-weight:600; color:#8a6d00; display:block; }
+.tip-text { font-size:12px; color:#8a7d50; margin-top:4px; display:block; line-height:1.6; }
+
+.nav-btn { display:flex; align-items:center; margin:8px 16px; padding:16px; background:linear-gradient(135deg,#5D8A6B,#7BA88E); border-radius:16px; color:#fff; cursor:pointer; gap:10px; }
+.nav-btn:active { opacity:.85; transform:scale(.98); }
+.nav-btn-icon { font-size:20px; }
+.nav-btn-text { flex:1; font-size:15px; font-weight:600; }
+.nav-btn-arrow { font-size:20px; opacity:.7; }

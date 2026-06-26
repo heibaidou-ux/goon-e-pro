@@ -16,9 +16,9 @@ Page({
     rooms: [], teaProducts: [], cartCount: 0,
     balance: 0, balanceDisplay: '', balanceVisible: true,
     qrRoomId: '', qrRoomName: '', qrTableId: '',
-    currentStore: 'yilong', storeName: '盈隆店', showStoreModal: false, showLoginModal: false,
+    currentStore: 'huachengguangchang', storeName: '花城广场店', showStoreModal: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
-    loginMode: 'login', loginType: 'code', loginPhone: '138****8888', loginCode: '8888', loginPassword: '',
+    loginMode: 'login', loginType: 'code', loginPhone: '', loginCode: '', loginPassword: '',
     regPhone: '', regCode: '',
     billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false
   },
@@ -60,7 +60,10 @@ Page({
       self.setData({ balanceDisplay: self.data.balanceVisible ? '¥' + balance : '****' })
       self.loadCartCount()
       self.setData({ loading: false })
-    }).catch(function() { self.setData({ loading: false, errorMsg: '加载失败' }) })
+    }).catch(function() {
+      self.renderFallbackData()
+      self.setData({ loading: false })
+    })
   },
 
   isOrderActiveNow: function(order) {
@@ -135,10 +138,10 @@ Page({
     var store = e.currentTarget.dataset.store
     var name = e.currentTarget.dataset.name
     this.setData({ currentStore: store, storeName: name, showStoreModal: false })
-    if (store !== 'yilong') {
-      wx.showToast({ title: name + ' 即将上线，敬请期待', icon: 'none' })
-    } else {
+    if (store === 'huachengguangchang') {
       wx.showToast({ title: '已切换至 ' + name, icon: 'success' })
+    } else {
+      wx.showToast({ title: name + ' 即将上线，敬请期待', icon: 'none' })
     }
   },
 
@@ -170,14 +173,14 @@ Page({
     })
   },
   copyAddress: function() {
-    wx.setClipboardData({ data: '广州市天河区珠江新城富力盈隆广场3801', success: function() { wx.showToast({ title: '地址已复制', icon: 'none' }) } })
+    wx.setClipboardData({ data: '广州市天河区花城广场', success: function() { wx.showToast({ title: '地址已复制', icon: 'none' }) } })
   },
   openNavigation: function() {
     wx.openLocation({
       latitude: 23.1275,
       longitude: 113.3220,
-      name: '高岸·富力盈隆广场',
-      address: '广州市天河区珠江新城富力盈隆广场3801',
+      name: '高岸·花城广场店',
+      address: '广州市天河区花城广场',
       scale: 18
     })
   },
@@ -282,12 +285,34 @@ Page({
     if (idx === undefined) return
     var key = 'carousels[' + idx + '].img'
     this.setData({ __cached: {} })
-    // fallback: use a placeholder
     var carousels = this.data.carousels
     if (carousels[idx] && carousels[idx].img.indexOf('data:') !== 0) {
       carousels[idx].img = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="375" height="200" viewBox="0 0 375 200"><rect fill="#e8f5e9" width="375" height="200"/><text x="50%" y="50%" fill="#5D8A6B" font-size="16" text-anchor="middle" dy=".3em">' + (carousels[idx].title || '图片加载失败') + '</text></svg>')
       this.setData({ carousels: carousels })
     }
+  },
+
+  // API不通时展示内置演示数据
+  renderFallbackData: function() {
+    var colors = { MeetingRoom: '#e3f2fd', TeaRoom: '#e8f5e9', Exhibition: '#fff3e0', Workspace: '#f5f5f5' }
+    var icons = { MeetingRoom: '💼', TeaRoom: '🍵', Exhibition: '🏛️', Workspace: '🔧' }
+    var fbRooms = [
+      { roomId:'RM001', name:'丰沙里', type:'MeetingRoom', capacity:10, area:30, pricePerHour:200 },
+      { roomId:'RM002', name:'翡冷翠', type:'TeaRoom', capacity:4, area:18, pricePerHour:80 },
+      { roomId:'RM003', name:'布拉格', type:'TeaRoom', capacity:4, area:18, pricePerHour:80 },
+      { roomId:'RM004', name:'白沙瓦', type:'TeaRoom', capacity:6, area:25, pricePerHour:120 },
+    ]
+    var rooms = []
+    for (var i = 0; i < fbRooms.length; i++) {
+      var r = fbRooms[i]
+      rooms.push({ roomId: r.roomId, name: r.name, capacity: r.capacity, area: r.area, pricePerHour: r.pricePerHour || 120, icon: icons[r.type] || '🏠', bgColor: colors[r.type] || '#f0f0f0' })
+    }
+    var fbTeas = [
+      { productId:'T01', name:'明前龙井', desc:'西湖核心产区 · 清香甘醇', price:168, icon:'🍃', bg:'#e8f5e9', _qty:0 },
+      { productId:'T02', name:'金骏眉', desc:'武夷山桐木关 · 蜜香甘醇', price:258, icon:'🪵', bg:'#fce4ec', _qty:0 },
+      { productId:'T03', name:'铁观音', desc:'安溪高山 · 七泡有余香', price:138, icon:'🏔️', bg:'#fff3e0', _qty:0 },
+    ]
+    this.setData({ rooms: rooms, teaProducts: fbTeas })
   },
 
 })

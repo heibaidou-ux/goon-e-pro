@@ -1,9 +1,65 @@
 <view class="page">
   <view class="header">
+    <text class="header-back" bindtap="goBack">‹</text>
     <text class="header-title">🅿️ 停车指引</text>
   </view>
 
-  <view class="content">
-    <!-- 空白占位，后续补充停车及上楼登记指引 -->
+  <view class="banner">
+    <text class="banner-icon">🅿️</text>
+    <text class="banner-title">花城广场店 · 停车指南</text>
+    <text class="banner-sub">本店周边停车方便，多种选择任您选</text>
+  </view>
+
+  <view class="section">
+    <view class="section-icon">📍</view>
+    <view class="section-body">
+      <text class="section-title">富力盈隆广场地下车库</text>
+      <text class="section-desc">本店所在大楼配套停车场，车位充足，可直达电梯上楼</text>
+      <view class="tag-row">
+        <text class="tag">🅿️ 地下车库 B1-B3</text>
+        <text class="tag">💵 约 8元/小时</text>
+        <text class="tag">🚶 电梯直达</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-icon">📍</view>
+    <view class="section-body">
+      <text class="section-title">维加斯广场停车场</text>
+      <text class="section-desc">步行至本店约3分钟，价格实惠</text>
+      <view class="tag-row">
+        <text class="tag">🅿️ 地面+地下</text>
+        <text class="tag">💵 约 6元/小时</text>
+        <text class="tag">🚶 步行3分钟</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-icon">📍</view>
+    <view class="section-body">
+      <text class="section-title">花城汇P1停车场</text>
+      <text class="section-desc">花城广场地下大型停车场，车位充足，步行约5分钟</text>
+      <view class="tag-row">
+        <text class="tag">🅿️ 大型地下车库</text>
+        <text class="tag">💵 约 5元/小时</text>
+        <text class="tag">🚶 步行5分钟</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="tip-card">
+    <text class="tip-icon">💡</text>
+    <view class="tip-body">
+      <text class="tip-title">温馨提示</text>
+      <text class="tip-text">高峰期（周末/节假日）车位紧张，建议优先选择花城汇P1停车场，车位充足且步行距离适中。</text>
+    </view>
+  </view>
+
+  <view class="nav-btn" bindtap="openNavigation">
+    <text class="nav-btn-icon">🗺️</text>
+    <text class="nav-btn-text">打开导航前往门店</text>
+    <text class="nav-btn-arrow">›</text>
   </view>
 </view>
