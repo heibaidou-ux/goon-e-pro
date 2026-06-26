@@ -241,7 +241,31 @@ const API = {
 
   // ── 房间 ──
   getRooms(bookableOnly) {
-    if (!USE_MOCK) return request({ url: '/api/rooms' })
+    if (!USE_MOCK) {
+      return request({ url: '/api/rooms' }).then(function(data) {
+        var list = data || []
+        if (!Array.isArray(list)) list = []
+        var result = []
+        for (var i = 0; i < list.length; i++) {
+          var r = list[i]
+          result.push({
+            roomId: r.room_id || r.roomId || '',
+            name: r.name || '',
+            type: r.type || '',
+            capacity: r.capacity || 0,
+            area: r.area || 0,
+            floor: r.floor || '',
+            description: r.description || '',
+            facilities: r.facilities || [],
+            pricePerHour: r.price_per_hour || r.pricePerHour || 120,
+            pricePerHalfHour: r.price_per_half_hour || r.pricePerHalfHour || 60,
+            status: (r.status === false || r.is_active === false) ? 'Inactive' : 'Active',
+            bookable: r.bookable !== false,
+          })
+        }
+        return result
+      })
+    }
     return delay().then(() => {
       let list = MOCK.rooms.slice()
       if (bookableOnly) list = list.filter(r => r.bookable !== false)
@@ -490,7 +514,28 @@ const API = {
 
   // ── 商品 ──
   getProducts(category) {
-    if (!USE_MOCK) return request({ url: '/api/products' + (category ? '?categoryId=' + category : '') })
+    if (!USE_MOCK) {
+      return request({ url: '/api/products' + (category ? '?categoryId=' + category : '') }).then(function(data) {
+        var items = (data && data.items) || (Array.isArray(data) ? data : [])
+        var result = []
+        for (var i = 0; i < items.length; i++) {
+          var p = items[i]
+          result.push({
+            productId: p.productId || p.product_id || '',
+            name: p.name || '',
+            desc: p.description || p.desc || '',
+            price: p.retailPrice || p.price || p.retail_price || 0,
+            category: p.categoryId || p.category || '',
+            spec: p.spec || '',
+            origin: p.origin || '',
+            story: p.story || '',
+            brewingTips: p.brewingTips || '',
+            isActive: p.isActive !== false,
+          })
+        }
+        return result
+      })
+    }
     return delay().then(() => {
       if (category) return MOCK.products.filter(p => p.category === category)
       return MOCK.products.slice()

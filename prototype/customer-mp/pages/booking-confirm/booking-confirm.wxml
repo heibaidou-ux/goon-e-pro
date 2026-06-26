@@ -115,7 +115,6 @@
 
       <view class="tips">
         <text class="tips-title">温馨提示</text>
-        <text class="tips-item">包间将于预约时间前5分钟预开空调</text>
         <text class="tips-item">开始前2小时以上可免费取消；2小时内取消收取定金的50%作为违约金</text>
         <text class="tips-item">到店后通过订单页门禁密码或"开门"按钮进入</text>
         <text class="tips-item">门店24小时营业</text>
