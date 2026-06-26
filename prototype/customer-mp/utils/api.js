@@ -676,7 +676,28 @@ const API = {
   },
 
   // ── 物流查询 ──
-  getLogistics(orderId) { return delay().then(() => null) }
-}
+  getLogistics(orderId) { return delay().then(() => null) },
 
+  wechatPay(totalFee, body, openid) {
+    if (!USE_MOCK) {
+      return request({ url: '/api/payment/wxpay/unified-order', method: 'POST', data: { total_fee: totalFee, body: body, openid: openid } }).then(function(data) {
+        if (!data || !data.pay_params) throw new Error('统一下单失败')
+        return new Promise(function(resolve, reject) {
+          wx.requestPayment({
+            timeStamp: data.pay_params.timeStamp,
+            nonceStr: data.pay_params.nonceStr,
+            package: data.pay_params.package,
+            signType: data.pay_params.signType,
+            paySign: data.pay_params.paySign,
+            success: function() { resolve(data) },
+            fail: function(err) { reject(new Error(err.errMsg || '支付失败')) }
+          })
+        })
+      })
+    }
+    return delay(500).then(function() {
+      return { success: true, out_trade_no: 'MOCK' + String(Date.now()).slice(-10), prepay_id: 'mock' }
+    })
+  },
+}
 module.exports = API

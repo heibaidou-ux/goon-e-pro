@@ -20,7 +20,7 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from config import settings
 from database import init_db, close_db
-from routers import auth, products, rooms, scan, shop, iot, finance
+from routers import auth, products, rooms, scan, shop, iot, finance, payment
 from routers import brand, store_dev, operations, marketing, finance_ext, hr, tech
 
 # ── Logging ──
@@ -123,6 +123,7 @@ app.include_router(marketing.router)
 app.include_router(finance_ext.router)
 app.include_router(hr.router)
 app.include_router(tech.router)
+app.include_router(payment.router)
 
 
 @app.get("/api/health")

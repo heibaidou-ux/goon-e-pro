@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     wechat_appid: str = "wx181568857908b5ae"
     wechat_secret: str = ""
 
+    # WeChat Pay
+    wechat_mch_id: str = ""
+    wechat_pay_key: str = ""
+    erp_base_url: str = "https://erp.highbank.cn"
+
     # Home Assistant
     ha_url: str = "http://localhost:8123"
     ha_token: str = ""
