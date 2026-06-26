@@ -27,7 +27,7 @@
   <!-- 门店信息栏 -->
   <view class="store-info-bar">
     <view class="info-row">
-      <text class="info-addr" bindtap="copyAddress">📍 广州市天河区花城广场</text>
+      <text class="info-addr" bindtap="copyAddress">📍 广州市天河区珠江新城富力盈隆广场3801</text>
       <text class="info-link" bindtap="openNavigation">🗺 导航</text>
     </view>
     <view class="info-row info-row-split">
