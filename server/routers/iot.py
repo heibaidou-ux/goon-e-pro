@@ -1,4 +1,4 @@
-"""IoT 管理 API — 基于 D08 新模型（tech.py）"""
+"""IoT 管理 API — 基于 D08 新模型（tech.py），含485直连 + HA实体发现"""
 import json
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -14,6 +14,7 @@ from schemas.iot import (
 )
 from services.auth_service import get_current_user, get_optional_user
 from services import ha_service
+from services import direct_485
 
 router = APIRouter(prefix="/api/iot", tags=["IoT管理"])
 
@@ -182,7 +183,123 @@ async def get_stats(current_user: Optional[User] = Depends(get_optional_user)):
     return await ha_service.get_stats()
 
 
-# ── Database helpers ──
+# ═══════════════════════════════════════════════════════════
+# 485直连网关
+# ═══════════════════════════════════════════════════════════
+
+@router.get("/485/health")
+async def check_485_gateway(current_user: Optional[User] = Depends(get_optional_user)):
+    """Check 485 gateway (FRP tunnel) connectivity."""
+    online = await direct_485.is_gateway_online()
+    return {
+        "mode": "direct485",
+        "gateway": f"{direct_485.GATEWAY_HOST}:{direct_485.GATEWAY_PORT}",
+        "online": online,
+    }
+
+
+@router.post("/485/relay")
+async def control_485_relay(
+    ha_room: str = Query(..., description="HA房间名 baishawa/bulage/feilengcui/fengshali"),
+    channel: str = Query(..., description="通道标识 ch1-ch8 或 relay_ch1-relay_ch8"),
+    state: bool = Query(..., description="true=开 false=关"),
+    current_user: User = Depends(get_current_user),
+):
+    """Direct 485 relay channel control (bypasses HA REST API)."""
+    result = await direct_485.relay_control(ha_room, channel, state)
+    return result
+
+
+@router.post("/485/thermostat")
+async def control_485_thermostat(
+    ha_room: str = Query(..., description="HA房间名"),
+    action: str = Query(..., description="on/off/temperature/read_temp/read_status"),
+    value: Optional[float] = Query(None, description="温度值 (仅temperature操作需要)"),
+    current_user: User = Depends(get_current_user),
+):
+    """Direct 485 thermostat control (bypasses HA REST API)."""
+    result = await direct_485.thermostat_control(ha_room, action, value)
+    return result
+
+
+# ═══════════════════════════════════════════════════════════
+# HA实体发现（校准用）
+# ═══════════════════════════════════════════════════════════
+
+@router.get("/ha-entities")
+async def discover_ha_entities(current_user: Optional[User] = Depends(get_optional_user)):
+    """Discover all HA entities and group by room for mapping calibration."""
+    if ha_service.is_mock_mode():
+        return {"mode": "mock", "message": "当前在Mock模式，无法发现真实HA实体"}
+
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get(
+                f"{settings.ha_url}/api/states",
+                headers=_ha_headers(),
+            )
+            if resp.status_code != 200:
+                raise HTTPException(502, f"HA返回 {resp.status_code}")
+
+            all_states = resp.json()
+
+        # 按房间分组
+        rooms = {
+            "baishawa": {"name": "大茶室·白沙瓦", "entities": []},
+            "bulage": {"name": "中茶室·布拉格", "entities": []},
+            "feilengcui": {"name": "小茶室·翡冷翠", "entities": []},
+            "fengshali": {"name": "会议室·丰沙里", "entities": []},
+            "unknown": {"name": "未映射", "entities": []},
+        }
+
+        for state in all_states:
+            eid = state.get("entity_id", "")
+            ha_room = _ha_entity_to_room(eid)
+            group = rooms.get(ha_room, rooms["unknown"]) if ha_room else rooms["unknown"]
+            group["entities"].append({
+                "entity_id": eid,
+                "state": state.get("state"),
+                "friendly_name": state.get("attributes", {}).get("friendly_name", ""),
+            })
+
+        # 统计
+        total = len(all_states)
+        mapped = total - len(rooms["unknown"]["entities"])
+
+        return {
+            "mode": "ha",
+            "ha_url": settings.ha_url,
+            "total_entities": total,
+            "mapped_to_rooms": mapped,
+            "unmapped": len(rooms["unknown"]["entities"]),
+            "rooms": {k: v for k, v in rooms.items() if v["entities"]},
+        }
+
+    except Exception as e:
+        raise HTTPException(502, f"HA查询失败: {e}")
+
+
+def _ha_headers() -> dict:
+    from config import settings
+    return {
+        "Authorization": f"Bearer {settings.ha_token}",
+        "Content-Type": "application/json",
+    }
+
+
+def _ha_entity_to_room(entity_id: str) -> Optional[str]:
+    """从HA实体名提取HA房间名（同ha_service._ha_entity_to_room逻辑）。"""
+    eid_lower = entity_id.lower()
+    for ha_name in ("baishawa", "bulage", "feilengcui", "fengshali"):
+        if ha_name in eid_lower:
+            return ha_name
+    return None
+
+
+# ═══════════════════════════════════════════════════════════
+# Database helpers
+# ═══════════════════════════════════════════════════════════
 
 async def _upsert_device(db: AsyncSession, dev: dict):
     """Persist device info to DB for reference/tracking."""

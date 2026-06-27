@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     ha_url: str = "http://localhost:8123"
     ha_token: str = ""
 
+    # 485直连网关（FRP隧道）
+    direct_485_host: str = "127.0.0.1"
+    direct_485_port: int = 7003
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

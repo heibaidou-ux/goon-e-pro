@@ -1,13 +1,17 @@
-"""微信支付 API — 统一下单/回调/查询"""
+"""微信支付 API — 统一下单/回调/查询，含IoT场景联动"""
 import logging
 import uuid
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from config import settings
 from database import get_db
 from models.user import User
+from models.operations import Order
 from services.auth_service import get_current_user
 from services.payment_service import unified_order, get_pay_params, order_query, verify_notify
+from services.order_iot import on_order_paid
 
 logger = logging.getLogger("gaoan.erp.payment")
 router = APIRouter(prefix="/api/payment", tags=["支付"])
@@ -16,18 +20,29 @@ def _gen_order_no() -> str:
     return f"GA{datetime.utcnow().strftime('%Y%m%d')}{uuid.uuid4().hex[:10].upper()}"
 
 @router.post("/wxpay/unified-order")
-async def wxpay_unified_order(request: Request, current_user: User = Depends(get_current_user)):
+async def wxpay_unified_order(request: Request, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     if not settings.wechat_mch_id or not settings.wechat_pay_key:
         raise HTTPException(400, "微信支付未配置")
     data = await request.json()
     total_fee = data.get("total_fee", 0)
     body = data.get("body", "高岸茶室-消费")
     openid = data.get("openid", "")
+    order_id = data.get("order_id", "")  # 关联的房间订单ID（IoT联动用）
     if total_fee <= 0:
         raise HTTPException(400, "金额无效")
     if not openid and settings.debug:
         openid = "mock_openid_dev"
     out_trade_no = _gen_order_no()
+
+    # 关联订单：将out_trade_no存入订单
+    if order_id:
+        r = await db.execute(select(Order).where(Order.orderId == order_id))
+        order = r.scalar_one_or_none()
+        if order:
+            order.platformOrderId = out_trade_no
+            await db.commit()
+            logger.info(f"支付关联订单: {order_id} → {out_trade_no}")
+
     try:
         result = await unified_order(
             appid=settings.wechat_appid, mch_id=settings.wechat_mch_id,
@@ -42,14 +57,37 @@ async def wxpay_unified_order(request: Request, current_user: User = Depends(get
     return {"success": True, "out_trade_no": out_trade_no, "prepay_id": prepay_id, "pay_params": pay_params}
 
 @router.post("/wxpay/notify")
-async def wxpay_notify(request: Request):
+async def wxpay_notify(request: Request, db: AsyncSession = Depends(get_db)):
     xml_data = (await request.body()).decode("utf-8")
     try:
         result = verify_notify(xml_data, settings.wechat_pay_key)
     except RuntimeError:
         return Response(content='<xml><return_code><![CDATA[FAIL]]></return_code></xml>', media_type="application/xml")
     if result.get("return_code") == "SUCCESS" and result.get("result_code") == "SUCCESS":
-        logger.info(f"支付成功: {result.get('out_trade_no')}, ¥{int(result.get('total_fee',0))/100:.2f}")
+        out_trade_no = result.get("out_trade_no", "")
+        total_fee = int(result.get("total_fee", 0))
+        logger.info(f"支付成功: {out_trade_no}, ¥{total_fee/100:.2f}")
+
+        # 查找关联订单 → 更新状态 + IoT联动
+        if out_trade_no:
+            r = await db.execute(
+                select(Order).where(Order.platformOrderId == out_trade_no)
+            )
+            order = r.scalar_one_or_none()
+            if order and order.status == "PendingPay":
+                order.status = "PendingUse"
+                order.paidAmount = round(total_fee / 100, 2)
+                order.paymentMethod = "WxPay"
+                order.paymentTime = datetime.utcnow()
+                import random
+                order.doorPassword = str(random.randint(1000, 9999))
+                await db.commit()
+                logger.info(f"订单{order.orderId}已通过支付回调更新为PendingUse")
+                # IoT联动：支付成功 → 预开模式
+                await on_order_paid(order.orderId, db)
+            elif not order:
+                logger.warning(f"支付回调: 未找到关联订单 out_trade_no={out_trade_no}")
+
     return Response(content='<xml><return_code><![CDATA[SUCCESS]]></return_code></xml>', media_type="application/xml")
 
 @router.get("/wxpay/query/{out_trade_no}")

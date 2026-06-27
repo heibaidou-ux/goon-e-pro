@@ -1,0 +1,52 @@
+<view class="container">
+  <view class="header">
+    <text class="title">隐私协议</text>
+    <text class="update-time">最后更新：2026年6月</text>
+  </view>
+
+  <view class="section">
+    <text class="section-title">一、引言</text>
+    <text class="body-text">
+      高岸茶室（以下简称"我们"）深知个人信息对您的重要性，我们将严格遵守法律法规，保护您的个人信息安全。
+    </text>
+  </view>
+
+  <view class="section">
+    <text class="section-title">二、信息收集</text>
+    <text class="body-text">
+      在您使用我们的服务时，我们可能会收集以下信息：
+    </text>
+    <text class="body-text">1. 微信昵称、头像（用于识别您的身份）</text>
+    <text class="body-text">2. 手机号码（用于订单通知和联系）</text>
+    <text class="body-text">3. 位置信息（用于查找附近门店）</text>
+    <text class="body-text">4. 订单信息（用于提供预约和服务）</text>
+  </view>
+
+  <view class="section">
+    <text class="section-title">三、信息使用</text>
+    <text class="body-text">
+      我们收集的信息仅用于：
+    </text>
+    <text class="body-text">• 提供和改善我们的服务</text>
+    <text class="body-text">• 处理您的预约和订单</text>
+    <text class="body-text">• 发送服务通知</text>
+  </view>
+
+  <view class="section">
+    <text class="section-title">四、信息保护</text>
+    <text class="body-text">
+      我们采用行业标准的安全措施保护您的个人信息，包括SSL加密传输、数据加密存储等。
+    </text>
+  </view>
+
+  <view class="section">
+    <text class="section-title">五、联系我们</text>
+    <text class="body-text">
+      如有任何关于隐私的疑问，请联系我们的客服。
+    </text>
+  </view>
+
+  <view class="footer">
+    <button class="agree-btn" bindtap="onAgree">同意并继续</button>
+  </view>
+</view>

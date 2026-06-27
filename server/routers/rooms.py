@@ -1,6 +1,7 @@
-"""房间管理 API — 基于 D02/D03 新模型（store_dev, operations）"""
+"""房间管理 API — 基于 D02/D03 新模型（store_dev, operations），含IoT场景联动"""
 import json, uuid
 from typing import Optional
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_
@@ -11,6 +12,7 @@ from models.operations import Order, OrderItem, Customer
 from models.user import User
 from schemas.order import StoreOut, RoomOut, RoomOrderOut, RoomOrderCreate
 from services.auth_service import get_current_user, get_optional_user
+from services.order_iot import on_order_paid, on_order_checkin, on_order_checkout
 
 router = APIRouter(prefix="/api", tags=["房间管理"])
 
@@ -242,3 +244,106 @@ async def create_order(
         source=data.source, payment_status="Unpaid",
         created_at=order.createdAt,
     )
+
+
+# ═══════════════════════════════════════════════════════════
+# IoT场景联动 — 支付/签入/签出
+# ═══════════════════════════════════════════════════════════
+
+@router.post("/orders/{order_id}/pay", response_model=dict)
+async def confirm_payment(
+    order_id: str,
+    payment_method: str = Query("WxPay"),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """确认订单支付 → 状态变更为 PendingUse + 触发IoT预开模式"""
+    r = await db.execute(select(Order).where(Order.orderId == order_id))
+    order = r.scalar_one_or_none()
+    if not order:
+        raise HTTPException(404, "订单不存在")
+    if order.status != "PendingPay":
+        raise HTTPException(400, f"当前状态 {order.status}，不可确认支付")
+
+    order.status = "PendingUse"
+    order.paidAmount = order.totalAmount
+    order.paymentMethod = payment_method
+    order.paymentTime = datetime.utcnow()
+
+    # 生成门锁密码（4位随机码）
+    import random
+    order.doorPassword = str(random.randint(1000, 9999))
+
+    await db.commit()
+
+    # ── IoT联动：支付成功 → 预开模式（空调提前开）──
+    iot_result = await on_order_paid(order_id, db)
+
+    return {
+        "success": True,
+        "order_id": order_id,
+        "status": "PendingUse",
+        "door_password": order.doorPassword,
+        "iot_scene": iot_result,
+        "message": "支付成功，房间已预开空调",
+    }
+
+
+@router.post("/orders/{order_id}/checkin", response_model=dict)
+async def checkin_order(
+    order_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """签到入住 → 状态变更为 InUse + 触发IoT迎宾模式"""
+    r = await db.execute(select(Order).where(Order.orderId == order_id))
+    order = r.scalar_one_or_none()
+    if not order:
+        raise HTTPException(404, "订单不存在")
+    if order.status not in ("PendingUse", "PendingPay"):
+        raise HTTPException(400, f"当前状态 {order.status}，不可签到")
+
+    order.status = "InUse"
+    order.actualStartTime = datetime.utcnow()
+    await db.commit()
+
+    # ── IoT联动：签到 → 迎宾模式（全开灯/窗帘/音乐）──
+    iot_result = await on_order_checkin(order_id, db)
+
+    return {
+        "success": True,
+        "order_id": order_id,
+        "status": "InUse",
+        "iot_scene": iot_result,
+        "message": "签到成功，欢迎使用！",
+    }
+
+
+@router.post("/orders/{order_id}/checkout", response_model=dict)
+async def checkout_order(
+    order_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """退房 → 状态变更为 Completed + 触发IoT退房模式"""
+    r = await db.execute(select(Order).where(Order.orderId == order_id))
+    order = r.scalar_one_or_none()
+    if not order:
+        raise HTTPException(404, "订单不存在")
+    if order.status != "InUse":
+        raise HTTPException(400, f"当前状态 {order.status}，不可退房")
+
+    order.status = "Completed"
+    order.actualEndTime = datetime.utcnow()
+    await db.commit()
+
+    # ── IoT联动：退房 → 退房模式（关所有设备+锁门）──
+    iot_result = await on_order_checkout(order_id, db)
+
+    return {
+        "success": True,
+        "order_id": order_id,
+        "status": "Completed",
+        "iot_scene": iot_result,
+        "message": "退房成功，欢迎再次光临！",
+    }

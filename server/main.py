@@ -44,6 +44,8 @@ async def lifespan(app: FastAPI):
     logger.info(f"高岸ERP {settings.version} 启动")
     logger.info(f"环境: {'开发' if settings.debug else '生产'}")
     logger.info(f"HA模式: {'真实' if settings.ha_token else '模拟'}")
+    logger.info(f"485直连网关: {settings.direct_485_host}:{settings.direct_485_port}")
+    logger.info(f"微信支付: {'已配置 ✅' if settings.wechat_mch_id and settings.wechat_pay_key else '未配置 ❌（需商户号+API密钥）'}")
     logger.info(f"CORS: {settings.cors_origins or '全开放(开发模式)'}")
     if settings.debug:
         logger.warning("⚠ Debug模式开启中，仅用于开发")

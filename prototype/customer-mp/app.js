@@ -31,6 +31,22 @@ App({
     }
     // 启动空调预开轮询
     this.startPreheatScheduler()
+    // 注册隐私授权回调
+    this.initPrivacy()
+  },
+
+  // ── 隐私授权 ──
+  initPrivacy: function() {
+    var self = this
+    // 微信基础库 3.0+ 隐私授权监听
+    if (wx.onNeedPrivacyEvent) {
+      wx.onNeedPrivacyEvent(function() {
+        // 需要用户授权隐私时，跳转到隐私协议页面
+        wx.navigateTo({
+          url: '/pages/privacy/privacy'
+        })
+      })
+    }
   },
 
   // ── 空调预开调度器 ──

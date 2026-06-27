@@ -6,7 +6,8 @@
     "pages/my-orders/my-orders","pages/member-center/member-center","pages/address-manager/address-manager",
     "pages/scan-landing/scan-landing","pages/scan-order/scan-order","pages/scan-bill/scan-bill",
     "pages/room-control/room-control","pages/my-coupons/my-coupons",
-    "pages/coupon-verify/coupon-verify","pages/parking-guide/parking-guide"
+    "pages/coupon-verify/coupon-verify","pages/parking-guide/parking-guide",
+    "pages/privacy/privacy"
   ],
   "subpackages": [
     {
@@ -46,5 +47,9 @@
     "staff-bottom-nav": "/components/staff-bottom-nav/staff-bottom-nav"
   },
   "lazyCodeLoading": "requiredComponents",
-  "requiredPrivateInfos": []
+  "__usePrivacyCheck__": true,
+  "requiredPrivateInfos": [],
+  "permission": {
+    "scope.userLocation": { "desc": "用于查找附近门店" }
+  }
 }
