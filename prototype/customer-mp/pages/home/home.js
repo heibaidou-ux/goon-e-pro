@@ -47,9 +47,16 @@ Page({
     try { var v = wx.getStorageSync('balance_visible'); if (v !== '') self.data.balanceVisible = v } catch(e) {}
     var colors = { MeetingRoom: '#e3f2fd', TeaRoom: '#e8f5e9', Exhibition: '#fff3e0', Workspace: '#f5f5f5' }
     var icons = { MeetingRoom: '💼', TeaRoom: '🍵', Exhibition: '🏛️', Workspace: '🔧' }
-    var visualMap = { 'T001': { icon: '🍃', bg: '#e8f5e9' }, 'T002': { icon: '🪵', bg: '#fce4ec' }, 'T003': { icon: '🏔️', bg: '#fff3e0' }, 'T004': { icon: '🌿', bg: '#efebe9' }, 'T005': { icon: '🏵️', bg: '#f1f8e9' }, 'T006': { icon: '🏔️', bg: '#efebe9' }, 'T007': { icon: '🏺', bg: '#f3e5f5' }, 'T008': { icon: '🥃', bg: '#e0f7fa' } }
+    var visualMap = { 'T001': { icon: '🍃', bg: '#e8f5e9' }, 'T002': { icon: '🪵', bg: '#fce4ec' }, 'T003': { icon: '🏔️', bg: '#fff3e0' }, 'T004': { icon: '🌿', bg: '#efebe9' }, 'T005': { icon: '🏵️', bg: '#f1f8e9' }, 'T006': { icon: '🏔️', bg: '#efebe9' }, 'T007': { icon: '🏺', bg: '#f3e5f5' }, 'T008': { icon: '🥃', bg: '#e0f7fa' }, 'T01': { icon: '🍃', bg: '#e8f5e9' }, 'T02': { icon: '🪵', bg: '#fce4ec' }, 'T03': { icon: '🏔️', bg: '#fff3e0' }, 'T04': { icon: '🏺', bg: '#f3e5f5' }, 'T05': { icon: '🏔️', bg: '#efebe9' }, 'T06': { icon: '🌿', bg: '#e0f7fa' }, 'T07': { icon: '🏵️', bg: '#f1f8e9' }, 'T08': { icon: '🥃', bg: '#fce4ec' } }
     Promise.all([API.getRooms(true), API.getProducts(), API.getCurrentUser(), API.getBalance(), API.getCart()]).then(function(results) {
       var roomsData = results[0] || [], productsData = results[1] || [], user = results[2], balance = results[3] || 0, cart = results[4] || []
+      // 后端数据为空时自动使用内置演示数据（VPS未部署/空数据库时仍可展示）
+      if (!roomsData.length || !productsData.length) {
+        self.renderFallbackData()
+        self.setData({ loading: false, isLoggedIn: !!user, balance: balance })
+        self.setData({ balanceDisplay: self.data.balanceVisible ? '¥' + balance : '****' })
+        return
+      }
       var rooms = []
       for (var i = 0; i < roomsData.length; i++) { var r = roomsData[i]; if (r.bookable === false) continue; rooms.push({ roomId: r.roomId, name: r.name, capacity: r.capacity, area: r.area, pricePerHour: r.pricePerHour || 120, icon: icons[r.type] || '🏠', bgColor: colors[r.type] || '#f0f0f0' }) }
       var qtyMap = {}
@@ -292,7 +299,7 @@ Page({
     }
   },
 
-  // API不通时展示内置演示数据
+  // API不通或数据为空时展示内置演示数据
   renderFallbackData: function() {
     var colors = { MeetingRoom: '#e3f2fd', TeaRoom: '#e8f5e9', Exhibition: '#fff3e0', Workspace: '#f5f5f5' }
     var icons = { MeetingRoom: '💼', TeaRoom: '🍵', Exhibition: '🏛️', Workspace: '🔧' }
@@ -311,6 +318,11 @@ Page({
       { productId:'T01', name:'明前龙井', desc:'西湖核心产区 · 清香甘醇', price:168, icon:'🍃', bg:'#e8f5e9', _qty:0 },
       { productId:'T02', name:'金骏眉', desc:'武夷山桐木关 · 蜜香甘醇', price:258, icon:'🪵', bg:'#fce4ec', _qty:0 },
       { productId:'T03', name:'铁观音', desc:'安溪高山 · 七泡有余香', price:138, icon:'🏔️', bg:'#fff3e0', _qty:0 },
+      { productId:'T04', name:'普洱茶饼', desc:'云南勐海古树 · 越陈越香', price:198, icon:'🏺', bg:'#f3e5f5', _qty:0 },
+      { productId:'T05', name:'正山小种', desc:'传统烟熏 · 桂圆汤味', price:98, icon:'🏔️', bg:'#efebe9', _qty:0 },
+      { productId:'T06', name:'白毫银针', desc:'福鼎高山 · 毫香蜜韵', price:228, icon:'🌿', bg:'#e0f7fa', _qty:0 },
+      { productId:'T07', name:'大红袍', desc:'武夷岩茶 · 岩骨花香', price:298, icon:'🏵️', bg:'#f1f8e9', _qty:0 },
+      { productId:'T08', name:'小青柑', desc:'新会柑+普洱 · 果香馥郁', price:88, icon:'🥃', bg:'#fce4ec', _qty:0 },
     ]
     this.setData({ rooms: rooms, teaProducts: fbTeas })
   },

@@ -87,7 +87,7 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .qty-ctrl { display:flex; align-items:center; gap:4px; }
 .qty-btn-sm { width:24px; height:24px; border-radius:50%; border:1.5px solid #5D8A6B; background:#fff; color:#5D8A6B; font-size:16px; display:flex; align-items:center; justify-content:center; }
 .qty-num-sm { min-width:20px; text-align:center; font-size:14px; font-weight:600; color:#333; }
-.tea-card-btn { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(93,138,107,.3); padding:0; font-weight:400; }
+.tea-card-btn { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#5D8A6B,#7BA88E); color:#fff; font-size:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(93,138,107,.3); padding:0; font-weight:400; }
 .tea-card-btn:active { transform:scale(.9); }
 .cart-link { font-size:12px; color:#5D8A6B; display:flex; align-items:center; gap:4px; }
 .cart-badge { display:inline-block; background:#D54941; color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; min-width:16px; text-align:center; }

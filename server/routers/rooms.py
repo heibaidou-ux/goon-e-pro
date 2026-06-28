@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_
 
 from database import get_db
-from models.store_dev import Store, Room
+from models.store_dev import Store, Room, RoomPricing
 from models.operations import Order, OrderItem, Customer
 from models.user import User
 from schemas.order import StoreOut, RoomOut, RoomOrderOut, RoomOrderCreate
@@ -15,6 +15,21 @@ from services.auth_service import get_current_user, get_optional_user
 from services.order_iot import on_order_paid, on_order_checkin, on_order_checkout
 
 router = APIRouter(prefix="/api", tags=["房间管理"])
+
+
+async def _get_room_price(db: AsyncSession, room_id: str) -> tuple[float, float]:
+    """查询房间最新有效定价，返回 (price_per_hour, price_per_half_hour)。"""
+    r = await db.execute(
+        select(RoomPricing).where(
+            RoomPricing.roomId == room_id,
+            RoomPricing.status == "Active",
+        ).order_by(RoomPricing.effectiveDate.desc()).limit(1)
+    )
+    pricing = r.scalar_one_or_none()
+    if pricing:
+        base = pricing.basePrice
+        return base, round(base / 2, 2)
+    return 0, 0
 
 
 @router.get("/stores", response_model=list[StoreOut])
@@ -30,17 +45,21 @@ async def list_stores(
             select(Room).where(Room.storeId == s.storeId, Room.status == "Active")
         )
         rooms_list = room_result.scalars().all()
+        room_outs = []
+        for r in rooms_list:
+            pph, pphh = await _get_room_price(db, r.roomId)
+            room_outs.append(RoomOut(
+                id=r.id, room_id=r.roomId, store_id=r.storeId,
+                name=r.name, type=r.type, capacity=r.capacity,
+                floor=r.floor or "", price_per_hour=pph,
+                price_per_half_hour=pphh,
+                facilities=json.loads(r.facilities) if isinstance(r.facilities, str) and r.facilities else [],
+                description=r.description or "", is_active=(r.status == "Active"),
+            ))
         out.append(StoreOut(
             id=s.id, store_id=s.storeId, name=s.name,
             address=s.address, phone=s.phone, is_active=(s.status == "Operating"),
-            rooms=[RoomOut(
-                id=r.id, room_id=r.roomId, store_id=r.storeId,
-                name=r.name, type=r.type, capacity=r.capacity,
-                floor=r.floor or "", price_per_hour=0,
-                price_per_half_hour=0,
-                facilities=json.loads(r.facilities) if isinstance(r.facilities, str) and r.facilities else [],
-                description=r.description or "", is_active=(r.status == "Active"),
-            ) for r in rooms_list]
+            rooms=room_outs,
         ))
     return out
 
@@ -60,13 +79,17 @@ async def list_rooms(
 
     result = await db.execute(query.order_by(Room.name))
     rooms = result.scalars().all()
-    return [RoomOut(
-        id=r.id, room_id=r.roomId, store_id=r.storeId,
-        name=r.name, type=r.type, capacity=r.capacity,
-        floor=r.floor or "", price_per_hour=0, price_per_half_hour=0,
-        facilities=json.loads(r.facilities) if isinstance(r.facilities, str) and r.facilities else [],
-        description=r.description or "", is_active=(r.status == "Active"),
-    ) for r in rooms]
+    room_outs = []
+    for r in rooms:
+        pph, pphh = await _get_room_price(db, r.roomId)
+        room_outs.append(RoomOut(
+            id=r.id, room_id=r.roomId, store_id=r.storeId,
+            name=r.name, type=r.type, capacity=r.capacity,
+            floor=r.floor or "", price_per_hour=pph, price_per_half_hour=pphh,
+            facilities=json.loads(r.facilities) if isinstance(r.facilities, str) and r.facilities else [],
+            description=r.description or "", is_active=(r.status == "Active"),
+        ))
+    return room_outs
 
 
 @router.get("/rooms/{room_id}", response_model=RoomOut)
@@ -79,10 +102,11 @@ async def get_room(
     room = result.scalar_one_or_none()
     if not room:
         raise HTTPException(status_code=404, detail="房间不存在")
+    pph, pphh = await _get_room_price(db, room_id)
     return RoomOut(
         id=room.id, room_id=room.roomId, store_id=room.storeId,
         name=room.name, type=room.type, capacity=room.capacity,
-        floor=room.floor or "", price_per_hour=0, price_per_half_hour=0,
+        floor=room.floor or "", price_per_hour=pph, price_per_half_hour=pphh,
         facilities=json.loads(room.facilities) if isinstance(room.facilities, str) and room.facilities else [],
         description=room.description or "", is_active=(room.status == "Active"),
     )
