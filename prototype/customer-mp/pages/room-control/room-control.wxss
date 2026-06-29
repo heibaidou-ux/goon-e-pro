@@ -28,54 +28,54 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .device-section { margin-bottom:16px; padding:0 16px; }
 .section-label { font-size:14px; font-weight:600; color:#333; margin-bottom:10px; display:block; }
 
-/* 2列网�?�?深灰按键+简笔画图标 */
+/* 2列网格 · 浅绿按键+茶色图标 */
 .dev-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.switch-key { background:#2a2a2a; border-radius:14px; padding:16px 14px; border:1.5px solid #3a3a3a; display:flex; align-items:center; gap:12px; transition:all .15s; }
+.switch-key { background:#f0faf2; border-radius:14px; padding:16px 14px; border:1.5px solid #d4e8d9; display:flex; align-items:center; gap:12px; transition:all .15s; }
 .switch-key:active { transform:scale(.95); }
-.switch-key.on { border-color:#FFC107; background:#2a2410; }
-.key-icon { font-size:28px; display:block; color:#ddd; font-weight:300; line-height:1; flex-shrink:0; width:32px; text-align:center; }
-.switch-key.on .key-icon { color:#FFC107; }
-.key-label { font-size:14px; font-weight:500; color:#aaa; display:block; letter-spacing:1px; flex:1; text-align:left; }
-.switch-key.on .key-label { color:#FFC107; }
-.key-indicator { width:6px; height:6px; border-radius:50%; background:#555; display:inline-block; flex-shrink:0; margin-left:auto; }
-.key-indicator.on { background:#FFC107; box-shadow:0 0 6px rgba(255,193,7,.5); }
+.switch-key.on { border-color:#5D8A6B; background:#e8f5e9; }
+.key-icon { font-size:28px; display:block; color:#7BA88E; font-weight:300; line-height:1; flex-shrink:0; width:32px; text-align:center; }
+.switch-key.on .key-icon { color:#5D8A6B; }
+.key-label { font-size:14px; font-weight:500; color:#555; display:block; letter-spacing:1px; flex:1; text-align:left; }
+.switch-key.on .key-label { color:#2C6B3F; }
+.key-indicator { width:6px; height:6px; border-radius:50%; background:#ccc; display:inline-block; flex-shrink:0; margin-left:auto; }
+.key-indicator.on { background:#5D8A6B; box-shadow:0 0 6px rgba(93,138,107,.5); }
 
-/* 空调 �?与灯光按键统一深灰�?*/
-.ac-card { background:#2a2a2a; border-radius:14px; padding:20px; border:1.5px solid #3a3a3a; }
+/* 空调 · 与灯光按键统一浅绿 */
+.ac-card { background:#f0faf2; border-radius:14px; padding:20px; border:1.5px solid #d4e8d9; }
 .ac-main { display:flex; align-items:center; gap:20px; }
 .ac-temp-area { display:flex; flex-direction:column; align-items:center; flex-shrink:0; min-width:90px; }
-.ac-up { font-size:14px; color:#FFC107; padding:10px 14px; cursor:pointer; opacity:.7; font-weight:700; }
+.ac-up { font-size:14px; color:#5D8A6B; padding:10px 14px; cursor:pointer; opacity:.7; font-weight:700; }
 .ac-up:active { opacity:1; }
-.ac-temp-num { font-size:52px; font-weight:200; color:#ddd; display:block; line-height:1; letter-spacing:-2px; }
-.ac-down { font-size:14px; color:#FFC107; padding:10px 14px; cursor:pointer; opacity:.7; font-weight:700; }
+.ac-temp-num { font-size:52px; font-weight:200; color:#333; display:block; line-height:1; letter-spacing:-2px; }
+.ac-down { font-size:14px; color:#5D8A6B; padding:10px 14px; cursor:pointer; opacity:.7; font-weight:700; }
 .ac-down:active { opacity:1; }
 .ac-temp-status { font-size:11px; color:#888; display:block; margin-top:6px; letter-spacing:1px; }
 .ac-ctrl-area { flex:1; display:flex; flex-direction:column; justify-content:center; padding:4px 0; gap:10px; }
 .ac-mode-row { display:flex; gap:8px; }
-.ac-mode-btn { flex:1; padding:10px 6px; border-radius:12px; background:#3a3a3a; border:1px solid #4a4a4a; text-align:center; letter-spacing:1px; display:flex; flex-direction:column; align-items:center; gap:2px; }
-.ac-mode-btn.active { background:#2a2410; border-color:#FFC107; }
+.ac-mode-btn { flex:1; padding:10px 6px; border-radius:12px; background:#fff; border:1.5px solid #d4e8d9; text-align:center; letter-spacing:1px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+.ac-mode-btn.active { background:#e8f5e9; border-color:#5D8A6B; }
 .mode-icon { font-size:20px; display:block; line-height:1.2; }
-.mode-label { font-size:12px; font-weight:500; color:#888; display:block; }
-.ac-mode-btn.active .mode-label { color:#FFC107; }
-.ac-power-bar { border-top:1px solid #3a3a3a; padding-top:10px; }
+.mode-label { font-size:12px; font-weight:500; color:#666; display:block; }
+.ac-mode-btn.active .mode-label { color:#5D8A6B; }
+.ac-power-bar { border-top:1px solid #d4e8d9; padding-top:10px; }
 .ac-power-btn { padding:10px; border-radius:10px; font-size:13px; font-weight:500; color:#666; text-align:center; letter-spacing:1px; }
-.ac-power-btn.on { color:#FFC107; }
+.ac-power-btn.on { color:#5D8A6B; }
 
 /* 窗帘 */
-.curtain-card { background:#2a2a2a; border-radius:14px; padding:16px; border:1.5px solid #3a3a3a; }
+.curtain-card { background:#f0faf2; border-radius:14px; padding:16px; border:1.5px solid #d4e8d9; }
 .curtain-item { margin:8px 0; }
-.curtain-name { font-size:13px; font-weight:500; color:#aaa; margin-bottom:4px; display:block; letter-spacing:1px; }
+.curtain-name { font-size:13px; font-weight:500; color:#555; margin-bottom:4px; display:block; letter-spacing:1px; }
 .curtain-bar { display:flex; align-items:center; gap:6px; }
 .curtain-bar slider { flex:1; }
-.curtain-end { font-size:10px; color:#666; white-space:nowrap; }
+.curtain-end { font-size:10px; color:#999; white-space:nowrap; }
 
 /* 背景音乐 */
-.bgm-card { background:#2a2a2a; border-radius:14px; padding:16px; border:1.5px solid #3a3a3a; }
+.bgm-card { background:#f0faf2; border-radius:14px; padding:16px; border:1.5px solid #d4e8d9; }
 .bgm-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
 .bgm-icon { font-size:22px; }
-.bgm-status { flex:1; font-size:12px; font-weight:500; color:#aaa; letter-spacing:1px; }
-.bgm-switch { width:36px; height:20px; border-radius:10px; background:#555; position:relative; transition:all .2s; flex-shrink:0; }
-.bgm-switch.on { background:#FFC107; }
+.bgm-status { flex:1; font-size:12px; font-weight:500; color:#555; letter-spacing:1px; }
+.bgm-switch { width:36px; height:20px; border-radius:10px; background:#ccc; position:relative; transition:all .2s; flex-shrink:0; }
+.bgm-switch.on { background:#5D8A6B; }
 .bgm-switch-knob { width:16px; height:16px; border-radius:50%; background:#fff; position:absolute; top:2px; left:2px; box-shadow:0 1px 3px rgba(0,0,0,.15); transition:all .2s; }
 .bgm-switch.on .bgm-switch-knob { left:18px; }
 .bgm-vol-row { display:flex; align-items:center; gap:8px; font-size:12px; }
