@@ -22,11 +22,6 @@
       <view class="form-btn" bindtap="doLogin" loading="{{loading}}">登 录</view>
       <text class="error-text" wx:if="{{error}}">{{error}}</text>
 
-      <view class="login-hint">
-        <text wx:if="{{selectedRole=='staff'}}">演示：admin / 8888</text>
-        <text wx:else>演示：shareholder / 8888</text>
-      </view>
-
       <text class="back-link" bindtap="goHome">← 返回客人首页</text>
     </view>
   </view>

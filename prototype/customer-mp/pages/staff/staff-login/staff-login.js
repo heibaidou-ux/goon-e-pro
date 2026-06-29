@@ -4,16 +4,15 @@ var app = getApp()
 Page({
   data: {
     selectedRole: 'staff',
-    account: 'admin',
-    password: '8888',
+    account: '',
+    password: '',
     loading: false,
     error: ''
   },
 
   switchRole: function(e) {
     var role = e.currentTarget.dataset.role
-    var account = role === 'staff' ? 'admin' : 'shareholder'
-    this.setData({ selectedRole: role, account: account, error: '' })
+    this.setData({ selectedRole: role, account: '', password: '', error: '' })
   },
 
   onAccount: function(e) { this.setData({ account: e.detail.value }) },

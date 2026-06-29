@@ -1,29 +1,5 @@
 var API = require('../../utils/api')
 
-// 每个房间的灯光设备ID（用于灯全开/全关）
-var LIGHT_DEVICE_IDS = {
-  RM001: ['DEV001','DEV002','DEV003'],
-  RM002: ['DEV009','DEV010'],
-  RM003: ['DEV016','DEV017','DEV018'],
-  RM004: ['DEV025','DEV026','DEV027'],
-  RM005: []
-}
-
-// 每个房间的风扇/换气扇设备
-var FAN_DEVICE_IDS = {
-  RM001: ['DEV004','DEV005','DEV006'],
-  RM002: ['DEV011','DEV012'],
-  RM003: ['DEV019'],
-  RM004: ['DEV028'],
-  RM005: []
-}
-
-// 灯光图标 — 简笔画风格
-var LIGHT_ICONS = { 'DEV001':'◯','DEV002':'◯','DEV003':'⊙','DEV009':'⊙','DEV010':'◯','DEV016':'⊙','DEV017':'◯','DEV018':'✦','DEV025':'⊙','DEV026':'◯','DEV027':'✦' }
-var LIGHT_LABELS = { 'DEV001':'筒灯1','DEV002':'筒灯2','DEV003':'吊灯','DEV009':'吊灯','DEV010':'筒灯','DEV016':'吊灯','DEV017':'筒灯','DEV018':'背景灯','DEV025':'吊灯','DEV026':'筒灯','DEV027':'背景灯' }
-var FAN_ICONS = { 'DEV004':'⏣','DEV005':'⏣','DEV006':'⏣','DEV011':'⏏','DEV012':'⏣','DEV019':'⏣','DEV028':'⏣' }
-var FAN_LABELS = { 'DEV004':'风扇1','DEV005':'风扇2','DEV006':'风扇3','DEV011':'换气扇','DEV012':'风扇','DEV019':'风扇','DEV028':'风扇' }
-
 Page({
   data: {
     roomId: '', roomName: '房间',
@@ -32,6 +8,7 @@ Page({
     balance: 0, hideBottomNav: false,
     devKeys: [], acModeLabel: '',
     acDevice: null, curtainDevices: [], bgmDevice: null,
+    lightDevices: [], fanDevices: [],
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
     extendPayInfo: '', extendPayAmount: 0, extendPayMethod: 'balance'
@@ -48,7 +25,6 @@ Page({
 
     self.setData({ roomId: roomId, roomName: roomName, orderStart: startStr })
 
-    // 查询该房间当前订单状态
     var todayStr = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0')
     API.getAllOrders().then(function(orders) {
       var curMin = new Date().getHours()*60+new Date().getMinutes()
@@ -94,38 +70,40 @@ Page({
     var self = this
     API.getRoomDevices(this.data.roomId).then(function(devices) {
       var stateMap = {}
-      var ac = null, curtains = [], bgm = null
+      var ac = null, curtains = [], bgm = null, lights = [], fans = []
+      var lightIcons = ['◯','⊙','✦','◉','◎']
+
       for (var i = 0; i < devices.length; i++) {
-        var d = devices[i]
-        if (d.type === 'Light') stateMap[d.deviceId] = (d.brightness || 0) > 0
-        else if (d.type === 'Fan') stateMap[d.deviceId] = (d.speed || 0) > 0
-        else if (d.type === 'ExhaustFan') stateMap[d.deviceId] = (d.speed || 0) > 0
-        else if (d.type === 'AC') { ac = d; stateMap[d.deviceId] = d.mode === 'cool' }
-        else if (d.type === 'Curtain') { d.positionNum = d.position === 'open' ? 100 : (d.position === 'closed' ? 0 : parseInt(d.position) || 0); curtains.push(d) }
-        else if (d.type === 'BGM') { bgm = d; stateMap[d.deviceId] = d.playing }
+        var d = devices[i]; var a = d.attributes || {}
+        if (d.type === 'Light') { d.on = a.power || (a.brightness || 0) > 0; lights.push(d) }
+        else if (d.type === 'Fan' || d.type === 'ExhaustFan') { d.on = (a.speed || 0) > 0; fans.push(d) }
+        else if (d.type === 'AC') { ac = d }
+        else if (d.type === 'Curtain') { d.positionNum = a.current_position || (d.position === 'open' ? 100 : 0); curtains.push(d) }
+        else if (d.type === 'BGM' || d.type === 'Speaker') { bgm = d; d.on = a.playing }
+        stateMap[d.deviceId] = d.on
       }
 
-      // 合并灯光和风扇按键，田字格排列（严格2列）
-      var roomId = self.data.roomId
-      var lightIds = LIGHT_DEVICE_IDS[roomId] || []
-      var allLightsOn = lightIds.length > 0
-      for (var j = 0; j < lightIds.length; j++) {
-        if (!stateMap[lightIds[j]]) { allLightsOn = false; break }
-      }
+      // 按通道号排序灯光
+      lights.sort(function(a,b){ return (a.attributes&&a.attributes.channel||99) - (b.attributes&&b.attributes.channel||99) })
+
+      // 构建虚拟按键列表
+      var allLightsOn = lights.length > 0 && lights.every(function(l){ return l.on })
       var devKeys = [
         { key: 'light_all_on',  label: '灯全开', icon: '◉', type: 'virtual', active: allLightsOn },
         { key: 'light_all_off', label: '灯全关', icon: '◎', type: 'virtual', active: false },
       ]
-      for (var j = 0; j < lightIds.length; j++) {
-        devKeys.push({ key: lightIds[j], label: LIGHT_LABELS[lightIds[j]] || lightIds[j], icon: LIGHT_ICONS[lightIds[j]] || '💡', type: 'Light', active: stateMap[lightIds[j]] || false })
+      for (var j = 0; j < lights.length; j++) {
+        var li = lights[j], idx = j % lightIcons.length
+        var shortName = (li.name || '').replace(/^.*[·]/,'')
+        devKeys.push({ key: li.deviceId, label: shortName, icon: lightIcons[idx], type: 'Light', active: li.on || false })
       }
-      var fanIds = FAN_DEVICE_IDS[roomId] || []
-      for (var j = 0; j < fanIds.length; j++) {
-        devKeys.push({ key: fanIds[j], label: FAN_LABELS[fanIds[j]] || fanIds[j], icon: FAN_ICONS[fanIds[j]] || '🌀', type: fanIds[j] === 'DEV011' ? 'ExhaustFan' : 'Fan', active: stateMap[fanIds[j]] || false })
+      for (var j = 0; j < fans.length; j++) {
+        var fj = fans[j]
+        devKeys.push({ key: fj.deviceId, label: fj.name || '风扇', icon: '⏣', type: fj.type, active: fj.on || false })
       }
 
       self.setData({
-        devKeys: devKeys,
+        devKeys: devKeys, lightDevices: lights, fanDevices: fans,
         acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '', curtainDevices: curtains, bgmDevice: bgm
       })
     })
@@ -134,11 +112,8 @@ Page({
   onKeyTap: function(e) {
     var key = e.currentTarget.dataset.key
     var type = e.currentTarget.dataset.type
-
     if (key === 'light_all_on') { this._setAllLights(true); return }
     if (key === 'light_all_off') { this._setAllLights(false); return }
-
-    // 设备开关
     var currentOn = false
     var keys = this.data.devKeys
     for (var i = 0; i < keys.length; i++) { if (keys[i].key === key) { currentOn = keys[i].active; break } }
@@ -147,8 +122,7 @@ Page({
 
   _setAllLights: function(on) {
     var self = this
-    var lightIds = LIGHT_DEVICE_IDS[self.data.roomId] || []
-    // UI立即更新
+    var lightIds = (self.data.lightDevices || []).map(function(l){ return l.deviceId })
     var keys = self.data.devKeys
     for (var i = 0; i < keys.length; i++) {
       if (keys[i].key === 'light_all_on') keys[i].active = on
@@ -176,10 +150,9 @@ Page({
     var cmd = {}
     if (type === 'Light') cmd = { brightness: newState ? 80 : 0 }
     else if (type === 'Fan' || type === 'ExhaustFan') cmd = { speed: newState ? 3 : 0 }
-    API.controlDevice(deviceId, cmd).catch(function() {})
+    API.controlDevice(deviceId, cmd).catch(function(){})
   },
 
-  // ── 空调（制冷/制热/送风/关闭） ──
   toggleAC: function(e) {
     var id = e.currentTarget.dataset.id, ac = this.data.acDevice
     if (!ac) return
@@ -210,7 +183,6 @@ Page({
     return '已关机'
   },
 
-  // ── 窗帘 ──
   onCurtainChange: function(e) {
     var id = e.currentTarget.dataset.id, val = parseInt(e.detail.value)
     var position = val >= 80 ? 'open' : (val <= 20 ? 'closed' : val + '%')
@@ -219,7 +191,6 @@ Page({
     this.setData({ curtainDevices: devs }); API.controlDevice(id, { position: position }).catch(function(){})
   },
 
-  // ── 背景音乐 ──
   toggleBGM: function(e) {
     var id = e.currentTarget.dataset.id, bgm = this.data.bgmDevice
     if (!bgm) return; bgm.playing = !bgm.playing
@@ -231,7 +202,6 @@ Page({
     API.controlDevice(id, { volume: val }).catch(function(){})
   },
 
-  // ── 倒计时 ──
   startCountdown: function(durationMin, endStr) {
     var self = this; durationMin = durationMin || 120; var now = new Date()
     if (endStr) {
@@ -272,7 +242,6 @@ Page({
   preventBubble: function() {},
   goTeaShop: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop' }) },
 
-  // ── 续订 ──
   showExtend: function() {
     var self = this
     var endDate = self._endDate ? new Date(self._endDate) : new Date()
