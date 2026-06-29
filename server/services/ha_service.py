@@ -163,19 +163,24 @@ def _build_devices_for_room(room: dict, ha_room: str) -> list[dict]:
             "status": "Online",
             "attributes": {"power": False, "channel": int(ch_num)},
         })
-    # Curtain
-    devices.append({
-        "device_id": f"DEV{idx_base}20",
-        "room_id": room["room_id"],
-        "type": "Curtain",
-        "name": f"{room['name']}窗帘",
-        "ha_entity_id": f"cover.{ha_room}_curtain",
-        "protocol": "Zigbee",
-        "slave_id": None,
-        "sub_address": None,
-        "status": "Online",
-        "attributes": {"position": "closed", "current_position": 0},
-    })
+    # Curtain(s) — 中茶室/大茶室有3台窗帘电机
+    curtain_count = 1
+    if room["room_id"] in ("RM002", "RM004"):
+        curtain_count = 3
+    for ci in range(curtain_count):
+        curtain_suffix = f"_{ci+1}" if curtain_count > 1 else ""
+        devices.append({
+            "device_id": f"DEV{idx_base}20{ci}",
+            "room_id": room["room_id"],
+            "type": "Curtain",
+            "name": f"{room['name']}窗帘{'(' + str(ci+1) + ')' if curtain_count > 1 else ''}",
+            "ha_entity_id": f"cover.{ha_room}_curtain{curtain_suffix}",
+            "protocol": "Zigbee",
+            "slave_id": None,
+            "sub_address": None,
+            "status": "Online",
+            "attributes": {"position": "closed", "current_position": 0},
+        })
     # Sensors
     devices.append({
         "device_id": f"DEV{idx_base}30",

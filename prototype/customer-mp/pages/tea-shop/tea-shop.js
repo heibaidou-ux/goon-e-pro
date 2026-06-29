@@ -21,7 +21,7 @@ Page({
     showPayModal: false,
     showInsufficient: false,
     insufficientMsg: '',
-    payMethod: 'balance',
+    payMethod: 'wechat',
     // Delivery modal
     showDeliveryModal: false,
     deliveryMethod: 'inroom',

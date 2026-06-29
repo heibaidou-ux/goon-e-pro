@@ -8,6 +8,8 @@ Page({
     // 从storage读取当前用户
     try {
       var user = wx.getStorageSync('mp_user') || {}
+      // 补全display_name字段
+      if (!user.display_name && user.name) user.display_name = user.name
       this.setData({ user: user })
     } catch(e) {}
   },

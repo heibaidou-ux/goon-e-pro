@@ -196,14 +196,10 @@
         <text class="pay-method-check" wx:if="{{payMethod=='balance'}}">✓</text>
       </view>
       <view class="pay-method {{payMethod=='wechat'?'selected':''}}" bindtap="selectPayMethod" data-method="wechat">
-        <text class="pay-method-icon">💚</text>
+        <text class="pay-method-icon wechat-pay-icon">微</text>
         <text class="pay-method-name">微信支付</text>
+        <text class="pay-method-desc">推荐使用</text>
         <text class="pay-method-check" wx:if="{{payMethod=='wechat'}}">✓</text>
-      </view>
-      <view class="pay-method {{payMethod=='alipay'?'selected':''}}" bindtap="selectPayMethod" data-method="alipay">
-        <text class="pay-method-icon">💙</text>
-        <text class="pay-method-name">支付宝</text>
-        <text class="pay-method-check" wx:if="{{payMethod=='alipay'}}">✓</text>
       </view>
     </view>
     <view class="pay-modal-btns">

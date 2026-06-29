@@ -20,7 +20,7 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .quick-cards { display:flex; gap:12px; padding:16px 16px; }
 .qcard { flex:1; padding:16px; border-radius:14px; text-align:center; }
 .qcard.renew { background:#5D8A6B; color:#fff; }
-.qcard.tea { background:#7B1FA2; color:#fff; }
+.qcard.tea { background:#7BA88E; color:#fff; }
 .qcard-icon { font-size:24px; display:block; margin-bottom:2px; }
 .qcard-label { font-size:13px; font-weight:600; }
 

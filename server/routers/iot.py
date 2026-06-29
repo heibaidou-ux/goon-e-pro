@@ -184,6 +184,38 @@ async def get_stats(current_user: Optional[User] = Depends(get_optional_user)):
 
 
 # ═══════════════════════════════════════════════════════════
+# 客服通电操作 — staff/客服角色可用
+# ═══════════════════════════════════════════════════════════
+
+@router.post("/power/{room_id}/{action}")
+async def room_power_control(
+    room_id: str,
+    action: str,
+    current_user: User = Depends(get_current_user),
+):
+    """#3 客服通电操作权限：控制房间总电源
+
+    Args:
+        room_id: 房间ID (RM001/RM002/RM003/RM004)
+        action: "on"（通电）/ "off"（断电）
+    """
+    if action not in ("on", "off"):
+        raise HTTPException(400, "操作无效，仅支持 on/off")
+
+    if action == "off":
+        result = await ha_service.activate_scene(room_id, "Checkout")
+    else:
+        result = await ha_service.activate_scene(room_id, "Welcome")
+
+    return {
+        "success": result.get("success", False),
+        "room_id": room_id,
+        "action": "通电" if action == "on" else "断电",
+        "message": f"房间已{'通电' if action == 'on' else '断电'}" if result.get("success") else f"操作失败: {result.get('message')}",
+    }
+
+
+# ═══════════════════════════════════════════════════════════
 # 485直连网关
 # ═══════════════════════════════════════════════════════════
 
