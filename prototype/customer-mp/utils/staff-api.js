@@ -5,8 +5,8 @@
  */
 const MOCK = require('./mock-data')
 
-const API_BASE = 'http://localhost:8000'
-const USE_MOCK = true  // false = 连后端
+const API_BASE = 'https://erp.highbank.cn'
+const USE_MOCK = false  // false = 连后端
 
 function lsGet(key, fallback) {
   try { const val = wx.getStorageSync('mp_' + key); return val || fallback } catch (e) { return fallback }

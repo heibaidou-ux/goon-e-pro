@@ -251,8 +251,8 @@
   //  4. 真实API请求支持
   // ═══════════════════════════════════════════
 
-  var API_BASE = localStorage.getItem('erp_api_base') || 'http://localhost:8000';
-  var USE_API = localStorage.getItem('staff_use_api') === 'true';
+  var API_BASE = localStorage.getItem('erp_api_base') || 'https://erp.highbank.cn';
+  var USE_API = localStorage.getItem('staff_use_api') !== 'false';
 
   function apiRequest(method, path, body) {
     var url = API_BASE + path;

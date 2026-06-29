@@ -43,14 +43,12 @@ const devices = [
   { deviceId: "DEV012", roomId: "RM002", type: "Fan", label: "风扇", protocol: "RS485", status: "Online", speed: 0 },
   { deviceId: "DEV013", roomId: "RM002", type: "Curtain", label: "窗帘", protocol: "RS485", status: "Online", position: "closed" },
   { deviceId: "DEV014", roomId: "RM002", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: false, volume: 50 },
-  // ── 布拉格 RM003 ──
+  // ── 翡冷翠 RM003 ──
   { deviceId: "DEV016", roomId: "RM003", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 0 },
   { deviceId: "DEV017", roomId: "RM003", type: "Light", label: "筒灯", protocol: "RS485", status: "Online", brightness: 0 },
   { deviceId: "DEV018", roomId: "RM003", type: "Light", label: "背景灯", protocol: "RS485", status: "Online", brightness: 0 },
   { deviceId: "DEV019", roomId: "RM003", type: "Fan", label: "风扇", protocol: "RS485", status: "Online", speed: 0 },
-  { deviceId: "DEV020", roomId: "RM003", type: "Curtain", label: "窗帘左", protocol: "RS485", status: "Online", position: "open" },
-  { deviceId: "DEV022", roomId: "RM003", type: "Curtain", label: "窗帘中", protocol: "RS485", status: "Online", position: "open" },
-  { deviceId: "DEV023", roomId: "RM003", type: "Curtain", label: "窗帘右", protocol: "RS485", status: "Online", position: "closed" },
+  { deviceId: "DEV020", roomId: "RM003", type: "Curtain", label: "窗帘", protocol: "RS485", status: "Online", position: "closed" },
   { deviceId: "DEV024", roomId: "RM003", type: "BGM", label: "背景音乐", protocol: "RS485", status: "Online", playing: false, volume: 50 },
   // ── 白沙瓦 RM004 ──
   { deviceId: "DEV025", roomId: "RM004", type: "Light", label: "吊灯", protocol: "RS485", status: "Online", brightness: 80 },

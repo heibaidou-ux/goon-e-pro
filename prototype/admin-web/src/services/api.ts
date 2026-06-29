@@ -28,8 +28,8 @@ import type {
 } from './types'
 
 // ── Config ──
-const API_BASE = localStorage.getItem('erp_api_base') || 'http://localhost:8000'
-const USE_MOCK = localStorage.getItem('erp_use_mock') !== 'false' // default: mock
+const API_BASE = localStorage.getItem('erp_api_base') || 'https://erp.highbank.cn'
+const USE_MOCK = localStorage.getItem('erp_use_mock') === 'true' // default: live
 
 // ── Mock fallback data (when backend unavailable) ──
 const MOCK_ROOMS = [

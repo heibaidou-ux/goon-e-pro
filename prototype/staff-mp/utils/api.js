@@ -11,7 +11,7 @@ function lsGet(key, fallback) {
 function lsSet(key, val) { try { wx.setStorageSync(LS_PREFIX + key, val) } catch (e) { } }
 function lsRemove(key) { try { wx.removeStorageSync(LS_PREFIX + key) } catch (e) { } }
 
-var USE_MOCK = true
+var USE_MOCK = false
 
 function delay(ms) {
   ms = ms || (150 + Math.random() * 250)

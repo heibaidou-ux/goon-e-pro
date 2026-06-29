@@ -127,7 +127,8 @@ Page({
   cancelUnlock: function() { this.setData({ showLockConfirm: false, lockDeviceId: "" }) },
   toggleFan: function(e) {
     var id = e.currentTarget.dataset.id
-    API.controlDevice(id, {}).catch(function(){})
+    var on = e.detail && e.detail.value === true
+    API.controlDevice(id, { action: on ? 'on' : 'off' }).catch(function(){})
   },
   _findDev: function(type) {
     var list = this.data.devices

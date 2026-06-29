@@ -71,7 +71,6 @@ Page({
     API.getRoomDevices(this.data.roomId).then(function(devices) {
       var stateMap = {}
       var ac = null, curtains = [], bgm = null, lights = [], fans = []
-      var lightIcons = ['◯','⊙','✦','◉','◎']
 
       for (var i = 0; i < devices.length; i++) {
         var d = devices[i]; var a = d.attributes || {}
@@ -86,16 +85,14 @@ Page({
       // 按通道号排序灯光
       lights.sort(function(a,b){ return (a.attributes&&a.attributes.channel||99) - (b.attributes&&b.attributes.channel||99) })
 
-      // 构建虚拟按键列表
-      var allLightsOn = lights.length > 0 && lights.every(function(l){ return l.on })
-      var devKeys = [
-        { key: 'light_all_on',  label: '灯全开', icon: '◉', type: 'virtual', active: allLightsOn },
-        { key: 'light_all_off', label: '灯全关', icon: '◎', type: 'virtual', active: false },
-      ]
+      // 构建设备按键列表（客人端不显示"全屋灯光"总开关）
+      var devKeys = []
       for (var j = 0; j < lights.length; j++) {
-        var li = lights[j], idx = j % lightIcons.length
+        var li = lights[j]
+        // 跳过全屋灯光总开关（该功能仅限店员端使用）
+        if (li.attributes && li.attributes.is_all_lights) continue
         var shortName = (li.name || '').replace(/^.*[·]/,'')
-        devKeys.push({ key: li.deviceId, label: shortName, icon: lightIcons[idx], type: 'Light', active: li.on || false })
+        devKeys.push({ key: li.deviceId, label: shortName, icon: '💡', type: 'Light', active: li.on || false })
       }
       for (var j = 0; j < fans.length; j++) {
         var fj = fans[j]
@@ -112,34 +109,10 @@ Page({
   onKeyTap: function(e) {
     var key = e.currentTarget.dataset.key
     var type = e.currentTarget.dataset.type
-    if (key === 'light_all_on') { this._setAllLights(true); return }
-    if (key === 'light_all_off') { this._setAllLights(false); return }
     var currentOn = false
     var keys = this.data.devKeys
     for (var i = 0; i < keys.length; i++) { if (keys[i].key === key) { currentOn = keys[i].active; break } }
     this._toggleDevice(key, type, !currentOn)
-  },
-
-  _setAllLights: function(on) {
-    var self = this
-    var lightIds = (self.data.lightDevices || []).map(function(l){ return l.deviceId })
-    var keys = self.data.devKeys
-    for (var i = 0; i < keys.length; i++) {
-      if (keys[i].key === 'light_all_on') keys[i].active = on
-      else if (keys[i].key === 'light_all_off') keys[i].active = false
-      else if (keys[i].type === 'Light') keys[i].active = on
-    }
-    self.setData({ devKeys: keys })
-    wx.showLoading({ title: on ? '全开中...' : '全关中...' })
-    var done = 0
-    for (var i = 0; i < lightIds.length; i++) {
-      API.controlDevice(lightIds[i], { brightness: on ? 80 : 0 }).then(function() {
-        done++; if (done >= lightIds.length) { wx.hideLoading(); self.loadDevices() }
-      }).catch(function() {
-        done++; if (done >= lightIds.length) { wx.hideLoading(); self.loadDevices() }
-      })
-    }
-    if (lightIds.length === 0) { wx.hideLoading(); self.loadDevices() }
   },
 
   _toggleDevice: function(deviceId, type, newState) {
