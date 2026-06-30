@@ -1,4 +1,4 @@
-var STAFF_API = require('../../../utils/staff-api')
+var STAFF_API = require('../utils/staff-api')
 
 Page({
   data: {

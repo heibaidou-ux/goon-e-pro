@@ -1,5 +1,5 @@
 var API = require('../../../utils/api')
-var STAFF_API = require('../../../utils/staff-api')
+var STAFF_API = require('../utils/staff-api')
 
 const ALL_SCENES = [
   { id: 'Welcome', name: '欢迎', icon: '🚪', desc: '空调预开+开门+灯光+音乐', type: 'Auto', params: { temperature: 26, colorTemp: 3500, volume: 30 } },

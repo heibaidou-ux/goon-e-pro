@@ -1,4 +1,4 @@
-﻿const STAFF_API = require('../../../utils/staff-api')
+﻿const STAFF_API = require('../utils/staff-api')
 const API = require('../../../utils/api')
 Page({
   data: { pending: [], inProgress: [] },

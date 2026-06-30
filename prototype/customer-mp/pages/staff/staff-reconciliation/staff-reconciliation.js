@@ -1,4 +1,4 @@
-var STAFF_API = require('../../../utils/staff-api')
+var STAFF_API = require('../utils/staff-api')
 var API = require('../../../utils/api')
 var PAY_LABELS = { WeChat:'微信支付', Alipay:'支付宝', Balance:'会员余额', Coupon:'验券', Other:'其他' }
 

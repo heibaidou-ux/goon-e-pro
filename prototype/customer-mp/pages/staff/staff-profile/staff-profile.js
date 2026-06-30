@@ -1,5 +1,5 @@
 var API = require('../../../utils/api')
-var STAFF_API = require('../../../utils/staff-api')
+var STAFF_API = require('../utils/staff-api')
 
 Page({
   data: { user: { displayName: '店员' } },

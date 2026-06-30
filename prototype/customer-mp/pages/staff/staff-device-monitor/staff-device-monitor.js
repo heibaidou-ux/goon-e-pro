@@ -1,4 +1,4 @@
-const STAFF_API = require('../../../utils/staff-api')
+const STAFF_API = require('../utils/staff-api')
 var API = require('../../../utils/api')
 var ROOM_IDS = ['']
 var ROOM_NAMES = ['全部房间']
