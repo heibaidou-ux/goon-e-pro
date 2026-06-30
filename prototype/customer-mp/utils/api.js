@@ -71,7 +71,13 @@ async function request(options) {
         if (res.statusCode === 401) {
           setToken(null)
           lsSet('logged_in', false)
-          wx.reLaunch({ url: '/pages/home/home?showLogin=1' })
+          // 按角色分流：staff→店员登录页，其他→客人首页
+          var role = lsGet('user_role', '')
+          if (role === 'staff') {
+            wx.reLaunch({ url: '/pages/staff/staff-login/staff-login' })
+          } else {
+            wx.reLaunch({ url: '/pages/home/home?showLogin=1' })
+          }
           reject(new Error('登录已过期'))
           return
         }

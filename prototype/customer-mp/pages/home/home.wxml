@@ -2,7 +2,7 @@
 
   <!-- 门店头部 -->
   <view class="store-header">
-    <text class="store-name">高岸茶室</text>
+    <image class="store-logo" src="/images/logo.png" mode="aspectFit"></image>
     <text class="store-select" bindtap="showStoreSelector">{{storeName}} ▾</text>
   </view>
 
