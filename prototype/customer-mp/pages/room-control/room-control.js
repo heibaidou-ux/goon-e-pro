@@ -16,7 +16,7 @@ Page({
   },
 
   onLoad: function(e) {
-    var roomId = e.roomId || 'RM004'
+    var roomId = e.roomId || ''
     var roomName = e.roomName ? decodeURIComponent(e.roomName) : '白沙瓦'
     var duration = parseInt(e.duration) || 120
     var endStr = e.end || ''
@@ -67,54 +67,53 @@ Page({
     API.getBalance().then(function(b) { self.setData({ balance: b || 0 }) })
   },
 
-  // 每个房间的设备清单（物理存在，不受HA连接状态影响）
-  _roomSchema: {
-    'RM001': { label:'丰沙里', devices:[
-      { id:'ac', type:'AC', name:'空调' },
-      { id:'L1', type:'Light', name:'筒灯1' }, { id:'L2', type:'Light', name:'筒灯2' }, { id:'L3', type:'Light', name:'吊灯' },
-      { id:'F1', type:'Fan', name:'风扇1' }, { id:'F2', type:'Fan', name:'风扇2' }, { id:'F3', type:'Fan', name:'风扇3' },
-      { id:'bgm', type:'Speaker', name:'音响' },
-    ]},
-    'RM002': { label:'布拉格', devices:[
+  // 按房间类型生成设备清单（RoomType → device list，不按房间ID硬编码）
+  _getRoomDevices: function(roomType) {
+    // 所有房间都有的基础设备
+    var base = [
       { id:'ac', type:'AC', name:'空调' },
       { id:'L1', type:'Light', name:'吊灯' }, { id:'L2', type:'Light', name:'筒灯' }, { id:'L3', type:'Light', name:'背景灯' },
       { id:'F1', type:'Fan', name:'风扇' },
-      { id:'C1', type:'Curtain', name:'窗帘(1)' }, { id:'C2', type:'Curtain', name:'窗帘(2)' }, { id:'C3', type:'Curtain', name:'窗帘(3)' },
       { id:'bgm', type:'Speaker', name:'音响' },
-    ]},
-    'RM003': { label:'翡冷翠', devices:[
-      { id:'ac', type:'AC', name:'空调' },
-      { id:'L1', type:'Light', name:'吊灯' }, { id:'L2', type:'Light', name:'筒灯' }, { id:'L3', type:'Light', name:'背景灯' },
-      { id:'F1', type:'Fan', name:'风扇' }, { id:'EF1', type:'ExhaustFan', name:'换气扇' },
-      { id:'C1', type:'Curtain', name:'窗帘' },
-      { id:'bgm1', type:'Speaker', name:'音响(茶室)' }, { id:'bgm2', type:'Speaker', name:'音响(展厅)' },
-    ]},
-    'RM004': { label:'白沙瓦', devices:[
-      { id:'ac', type:'AC', name:'空调' },
-      { id:'L1', type:'Light', name:'吊灯' }, { id:'L2', type:'Light', name:'筒灯' }, { id:'L3', type:'Light', name:'背景灯' },
-      { id:'F1', type:'Fan', name:'风扇' },
+    ]
+    if (roomType === 'MeetingRoom') {
+      // 会议室：3个风扇，无窗帘
+      return [
+        { id:'ac', type:'AC', name:'空调' },
+        { id:'L1', type:'Light', name:'筒灯1' }, { id:'L2', type:'Light', name:'筒灯2' }, { id:'L3', type:'Light', name:'吊灯' },
+        { id:'F1', type:'Fan', name:'风扇1' }, { id:'F2', type:'Fan', name:'风扇2' }, { id:'F3', type:'Fan', name:'风扇3' },
+        { id:'bgm', type:'Speaker', name:'音响' },
+      ]
+    }
+    // 茶室默认：3窗帘
+    return base.concat([
       { id:'C1', type:'Curtain', name:'窗帘(1)' }, { id:'C2', type:'Curtain', name:'窗帘(2)' }, { id:'C3', type:'Curtain', name:'窗帘(3)' },
-      { id:'bgm', type:'Speaker', name:'音响' },
-    ]},
+    ])
   },
 
   loadDevices: function() {
     var self = this
     var roomId = self.data.roomId
-    var schema = self._roomSchema[roomId] || self._roomSchema['RM004']
+    // 先从API获取房间信息确定类型，失败则默认TeaRoom
+    var roomType = 'TeaRoom'
+    API.getRooms(true).then(function(list) {
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].roomId === roomId) { roomType = list[i].type || 'TeaRoom'; break }
+      }
+    }).catch(function() {})
+
+    var devices = self._getRoomDevices(roomType)
     var ac = null, curtains = [], bgm = null
-    var lightIcons = ['💡','💡','💡','💡','💡']
-    var li = 0
 
     // 先用本地清单构建设备UI（物理设备一直存在，不受HA连接影响）
     var devKeys = [{ key: 'light_all_on', label: '灯全开', icon: '🔆', type: 'virtual', active: false },
                    { key: 'light_all_off', label: '灯全关', icon: '🔅', type: 'virtual', active: false }]
-    for (var i = 0; i < schema.devices.length; i++) {
-      var d = schema.devices[i]
+    for (var i = 0; i < devices.length; i++) {
+      var d = devices[i]
       if (d.type === 'AC') { ac = { deviceId: roomId+'_ac', name: d.name, mode: 'off', temperature: 24 }; continue }
       if (d.type === 'Curtain') { curtains.push({ deviceId: d.id, name: d.name, positionNum: 0 }); continue }
       if (d.type === 'Speaker') { bgm = { deviceId: d.id, playing: false, volume: 30 }; continue }
-      if (d.type === 'Light') { devKeys.push({ key: d.id, label: d.name, icon: lightIcons[li % lightIcons.length], type: 'Light', active: false }); li++ }
+      if (d.type === 'Light') { devKeys.push({ key: d.id, label: d.name, icon: '💡', type: 'Light', active: false }) }
       if (d.type === 'Fan' || d.type === 'ExhaustFan') { devKeys.push({ key: d.id, label: d.name, icon: '⏣', type: d.type, active: false }) }
     }
     self.setData({

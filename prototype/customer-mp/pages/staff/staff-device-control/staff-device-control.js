@@ -2,10 +2,10 @@ var API = require('../../../utils/api')
 
 Page({
   data: {
-    currentRoomId: "RM001",
-    currentRoomName: "丰沙里",
-    roomNames: ["丰沙里", "翡冷翠", "布拉格", "白沙瓦"],
-    roomIds: ["RM001", "RM002", "RM003", "RM004"],
+    currentRoomId: "",
+    currentRoomName: "",
+    roomNames: [],
+    roomIds: [],
     devices: [],
     showLockConfirm: false, lockDeviceId: "",
     showRoomPicker: false,
@@ -16,7 +16,29 @@ Page({
     hasLock: false, lockLocked: false,
     hasFan: false,
   },
-  onShow: function() { this.loadDevices(this.data.currentRoomId) },
+  onLoad: function() {
+    var self = this
+    API.getRooms(true).then(function(list) {
+      if (list && list.length > 0) {
+        var names = [], ids = []
+        for (var i = 0; i < list.length; i++) {
+          names.push(list[i].name)
+          ids.push(list[i].roomId)
+        }
+        self.setData({
+          roomNames: names, roomIds: ids,
+          currentRoomId: ids[0], currentRoomName: names[0]
+        })
+        self.loadDevices(ids[0])
+      }
+    }).catch(function() {
+      self.setData({
+        roomNames: ['默认房间'], roomIds: ['RM001'],
+        currentRoomId: 'RM001', currentRoomName: '默认房间'
+      })
+    })
+  },
+  onShow: function() { if (this.data.currentRoomId) this.loadDevices(this.data.currentRoomId) },
   showRoomPicker: function() { this.setData({ showRoomPicker: true }) },
   hideRoomPicker: function() { this.setData({ showRoomPicker: false }) },
   selectRoom: function(e) {

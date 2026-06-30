@@ -1,11 +1,27 @@
 const STAFF_API = require('../../../utils/staff-api')
-const ROOM_IDS = ['', 'RM004', 'RM003', 'RM002', 'RM001']
-const ROOM_NAMES = ['全部房间', '白沙瓦', '布拉格', '翡冷翠', '丰沙里']
+var API = require('../../../utils/api')
+var ROOM_IDS = ['']
+var ROOM_NAMES = ['全部房间']
 
 Page({
   data: {
     rooms: [], devices: [], stats: { total: 0, online: 0, rate: '0%' },
     selectedRoomId: '', selectedRoomName: '全部房间'
+  },
+
+  onLoad: function() {
+    var self = this
+    API.getRooms(true).then(function(list) {
+      if (list && list.length > 0) {
+        ROOM_IDS = ['']
+        ROOM_NAMES = ['全部房间']
+        for (var i = 0; i < list.length; i++) {
+          ROOM_IDS.push(list[i].roomId)
+          ROOM_NAMES.push(list[i].name)
+        }
+        self.setData({ roomTabs: tabs })
+      }
+    }).catch(function() {})
   },
 
   onShow() {
@@ -37,6 +53,8 @@ Page({
     var roomId = ROOM_IDS[idx]
     var roomName = ROOM_NAMES[idx]
     self.setData({ selectedRoomId: roomId, selectedRoomName: roomName })
+    var tabs = self.data.roomTabs || [{id:'',name:'全部房间'}]
+    if (idx < tabs.length) self.setData({ selectedRoomId: tabs[idx].id, selectedRoomName: tabs[idx].name })
 
     if (!roomId) {
       STAFF_API.getDeviceList().then(function(devices) {

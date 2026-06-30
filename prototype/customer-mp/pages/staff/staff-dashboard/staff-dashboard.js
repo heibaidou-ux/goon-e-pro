@@ -69,10 +69,21 @@ Page({
     var pendingCalls = calls.filter(function(c) { return c.status === 'pending' })
     self.setData({ serviceCalls: pendingCalls, serviceCallCount: pendingCalls.length })
 
-    // 开门菜单的房间列表
-    self.setData({
-      doorRooms: ['白沙瓦', '翡冷翠', '布拉格', '丰沙里'],
-      doorRoomIds: ['RM004', 'RM002', 'RM003', 'RM001']
+    // 开门菜单的房间列表 — 从API动态拉取
+    API.getRooms(true).then(function(list) {
+      if (list && list.length > 0) {
+        var names = [], ids = []
+        for (var i = 0; i < list.length; i++) {
+          names.push(list[i].name)
+          ids.push(list[i].roomId)
+        }
+        self.setData({ doorRooms: names, doorRoomIds: ids })
+      }
+    }).catch(function() {
+      self.setData({
+        doorRooms: ['白沙瓦', '翡冷翠', '布拉格', '丰沙里'],
+        doorRoomIds: ['RM004', 'RM002', 'RM003', 'RM001']
+      })
     })
   },
 

@@ -48,14 +48,6 @@ HA_ENTITY_ROOM_MAP = {
     "bu_la_ge": "bulage",           # 布拉格
     "fei_leng_cui": "feilengcui",   # 翡冷翠
     "feng_sha_li": "fengshali",     # 丰沙里
-    "da_cha_shi": "baishawa",       # 大茶室 = 白沙瓦
-    "zhong_cha_shi": "bulage",      # 中茶室 = 布拉格
-    "xiao_cha_shi": "feilengcui",   # 小茶室 = 翡冷翠
-    "da_hui_yi_shi": "fengshali",   # 大会议室 = 丰沙里
-    "hui_yi_shi": "fengshali",      # 会议室
-    "curtain_dacha": "baishawa",    # 大茶室窗帘
-    "curtain_zhong": "bulage",      # 中茶室窗帘
-    "curtain_xiao": "feilengcui",   # 小茶室窗帘
 }
 
 
