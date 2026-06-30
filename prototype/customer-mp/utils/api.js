@@ -435,7 +435,23 @@ const API = {
 
   // ── 订单 ──
   createBooking(booking) {
-    if (!USE_MOCK) return request({ url: '/api/orders', method: 'POST', data: booking })
+    if (!USE_MOCK) {
+      var startTime = '', endTime = ''
+      var timeStr = booking.time || booking.slot || ''
+      var parts = timeStr.split('-')
+      if (parts.length >= 2) {
+        startTime = booking.date + 'T' + parts[0].trim() + ':00'
+        endTime = booking.date + 'T' + parts[1].trim() + ':00'
+      }
+      return request({ url: '/api/operations/room-appointments', method: 'POST', data: {
+        orderId: booking.orderId || ('ORD' + String(Date.now()).slice(-6)),
+        roomId: booking.roomId,
+        customerId: '',
+        startTime: startTime,
+        endTime: endTime,
+        doorPassword: ''
+      } })
+    }
     return delay(500).then(() => {
       var bookings = lsGet('bookings', [])
       var id = 'ORD' + String(Date.now()).slice(-6)
