@@ -40,6 +40,25 @@ HA_ROOM_MAP = {
 }
 HA_ROOM_REVERSE = {v: k for k, v in HA_ROOM_MAP.items()}
 
+# HA实际实体ID前缀 -> ERP房间名映射
+# HA的实体名是拼音+下划线（如 bai_sha_wa_men_suo），
+# ERP内部用无下划线的短名（如 baishawa），需要做映射
+HA_ENTITY_ROOM_MAP = {
+    "bai_sha_wa": "baishawa",       # 白沙瓦
+    "bu_la_ge": "bulage",           # 布拉格
+    "fei_leng_cui": "feilengcui",   # 翡冷翠
+    "feng_sha_li": "fengshali",     # 丰沙里
+    "da_cha_shi": "baishawa",       # 大茶室 = 白沙瓦
+    "zhong_cha_shi": "bulage",      # 中茶室 = 布拉格
+    "xiao_cha_shi": "feilengcui",   # 小茶室 = 翡冷翠
+    "da_hui_yi_shi": "fengshali",   # 大会议室 = 丰沙里
+    "hui_yi_shi": "fengshali",      # 会议室
+    "curtain_dacha": "baishawa",    # 大茶室窗帘
+    "curtain_zhong": "bulage",      # 中茶室窗帘
+    "curtain_xiao": "feilengcui",   # 小茶室窗帘
+}
+
+
 ROOMS = [
     {"room_id": "RM001", "name": "大会议室·丰沙里", "type": "MeetingRoom"},
     {"room_id": "RM002", "name": "中茶室·布拉格", "type": "TeaRoom"},
@@ -811,15 +830,19 @@ def _ha_entity_to_type(entity_id: str) -> Optional[str]:
 
 def _ha_entity_to_room(entity_id: str) -> Optional[str]:
     """从HA实体名提取ERP room_id。
-    命名规范: {domain}.{room}_{suffix}
-    房名: baishawa, bulage, feilengcui, fengshali
+    先匹配 HA_ENTITY_ROOM_MAP（实际HA实体ID前缀），
+    再回退到 HA_ROOM_REVERSE（规范命名）。
     """
     eid_lower = entity_id.lower()
+    # 优先匹配实际HA实体ID前缀（含下划线的拼音名）
+    for ha_pattern, ha_name in HA_ENTITY_ROOM_MAP.items():
+        if ha_pattern in eid_lower:
+            return HA_ROOM_REVERSE.get(ha_name, None)
+    # 回退：匹配规范短名
     for ha_name, room_id in HA_ROOM_REVERSE.items():
         if ha_name in eid_lower:
             return room_id
     return None
-
 
 def _ha_state_to_device(state: dict) -> dict:
     """Convert HA API state object to our device format."""

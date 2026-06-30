@@ -78,7 +78,7 @@ class ProductCreate(BaseModel):
     unit: Optional[str] = None
     basePrice: float = 0
     retailPrice: float = 0
-    marketPrice: float = 0
+    marketPrice: Optional[float] = None
     isFood: bool = False
     shelfLife: Optional[int] = None
     description: Optional[str] = None
@@ -123,19 +123,7 @@ class ProductOut(BaseModel):
     unit: Optional[str] = None
     basePrice: float = 0
     retailPrice: float = 0
-    marketPrice: float = 0
-    isFood: bool = False
-    shelfLife: Optional[int] = None
-    description: Optional[str] = None
-    story: Optional[str] = None
-    origin: Optional[str] = None
-    brewingTips: Optional[str] = None
-    isActive: bool = True
-    status: str = "上架"
-    sortOrder: int = 0
-    images: List[ProductImageOut] = []
-    createdAt: Optional[datetime] = None
-    updatedAt: Optional[datetime] = None
+    marketPrice: Optional[float] = None
 
     class Config:
         from_attributes = True
