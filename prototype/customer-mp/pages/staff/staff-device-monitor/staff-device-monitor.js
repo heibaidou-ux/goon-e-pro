@@ -13,11 +13,13 @@ Page({
     var self = this
     API.getRooms(true).then(function(list) {
       if (list && list.length > 0) {
+        var tabs = [{id:'', name:'全部房间'}]
         ROOM_IDS = ['']
         ROOM_NAMES = ['全部房间']
         for (var i = 0; i < list.length; i++) {
           ROOM_IDS.push(list[i].roomId)
           ROOM_NAMES.push(list[i].name)
+          tabs.push({id:list[i].roomId, name:list[i].name})
         }
         self.setData({ roomTabs: tabs })
       }

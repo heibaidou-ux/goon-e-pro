@@ -5,10 +5,9 @@
       <text class="header-stats">在线 {{stats.online}}/{{stats.total}} · {{stats.rate}}</text>
     </view>
 
-    <!-- 5个房间按钮 -->
+    <!-- 房间按钮（从API动态加载） -->
     <view class="room-bar">
-      <view class="rbar-item {{selectedRoomId==''?'active':''}}" bindtap="selectRoom" data-idx="0">全部</view>
-      <view class="rbar-item {{selectedRoomId==item.id?'active':''}}" wx:for="{{"roomTabs}}" wx:key="idx" bindtap="selectRoom" data-idx="{{idx}}">{{item.name}}</view>
+      <view class="rbar-item {{selectedRoomId==item.id?'active':''}}" wx:for="{{roomTabs}}" wx:key="idx" bindtap="selectRoom" data-idx="{{idx}}">{{item.name}}</view>
     </view>
 
     <view class="device-list">
