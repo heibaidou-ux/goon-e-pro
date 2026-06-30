@@ -26,6 +26,11 @@ page {
 .bg-primary { background: #5D8A6B; }
 .bg-warm { background: #FAF8F5; }
 
+/* ── 微信支付官方图标 ── */
+.wechat-pay-icon {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+}
+
 /* ── 卡片通用 ── */
 .card {
   background: #fff;

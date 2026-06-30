@@ -132,11 +132,17 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .form-hint { font-size:11px;color:#999;text-align:center;display:block;margin-top:8px; }
 .staff-login-link { margin-top:8px !important; font-size:12px !important; }
 
+/* ── 手机号登录次级入口 ── */
+.phone-login-trigger { text-align:center; margin-top:14px; padding:8px 0; font-size:13px; color:#999; }
+.phone-login-trigger:active { color:#5D8A6B; }
+.back-to-wechat { font-size:12px; color:#999; margin-top:16px !important; }
+.back-to-wechat:active { color:#5D8A6B; }
+
 /* ── 微信一键登录按钮 ── */
-.wechat-login-btn { display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:14px;border:none;background:#07C160;color:#fff;font-size:16px;font-weight:600;margin:16px 0 0;text-align:center;box-shadow:0 4px 12px rgba(7,193,96,.3);transition:all .15s; }
+.wechat-login-btn { display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:14px;border:1.5px solid #07C160;background:#fff;color:#333;font-size:15px;font-weight:600;margin:16px 0 0;text-align:center;transition:all .15s; }
 .wechat-login-btn::after { border:none; }
-.wechat-login-btn:active { transform:scale(.97);opacity:.9; }
-.wechat-icon { font-size:20px; }
+.wechat-login-btn:active { transform:scale(.97);background:#f0fdf4; }
+.wechat-btn-icon { width:22px;height:22px;flex-shrink:0; }
 .divider-text { display:flex;align-items:center;margin:16px 0 4px;color:#ccc;font-size:12px;gap:12px; }
 .divider-text::before,
 .divider-text::after { content:'';flex:1;height:1px;background:#f0ece6; }

@@ -18,7 +18,7 @@ Page({
     qrRoomId: '', qrRoomName: '', qrTableId: '',
     currentStore: 'huachengguangchang', storeName: '花城广场店', showStoreModal: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
-    loginMode: 'login', loginType: 'code', loginPhone: '', loginCode: '', loginPassword: '',
+    phoneLoginView: false, loginMode: 'login', loginType: 'code', loginPhone: '', loginCode: '', loginPassword: '',
     regPhone: '', regCode: '',
     billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false
   },
@@ -155,6 +155,8 @@ Page({
   goMyOrders: function() { wx.navigateTo({ url: '/pages/my-orders/my-orders' }) },
   goMemberCenter: function() { wx.navigateTo({ url: '/pages/member-center/member-center' }) },
   goCouponVerify: function() { wx.navigateTo({ url: '/pages/coupon-verify/coupon-verify' }) },
+  showPhoneLoginForm: function() { this.setData({ phoneLoginView: true, loginMode: 'login', loginType: 'code' }) },
+  hidePhoneLoginForm: function() { this.setData({ phoneLoginView: false }) },
   goStaffLogin: function() { wx.navigateTo({ url: '/pages/staff/staff-login/staff-login' }) },
   goCartPage: function() { wx.navigateTo({ url: '/pages/tea-shop/tea-shop?tab=cart' }) },
 

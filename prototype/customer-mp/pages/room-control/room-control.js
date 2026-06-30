@@ -9,6 +9,7 @@ Page({
     devKeys: [], acModeLabel: '',
     acDevice: null, curtainDevices: [], bgmDevice: null,
     lightDevices: [], fanDevices: [],
+    _devIdMap: {}, // 本地ID ↔ API真实deviceId映射
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
     extendPayInfo: '', extendPayAmount: 0, extendPayMethod: 'balance'
@@ -66,88 +67,204 @@ Page({
     API.getBalance().then(function(b) { self.setData({ balance: b || 0 }) })
   },
 
+  // 每个房间的设备清单（物理存在，不受HA连接状态影响）
+  _roomSchema: {
+    'RM001': { label:'丰沙里', devices:[
+      { id:'ac', type:'AC', name:'空调' },
+      { id:'L1', type:'Light', name:'筒灯1' }, { id:'L2', type:'Light', name:'筒灯2' }, { id:'L3', type:'Light', name:'吊灯' },
+      { id:'F1', type:'Fan', name:'风扇1' }, { id:'F2', type:'Fan', name:'风扇2' }, { id:'F3', type:'Fan', name:'风扇3' },
+      { id:'bgm', type:'Speaker', name:'音响' },
+    ]},
+    'RM002': { label:'布拉格', devices:[
+      { id:'ac', type:'AC', name:'空调' },
+      { id:'L1', type:'Light', name:'吊灯' }, { id:'L2', type:'Light', name:'筒灯' }, { id:'L3', type:'Light', name:'背景灯' },
+      { id:'F1', type:'Fan', name:'风扇' },
+      { id:'C1', type:'Curtain', name:'窗帘(1)' }, { id:'C2', type:'Curtain', name:'窗帘(2)' }, { id:'C3', type:'Curtain', name:'窗帘(3)' },
+      { id:'bgm', type:'Speaker', name:'音响' },
+    ]},
+    'RM003': { label:'翡冷翠', devices:[
+      { id:'ac', type:'AC', name:'空调' },
+      { id:'L1', type:'Light', name:'吊灯' }, { id:'L2', type:'Light', name:'筒灯' }, { id:'L3', type:'Light', name:'背景灯' },
+      { id:'F1', type:'Fan', name:'风扇' }, { id:'EF1', type:'ExhaustFan', name:'换气扇' },
+      { id:'C1', type:'Curtain', name:'窗帘' },
+      { id:'bgm1', type:'Speaker', name:'音响(茶室)' }, { id:'bgm2', type:'Speaker', name:'音响(展厅)' },
+    ]},
+    'RM004': { label:'白沙瓦', devices:[
+      { id:'ac', type:'AC', name:'空调' },
+      { id:'L1', type:'Light', name:'吊灯' }, { id:'L2', type:'Light', name:'筒灯' }, { id:'L3', type:'Light', name:'背景灯' },
+      { id:'F1', type:'Fan', name:'风扇' },
+      { id:'C1', type:'Curtain', name:'窗帘(1)' }, { id:'C2', type:'Curtain', name:'窗帘(2)' }, { id:'C3', type:'Curtain', name:'窗帘(3)' },
+      { id:'bgm', type:'Speaker', name:'音响' },
+    ]},
+  },
+
   loadDevices: function() {
     var self = this
-    API.getRoomDevices(this.data.roomId).then(function(devices) {
-      var stateMap = {}
-      var ac = null, curtains = [], bgm = null, lights = [], fans = []
+    var roomId = self.data.roomId
+    var schema = self._roomSchema[roomId] || self._roomSchema['RM004']
+    var ac = null, curtains = [], bgm = null
+    var lightIcons = ['💡','💡','💡','💡','💡']
+    var li = 0
 
-      for (var i = 0; i < devices.length; i++) {
-        var d = devices[i]; var a = d.attributes || {}
-        if (d.type === 'Light') { d.on = a.power || (a.brightness || 0) > 0; lights.push(d) }
-        else if (d.type === 'Fan' || d.type === 'ExhaustFan') { d.on = (a.speed || 0) > 0; fans.push(d) }
-        else if (d.type === 'AC') { ac = d }
-        else if (d.type === 'Curtain') { d.positionNum = a.current_position || (d.position === 'open' ? 100 : 0); curtains.push(d) }
-        else if (d.type === 'BGM' || d.type === 'Speaker') { bgm = d; d.on = a.playing }
-        stateMap[d.deviceId] = d.on
-      }
-
-      // 按通道号排序灯光
-      lights.sort(function(a,b){ return (a.attributes&&a.attributes.channel||99) - (b.attributes&&b.attributes.channel||99) })
-
-      // 构建设备按键列表（客人端不显示"全屋灯光"总开关）
-      var devKeys = []
-      for (var j = 0; j < lights.length; j++) {
-        var li = lights[j]
-        // 跳过全屋灯光总开关（该功能仅限店员端使用）
-        if (li.attributes && li.attributes.is_all_lights) continue
-        var shortName = (li.name || '').replace(/^.*[·]/,'')
-        devKeys.push({ key: li.deviceId, label: shortName, icon: '💡', type: 'Light', active: li.on || false })
-      }
-      for (var j = 0; j < fans.length; j++) {
-        var fj = fans[j]
-        devKeys.push({ key: fj.deviceId, label: fj.name || '风扇', icon: '⏣', type: fj.type, active: fj.on || false })
-      }
-
-      self.setData({
-        devKeys: devKeys, lightDevices: lights, fanDevices: fans,
-        acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '', curtainDevices: curtains, bgmDevice: bgm
-      })
+    // 先用本地清单构建设备UI（物理设备一直存在，不受HA连接影响）
+    var devKeys = [{ key: 'light_all_on', label: '灯全开', icon: '🔆', type: 'virtual', active: false },
+                   { key: 'light_all_off', label: '灯全关', icon: '🔅', type: 'virtual', active: false }]
+    for (var i = 0; i < schema.devices.length; i++) {
+      var d = schema.devices[i]
+      if (d.type === 'AC') { ac = { deviceId: roomId+'_ac', name: d.name, mode: 'off', temperature: 24 }; continue }
+      if (d.type === 'Curtain') { curtains.push({ deviceId: d.id, name: d.name, positionNum: 0 }); continue }
+      if (d.type === 'Speaker') { bgm = { deviceId: d.id, playing: false, volume: 30 }; continue }
+      if (d.type === 'Light') { devKeys.push({ key: d.id, label: d.name, icon: lightIcons[li % lightIcons.length], type: 'Light', active: false }); li++ }
+      if (d.type === 'Fan' || d.type === 'ExhaustFan') { devKeys.push({ key: d.id, label: d.name, icon: '⏣', type: d.type, active: false }) }
+    }
+    self.setData({
+      devKeys: devKeys, lightDevices: [], fanDevices: [],
+      acDevice: ac, acModeLabel: self._acModeLabel(ac ? ac.mode : 'off'),
+      curtainDevices: curtains, bgmDevice: bgm
     })
+
+    // 异步获取真实设备状态（更新状态，不阻塞展示）
+    API.getRoomDevices(roomId).then(function(apiDevices) {
+      if (!apiDevices || apiDevices.length === 0) return
+      var devIdMap = {}
+      // 建立本地设备ID到API真实deviceId的映射
+      var apiAC = null, apiCurtains = [], apiBGM = null
+      for (var i = 0; i < apiDevices.length; i++) {
+        var d = apiDevices[i]; var a = d.attributes || {}
+        devIdMap[d.deviceId] = d.deviceId
+        if (d.type === 'AC') apiAC = d
+        else if (d.type === 'Curtain') apiCurtains.push(d)
+        else if (d.type === 'BGM' || d.type === 'Speaker') apiBGM = d
+      }
+      // 尝试按房间映射本地ID → API ID
+      // 通过比较设备类型和通道号来匹配
+      var apiByType = {}
+      for (var i = 0; i < apiDevices.length; i++) {
+        var d = apiDevices[i]; var a = d.attributes || {}
+        var ch = a.channel || ''
+        if (d.type === 'AC') apiByType['ac'] = d.deviceId
+        else if (d.type === 'Curtain') { if (!apiByType['curtain']) apiByType['curtain'] = []; apiByType['curtain'].push(d.deviceId) }
+        else if (d.type === 'BGM' || d.type === 'Speaker') apiByType['bgm'] = d.deviceId
+        else if (d.type === 'Light') { var key = 'L' + (parseInt(ch) || (apiByType['light']||[]).length + 1); if (!apiByType['light']) apiByType['light'] = []; apiByType['light'].push({id:d.deviceId, ch:ch}) }
+        else if (d.type === 'Fan' || d.type === 'ExhaustFan') { var fkey = d.type === 'ExhaustFan' ? 'EF' : 'F'; if (!apiByType['fan']) apiByType['fan'] = []; apiByType['fan'].push({id:d.deviceId, type:d.type}) }
+      }
+      // 构建devIdMap
+      if (apiByType['ac']) devIdMap[roomId+'_ac'] = apiByType['ac']
+      if (apiByType['bgm']) { devIdMap['bgm'] = apiByType['bgm']; devIdMap['bgm1'] = apiByType['bgm']; devIdMap['bgm2'] = apiByType['bgm'] }
+      if (apiByType['curtain']) { for (var j=0; j<apiByType['curtain'].length && j<curtains.length; j++) { devIdMap[curtains[j].deviceId] = apiByType['curtain'][j]; curtains[j].deviceId = apiByType['curtain'][j] } }
+      if (apiByType['light']) { for (var j=0; j<apiByType['light'].length && j<3; j++) { var lid = 'L'+(j+1); devIdMap[lid] = apiByType['light'][j].id } }
+      if (apiByType['fan']) { for (var j=0; j<apiByType['fan'].length; j++) { var fid = (apiByType['fan'][j].type==='ExhaustFan'?'EF':'F')+(j+1); devIdMap[fid] = apiByType['fan'][j].id } }
+      self.setData({ _devIdMap: devIdMap })
+
+      // 更新AC状态
+      if (apiAC) { var aa = apiAC.attributes || {}; ac.mode = aa.mode || 'off'; ac.temperature = aa.target_temperature || 24; ac.deviceId = apiAC.deviceId }
+      // 更新窗帘状态
+      for (var j = 0; j < apiCurtains.length && j < curtains.length; j++) { curtains[j].deviceId = apiCurtains[j].deviceId; curtains[j].positionNum = (apiCurtains[j].attributes||{}).current_position || 0 }
+      // 更新音响状态
+      if (apiBGM) { var ba = apiBGM.attributes || {}; bgm.playing = ba.playing || false; bgm.volume = ba.volume || 30; bgm.deviceId = apiBGM.deviceId }
+      // 更新灯光/风扇状态
+      for (var i = 0; i < apiDevices.length; i++) {
+        var d = apiDevices[i], a = d.attributes || {}
+        var isOn = !!(a.power || a.brightness > 0 || (a.speed || 0) > 0)
+        for (var j = 0; j < devKeys.length; j++) {
+          if (devKeys[j].key === d.deviceId) { devKeys[j].active = isOn; break }
+        }
+      }
+      self.setData({ devKeys: devKeys, acDevice: ac, curtainDevices: curtains, bgmDevice: bgm })
+    }).catch(function() {})
+  },
+
+  // 解析设备ID：本地ID → API真实deviceId
+  _resolveId: function(localId) {
+    return this.data._devIdMap[localId] || localId
   },
 
   onKeyTap: function(e) {
     var key = e.currentTarget.dataset.key
     var type = e.currentTarget.dataset.type
+    if (key === 'light_all_on') { this._setAllLights(true); return }
+    if (key === 'light_all_off') { this._setAllLights(false); return }
     var currentOn = false
     var keys = this.data.devKeys
     for (var i = 0; i < keys.length; i++) { if (keys[i].key === key) { currentOn = keys[i].active; break } }
     this._toggleDevice(key, type, !currentOn)
   },
 
+  _setAllLights: function(on) {
+    var self = this
+    // 从devKeys中找出所有灯光按键
+    var keys = self.data.devKeys
+    var lightKeys = []
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i].type === 'Light') { lightKeys.push(keys[i].key); keys[i].active = on }
+      else if (keys[i].key === 'light_all_on') keys[i].active = on
+      else if (keys[i].key === 'light_all_off') keys[i].active = false
+    }
+    self.setData({ devKeys: keys })
+    if (lightKeys.length === 0) return
+    wx.showLoading({ title: on ? '全开中...' : '全关中...' })
+    var done = 0
+    for (var i = 0; i < lightKeys.length; i++) {
+      API.controlDevice(self._resolveId(lightKeys[i]), { brightness: on ? 80 : 0 }).then(function() {
+        done++; if (done >= lightKeys.length) { wx.hideLoading() }
+      }).catch(function(err) {
+        done++; if (done >= lightKeys.length) { wx.hideLoading() }
+        if (err && err.message) wx.showToast({ title: '灯控失败: ' + err.message, icon: 'none' })
+      })
+    }
+  },
+
   _toggleDevice: function(deviceId, type, newState) {
     var self = this
+    var realId = self._resolveId(deviceId)
     var keys = self.data.devKeys
     for (var i = 0; i < keys.length; i++) { if (keys[i].key === deviceId) { keys[i].active = newState; break } }
     self.setData({ devKeys: keys })
     var cmd = {}
     if (type === 'Light') cmd = { brightness: newState ? 80 : 0 }
     else if (type === 'Fan' || type === 'ExhaustFan') cmd = { speed: newState ? 3 : 0 }
-    API.controlDevice(deviceId, cmd).catch(function(){})
+    API.controlDevice(realId, cmd).catch(function(err) {
+      // 失败则回滚状态
+      for (var i = 0; i < keys.length; i++) { if (keys[i].key === deviceId) { keys[i].active = !newState; break } }
+      self.setData({ devKeys: keys })
+      wx.showToast({ title: '控制失败: ' + ((err && err.message) || '设备无响应'), icon: 'none' })
+    })
   },
 
   toggleAC: function(e) {
-    var id = e.currentTarget.dataset.id, ac = this.data.acDevice
+    var self = this
+    var id = self._resolveId(e.currentTarget.dataset.id), ac = self.data.acDevice
     if (!ac) return
     ac.mode = ac.mode === 'off' ? 'cool' : 'off'
-    this.setData({ acDevice: ac, acModeLabel: this._acModeLabel(ac.mode) })
-    API.controlDevice(id, { mode: ac.mode }).catch(function(){})
+    self.setData({ acDevice: ac, acModeLabel: self._acModeLabel(ac.mode) })
+    API.controlDevice(id, { mode: ac.mode }).catch(function(err){
+      wx.showToast({ title: '空调控制失败: ' + ((err&&err.message)||'无响应'), icon: 'none' })
+    })
   },
   setACMode: function(e) {
-    var id = e.currentTarget.dataset.id, mode = e.currentTarget.dataset.mode, ac = this.data.acDevice
+    var self = this
+    var id = self._resolveId(e.currentTarget.dataset.id), mode = e.currentTarget.dataset.mode, ac = self.data.acDevice
     if (!ac) return; ac.mode = mode
     this.setData({ acDevice: ac, acModeLabel: this._acModeLabel(mode) })
-    API.controlDevice(id, { mode: mode }).catch(function(){})
+    API.controlDevice(id, { mode: mode }).catch(function(err){
+      wx.showToast({ title: '空调控制失败: ' + ((err&&err.message)||'无响应'), icon: 'none' })
+    })
   },
   acTempUp: function(e) {
-    var id = e.currentTarget.dataset.id, ac = this.data.acDevice
+    var self = this
+    var id = self._resolveId(e.currentTarget.dataset.id), ac = self.data.acDevice
     if (!ac) return; ac.temperature = Math.min(30, (ac.temperature || 24) + 1)
-    this.setData({ acDevice: ac }); API.controlDevice(id, { temperature: ac.temperature }).catch(function(){})
+    self.setData({ acDevice: ac }); API.controlDevice(id, { temperature: ac.temperature }).catch(function(err){
+      wx.showToast({ title: '调温失败: ' + ((err&&err.message)||'无响应'), icon: 'none' })
+    })
   },
   acTempDown: function(e) {
-    var id = e.currentTarget.dataset.id, ac = this.data.acDevice
+    var self = this
+    var id = self._resolveId(e.currentTarget.dataset.id), ac = self.data.acDevice
     if (!ac) return; ac.temperature = Math.max(16, (ac.temperature || 24) - 1)
-    this.setData({ acDevice: ac }); API.controlDevice(id, { temperature: ac.temperature }).catch(function(){})
+    self.setData({ acDevice: ac }); API.controlDevice(id, { temperature: ac.temperature }).catch(function(err){
+      wx.showToast({ title: '调温失败: ' + ((err&&err.message)||'无响应'), icon: 'none' })
+    })
   },
   _acModeLabel: function(mode) {
     if (mode === 'cool') return '制冷中'
@@ -157,22 +274,31 @@ Page({
   },
 
   onCurtainChange: function(e) {
-    var id = e.currentTarget.dataset.id, val = parseInt(e.detail.value)
+    var self = this
+    var id = self._resolveId(e.currentTarget.dataset.id), val = parseInt(e.detail.value)
     var position = val >= 80 ? 'open' : (val <= 20 ? 'closed' : val + '%')
-    var devs = this.data.curtainDevices
-    for (var i = 0; i < devs.length; i++) { if (devs[i].deviceId === id) { devs[i].positionNum = val; devs[i].position = position; break } }
-    this.setData({ curtainDevices: devs }); API.controlDevice(id, { position: position }).catch(function(){})
+    var devs = self.data.curtainDevices
+    for (var i = 0; i < devs.length; i++) { if (devs[i].deviceId === id || devs[i].deviceId === e.currentTarget.dataset.id) { devs[i].positionNum = val; devs[i].position = position; break } }
+    self.setData({ curtainDevices: devs }); API.controlDevice(id, { position: position }).catch(function(err){
+      wx.showToast({ title: '窗帘控制失败: ' + ((err&&err.message)||'无响应'), icon: 'none' })
+    })
   },
 
   toggleBGM: function(e) {
-    var id = e.currentTarget.dataset.id, bgm = this.data.bgmDevice
+    var self = this
+    var id = self._resolveId(e.currentTarget.dataset.id), bgm = self.data.bgmDevice
     if (!bgm) return; bgm.playing = !bgm.playing
-    this.setData({ bgmDevice: bgm }); API.controlDevice(id, { playing: bgm.playing }).catch(function(){})
+    self.setData({ bgmDevice: bgm }); API.controlDevice(id, { playing: bgm.playing }).catch(function(err){
+      wx.showToast({ title: '音响控制失败: ' + ((err&&err.message)||'无响应'), icon: 'none' })
+    })
   },
   onBGMVolumeChange: function(e) {
-    var id = e.currentTarget.dataset.id, val = parseInt(e.detail.value), bgm = this.data.bgmDevice
-    if (!bgm) return; bgm.volume = val; this.setData({ bgmDevice: bgm })
-    API.controlDevice(id, { volume: val }).catch(function(){})
+    var self = this
+    var id = self._resolveId(e.currentTarget.dataset.id), val = parseInt(e.detail.value), bgm = self.data.bgmDevice
+    if (!bgm) return; bgm.volume = val; self.setData({ bgmDevice: bgm })
+    API.controlDevice(id, { volume: val }).catch(function(err){
+      wx.showToast({ title: '音量调节失败: ' + ((err&&err.message)||'无响应'), icon: 'none' })
+    })
   },
 
   startCountdown: function(durationMin, endStr) {

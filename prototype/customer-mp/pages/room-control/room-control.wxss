@@ -33,7 +33,7 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .switch-key { background:#f0faf2; border-radius:14px; padding:16px 14px; border:1.5px solid #d4e8d9; display:flex; align-items:center; gap:12px; transition:all .15s; }
 .switch-key:active { transform:scale(.95); }
 .switch-key.on { border-color:#5D8A6B; background:#e8f5e9; }
-.key-icon { font-size:28px; display:block; color:#7BA88E; font-weight:300; line-height:1; flex-shrink:0; width:32px; text-align:center; }
+.key-icon { font-size:24px; display:flex; align-items:center; justify-content:center; color:#7BA88E; line-height:1; flex-shrink:0; width:32px; height:32px; text-align:center; }
 .switch-key.on .key-icon { color:#5D8A6B; }
 .key-label { font-size:14px; font-weight:500; color:#555; display:block; letter-spacing:1px; flex:1; text-align:left; }
 .switch-key.on .key-label { color:#2C6B3F; }

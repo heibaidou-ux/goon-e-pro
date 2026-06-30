@@ -54,9 +54,9 @@ async def login(request: Request, data: LoginRequest, db: AsyncSession = Depends
     user = result.scalar_one_or_none()
 
     if not user or not verify_password(data.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="用户名或密码错误")
+        raise HTTPException(status_code=400, detail="用户名或密码错误")
     if not user.is_active:
-        raise HTTPException(status_code=401, detail="用户已被禁用")
+        raise HTTPException(status_code=400, detail="用户已被禁用")
 
     access_token = create_access_token({"sub": user.username, "role": user.role})
     refresh_token = create_refresh_token({"sub": user.username})

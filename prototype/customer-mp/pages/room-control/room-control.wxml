@@ -129,14 +129,9 @@
       <view class="pay-methods-section">
         <text class="pay-section-title">选择支付方式</text>
         <view class="pay-method {{extendPayMethod=='wechat'?'selected':''}}" bindtap="selectExtendPay" data-pay="wechat">
-          <text class="pay-method-icon">💚</text>
+          <image class="pay-method-icon wechat-pay-icon" src="/images/wxpay-logo.png" mode="aspectFit"></image>
           <view class="pay-method-info"><text class="pay-method-name">微信支付</text></view>
           <text class="pay-method-check" wx:if="{{extendPayMethod=='wechat'}}">✓</text>
-        </view>
-        <view class="pay-method {{extendPayMethod=='alipay'?'selected':''}}" bindtap="selectExtendPay" data-pay="alipay">
-          <text class="pay-method-icon">💙</text>
-          <view class="pay-method-info"><text class="pay-method-name">支付宝</text></view>
-          <text class="pay-method-check" wx:if="{{extendPayMethod=='alipay'}}">✓</text>
         </view>
         <view class="pay-method {{extendPayMethod=='balance'?'selected':''}}" bindtap="selectExtendPay" data-pay="balance">
           <text class="pay-method-icon">💰</text>

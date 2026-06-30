@@ -224,7 +224,8 @@ Page({
       var totalFee = Math.round(self.data.finalPrice || self.data.price) * 100
       var body = '高岸茶室-' + (self.data.roomName || '包间预订')
       API.createBooking({ roomId: self.data.roomId, roomName: self.data.roomName, date: self.data.dateStr, time: self.data.slot, duration: self.data.editableDuration, amount: self.data.price, paymentMethod: payLabel, customerSource: self.data.selectedSource }).then(function(bookingResult) {
-        API.wechatPay(totalFee, body, '').then(function(payResult) {
+        self._payingWechat = true
+        API.wechatPay(totalFee, body).then(function(payResult) {
           wx.hideLoading()
           var doorOk = false, doorStatus = ''
           var now = new Date(), curMin = now.getHours()*60+now.getMinutes()

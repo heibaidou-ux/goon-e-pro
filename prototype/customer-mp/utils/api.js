@@ -678,20 +678,28 @@ const API = {
   // ── 物流查询 ──
   getLogistics(orderId) { return delay().then(() => null) },
 
-  wechatPay(totalFee, body, openid) {
+  wechatPay(totalFee, body) {
     if (!USE_MOCK) {
-      return request({ url: '/api/payment/wxpay/unified-order', method: 'POST', data: { total_fee: totalFee, body: body, openid: openid } }).then(function(data) {
-        if (!data || !data.pay_params) throw new Error('统一下单失败')
-        return new Promise(function(resolve, reject) {
-          wx.requestPayment({
-            timeStamp: data.pay_params.timeStamp,
-            nonceStr: data.pay_params.nonceStr,
-            package: data.pay_params.package,
-            signType: data.pay_params.signType,
-            paySign: data.pay_params.paySign,
-            success: function() { resolve(data) },
-            fail: function(err) { reject(new Error(err.errMsg || '支付失败')) }
-          })
+      // 微信支付前先获取用户临时code，用于后端换取openid
+      var self = this
+      return new Promise(function(resolve, reject) {
+        wx.login({
+          success: function(r) {
+            if (!r.code) { reject(new Error('获取微信登录态失败')); return }
+            request({ url: '/api/payment/wxpay/unified-order', method: 'POST', data: { total_fee: totalFee, body: body, wx_code: r.code } }).then(function(data) {
+              if (!data || !data.pay_params) { reject(new Error('统一下单失败')); return }
+              wx.requestPayment({
+                timeStamp: data.pay_params.timeStamp,
+                nonceStr: data.pay_params.nonceStr,
+                package: data.pay_params.package,
+                signType: data.pay_params.signType,
+                paySign: data.pay_params.paySign,
+                success: function() { resolve(data) },
+                fail: function(err) { reject(new Error(err.errMsg || '支付失败')) }
+              })
+            }).catch(function(err) { reject(err) })
+          },
+          fail: function() { reject(new Error('微信登录失败')) }
         })
       })
     }

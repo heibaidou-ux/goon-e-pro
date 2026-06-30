@@ -196,7 +196,7 @@
         <text class="pay-method-check" wx:if="{{payMethod=='balance'}}">✓</text>
       </view>
       <view class="pay-method {{payMethod=='wechat'?'selected':''}}" bindtap="selectPayMethod" data-method="wechat">
-        <text class="pay-method-icon wechat-pay-icon">微</text>
+        <image class="pay-method-icon wechat-pay-icon" src="/images/wxpay-logo.png" mode="aspectFit"></image>
         <text class="pay-method-name">微信支付</text>
         <text class="pay-method-desc">推荐使用</text>
         <text class="pay-method-check" wx:if="{{payMethod=='wechat'}}">✓</text>

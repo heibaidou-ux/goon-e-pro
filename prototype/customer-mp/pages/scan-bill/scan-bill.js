@@ -6,7 +6,7 @@ Page({
     billData: { roomName: '', roomCharge: 0, scanTotal: 0, pendingPayment: 0, orders: [], activeOrderId: '' },
     showSettleSheet: false,
     settlePaymentIndex: 0,
-    settlePaymentList: ['微信支付', '支付宝', '会员余额']
+    settlePaymentList: ['微信支付', '会员余额']
   },
 
   onLoad: function(e) {

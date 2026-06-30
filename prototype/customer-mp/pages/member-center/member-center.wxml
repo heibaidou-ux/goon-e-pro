@@ -70,8 +70,7 @@
       </view>
       <text class="recharge-bonus-text">充值 {{selectedAmount}} 可得 ¥{{selectedAmount * 1.3}}</text>
       <text class="modal-label">选择支付方式</text>
-      <view class="payment-option {{selectedPayment=='WeChat'?'active':''}}" bindtap="selectPayment" data-payment="WeChat">💚 微信支付</view>
-      <view class="payment-option {{selectedPayment=='AliPay'?'active':''}}" bindtap="selectPayment" data-payment="AliPay">💙 支付宝</view>
+      <view class="payment-option {{selectedPayment=='WeChat'?'active':''}}" bindtap="selectPayment" data-payment="WeChat"><image class="wechat-pay-icon" src="/images/wxpay-logo.png" mode="aspectFit" style="width:24px;height:24px;margin-right:6px;vertical-align:middle;"></image>微信支付</view>
       <view class="payment-option {{selectedPayment=='BankCard'?'active':''}}" bindtap="selectPayment" data-payment="BankCard">🏦 银行卡</view>
       <view class="modal-buttons">
         <button class="modal-btn cancel" bindtap="hideRecharge">取消</button>

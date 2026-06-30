@@ -26,12 +26,32 @@ async def wxpay_unified_order(request: Request, current_user: User = Depends(get
     data = await request.json()
     total_fee = data.get("total_fee", 0)
     body = data.get("body", "高岸茶室-消费")
-    openid = data.get("openid", "")
     order_id = data.get("order_id", "")  # 关联的房间订单ID（IoT联动用）
     if total_fee <= 0:
         raise HTTPException(400, "金额无效")
+
+    # 获取openid（优先级: 1.用户已存储的wechat_openid 2.wx_login传的code 3.debug模式mock）
+    openid = current_user.wechat_openid if current_user else ""
+    wx_code = data.get("wx_code", "")
+    if not openid and wx_code and settings.wechat_secret:
+        # 用前端wx.login()获取的code换取openid
+        import httpx
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.get(
+                    f"https://api.weixin.qq.com/sns/jscode2session"
+                    f"?appid={settings.wechat_appid}&secret={settings.wechat_secret}"
+                    f"&js_code={wx_code}&grant_type=authorization_code"
+                )
+                wx_data = resp.json()
+                openid = wx_data.get("openid", "")
+                logger.info(f"支付换取openid成功: {openid}")
+        except Exception as e:
+            logger.error(f"支付换取openid失败: {e}")
     if not openid and settings.debug:
         openid = "mock_openid_dev"
+    if not openid:
+        raise HTTPException(400, "微信支付需要用户先微信登录")
     out_trade_no = _gen_order_no()
 
     # 关联订单：将out_trade_no存入订单

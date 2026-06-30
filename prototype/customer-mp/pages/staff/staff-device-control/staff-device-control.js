@@ -128,7 +128,9 @@ Page({
   toggleFan: function(e) {
     var id = e.currentTarget.dataset.id
     var on = e.detail && e.detail.value === true
-    API.controlDevice(id, { action: on ? 'on' : 'off' }).catch(function(){})
+    API.controlDevice(id, { action: on ? 'on' : 'off' }).catch(function(err) {
+      wx.showToast({ title: '风扇控制失败: ' + ((err&&err.message)||'无响应'), icon: 'none' })
+    })
   },
   _findDev: function(type) {
     var list = this.data.devices
