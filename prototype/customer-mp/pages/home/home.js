@@ -220,6 +220,7 @@ Page({
           wx.hideLoading()
           self.setData({ isLoggedIn: true, showLoginModal: false })
           wx.showToast({ title: '登录成功', icon: 'success' })
+          self.loadData()
           self.handlePendingAction()
         }).catch(function(err) {
           wx.hideLoading()
