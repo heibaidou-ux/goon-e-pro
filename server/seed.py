@@ -58,14 +58,19 @@ async def seed():
             db.add(cat)
 
         # ── Stores (new model: camelCase) ──
-        store = Store(
-            storeId="YINGLONG", storeCode="YL001",
-            orgId="", name="盈隆店",
-            address="广州市天河区珠江新城华夏路28号盈隆大厦16层",
-            phone="020-8888-8888",
-            type="Direct",
-        )
-        db.add(store)
+        stores_data = [
+            ("HUACHENGGUANGCHANG", "HC001", "花城广场店", "广州市天河区珠江新城华夏路28号盈隆大厦16层", "020-8888-8888"),
+            ("ZHUJIANGXINCHENG", "ZJ001", "珠江新城店", "广州市天河区珠江新城花城大道18号", "020-8888-8889"),
+            ("BEIJINGLU", "BJ001", "北京路店", "广州市越秀区北京路步行街168号", "020-8888-8890"),
+        ]
+        for sid, scode, sname, saddr, sphone in stores_data:
+            store = Store(
+                storeId=sid, storeCode=scode,
+                orgId="", name=sname,
+                address=saddr, phone=sphone,
+                type="Direct",
+            )
+            db.add(store)
 
         # ── Rooms (new model: camelCase) ──
         rooms_data = [
@@ -81,7 +86,7 @@ async def seed():
         for r in rooms_data:
             room = Room(
                 roomId=r["roomId"], roomCode=r["roomId"],
-                storeId="YINGLONG", name=r["name"],
+                storeId="HUACHENGGUANGCHANG", name=r["name"],
                 type=r["type"], capacity=r["capacity"],
                 floor=r.get("floor"), description=r.get("description"),
                 facilities=json.dumps(["投影", "WiFi", "茶具", "空调"], ensure_ascii=False),

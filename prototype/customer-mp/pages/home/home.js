@@ -16,7 +16,7 @@ Page({
     rooms: [], teaProducts: [], cartCount: 0,
     balance: 0, balanceDisplay: '', balanceVisible: true,
     qrRoomId: '', qrRoomName: '', qrTableId: '',
-    currentStore: 'huachengguangchang', storeName: '花城广场店', showStoreModal: false, showLoginModal: false,
+    currentStore: 'huachengguangchang', storeName: '花城广场店', showStoreModal: false, showAllStores: false, showLoginModal: false,
     showBillModal: false, showQrWarning: false, qrWarningText: '',
     phoneLoginView: false, loginMode: 'login', loginType: 'code', loginPhone: '', loginCode: '', loginPassword: '',
     regPhone: '', regCode: '',

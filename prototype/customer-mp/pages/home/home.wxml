@@ -90,8 +90,8 @@
 <view class="modal-overlay" wx:if="{{showStoreModal}}" bindtap="hideStoreSelector">
   <view class="modal" catchtap><text class="modal-title">选择门店</text>
     <view class="store-option {{currentStore=='huachengguangchang' ? 'active' : ''}}" bindtap="selectStore" data-store="huachengguangchang" data-name="花城广场店"><text>📍 花城广场店</text><text wx:if="{{currentStore=='huachengguangchang'}}" style="color:#5D8A6B;">✓ 当前</text></view>
-    <view class="store-option {{currentStore=='yilong' ? 'active' : ''}}" bindtap="selectStore" data-store="yilong" data-name="盈隆店"><text>📍 盈隆店（筹备中）</text><text wx:if="{{currentStore=='yilong'}}" style="color:#5D8A6B;">✓ 当前</text></view>
-    <view class="store-option {{currentStore=='pazhou' ? 'active' : ''}}" bindtap="selectStore" data-store="pazhou" data-name="琶洲店"><text>📍 琶洲店（筹备中）</text><text wx:if="{{currentStore=='pazhou'}}" style="color:#5D8A6B;">✓ 当前</text></view>
+    <view class="store-option {{currentStore=='zhujiangxincheng' ? 'active' : ''}}" bindtap="selectStore" data-store="zhujiangxincheng" data-name="珠江新城店" wx:if="{{showAllStores}}"><text>📍 珠江新城店</text></view>
+    <view class="store-option {{currentStore=='beijinglu' ? 'active' : ''}}" bindtap="selectStore" data-store="beijinglu" data-name="北京路店" wx:if="{{showAllStores}}"><text>📍 北京路店</text></view>
     <view class="modal-close" bindtap="hideStoreSelector">关闭</view>
   </view>
 </view>
