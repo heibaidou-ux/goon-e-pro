@@ -330,35 +330,45 @@ async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] 
             result = [d for d in result if d["status"] == status_filter]
         return result
 
-    # Real HA mode
+    # Real HA mode — try HA first, fallback to mock if unreachable
+    _build_mock_devices()
     try:
         async with httpx.AsyncClient(timeout=5) as client:
             resp = await client.get(
                 f"{settings.ha_url}/api/states",
                 headers=_ha_headers()
             )
-            if resp.status_code != 200:
-                return []
-            ha_states = resp.json()
-            # Filter to only entities belonging to our rooms
-            our_ha_rooms = set(HA_ROOM_REVERSE.keys())
-            devices = []
-            for state in ha_states:
-                entity_id = state.get("entity_id", "")
-                dev_type = _ha_entity_to_type(entity_id)
-                if not dev_type:
-                    continue
-                ha_room = _ha_entity_to_room(entity_id)
-                if not ha_room:
-                    continue
-                if room_id and ha_room != room_id:
-                    continue
-                if device_type and dev_type != device_type:
-                    continue
-                devices.append(_ha_state_to_device(state))
-            return devices
-    except Exception as e:
-        return []
+            if resp.status_code == 200:
+                ha_states = resp.json()
+                # Filter to only entities belonging to our rooms
+                our_ha_rooms = set(HA_ROOM_REVERSE.keys())
+                devices = []
+                for state in ha_states:
+                    entity_id = state.get("entity_id", "")
+                    dev_type = _ha_entity_to_type(entity_id)
+                    if not dev_type:
+                        continue
+                    ha_room = _ha_entity_to_room(entity_id)
+                    if not ha_room:
+                        continue
+                    if room_id and ha_room != room_id:
+                        continue
+                    if device_type and dev_type != device_type:
+                        continue
+                    devices.append(_ha_state_to_device(state))
+                return devices
+    except Exception:
+        pass
+
+    # Fallback: use mock devices
+    result = list(_mock_devices)
+    if room_id:
+        result = [d for d in result if d["room_id"] == room_id]
+    if device_type:
+        result = [d for d in result if d["type"] == device_type]
+    if status_filter:
+        result = [d for d in result if d["status"] == status_filter]
+    return result
 
 
 async def get_device(device_id: str) -> Optional[dict]:
