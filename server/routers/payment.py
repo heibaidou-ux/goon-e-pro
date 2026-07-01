@@ -9,6 +9,7 @@ from config import settings
 from database import get_db
 from models.user import User
 from models.operations import Order
+from models.finance import RevenueFlow
 from services.auth_service import get_current_user
 from services.payment_service import unified_order, get_pay_params, order_query, verify_notify
 from services.order_iot import on_order_paid
@@ -103,6 +104,23 @@ async def wxpay_notify(request: Request, db: AsyncSession = Depends(get_db)):
                 order.doorPassword = str(random.randint(1000, 9999))
                 await db.commit()
                 logger.info(f"订单{order.orderId}已通过支付回调更新为PendingUse")
+                # 记收入账
+                try:
+                    rev = RevenueFlow(
+                        revenueId=uuid.uuid4().hex[:12],
+                        storeId=order.storeId or '',
+                        orderId=order.orderId,
+                        amount=round(total_fee / 100, 2),
+                        paymentMethod='WxPay',
+                        type='RoomRental',
+                        channel='WeChat',
+                        receivedAt=datetime.utcnow(),
+                    )
+                    db.add(rev)
+                    await db.commit()
+                    logger.info(f"支付回调: 收入流水已记录 {rev.revenueId}")
+                except Exception as rev_err:
+                    logger.error(f"支付回调: 记收入失败 {rev_err}")
                 # IoT联动：支付成功 → 预开模式
                 await on_order_paid(order.orderId, db)
             elif not order:

@@ -218,14 +218,14 @@ Page({
     var payLabels = { wechat: '微信支付', alipay: '支付宝', balance: '会员余额', coupon: '验券' }
     var payLabel = self.data.isCombinedPay ? '余额+微信支付' : (self.data.selectedPay == 'coupon' ? '验券' : payLabels[self.data.selectedPay] || '微信支付')
 
-    // 微信支付走真实支付
+    // 微信支付：先支付，成功后再创建订单（防止支付失败产生脏订单）
     if (self.data.selectedPay == 'wechat' && !self.data.isCombinedPay) {
       wx.showLoading({ title: '正在支付...' })
       var totalFee = Math.round(self.data.finalPrice || self.data.price) * 100
       var body = '高岸茶室-' + (self.data.roomName || '包间预订')
-      API.createBooking({ roomId: self.data.roomId, roomName: self.data.roomName, date: self.data.dateStr, time: self.data.slot, duration: self.data.editableDuration, amount: self.data.price, paymentMethod: payLabel, customerSource: self.data.selectedSource }).then(function(bookingResult) {
-        self._payingWechat = true
-        API.wechatPay(totalFee, body).then(function(payResult) {
+      API.wechatPay(totalFee, body).then(function(payResult) {
+        // 支付成功后再创建订单
+        API.createBooking({ roomId: self.data.roomId, roomName: self.data.roomName, date: self.data.dateStr, time: self.data.slot, duration: self.data.editableDuration, amount: self.data.price, paymentMethod: payLabel, customerSource: self.data.selectedSource }).then(function(bookingResult) {
           wx.hideLoading()
           var doorOk = false, doorStatus = ''
           var now = new Date(), curMin = now.getHours()*60+now.getMinutes()
@@ -237,13 +237,13 @@ Page({
             else { doorStatus = '❌ 密码将在15分钟前生效，还需等待' + Math.ceil(diff-15) + '分钟' }
           }
           self.setData({ showSuccess: true, doorCode: bookingResult.doorCode || doorCode, payMethodLabel: payLabel, createdOrderId: bookingResult.orderId || '', doorStatus: doorStatus, doorOk: doorOk })
-        }).catch(function(payErr) {
+        }).catch(function(err) {
           wx.hideLoading()
-          wx.showToast({ title: payErr.message || '支付取消', icon: 'none' })
+          wx.showToast({ title: err.message || '下单失败', icon: 'none' })
         })
-      }).catch(function(err) {
+      }).catch(function(payErr) {
         wx.hideLoading()
-        wx.showToast({ title: err.message || '下单失败', icon: 'none' })
+        wx.showToast({ title: payErr.message || '支付取消', icon: 'none' })
       })
       return
     }

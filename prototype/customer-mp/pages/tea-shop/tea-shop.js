@@ -234,7 +234,7 @@ Page({
   // ── 结算 ──
   checkout: function() {
     if (this.data.cart.length === 0) { wx.showToast({ title: '购物车为空', icon: 'none' }); return }
-    this.setData({ showPayModal: true, payMethod: 'balance' })
+    this.setData({ showPayModal: true, payMethod: 'wechat' })
   },
 
   selectPayMethod: function(e) {
@@ -256,22 +256,39 @@ Page({
         })
         return
       }
+      // 余额足够，直接到配送
+      self._proceedToDelivery(payMethod, total)
+      return
     }
 
-    wx.showLoading({ title: '支付中...' })
-    // 模拟支付，先保存订单数据，然后弹出配送方式选择
-    setTimeout(function() {
-      wx.hideLoading()
-      // 加载地址历史
-      try {
-        var history = wx.getStorageSync('mp_address_history') || []
-        self.setData({ addressHistory: history })
-      } catch(e) {}
-      self.setData({
-        showPayModal: false,
-        showDeliveryModal: true,
-        deliveryMethod: self.data.roomId ? 'inroom' : 'pickup',
-        pendingOrder: { cart: self.data.cart, payMethod: payMethod, total: total }
+    if (payMethod === 'wechat') {
+      wx.showLoading({ title: '微信支付中...' })
+      var totalFee = Math.round(total * 100)
+      API.wechatPay(totalFee, '高岸茶室-茶品购买').then(function() {
+        wx.hideLoading()
+        self._proceedToDelivery(payMethod, total)
+      }).catch(function(err) {
+        wx.hideLoading()
+        wx.showToast({ title: err.message || '支付取消', icon: 'none' })
+      })
+      return
+    }
+
+    // 其他方式
+    self._proceedToDelivery(payMethod, total)
+  },
+
+  _proceedToDelivery: function(payMethod, total) {
+    var self = this
+    try {
+      var history = wx.getStorageSync('mp_address_history') || []
+      self.setData({ addressHistory: history })
+    } catch(e) {}
+    self.setData({
+      showPayModal: false,
+      showDeliveryModal: true,
+      deliveryMethod: self.data.roomId ? 'inroom' : 'pickup',
+      pendingOrder: { cart: self.data.cart, payMethod: payMethod, total: total }
       })
     }, 800)
   },
