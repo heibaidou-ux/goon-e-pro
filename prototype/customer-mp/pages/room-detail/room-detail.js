@@ -44,15 +44,38 @@ Page({
 
   onLoad: function(e) {
     wx.pageScrollTo({ scrollTop: 0, duration: 0 })
+    var self = this
     var roomId = e.roomId || e.id || ''
-    var room = null
-    for (var i = 0; i < ROOMS_DATA.length; i++) { if (ROOMS_DATA[i].roomId === roomId) { room = ROOMS_DATA[i]; break } }
-    if (!room) room = ROOMS_DATA[0]
+    if (!roomId) { wx.showToast({ title: '房间ID缺失', icon: 'none' }); return }
 
     var now = new Date()
     var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+    // 先从API加载房间信息（确保新房间RM099也能正确显示）
+    API.getRoomById(roomId).then(function(apiRoom) {
+      if (apiRoom) {
+        self._initRoom(apiRoom, roomId, now, todayStart)
+      } else {
+        self._fallbackRoom(roomId, now, todayStart)
+      }
+    }).catch(function() {
+      self._fallbackRoom(roomId, now, todayStart)
+    })
+  },
+
+  _fallbackRoom: function(roomId, now, todayStart) {
+    var room = null
+    for (var i = 0; i < ROOMS_DATA.length; i++) { if (ROOMS_DATA[i].roomId === roomId) { room = ROOMS_DATA[i]; break } }
+    if (!room) {
+      wx.showToast({ title: '房间不存在', icon: 'none' })
+      return
+    }
+    this._initRoom(room, roomId, now, todayStart)
+  },
+
+  _initRoom: function(room, roomId, now, todayStart) {
     this.setData({
-      room: room, roomId: room.roomId, hourRate: room.pricePerHour || 120,
+      room: room, roomId: room.roomId || roomId, hourRate: room.pricePerHour || 120,
       heroIcon: HERO_MAP[room.type] || '🏠', gradClass: GRAD_MAP[room.type] || 'gradient-tea',
       bookable: room.bookable !== false, today: now, selectedDate: todayStart,
       calYear: now.getFullYear(), calMonth: now.getMonth(),
