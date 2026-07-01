@@ -42,39 +42,53 @@ Page({
 
   loadData: function() {
     var self = this
-    // 立即展示上一次缓存数据（如有）
-    self.setData({ loading: false, errorMsg: '' })
-    // 读取用户微信信息
-    var u = API.getCurrentUser()
-    if (u) self.setData({ wxNickname: u.wechat_nickname || u.display_name || u.name || '', wxAvatar: u.wechat_avatar || '' })
-    // 同步会员中心的余额显隐设置
-    try { var v = wx.getStorageSync('balance_visible'); if (v !== '') self.data.balanceVisible = v } catch(e) {}
-    var colors = { MeetingRoom: '#e3f2fd', TeaRoom: '#e8f5e9', Exhibition: '#fff3e0', Workspace: '#f5f5f5' }
-    var icons = { MeetingRoom: '💼', TeaRoom: '🍵', Exhibition: '🏛️', Workspace: '🔧' }
-    var visualMap = { 'T001': { icon: '🍃', bg: '#e8f5e9' }, 'T002': { icon: '🪵', bg: '#fce4ec' }, 'T003': { icon: '🏔️', bg: '#fff3e0' }, 'T004': { icon: '🌿', bg: '#efebe9' }, 'T005': { icon: '🏵️', bg: '#f1f8e9' }, 'T006': { icon: '🏔️', bg: '#efebe9' }, 'T007': { icon: '🏺', bg: '#f3e5f5' }, 'T008': { icon: '🥃', bg: '#e0f7fa' }, 'T01': { icon: '🍃', bg: '#e8f5e9' }, 'T02': { icon: '🪵', bg: '#fce4ec' }, 'T03': { icon: '🏔️', bg: '#fff3e0' }, 'T04': { icon: '🏺', bg: '#f3e5f5' }, 'T05': { icon: '🏔️', bg: '#efebe9' }, 'T06': { icon: '🌿', bg: '#e0f7fa' }, 'T07': { icon: '🏵️', bg: '#f1f8e9' }, 'T08': { icon: '🥃', bg: '#fce4ec' } }
-    Promise.all([API.getRooms(true), API.getProducts(), API.getCurrentUser(), API.getBalance(), API.getCart()]).then(function(results) {
-      var roomsData = results[0] || [], productsData = results[1] || [], user = results[2], balance = results[3] || 0, cart = results[4] || []
-      // 后端数据为空时自动使用内置演示数据（VPS未部署/空数据库时仍可展示）
-      if (!roomsData.length || !productsData.length) {
-        self.renderFallbackData()
-        self.setData({ loading: false, isLoggedIn: !!user, balance: balance })
-        self.setData({ balanceDisplay: self.data.balanceVisible ? '¥' + balance : '****' })
-        return
+    // 立刻展示localStorage缓存（秒开）
+    try {
+      var cached = wx.getStorageSync('home_cache')
+      if (cached && cached.rooms && cached.teas) {
+        self.setData({ rooms: cached.rooms, teaProducts: cached.teas })
       }
+    } catch(e) {}
+    var u = API.getCurrentUser()
+    self.setData({ wxNickname: (u&&(u.wechat_nickname||u.display_name||u.name))||'', wxAvatar: (u&&u.wechat_avatar)||'', loading: false, errorMsg: '' })
+    try { var v = wx.getStorageSync('balance_visible'); if (v !== "") self.data.balanceVisible = v } catch(e) {}
+    var colors = { MeetingRoom:'#e3f2fd', TeaRoom:'#e8f5e9', Exhibition:'#fff3e0', Workspace:'#f5f5f5' }
+    var icons = { MeetingRoom:'💼', TeaRoom:'🍵', Exhibition:'🏛', Workspace:'🔧' }
+
+    API.getRooms(true).then(function(list) {
+      if (!list || !list.length) { self.renderFallbackData(); return }
       var rooms = []
-      for (var i = 0; i < roomsData.length; i++) { var r = roomsData[i]; if (r.bookable === false) continue; rooms.push({ roomId: r.roomId, name: r.name, capacity: r.capacity, area: r.area, pricePerHour: r.pricePerHour || 120, icon: icons[r.type] || '🏠', bgColor: colors[r.type] || '#f0f0f0' }) }
+      for (var i = 0; i < list.length; i++) {
+        var r = list[i]; if (r.bookable === false) continue
+        rooms.push({ roomId:r.roomId, name:r.name, capacity:r.capacity, area:r.area, pricePerHour:r.pricePerHour||120, icon:icons[r.type]||'🏠', bgColor:colors[r.type]||'#f0f0f0' })
+      }
+      self.setData({ rooms: rooms })
+      try { var cache = wx.getStorageSync('home_cache') || {}; cache.rooms = rooms; wx.setStorageSync('home_cache', cache) } catch(e) {}
+    }).catch(function() { self.renderFallbackData() })
+
+    API.getProducts().then(function(productsData) {
+      if (!productsData || !productsData.length) return
+      var visualMap = { 'T001':{icon:'🍃',bg:'#e8f5e9'},'T002':{icon:'🪵',bg:'#fce4ec'},'T003':{icon:'🏔',bg:'#fff3e0'},'T004':{icon:'🌿',bg:'#efebe9'},'T005':{icon:'🏵',bg:'#f1f8e9'},'T006':{icon:'🏔',bg:'#efebe9'},'T007':{icon:'🏺',bg:'#f3e5f5'},'T008':{icon:'🥃',bg:'#e0f7fa'},'T01':{icon:'🍃',bg:'#e8f5e9'},'T02':{icon:'🪵',bg:'#fce4ec'},'T03':{icon:'🏔',bg:'#fff3e0'},'T04':{icon:'🏺',bg:'#f3e5f5'},'T05':{icon:'🏔',bg:'#efebe9'},'T06':{icon:'🌿',bg:'#e0f7fa'},'T07':{icon:'🏵',bg:'#f1f8e9'},'T08':{icon:'🥃',bg:'#fce4ec'} }
       var qtyMap = {}
-      for (var i = 0; i < cart.length; i++) { qtyMap[cart[i].productId] = cart[i].qty || 1 }
+      try { var cart = wx.getStorageSync('mp_tea_cart') || []; for (var i = 0; i < cart.length; i++) { qtyMap[cart[i].productId] = cart[i].qty || 1 } } catch(e) {}
       var teas = []
-      for (var i = 0; i < productsData.length; i++) { var t = productsData[i], vis = visualMap[t.productId] || { icon: '🍵', bg: '#f0f0f0' }; teas.push({ productId: t.productId, name: t.name, desc: t.desc || '', price: t.price, icon: vis.icon, bg: vis.bg, _qty: qtyMap[t.productId] || 0 }) }
-      self.setData({ rooms: rooms, teaProducts: teas, balance: balance, isLoggedIn: !!user })
-      self.setData({ balanceDisplay: self.data.balanceVisible ? '¥' + balance : '****' })
-      self.loadCartCount()
-      self.setData({ loading: false })
-    }).catch(function() {
-      self.renderFallbackData()
-      self.setData({ loading: false })
-    })
+      for (var i = 0; i < productsData.length; i++) {
+        var t = productsData[i], vis = visualMap[t.productId] || {icon:'🍵',bg:'#f0f0f0'}
+        teas.push({ productId:t.productId, name:t.name, desc:t.desc||'', price:t.price, icon:vis.icon, bg:vis.bg, _qty:qtyMap[t.productId]||0 })
+      }
+      self.setData({ teaProducts: teas })
+      try { var cache = wx.getStorageSync('home_cache') || {}; cache.teas = teas; wx.setStorageSync('home_cache', cache) } catch(e) {}
+    }).catch(function() {})
+
+    API.getBalance().then(function(b) {
+      self.setData({ balance: b || 0 })
+      self.setData({ balanceDisplay: self.data.balanceVisible ? '¥'+(b||0) : '****' })
+    }).catch(function() {})
+    API.getCart().then(function(c) {
+      var total = 0; for (var i = 0; i < (c||[]).length; i++) { total += (c[i].qty||1) }
+      self.setData({ cartCount: total })
+    }).catch(function() {})
+  },
   },
 
   isOrderActiveNow: function(order) {
