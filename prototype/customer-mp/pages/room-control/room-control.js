@@ -116,7 +116,12 @@ Page({
         } else if (d.type === 'Fan' || d.type === 'ExhaustFan') {
           devKeys.push({ key: d.deviceId, label: d.name || '\u98ce\u6247', icon: '\u23e3', type: d.type, active: !!(a.speed > 0 || a.power), deviceId: d.deviceId })
         } else if (d.type === 'Speaker' || d.type === 'BGM') {
-          bgm = { deviceId: d.deviceId, playing: a.playing || false, volume: a.volume || 30 }
+          // 有playing/volume属性的才是真正的背景音乐，否则是功放开关按钮
+          if (a.playing !== undefined || a.volume !== undefined || d.deviceId.indexOf('media_player') >= 0) {
+            bgm = { deviceId: d.deviceId, playing: a.playing || false, volume: a.volume || 30 }
+          } else {
+            devKeys.push({ key: d.deviceId, label: d.name || '功放', icon: '🔊', type: 'Speaker', active: !!(a.power || a.volume_level > 0), deviceId: d.deviceId })
+          }
         }
       }
       self.setData({ devKeys: devKeys, acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '\u5df2\u5173\u673a', curtainDevices: curtains, bgmDevice: bgm })
@@ -203,6 +208,7 @@ Page({
     var cmd = {}
     if (type === 'Light') cmd = { brightness: newState ? 80 : 0 }
     else if (type === 'Fan' || type === 'ExhaustFan') cmd = { speed: newState ? 3 : 0 }
+    else if (type === 'Speaker') cmd = { action: newState ? 'on' : 'off' }
     API.controlDevice(deviceId, cmd).then(function() {
       self._cacheRoomState(self.data.roomId)
     }).catch(function(err) {
