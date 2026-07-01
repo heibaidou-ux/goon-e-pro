@@ -802,9 +802,9 @@ def _ha_entity_to_type(entity_id: str) -> Optional[str]:
         return _HA_DOMAIN_TYPE_MAP[domain]
 
     if domain == "switch":
-        # 门锁和相关设置项
-        if "_men_suo" in entity_name:
-            if entity_name.endswith("_men_suo"):
+        # 门锁和相关设置项（匹配中文拼音_men_suo和英文_lock_）
+        if "_men_suo" in entity_name or "_lock_" in entity_name or entity_name.endswith("_lock"):
+            if entity_name.endswith("_men_suo") or entity_name.endswith("_lock"):
                 return "Lock"
             return None
         # 仅_relay_ch或_all_lights才作为Light
