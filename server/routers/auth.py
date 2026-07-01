@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
+from typing import Optional
 import httpx
 import uuid
 
@@ -11,7 +12,7 @@ from schemas.user import UserCreate, UserOut, Token, LoginRequest, PhoneLoginReq
 from config import settings
 from services.auth_service import (
     hash_password, verify_password, create_access_token,
-    create_refresh_token, get_current_user, validate_password_strength,
+    create_refresh_token, get_current_user, get_optional_user, validate_password_strength,
 )
 from services.rate_limit import limiter, rate_limit
 
@@ -216,8 +217,8 @@ async def change_password(
 
 
 @router.get("/balance")
-async def get_balance(user: User = Depends(get_current_user)):
-    return {"balance": user.balance or 0.0}
+async def get_balance(user: Optional[User] = Depends(get_optional_user)):
+    return {"balance": (user.balance if user else 0.0)}
 
 
 @router.post("/balance/deduct")

@@ -365,6 +365,9 @@ async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] 
                     continue
                 if device_type and dev_type != device_type:
                     continue
+                # 过滤掉unavailable实体
+                if state.get('state') in ('unavailable', None, ''):
+                    continue
                 devices.append(_ha_state_to_device(state))
             return devices
     except Exception:
@@ -799,7 +802,16 @@ def _ha_entity_to_type(entity_id: str) -> Optional[str]:
         return _HA_DOMAIN_TYPE_MAP[domain]
 
     if domain == "switch":
-        return "Light"
+        # 门锁和相关设置项
+        if "_men_suo" in entity_name:
+            if entity_name.endswith("_men_suo"):
+                return "Lock"
+            return None
+        # 仅_relay_ch或_all_lights才作为Light
+        if "_relay_" in entity_name or "_all_lights" in entity_name:
+            return "Light"
+        # 其他switch跳过
+        return None
 
     if domain == "sensor":
         if "temp" in entity_name:
@@ -875,7 +887,23 @@ def _ha_state_to_device(state: dict) -> dict:
             attrs["value"] = state_val
         attrs["unit"] = unit
 
-    friendly_name = attrs.get("friendly_name", entity_id)
+    friendly_name = attrs.get("friendly_name", "")
+    if not friendly_name:
+        # 从通道描述取中文名
+        ha_room_name = _ha_entity_to_room(entity_id)
+        for ha_rn, erp_id in HA_ROOM_REVERSE.items():
+            if ha_rn == ha_room_name:
+                relay_config = RELAY_CHANNELS.get(ha_rn, [])
+                for ch, desc in relay_config:
+                    ch_str = ch.replace("ch", "")
+                    if "_ch" + ch_str in entity_id or "_" + ch in entity_id:
+                        friendly_name = desc
+                        break
+                if not friendly_name:
+                    # fallback: 读目标名
+                    domain = entity_id.split(".")[0] if "." in entity_id else ""
+                    short_name = entity_name.split(".")[1] if "." in entity_id else entity_id
+                    friendly_name = short_name[:16]
     return {
         "device_id": entity_id,
         "room_id": room_id,
