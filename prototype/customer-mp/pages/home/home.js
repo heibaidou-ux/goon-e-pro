@@ -89,7 +89,6 @@ Page({
       self.setData({ cartCount: total })
     }).catch(function() {})
   },
-  },
 
   isOrderActiveNow: function(order) {
     if (!order.date || !order.time) return false

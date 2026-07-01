@@ -4,6 +4,7 @@ Page({
   data: {
     userName: '会员', levelLabel: '金牌会员', balanceIcon: '💎',
     balance: 0, balanceDisplay: '¥0', balanceVisible: true,
+    wxAvatar: '', avatarChar: '',
     totalSpent: 0, visitCount: 0, points: 0,
     showRechargeModal: false, showSettingsModal: false,
     selectedAmount: 100,
@@ -24,7 +25,9 @@ Page({
       var cachedUser = wx.getStorageSync('mp_user')
       if (cachedUser) {
         var name = cachedUser.name || cachedUser.nickname || cachedUser.phone || '会员'
-        this.setData({ userName: name, userPhone: cachedUser.phone || '—', editName: name })
+        var avatar = cachedUser.wechat_avatar || ''
+        var firstChar = name ? name.charAt(0) : '会'
+        this.setData({ userName: name, userPhone: cachedUser.phone || '—', editName: name, wxAvatar: avatar, avatarChar: firstChar })
       }
     } catch(e) {}
 

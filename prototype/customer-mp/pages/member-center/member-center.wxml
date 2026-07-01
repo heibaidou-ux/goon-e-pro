@@ -10,7 +10,10 @@
 
     <!-- 蓝色会员卡片 -->
     <view class="member-card">
-      <view class="member-avatar">👤</view>
+      <view class="member-avatar">
+        <image class="avatar-img" src="{{wxAvatar}}" mode="aspectFill" wx:if="{{wxAvatar}}"></image>
+        <text class="avatar-text" wx:else>{{avatarChar}}</text>
+      </view>
       <view style="text-align:center;">
         <text class="member-name">{{userName}}</text>
         <text class="member-level"><text class="level-badge gold">🥇 {{levelLabel}}</text></text>
