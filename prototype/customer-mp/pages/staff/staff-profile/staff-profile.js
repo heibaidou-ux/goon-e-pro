@@ -10,7 +10,8 @@ Page({
       var user = wx.getStorageSync('mp_user') || {}
       // 补全display_name字段
       if (!user.display_name && user.name) user.display_name = user.name
-      this.setData({ user: user })
+      var name = user.display_name || user.name || '店'
+      this.setData({ user: user, avatarChar: name.charAt(0) })
     } catch(e) {}
   },
 
