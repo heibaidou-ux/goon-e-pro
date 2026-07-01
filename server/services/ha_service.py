@@ -76,7 +76,15 @@ RELAY_CHANNELS = {
         ("ch1", "壁灯"), ("ch2", "筒灯"), ("ch3", "吊灯"),
         ("ch4", "背景灯"),
     ],
+}
 
+# 窗帘数量配置：房间ID → 窗帘电机数量
+CURTAIN_COUNT = {
+    "RM001": 0,  # 丰沙里-无窗帘
+    "RM002": 3,  # 布拉格-3台
+    "RM003": 1,  # 翡冷翠-1台
+    "RM004": 3,  # 白沙瓦-3台
+}
 
 
 def _build_devices_for_room(room: dict, ha_room: str) -> list[dict]:
@@ -146,10 +154,8 @@ def _build_devices_for_room(room: dict, ha_room: str) -> list[dict]:
             "status": "Online",
             "attributes": {"power": False, "channel": int(ch_num)},
         })
-    # Curtain(s) — 中茶室/大茶室有3台窗帘电机
-    curtain_count = 1
-    if room["room_id"] in ("RM002", "RM004"):
-        curtain_count = 3
+    # Curtain(s) — 按CURTAIN_COUNT配置生成
+    curtain_count = CURTAIN_COUNT.get(room["room_id"], 1)
     for ci in range(curtain_count):
         curtain_suffix = f"_{ci+1}" if curtain_count > 1 else ""
         devices.append({
