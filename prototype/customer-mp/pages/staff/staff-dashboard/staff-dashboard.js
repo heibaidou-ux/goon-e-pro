@@ -3,7 +3,7 @@ var API = require('../../../utils/api')
 
 Page({
   data: {
-    storeName: '盈隆店',
+    storeName: '花城广场店',
     timeStr: '',
     roomOverview: { idle: 0, inUse: 0, booked: 0, cleaning: 0 },
     stats: { roomCount: { inUse: 0 }, todayRevenue: 0, todayOrders: 0, pendingTasks: 0, orderStatus: 0, alerts: 0 },

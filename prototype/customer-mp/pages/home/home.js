@@ -42,7 +42,8 @@ Page({
 
   loadData: function() {
     var self = this
-    self.setData({ loading: true, errorMsg: '' })
+    // 立即展示上一次缓存数据（如有）
+    self.setData({ loading: false, errorMsg: '' })
     // 同步会员中心的余额显隐设置
     try { var v = wx.getStorageSync('balance_visible'); if (v !== '') self.data.balanceVisible = v } catch(e) {}
     var colors = { MeetingRoom: '#e3f2fd', TeaRoom: '#e8f5e9', Exhibition: '#fff3e0', Workspace: '#f5f5f5' }

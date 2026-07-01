@@ -5,7 +5,7 @@
 
 // 门店
 const stores = [{
-  storeId: "ST001", name: "盈隆店", address: "广州市天河区珠江新城富力盈隆广场3801",
+  storeId: "ST001", name: "花城广场店", address: "广州市天河区珠江新城花城广场18号",
   phone: "020-88888888", status: "Active"
 }]
 

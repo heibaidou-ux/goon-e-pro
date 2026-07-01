@@ -1,7 +1,7 @@
 """市场营销管理 API — 活动/优惠券/线索/商机/营销列表/客户细分/第三方活动/渠道"""
 import uuid
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 from datetime import datetime, date
@@ -417,6 +417,32 @@ async def verify_coupon(
             createdAt=item.createdAt,
         ),
     }
+
+
+@router.post("/coupons/redeem")
+async def redeem_coupon(
+    code: str = Body(..., embed=True),
+    room_id: Optional[str] = Body(None, embed=True),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Redeem (核销) a coupon by its unique code. Marks as Used."""
+    r = await db.execute(select(Coupon).where(Coupon.code == code))
+    item = r.scalar_one_or_none()
+    if not item:
+        raise HTTPException(404, "优惠券不存在")
+    if item.status == "Used":
+        raise HTTPException(400, "优惠券已使用")
+    if item.status == "Expired" or (item.expiredAt and item.expiredAt < datetime.utcnow()):
+        raise HTTPException(400, "优惠券已过期")
+
+    item.status = "Used"
+    item.usedAt = datetime.utcnow()
+    item.usedBy = user.username if user else None
+    item.usedRoomId = room_id
+    await db.commit()
+
+    return {"success": True, "message": "核销成功", "code": code}
 
 
 @router.get("/coupons/by-customer/{customer_id}", response_model=list[CouponOut])
