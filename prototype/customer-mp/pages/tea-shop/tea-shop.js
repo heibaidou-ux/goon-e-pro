@@ -301,8 +301,7 @@ Page({
       showDeliveryModal: true,
       deliveryMethod: self.data.roomId ? 'inroom' : 'pickup',
       pendingOrder: { cart: self.data.cart, payMethod: payMethod, total: total }
-      })
-    }, 800)
+    })
   },
 
   cancelPay: function() { this.setData({ showPayModal: false }) },
