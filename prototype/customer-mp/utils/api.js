@@ -696,7 +696,26 @@ const API = {
 
   wechatPay(totalFee, body) {
     if (!USE_MOCK) {
-      // 微信支付前先获取用户临时code，用于后端换取openid
+      // 优先使用已存储的wechat_openid（微信登录后已保存）
+      var user = lsGet('user', null)
+      var openid = user ? (user.wechat_openid || '') : ''
+      if (openid) {
+        return request({ url: '/api/payment/wxpay/unified-order', method: 'POST', data: { total_fee: totalFee, body: body, openid: openid } }).then(function(data) {
+          if (!data || !data.pay_params) throw new Error('统一下单失败')
+          return new Promise(function(resolve, reject) {
+            wx.requestPayment({
+              timeStamp: data.pay_params.timeStamp,
+              nonceStr: data.pay_params.nonceStr,
+              package: data.pay_params.package,
+              signType: data.pay_params.signType,
+              paySign: data.pay_params.paySign,
+              success: function() { resolve(data) },
+              fail: function(err) { reject(new Error(err.errMsg || '支付失败')) }
+            })
+          })
+        })
+      }
+      // 没有openid则用wx.login获取code交给后端处理
       var self = this
       return new Promise(function(resolve, reject) {
         wx.login({

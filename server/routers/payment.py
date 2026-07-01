@@ -30,8 +30,8 @@ async def wxpay_unified_order(request: Request, current_user: User = Depends(get
     if total_fee <= 0:
         raise HTTPException(400, "金额无效")
 
-    # 获取openid（优先级: 1.用户已存储的wechat_openid 2.wx_login传的code 3.debug模式mock）
-    openid = current_user.wechat_openid if current_user else ""
+    # 获取openid（优先级: 1.前端传的openid 2.用户已存储的wechat_openid 3.wx.login的code 4.debug）
+    openid = data.get("openid", "") or (current_user.wechat_openid if current_user else "")
     wx_code = data.get("wx_code", "")
     if not openid and wx_code and settings.wechat_secret:
         # 用前端wx.login()获取的code换取openid
