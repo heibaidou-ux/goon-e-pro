@@ -170,6 +170,20 @@ def _build_devices_for_room(room: dict, ha_room: str) -> list[dict]:
             "status": "Online",
             "attributes": {"position": "closed", "current_position": 0},
         })
+    # Speaker — 背景音乐（展厅功放已挂翡冷翠，翡冷翠不重复加）
+    if room["room_id"] != "RM003":
+        devices.append({
+            "device_id": f"DEV{idx_base}40",
+            "room_id": room["room_id"],
+            "type": "Speaker",
+            "name": f"{room['name']}背景音乐",
+            "ha_entity_id": f"switch.{ha_room}_bgm",
+            "protocol": "IP",
+            "slave_id": None,
+            "sub_address": None,
+            "status": "Online",
+            "attributes": {"playing": False, "volume": 30},
+        })
     # Sensors
     devices.append({
         "device_id": f"DEV{idx_base}30",
