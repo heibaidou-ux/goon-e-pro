@@ -1,5 +1,6 @@
 """商城订单 API — 基于 D03/D05 新模型（operations, supply_chain）"""
 import uuid
+from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +8,7 @@ from sqlalchemy import select, func
 
 from database import get_db
 from models.operations import Order, OrderItem
+from models.finance import RevenueFlow
 from models.supply_chain import Product
 from models.user import User
 from schemas.order import ShopOrderCreate, ShopOrderOut
@@ -52,6 +54,24 @@ async def create_shop_order(
     db.add(order)
     await db.commit()
     await db.refresh(order)
+
+    # 记收入流水
+    try:
+        rev = RevenueFlow(
+            revenueId=uuid.uuid4().hex[:12],
+            storeId="",
+            orderId=order_id,
+            amount=total,
+            paymentMethod=data.payment_method or "WeChat",
+            type="ProductSales",
+            channel=data.payment_method or "WeChat",
+            receivedAt=datetime.utcnow(),
+        )
+        db.add(rev)
+        await db.commit()
+    except Exception:
+        pass
+
     return ShopOrderOut(
         id=order.id, order_no=order.orderNumber, customer_name=data.customer_name,
         customer_phone=data.customer_phone, room_id=data.room_id,

@@ -584,7 +584,34 @@ const API = {
   },
 
   createShopOrder(items, paymentMethod, total, deliveryInfo) {
-    return delay(400).then(() => {
+    if (!USE_MOCK) {
+      var user = lsGet('user', {})
+      var userId = user.phone || user.username || ''
+      var roomId = (deliveryInfo && deliveryInfo.roomId) || ''
+      // 余额支付：先扣款
+      if (paymentMethod === 'Balance') {
+        return request({ url: '/api/auth/balance/deduct', method: 'POST', data: { amount: total, order_id: 'SHP' + String(Date.now()).slice(-6) } }).then(function() {
+          return request({ url: '/api/shop/orders', method: 'POST', data: {
+            customer_name: user.display_name || user.name || '',
+            customer_phone: user.phone || '',
+            room_id: roomId,
+            payment_method: paymentMethod,
+            total_amount: total,
+            items: (items || []).map(function(i) { return { product_id: i.productId, quantity: i.qty || 1, unit_price: i.price || 0 } })
+          } }).then(function(r) { lsSet('tea_cart', []); return r })
+        })
+      }
+      // 微信支付：直接下单
+      return request({ url: '/api/shop/orders', method: 'POST', data: {
+        customer_name: user.display_name || user.name || '',
+        customer_phone: user.phone || '',
+        room_id: roomId,
+        payment_method: paymentMethod,
+        total_amount: total,
+        items: (items || []).map(function(i) { return { product_id: i.productId, quantity: i.qty || 1, unit_price: i.price || 0 } })
+      } }).then(function(r) { lsSet('tea_cart', []); return r })
+    }
+    return delay(400).then(function() {
       deliveryInfo = deliveryInfo || {}
       var order = {
         orderId: 'SHP' + String(Date.now()).slice(-6), items, total, paymentMethod,
@@ -606,8 +633,8 @@ const API = {
       shopOrders.push(order); lsSet('shop_orders', shopOrders)
       lsSet('tea_cart', [])
       if (paymentMethod === 'Balance') {
-        var user = lsGet('user', {})
-        user.balance = (user.balance || 0) - total; lsSet('user', user)
+        var u = lsGet('user', {})
+        u.balance = (u.balance || 0) - total; lsSet('user', u)
       }
       return order
     })
@@ -616,7 +643,10 @@ const API = {
   getShopOrders() { return delay().then(() => lsGet('shop_orders', [])) },
 
   // ── 余额 ──
-  getBalance() { return delay(100).then(() => (lsGet('user', {})).balance || 0) },
+  getBalance() {
+    if (!USE_MOCK) return request({ url: '/api/auth/balance' }).then(function(d) { return d.balance || 0 }).catch(function() { return (lsGet('user', {})).balance || 0 })
+    return delay(100).then(() => (lsGet('user', {})).balance || 0)
+  },
 
   topUp(amount, paymentMethod) {
     return delay(500).then(() => {

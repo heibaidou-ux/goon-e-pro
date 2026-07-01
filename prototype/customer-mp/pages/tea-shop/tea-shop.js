@@ -247,17 +247,29 @@ Page({
     var payMethod = self.data.payMethod
 
     if (payMethod === 'balance') {
-      var user = API.getCurrentUser()
-      var balance = user ? (user.balance || 0) : 0
-      if (balance < total) {
-        self.setData({
-          showInsufficient: true,
-          insufficientMsg: '当前余额 ¥' + balance + '，需支付 ¥' + total + '。请选择其他支付方式或取消支付。'
-        })
-        return
-      }
-      // 余额足够，直接到配送
-      self._proceedToDelivery(payMethod, total)
+      API.getBalance().then(function(balance) {
+        if (balance < total) {
+          self.setData({
+            showInsufficient: true,
+            insufficientMsg: '当前余额 ¥' + balance + '，需支付 ¥' + total + '。请选择其他支付方式或取消支付。'
+          })
+          return
+        }
+        // 余额足够，直接到配送
+        self._proceedToDelivery(payMethod, total)
+      }).catch(function() {
+        // API不通时用本地余额
+        var user = API.getCurrentUser()
+        var balance = user ? (user.balance || 0) : 0
+        if (balance < total) {
+          self.setData({
+            showInsufficient: true,
+            insufficientMsg: '当前余额 ¥' + balance + '，需支付 ¥' + total + '。请选择其他支付方式或取消支付。'
+          })
+          return
+        }
+        self._proceedToDelivery(payMethod, total)
+      })
       return
     }
 

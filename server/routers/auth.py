@@ -214,6 +214,61 @@ async def change_password(
     return {"success": True, "message": "密码已修改"}
 
 
+
+@router.get("/balance")
+async def get_balance(user: User = Depends(get_current_user)):
+    return {"balance": user.balance or 0.0}
+
+
+@router.post("/balance/deduct")
+async def deduct_balance(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    data = await request.json()
+    amount = float(data.get("amount", 0))
+    order_id = data.get("order_id", "")
+    if amount <= 0:
+        raise HTTPException(400, "金额无效")
+    if (user.balance or 0) < amount:
+        raise HTTPException(400, "余额不足")
+    user.balance = (user.balance or 0) - amount
+    # 记收入流水
+    try:
+        from models.finance import RevenueFlow
+        from datetime import datetime
+        rev = RevenueFlow(
+            revenueId=uuid.uuid4().hex[:12],
+            storeId="",
+            orderId=order_id,
+            amount=amount,
+            paymentMethod="Balance",
+            type="ProductSales",
+            channel="Balance",
+            receivedAt=datetime.utcnow(),
+        )
+        db.add(rev)
+    except Exception:
+        pass
+    await db.commit()
+    return {"success": True, "balance": user.balance, "deducted": amount}
+
+
+@router.post("/balance/recharge")
+async def recharge_balance(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    data = await request.json()
+    amount = float(data.get("amount", 0))
+    if amount <= 0:
+        raise HTTPException(400, "金额无效")
+    user.balance = (user.balance or 0) + amount
+    await db.commit()
+    return {"success": True, "balance": user.balance, "recharged": amount}
+
 @router.get("/me", response_model=UserOut)
 async def get_me(user: User = Depends(get_current_user)):
     return user

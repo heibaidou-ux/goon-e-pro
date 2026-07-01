@@ -20,6 +20,7 @@ class UserOut(BaseModel):
     wechat_openid: Optional[str] = None
     wechat_nickname: Optional[str] = None
     wechat_avatar: Optional[str] = None
+    balance: float = 0.0
     is_active: bool
     created_at: Optional[datetime] = None
 
