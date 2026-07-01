@@ -7,6 +7,16 @@
     <text class="store-select" bindtap="showStoreSelector">{{storeName}} ▾</text>
   </view>
 
+  <!-- 用户信息栏 -->
+  <view class="user-info-bar" wx:if="{{isLoggedIn && wxNickname}}">
+    <image class="user-avatar" src="{{wxAvatar}}" mode="aspectFill" wx:if="{{wxAvatar}}"></image>
+    <text class="user-nickname" wx:else>👤</text>
+    <view class="user-detail">
+      <text class="user-name">{{wxNickname}}</text>
+      <text class="user-welcome">欢迎回来 🍺</text>
+    </view>
+  </view>
+
   <!-- 轮播图 -->
   <view class="carousel-wrap">
     <swiper class="carousel-swiper" current="{{currentSlide}}" bindchange="onSwiperChange" autoplay interval="3500" circular duration="300" easing-function="easeInOutCubic">

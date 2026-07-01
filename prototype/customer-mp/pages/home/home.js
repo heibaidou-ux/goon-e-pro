@@ -20,7 +20,7 @@ Page({
     showBillModal: false, showQrWarning: false, qrWarningText: '',
     phoneLoginView: false, loginMode: 'login', loginType: 'code', loginPhone: '', loginCode: '', loginPassword: '',
     regPhone: '', regCode: '',
-    billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false
+    billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false, wxNickname: "", wxAvatar: ""
   },
 
   onLoad: function(e) {
@@ -44,6 +44,9 @@ Page({
     var self = this
     // 立即展示上一次缓存数据（如有）
     self.setData({ loading: false, errorMsg: '' })
+    // 读取用户微信信息
+    var u = API.getCurrentUser()
+    if (u) self.setData({ wxNickname: u.wechat_nickname || u.display_name || u.name || '', wxAvatar: u.wechat_avatar || '' })
     // 同步会员中心的余额显隐设置
     try { var v = wx.getStorageSync('balance_visible'); if (v !== '') self.data.balanceVisible = v } catch(e) {}
     var colors = { MeetingRoom: '#e3f2fd', TeaRoom: '#e8f5e9', Exhibition: '#fff3e0', Workspace: '#f5f5f5' }

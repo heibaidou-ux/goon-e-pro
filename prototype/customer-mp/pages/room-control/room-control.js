@@ -17,7 +17,7 @@ Page({
 
   onLoad: function(e) {
     var roomId = e.roomId || ''
-    var roomName = e.roomName ? decodeURIComponent(e.roomName) : '白沙瓦'
+    var roomName = e.roomName ? decodeURIComponent(e.roomName) : ''
     var duration = parseInt(e.duration) || 120
     var endStr = e.end || ''
     var startStr = e.start || ''
