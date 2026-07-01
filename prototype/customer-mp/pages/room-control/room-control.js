@@ -94,103 +94,59 @@ Page({
   loadDevices: function() {
     var self = this
     var roomId = self.data.roomId
-    // 先从API获取房间信息确定类型，失败则默认TeaRoom
-    var roomType = 'TeaRoom'
-    API.getRooms(true).then(function(list) {
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].roomId === roomId) { roomType = list[i].type || 'TeaRoom'; break }
+
+    API.getRoomDevices(roomId).then(function(apiDevices) {
+      if (!apiDevices || apiDevices.length === 0) {
+        self._renderLocalDevices(roomId)
+        return
       }
-    }).catch(function() {})
+      var ac = null, curtains = [], bgm = null
+      var devKeys = [{ key: 'light_all_on', label: '灯全开', icon: '\U0001f506', type: 'virtual', active: false },
+                     { key: 'light_all_off', label: '灯全关', icon: '\U0001f505', type: 'virtual', active: false }]
+      for (var i = 0; i < apiDevices.length; i++) {
+        var d = apiDevices[i], a = d.attributes || {}
+        if (d.type === 'AC') {
+          ac = { deviceId: d.deviceId, name: d.name, mode: a.mode || 'off', temperature: a.target_temperature || a.temperature || 24 }
+        } else if (d.type === 'Curtain') {
+          var pos = a.current_position !== undefined ? a.current_position : (a.position === 'open' ? 100 : 0)
+          curtains.push({ deviceId: d.deviceId, name: d.name || '\u7a97\u5e18', positionNum: pos })
+        } else if (d.type === 'Light') {
+          devKeys.push({ key: d.deviceId, label: d.name || '\u706f\u5149', icon: '\U0001f4a1', type: 'Light', active: !!(a.power || a.brightness > 0), deviceId: d.deviceId })
+        } else if (d.type === 'Fan' || d.type === 'ExhaustFan') {
+          devKeys.push({ key: d.deviceId, label: d.name || '\u98ce\u6247', icon: '\u23e3', type: d.type, active: !!(a.speed > 0 || a.power), deviceId: d.deviceId })
+        } else if (d.type === 'Speaker' || d.type === 'BGM') {
+          bgm = { deviceId: d.deviceId, playing: a.playing || false, volume: a.volume || 30 }
+        }
+      }
+      self.setData({ devKeys: devKeys, acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '\u5df2\u5173\u673a', curtainDevices: curtains, bgmDevice: bgm })
+      try { wx.setStorageSync('room_devices_' + roomId, { devKeys: devKeys, acDevice: ac, curtains: curtains, bgm: bgm }) } catch(e) {}
+    }).catch(function() {
+      self._renderLocalDevices(roomId)
+    })
+  },
 
-    var devices = self._getRoomDevices(roomType)
+  _renderLocalDevices: function(roomId) {
+    var self = this
+    try {
+      var cached = wx.getStorageSync('room_devices_' + roomId)
+      if (cached && cached.devKeys) {
+        self.setData({ devKeys: cached.devKeys, acDevice: cached.acDevice, acModeLabel: cached.acDevice ? self._acModeLabel(cached.acDevice.mode) : '\u5df2\u5173\u673a', curtainDevices: cached.curtains || [], bgmDevice: cached.bgm || null })
+        return
+      }
+    } catch(e) {}
+    var devices = self._getRoomDevices('TeaRoom')
     var ac = null, curtains = [], bgm = null
-
-    // 先用本地清单构建设备UI（物理设备一直存在，不受HA连接影响）
-    var devKeys = [{ key: 'light_all_on', label: '灯全开', icon: '🔆', type: 'virtual', active: false },
-                   { key: 'light_all_off', label: '灯全关', icon: '🔅', type: 'virtual', active: false }]
+    var devKeys = [{ key: 'light_all_on', label: '\u706f\u5168\u5f00', icon: '\U0001f506', type: 'virtual', active: false },
+                   { key: 'light_all_off', label: '\u706f\u5168\u5173', icon: '\U0001f505', type: 'virtual', active: false }]
     for (var i = 0; i < devices.length; i++) {
       var d = devices[i]
       if (d.type === 'AC') { ac = { deviceId: roomId+'_ac', name: d.name, mode: 'off', temperature: 24 }; continue }
       if (d.type === 'Curtain') { curtains.push({ deviceId: d.id, name: d.name, positionNum: 0 }); continue }
       if (d.type === 'Speaker') { bgm = { deviceId: d.id, playing: false, volume: 30 }; continue }
-      if (d.type === 'Light') { devKeys.push({ key: d.id, label: d.name, icon: '💡', type: 'Light', active: false }) }
-      if (d.type === 'Fan' || d.type === 'ExhaustFan') { devKeys.push({ key: d.id, label: d.name, icon: '⏣', type: d.type, active: false }) }
+      if (d.type === 'Light') { devKeys.push({ key: d.id, label: d.name, icon: '\U0001f4a1', type: 'Light', active: false }) }
+      if (d.type === 'Fan' || d.type === 'ExhaustFan') { devKeys.push({ key: d.id, label: d.name, icon: '\u23e3', type: d.type, active: false }) }
     }
-    self.setData({
-      devKeys: devKeys, lightDevices: [], fanDevices: [],
-      acDevice: ac, acModeLabel: self._acModeLabel(ac ? ac.mode : 'off'),
-      curtainDevices: curtains, bgmDevice: bgm
-    })
-
-    // 异步获取真实设备状态（无论成功失败都不阻塞UI）
-    API.getRoomDevices(roomId).then(function(apiDevices) {
-      if (!apiDevices || apiDevices.length === 0) return
-
-      // 用API实时状态二次映射：通过 type+channel 匹配到本地设备
-      var apiAC = null, apiCurtains = [], apiBGM = null
-      var apiLights = [], apiFans = []
-      for (var i = 0; i < apiDevices.length; i++) {
-        var d = apiDevices[i], a = d.attributes || {}
-        if (d.type === 'AC') apiAC = d
-        else if (d.type === 'Curtain') apiCurtains.push(d)
-        else if (d.type === 'Light') apiLights.push(d)
-        else if (d.type === 'Fan' || d.type === 'ExhaustFan') apiFans.push(d)
-        else if (d.type === 'BGM' || d.type === 'Speaker') apiBGM = d
-      }
-
-      // 更新空调
-      if (apiAC) {
-        var aa = apiAC.attributes || {}
-        ac.mode = aa.mode || ac.mode || 'off'
-        ac.temperature = aa.target_temperature || aa.temperature || ac.temperature || 24
-        ac.deviceId = apiAC.deviceId
-      }
-
-      // 更新灯光/风扇：按顺序匹配（本地第N个Light ← 第N个API Light）
-      var lightIdx = 0, fanIdx = 0
-      for (var i = 0; i < devKeys.length; i++) {
-        var k = devKeys[i]
-        if (k.type === 'Light' && lightIdx < apiLights.length) {
-          k.active = !!(apiLights[lightIdx].attributes||{}).power
-          k.deviceId = apiLights[lightIdx].deviceId
-          lightIdx++
-        } else if (k.type === 'Fan' && fanIdx < apiFans.length) {
-          var isOn = !!(apiFans[fanIdx].attributes||{}).speed || !!(apiFans[fanIdx].attributes||{}).power
-          k.active = isOn
-          k.deviceId = apiFans[fanIdx].deviceId
-          fanIdx++
-        } else if (k.type === 'ExhaustFan' && fanIdx < apiFans.length) {
-          k.active = !!(apiFans[fanIdx].attributes||{}).speed || !!(apiFans[fanIdx].attributes||{}).power
-          k.deviceId = apiFans[fanIdx].deviceId
-          fanIdx++
-        }
-      }
-
-      // 更新窗帘
-      for (var j = 0; j < apiCurtains.length && j < curtains.length; j++) {
-        var ca = apiCurtains[j].attributes || {}
-        curtains[j].deviceId = apiCurtains[j].deviceId
-        var pos = ca.current_position !== undefined ? ca.current_position : (ca.position === 'open' ? 100 : 0)
-        curtains[j].positionNum = pos
-      }
-
-      // 更新背景音乐
-      if (apiBGM) {
-        var ba = apiBGM.attributes || {}
-        bgm.playing = ba.playing || false
-        bgm.volume = ba.volume || 30
-        bgm.deviceId = apiBGM.deviceId
-      }
-
-      self.setData({ devKeys: devKeys, acDevice: ac, curtainDevices: curtains, bgmDevice: bgm })
-    }).catch(function() {
-      // API不可用不阻塞，设备已用本地清单展示
-    })
-  },
-
-  // 解析设备ID：本地ID → API真实deviceId
-  _resolveId: function(localId) {
-    return this.data._devIdMap[localId] || localId
+    self.setData({ devKeys: devKeys, acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '\u5df2\u5173\u673a', curtainDevices: curtains, bgmDevice: bgm })
   },
 
   onKeyTap: function(e) {
@@ -226,9 +182,10 @@ Page({
     wx.showLoading({ title: on ? '全开中...' : '全关中...' })
     var done = 0
     for (var i = 0; i < lightKeys.length; i++) {
-      var devId = lightKeys[i].deviceId || self._resolveId(lightKeys[i].key || lightKeys[i])
+      var devId = lightKeys[i]
+      for (var j = 0; j < keys.length; j++) { if (keys[j].key === lightKeys[i] && keys[j].deviceId) { devId = keys[j].deviceId; break } }
       API.controlDevice(devId, { brightness: on ? 80 : 0 }).then(function() {
-        done++; if (done >= lightKeys.length) { wx.hideLoading() }
+        done++; if (done >= lightKeys.length) { wx.hideLoading(); self._cacheRoomState(self.data.roomId) }
       }).catch(function(err) {
         done++; if (done >= lightKeys.length) { wx.hideLoading() }
         if (err && err.message) wx.showToast({ title: '灯控失败: ' + err.message, icon: 'none' })
@@ -244,11 +201,24 @@ Page({
     var cmd = {}
     if (type === 'Light') cmd = { brightness: newState ? 80 : 0 }
     else if (type === 'Fan' || type === 'ExhaustFan') cmd = { speed: newState ? 3 : 0 }
-    API.controlDevice(deviceId, cmd).catch(function(err) {
+    API.controlDevice(deviceId, cmd).then(function() {
+      self._cacheRoomState(self.data.roomId)
+    }).catch(function(err) {
       for (var i = 0; i < keys.length; i++) { if (keys[i].deviceId === deviceId || keys[i].key === deviceId) { keys[i].active = !newState; break } }
       self.setData({ devKeys: keys })
       wx.showToast({ title: '控制失败: ' + ((err && err.message) || '设备无响应'), icon: 'none' })
     })
+  },
+
+  _cacheRoomState: function(roomId) {
+    try {
+      wx.setStorageSync('room_devices_' + roomId, {
+        devKeys: this.data.devKeys,
+        acDevice: this.data.acDevice,
+        curtains: this.data.curtainDevices,
+        bgm: this.data.bgmDevice,
+      })
+    } catch(e) {}
   },
 
   toggleAC: function(e) {
