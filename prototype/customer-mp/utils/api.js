@@ -274,7 +274,23 @@ const API = {
   },
 
   getRoomById(roomId) {
-    if (!USE_MOCK) return request({ url: '/api/rooms/' + roomId })
+    if (!USE_MOCK) return request({ url: '/api/rooms/' + roomId }).then(function(r) {
+      if (!r) return null
+      return {
+        roomId: r.room_id || r.roomId || '',
+        name: r.name || '',
+        type: r.type || '',
+        capacity: r.capacity || 0,
+        area: r.area || 0,
+        floor: r.floor || '',
+        description: r.description || '',
+        facilities: r.facilities || [],
+        pricePerHour: r.price_per_hour || r.pricePerHour || 120,
+        pricePerHalfHour: r.price_per_half_hour || r.pricePerHalfHour || 60,
+        status: (r.status === false || r.is_active === false) ? 'Inactive' : 'Active',
+        bookable: r.bookable !== false,
+      }
+    })
     return delay().then(() => {
       for (var i = 0; i < MOCK.rooms.length; i++) {
         if (MOCK.rooms[i].roomId === roomId) return JSON.parse(JSON.stringify(MOCK.rooms[i]))
