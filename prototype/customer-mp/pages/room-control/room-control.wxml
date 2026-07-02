@@ -31,7 +31,7 @@
 
     <!-- 无权限提示 -->
     <view class="device-section" wx:if="{{!canControl && !_isStaff}}">
-      <view class="no-control-tip">
+      <view class="no-control-tip" bindtap="goToBooking">
         <text class="tip-icon">📋</text>
         <text class="tip-text">您当前没有进行中的订单，去预订包间即可使用设备控制</text>
       </view>

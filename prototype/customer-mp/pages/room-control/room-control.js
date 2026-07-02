@@ -12,8 +12,7 @@ Page({
     canControl: false, _isStaff: false,
     _devIdMap: {}, // 本地ID ↔ API真实deviceId映射
     showExtendModal: false, showExtendPayModal: false,
-    goToBooking: function() { wx.navigateTo({ url: "/pages/room-list/room-list" }) },
-  extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
+    extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
     extendPayInfo: '', extendPayAmount: 0, extendPayMethod: 'balance'
   },
 
@@ -205,6 +204,8 @@ Page({
       })
     }
   },
+
+  goToBooking: function() { wx.navigateTo({ url: "/pages/room-list/room-list" }) },
 
   _toggleDevice: function(deviceId, type, newState) {
     var self = this
