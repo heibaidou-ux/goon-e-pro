@@ -227,6 +227,8 @@ Page({
     })
   },
 
+  _resolveId: function(id) { return this.data._devIdMap && this.data._devIdMap[id] ? this.data._devIdMap[id] : id },
+
   _cacheRoomState: function(roomId) {
     try {
       wx.setStorageSync('room_devices_' + roomId, {

@@ -38,7 +38,7 @@
     </view>
 
     <!-- 空调 -->
-    <view class="device-section" wx:if="{{acDevice && (canControl || _isStaff)}}">
+    <view class="device-section" wx:if="{{acDevice}}">
       <text class="section-label">❄️ 空调</text>
       <view class="ac-card">
         <view class="ac-main">
