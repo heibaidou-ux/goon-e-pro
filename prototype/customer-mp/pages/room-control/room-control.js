@@ -111,7 +111,7 @@ Page({
       for (var i = 0; i < apiDevices.length; i++) {
         var d = apiDevices[i], a = d.attributes || {}
         if (d.type === 'Lock' || d.type === 'System') { continue
-        } else if (d.type === 'AC') {
+        } else if (d.type === 'AC' || d.type === 'Climate') {
           ac = { deviceId: d.deviceId, name: d.name, mode: a.mode || 'off', temperature: a.target_temperature || a.temperature || 24 }
         } else if (d.type === 'Curtain') {
           var pos = a.current_position !== undefined ? a.current_position : (a.position === 'open' ? 100 : 0)
@@ -153,7 +153,7 @@ Page({
     for (var i = 0; i < devices.length; i++) {
       var d = devices[i]
       if (d.type === 'Lock' || d.type === 'System') { continue }
-      if (d.type === 'AC') { ac = { deviceId: roomId+'_ac', name: d.name, mode: 'off', temperature: 24 }; continue }
+      if (d.type === 'AC' || d.type === 'Climate') { ac = { deviceId: roomId+'_ac', name: d.name, mode: 'off', temperature: 24 }; continue }
       if (d.type === 'Curtain') { curtains.push({ deviceId: d.id, name: d.name, positionNum: 0 }); continue }
       if (d.type === 'Speaker') { bgm = { deviceId: d.id, playing: false, volume: 30 }; continue }
       if (d.type === 'Light' && d.name && d.name.indexOf('壁灯') >= 0) { continue }

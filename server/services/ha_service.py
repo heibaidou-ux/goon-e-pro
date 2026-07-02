@@ -29,6 +29,10 @@ from typing import Optional
 
 from config import settings
 
+# 485空调网关（VPS内部HTTP API）
+AC_GATEWAY_URL = "http://127.0.0.1:8801"
+AC_ADDR_MAP = {"RM001": 0x09, "RM002": 0x0B, "RM003": 0x0A, "RM004": 0x0C}
+
 # ── HA房间名映射（ERP room_id ↔ HA系统名）──
 # 根据 ERP_IoT_API规范.md v1.1
 
@@ -48,6 +52,11 @@ HA_ENTITY_ROOM_MAP = {
     "bu_la_ge": "bulage",           # 布拉格
     "fei_leng_cui": "feilengcui",   # 翡冷翠
     "feng_sha_li": "fengshali",     # 丰沙里
+    # 空调温控器climate实体
+    "dacha": "baishawa",
+    "zhong": "bulage",
+    "xiao": "feilengcui",
+    "meeting": "fengshali",
 }
 
 
@@ -454,8 +463,62 @@ async def control_device(device_id: str, action: str, params: Optional[dict] = N
     """
     if is_mock_mode():
         return _mock_control(device_id, action, params or {})
+    # Climate/AC设备：走485直连网关（绕过HA template climate）
+    device = _get_device(device_id)
+    if device and device.get("type") in ("AC", "Climate"):
+        room_id = device.get("room_id", "")
+        addr = AC_ADDR_MAP.get(room_id)
+        if addr:
+            try:
+                return await _ac_gateway_control(addr, action, params or {})
+            except Exception as e:
+                logger.error(f"空调485控制失败: {e}")
+                return {"success": False, "message": f"空调控制失败: {e}"}
     return await _ha_control(device_id, action, params or {})
 
+
+async def _ac_gateway_control(addr: int, action: str, params: dict) -> dict:
+    """通过485网关直接控制空调温控器。
+    寄存器映射: 57=开关, 49=模式, 50=风速, 54=制冷温度, 77=制热温度
+    """
+    reg_map = {"on": (57, 1), "off": (57, 0)}
+    if action == "on":
+        await _ac_write_reg(addr, 57, 1)
+        return {"success": True, "message": "开机指令已发送", "action": "on"}
+    elif action == "off":
+        await _ac_write_reg(addr, 57, 0)
+        return {"success": True, "message": "关机指令已发送", "action": "off"}
+    elif action in ("cool", "heat", "fan"):
+        mode_val = {"cool": 0, "heat": 1, "fan": 2}[action]
+        await _ac_write_reg(addr, 49, mode_val)
+        await _ac_write_reg(addr, 57, 1)
+        return {"success": True, "message": f"模式已切换: {action}"}
+    elif action == "temperature" or action == "set_temperature":
+        temp = int(params.get("temperature", 24))
+        temp = max(16, min(30, temp))
+        await _ac_write_reg(addr, 54, temp)
+        return {"success": True, "message": f"温度已设为 {temp}°C"}
+    elif action == "fan_speed" or action == "speed":
+        speed = params.get("speed", 2)
+        speed_map = {"low":0, "middle":1, "high":2, "auto":4}
+        if isinstance(speed, str): speed = speed_map.get(speed, 2)
+        await _ac_write_reg(addr, 50, int(speed))
+        return {"success": True, "message": f"风速已设"}
+    return {"success": False, "message": f"不支持的动作: {action}"}
+
+async def _ac_write_reg(addr: int, reg: int, value: int) -> dict:
+    """向485网关发送Modbus写寄存器指令。"""
+    async with httpx.AsyncClient(timeout=5) as client:
+        resp = await client.post(AC_GATEWAY_URL, json={
+            "action": "modbus_write_reg",
+            "addr": addr,
+            "reg": reg,
+            "value": value,
+        })
+        data = resp.json()
+        if not data.get("ok"):
+            raise RuntimeError(f"网关返回错误: {data}")
+        return data
 
 def _mock_control(device_id: str, action: str, params: dict) -> dict:
     """模拟控制（脱机开发用）。"""
