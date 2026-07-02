@@ -121,20 +121,15 @@ Page({
         } else if (d.type === 'Fan' || d.type === 'ExhaustFan') {
           devKeys.push({ key: d.deviceId, label: d.name || '\u98ce\u6247', icon: '\u23e3', type: d.type, active: !!(a.speed > 0 || a.power), deviceId: d.deviceId })
         } else if (d.type === 'Speaker' || d.type === 'BGM') {
-          // 有playing/volume属性、或名称含背景音乐/BGM、或deviceId含_bgm的当作BGM面板
-          if (a.playing !== undefined || a.volume !== undefined || (d.name && d.name.indexOf('背景音乐') >= 0) || (d.deviceId && d.deviceId.indexOf('_bgm') >= 0) || d.deviceId.indexOf('media_player') >= 0) {
-            bgm = { deviceId: d.deviceId, playing: a.playing || a.power || false, volume: a.volume || 30 }
-          } else {
-            devKeys.push({ key: d.deviceId, label: d.name || '功放', icon: '🔊', type: 'Speaker', active: !!(a.power || a.volume_level > 0), deviceId: d.deviceId })
-          }
+          // Speaker/BGM只设底部面板，不推入devKeys
+          bgm = { deviceId: d.deviceId, playing: a.playing || a.power || false, volume: a.volume || 30 }
         }
       }
       self.setData({ devKeys: devKeys, acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '\u5df2\u5173\u673a', curtainDevices: curtains, bgmDevice: bgm })
-      // API未返回BGM时自动补充
+      // 后端未返回BGM时补充
       if (!bgm) {
         bgm = { deviceId: "bgm_" + roomId, playing: false, volume: 30 }
-        devKeys.push({ key: "bgm_" + roomId, label: "背景音乐", icon: "🔊", type: "Speaker", active: false, deviceId: "bgm_" + roomId })
-        self.setData({ devKeys: devKeys, bgmDevice: bgm })
+        self.setData({ bgmDevice: bgm })
       }
       try { wx.setStorageSync('room_devices_' + roomId, { devKeys: devKeys, acDevice: ac, curtains: curtains, bgm: bgm }) } catch(e) {}
     }).catch(function() {
@@ -161,6 +156,7 @@ Page({
       if (d.type === 'AC') { ac = { deviceId: roomId+'_ac', name: d.name, mode: 'off', temperature: 24 }; continue }
       if (d.type === 'Curtain') { curtains.push({ deviceId: d.id, name: d.name, positionNum: 0 }); continue }
       if (d.type === 'Speaker') { bgm = { deviceId: d.id, playing: false, volume: 30 }; continue }
+      if (d.type === 'Light' && d.name && d.name.indexOf('壁灯') >= 0) { continue }
       if (d.type === 'Light' && d.name.indexOf('壁灯') < 0) { devKeys.push({ key: d.id, label: d.name, icon: '💡', type: 'Light', active: false }) }
       if (d.type === 'Fan' || d.type === 'ExhaustFan') { devKeys.push({ key: d.id, label: d.name, icon: '\u23e3', type: d.type, active: false }) }
     }
