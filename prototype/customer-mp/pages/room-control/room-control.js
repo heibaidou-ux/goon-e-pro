@@ -134,6 +134,7 @@ Page({
       if (!bgm) {
         bgm = { deviceId: "bgm_" + roomId, playing: false, volume: 30 }
         devKeys.push({ key: "bgm_" + roomId, label: "背景音乐", icon: "🔊", type: "Speaker", active: false, deviceId: "bgm_" + roomId })
+        self.setData({ devKeys: devKeys, bgmDevice: bgm })
       }
       try { wx.setStorageSync('room_devices_' + roomId, { devKeys: devKeys, acDevice: ac, curtains: curtains, bgm: bgm }) } catch(e) {}
     }).catch(function() {
