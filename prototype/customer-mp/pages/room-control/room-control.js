@@ -116,9 +116,9 @@ Page({
         } else if (d.type === 'Fan' || d.type === 'ExhaustFan') {
           devKeys.push({ key: d.deviceId, label: d.name || '\u98ce\u6247', icon: '\u23e3', type: d.type, active: !!(a.speed > 0 || a.power), deviceId: d.deviceId })
         } else if (d.type === 'Speaker' || d.type === 'BGM') {
-          // 有playing/volume属性的才是真正的背景音乐，否则是功放开关按钮
-          if (a.playing !== undefined || a.volume !== undefined || d.deviceId.indexOf('media_player') >= 0) {
-            bgm = { deviceId: d.deviceId, playing: a.playing || false, volume: a.volume || 30 }
+          // 有playing/volume属性、或名称含背景音乐/BGM、或deviceId含_bgm的当作BGM面板
+          if (a.playing !== undefined || a.volume !== undefined || (d.name && d.name.indexOf('背景音乐') >= 0) || (d.deviceId && d.deviceId.indexOf('_bgm') >= 0) || d.deviceId.indexOf('media_player') >= 0) {
+            bgm = { deviceId: d.deviceId, playing: a.playing || a.power || false, volume: a.volume || 30 }
           } else {
             devKeys.push({ key: d.deviceId, label: d.name || '功放', icon: '🔊', type: 'Speaker', active: !!(a.power || a.volume_level > 0), deviceId: d.deviceId })
           }

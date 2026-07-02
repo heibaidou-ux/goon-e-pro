@@ -170,20 +170,19 @@ def _build_devices_for_room(room: dict, ha_room: str) -> list[dict]:
             "status": "Online",
             "attributes": {"position": "closed", "current_position": 0},
         })
-    # Speaker — 背景音乐（展厅功放已挂翡冷翠，翡冷翠不重复加）
-    if room["room_id"] != "RM003":
-        devices.append({
-            "device_id": f"DEV{idx_base}40",
-            "room_id": room["room_id"],
-            "type": "Speaker",
-            "name": f"{room['name']}背景音乐",
-            "ha_entity_id": f"switch.{ha_room}_bgm",
-            "protocol": "IP",
-            "slave_id": None,
-            "sub_address": None,
-            "status": "Online",
-            "attributes": {"playing": False, "volume": 30},
-        })
+    # Speaker — 每个房间独立背景音乐
+    devices.append({
+        "device_id": f"DEV{idx_base}40",
+        "room_id": room["room_id"],
+        "type": "Speaker",
+        "name": f"{room['name']}背景音乐",
+        "ha_entity_id": f"switch.{ha_room}_bgm",
+        "protocol": "IP",
+        "slave_id": None,
+        "sub_address": None,
+        "status": "Online",
+        "attributes": {"playing": False, "volume": 30},
+    })
     # Sensors
     devices.append({
         "device_id": f"DEV{idx_base}30",
@@ -826,6 +825,8 @@ def _ha_entity_to_type(entity_id: str) -> Optional[str]:
         # 仅_relay_ch或_all_lights才作为Light
         if "_relay_" in entity_name or "_all_lights" in entity_name:
             return "Light"
+        if "_bgm" in entity_name:
+            return "Speaker"
         # 其他switch跳过
         return None
 
