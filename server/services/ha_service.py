@@ -384,22 +384,40 @@ async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] 
                 if state.get('state') in ('unavailable', None, ''):
                     continue
                 devices.append(_ha_state_to_device(state))
-        # 补充缺失的背景音乐控件
-        bgm_rooms = set()
+        # 补充缺失的必需设备（HA未定义但ERP需要的）
+        existing_types = {}
         for d in devices:
-            if d['type'] in ('Speaker', 'BGM'):
-                bgm_rooms.add(d['room_id'])
+            existing_types.setdefault(d['room_id'], set()).add(d['type'])
         for room in ROOMS:
-            if room['room_id'] not in bgm_rooms:
-                ha_room = HA_ROOM_MAP.get(room['room_id'], '')
+            rid = room['room_id']
+            types = existing_types.get(rid, set())
+            ha_room = HA_ROOM_MAP.get(rid, '')
+            # 背景音乐
+            if 'Speaker' not in types and 'BGM' not in types:
                 devices.append({
-                    'device_id': f'bgm_{room["room_id"]}',
-                    'room_id': room['room_id'],
-                    'type': 'Speaker',
-                    'name': f'{room["name"]}背景音乐',
-                    'ha_entity_id': f'switch.{ha_room}_bgm',
+                    'device_id': 'bgm_' + rid, 'room_id': rid,
+                    'type': 'Speaker', 'name': room['name'] + '背景音乐',
+                    'ha_entity_id': 'switch.' + ha_room + '_bgm',
                     'protocol': 'IP', 'status': 'Online',
                     'attributes': {'playing': False, 'volume': 30},
+                })
+            # 白沙瓦风扇
+            if 'Fan' not in types and rid == 'RM004':
+                devices.append({
+                    'device_id': 'fan_' + rid, 'room_id': rid,
+                    'type': 'Fan', 'name': room['name'] + '风扇',
+                    'ha_entity_id': 'switch.' + ha_room + '_relay_fan',
+                    'protocol': 'Modbus', 'status': 'Online',
+                    'attributes': {'speed': 0},
+                })
+            # 翡冷翠换气扇
+            if 'ExhaustFan' not in types and rid == 'RM003':
+                devices.append({
+                    'device_id': 'ef_' + rid, 'room_id': rid,
+                    'type': 'ExhaustFan', 'name': room['name'] + '换气扇',
+                    'ha_entity_id': 'switch.' + ha_room + '_relay_ef',
+                    'protocol': 'Modbus', 'status': 'Online',
+                    'attributes': {'speed': 0},
                 })
         return devices
     except Exception:
@@ -847,21 +865,18 @@ def _ha_entity_to_type(entity_id: str) -> Optional[str]:
         # 其他switch跳过
         return None
 
+    if domain == "input_select" or domain == "input_boolean":
+        return "System"
+    if domain == "media_player":
+        return "Speaker"
+
+
     if domain == "sensor":
         if "temp" in entity_name:
             return "Sensor"
         if "humidity" in entity_name:
             return "Sensor"
         return "Sensor"
-
-    if domain == "input_boolean":
-        return "System"
-
-    if domain == "input_number":
-        return "Sensor"
-
-    if domain == "input_select":
-        return "Speaker"
 
     return None
 
@@ -923,7 +938,6 @@ def _ha_state_to_device(state: dict) -> dict:
 
     friendly_name = attrs.get("friendly_name", "")
     if not friendly_name:
-        # 从通道描述取中文名
         ha_room_name = _ha_entity_to_room(entity_id)
         for ha_rn, erp_id in HA_ROOM_REVERSE.items():
             if ha_rn == ha_room_name:
@@ -934,10 +948,18 @@ def _ha_state_to_device(state: dict) -> dict:
                         friendly_name = desc
                         break
                 if not friendly_name:
-                    # fallback: 读目标名
                     domain = entity_id.split(".")[0] if "." in entity_id else ""
                     short_name = entity_name.split(".")[1] if "." in entity_id else entity_id
                     friendly_name = short_name[:16]
+    # 根据friendly_name重分类设备类型（HA的switch无法区分灯/风扇/功放）
+    if device_type == "Light" and friendly_name:
+        fn_lower = friendly_name.lower()
+        if '换气扇' in fn_lower or '排气' in fn_lower:
+            device_type = "ExhaustFan"
+        elif '风扇' in fn_lower:
+            device_type = "Fan"
+        elif '功放' in fn_lower or '音箱' in fn_lower or '音响' in fn_lower or '喇叭' in fn_lower:
+            device_type = "Speaker"
     return {
         "device_id": entity_id,
         "room_id": room_id,
