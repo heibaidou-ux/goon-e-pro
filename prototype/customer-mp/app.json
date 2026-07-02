@@ -1,12 +1,21 @@
 {
   "entryPagePath": "pages/home/home",
   "pages": [
-    "pages/home/home","pages/room-list/room-list","pages/room-detail/room-detail",
-    "pages/booking-confirm/booking-confirm","pages/tea-shop/tea-shop",
-    "pages/my-orders/my-orders","pages/member-center/member-center","pages/address-manager/address-manager",
-    "pages/scan-landing/scan-landing","pages/scan-order/scan-order","pages/scan-bill/scan-bill",
-    "pages/room-control/room-control","pages/my-coupons/my-coupons",
-    "pages/coupon-verify/coupon-verify","pages/parking-guide/parking-guide",
+    "pages/home/home",
+    "pages/room-list/room-list",
+    "pages/room-detail/room-detail",
+    "pages/booking-confirm/booking-confirm",
+    "pages/tea-shop/tea-shop",
+    "pages/my-orders/my-orders",
+    "pages/member-center/member-center",
+    "pages/address-manager/address-manager",
+    "pages/scan-landing/scan-landing",
+    "pages/scan-order/scan-order",
+    "pages/scan-bill/scan-bill",
+    "pages/room-control/room-control",
+    "pages/my-coupons/my-coupons",
+    "pages/coupon-verify/coupon-verify",
+    "pages/parking-guide/parking-guide",
     "pages/privacy/privacy"
   ],
   "subpackages": [
@@ -14,14 +23,21 @@
       "root": "pages/staff",
       "name": "staff",
       "pages": [
-        "staff-login/staff-login","staff-dashboard/staff-dashboard",
-        "staff-room-status/staff-room-status","staff-device-monitor/staff-device-monitor",
-        "staff-cleaning-task/staff-cleaning-task","staff-order-management/staff-order-management",
-        "staff-todo/staff-todo","staff-profile/staff-profile",
-        "staff-attendance/staff-attendance","staff-inspection/staff-inspection",
-        "staff-scheduling/staff-scheduling","staff-reconciliation/staff-reconciliation",
+        "staff-login/staff-login",
+        "staff-dashboard/staff-dashboard",
+        "staff-room-status/staff-room-status",
+        "staff-device-monitor/staff-device-monitor",
+        "staff-cleaning-task/staff-cleaning-task",
+        "staff-order-management/staff-order-management",
+        "staff-todo/staff-todo",
+        "staff-profile/staff-profile",
+        "staff-attendance/staff-attendance",
+        "staff-inspection/staff-inspection",
+        "staff-scheduling/staff-scheduling",
+        "staff-reconciliation/staff-reconciliation",
         "staff-product-management/staff-product-management",
-        "staff-device-control/staff-device-control","staff-scene-control/staff-scene-control",
+        "staff-device-control/staff-device-control",
+        "staff-scene-control/staff-scene-control",
         "staff-receivable/staff-receivable"
       ]
     },
@@ -29,8 +45,10 @@
       "root": "pages/workbench",
       "name": "workbench",
       "pages": [
-        "finance-workbench/finance-workbench","gm-workbench/gm-workbench",
-        "investor-workbench/investor-workbench","technician-workbench/technician-workbench"
+        "finance-workbench/finance-workbench",
+        "gm-workbench/gm-workbench",
+        "investor-workbench/investor-workbench",
+        "technician-workbench/technician-workbench"
       ]
     }
   ],
@@ -38,9 +56,12 @@
     "navigationBarTitleText": "高岸茶室",
     "navigationBarTextStyle": "black",
     "navigationBarBackgroundColor": "#ffffff",
+    "initialRenderingCache": "static",
     "backgroundColor": "#FAF8F5"
   },
-  "networkTimeout": { "request": 10000 },
+  "networkTimeout": {
+    "request": 10000
+  },
   "sitemapLocation": "sitemap.json",
   "usingComponents": {
     "bottom-nav": "/components/bottom-nav/bottom-nav",
@@ -50,6 +71,17 @@
   "__usePrivacyCheck__": true,
   "requiredPrivateInfos": [],
   "permission": {
-    "scope.userLocation": { "desc": "用于查找附近门店" }
+    "scope.userLocation": {
+      "desc": "用于查找附近门店"
+    }
+  },
+  "preloadRule": {
+    "pages/home/home": {
+      "network": "all",
+      "packages": [
+        "staff",
+        "workbench"
+      ]
+    }
   }
 }

@@ -55,7 +55,6 @@ Page({
       for (var i = 0; i < devices.length; i++) {
         var d = devices[i], a = d.attributes || {}
         d.typeLabel = self.data.currentRoomName + " " + (labels[d.type] || d.type)
-        if (d.type === "Speaker" || d.type === "BGM") continue
         d.typeIcon = icons[d.type] || "📡"
         if (d.type === "Light") d.on = a.power || (a.brightness || 0) > 0
         else if (d.type === "Fan" || d.type === "ExhaustFan") d.on = (a.speed || 0) > 0

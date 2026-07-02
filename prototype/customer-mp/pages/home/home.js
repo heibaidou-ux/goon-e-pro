@@ -15,11 +15,10 @@ Page({
     ],
     rooms: [], teaProducts: [], cartCount: 0,
     balance: 0, balanceDisplay: '', balanceVisible: true,
-    qrRoomId: '', qrRoomName: '', qrTableId: '',
+    
     currentStore: 'huachengguangchang', storeName: '花城广场店', showStoreModal: false, showAllStores: false, showLoginModal: false,
-    showBillModal: false, showQrWarning: false, qrWarningText: '',
-    phoneLoginView: false, loginMode: 'login', loginType: 'code', loginPhone: '', loginCode: '', loginPassword: '',
-    regPhone: '', regCode: '',
+    
+    phoneLoginView: false, 
     billItems: [], billTotal: 0, pendingAction: null, isLoggedIn: false, wxNickname: "", wxAvatar: ""
   },
 
@@ -49,9 +48,10 @@ Page({
         self.setData({ rooms: cached.rooms, teaProducts: cached.teas })
       }
     } catch(e) {}
+    // 合并storage读取
+    try { var v = wx.getStorageSync("balance_visible"); if (v !== "") self.data.balanceVisible = v } catch(e) {}
     var u = API.getCurrentUser()
     self.setData({ wxNickname: (u&&(u.wechat_nickname||u.display_name||u.name))||'', wxAvatar: (u&&u.wechat_avatar)||'', loading: false, errorMsg: '' })
-    try { var v = wx.getStorageSync('balance_visible'); if (v !== "") self.data.balanceVisible = v } catch(e) {}
     var colors = { MeetingRoom:'#e3f2fd', TeaRoom:'#e8f5e9', Exhibition:'#fff3e0', Workspace:'#f5f5f5' }
     var icons = { MeetingRoom:'💼', TeaRoom:'🍵', Exhibition:'🏛', Workspace:'🔧' }
 
