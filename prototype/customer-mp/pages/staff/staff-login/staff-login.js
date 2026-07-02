@@ -6,8 +6,24 @@ Page({
     selectedRole: 'staff',
     account: '',
     password: '',
+    showPwd: false,
+    rememberPwd: false,
     loading: false,
     error: ''
+  },
+
+  onLoad: function() {
+    // 恢复上次账号和记住的密码
+    try {
+      var saved = wx.getStorageSync('staff_login_remember') || {}
+      if (saved.account) {
+        this.setData({
+          account: saved.account,
+          password: saved.password || '',
+          rememberPwd: !!(saved.password)
+        })
+      }
+    } catch(e) {}
   },
 
   switchRole: function(e) {
@@ -17,6 +33,8 @@ Page({
 
   onAccount: function(e) { this.setData({ account: e.detail.value }) },
   onPassword: function(e) { this.setData({ password: e.detail.value }) },
+  togglePwd: function() { this.setData({ showPwd: !this.data.showPwd }) },
+  toggleRemember: function() { this.setData({ rememberPwd: !this.data.rememberPwd }) },
 
   doLogin: function() {
     var self = this
@@ -24,6 +42,13 @@ Page({
     self.setData({ loading: true, error: '' })
 
     API.loginWithRole(self.data.account, self.data.password, self.data.selectedRole).then(function(user) {
+      // 记住密码
+      if (self.data.rememberPwd) {
+        try { wx.setStorageSync('staff_login_remember', { account: self.data.account, password: self.data.password }) } catch(e) {}
+      } else {
+        try { wx.setStorageSync('staff_login_remember', { account: self.data.account, password: '' }) } catch(e) {}
+      }
+
       app.globalData.user = user
       app.globalData.loggedIn = true
       app.globalData.userRole = user.role

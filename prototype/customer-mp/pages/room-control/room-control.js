@@ -9,6 +9,7 @@ Page({
     devKeys: [], acModeLabel: '',
     acDevice: null, curtainDevices: [], bgmDevice: null,
     lightDevices: [], fanDevices: [],
+    canControl: false, _isStaff: false,
     _devIdMap: {}, // 本地ID ↔ API真实deviceId映射
     showExtendModal: false, showExtendPayModal: false,
     extendInfo: '', extendOptions: [], selectedExtendIdx: -1,
@@ -22,7 +23,10 @@ Page({
     var endStr = e.end || ''
     var startStr = e.start || ''
     var self = this
-    try { if (wx.getStorageSync('mp_user_role') === 'staff') self.setData({ hideBottomNav: true }) } catch(e) {}
+    try { 
+      var userRole = wx.getStorageSync('mp_user_role') 
+      if (userRole === 'staff') { self.setData({ hideBottomNav: true, _isStaff: true, canControl: true }) }
+    } catch(e) {}
 
     self.setData({ roomId: roomId, roomName: roomName, orderStart: startStr })
 
@@ -45,6 +49,7 @@ Page({
       }
 
       if (activeOrder && activeOrder.status === 'InUse') {
+        if (!self.data._isStaff) self.setData({ canControl: true })
         var timeStr = activeOrder.time || ''
         var slot = ''
         if (timeStr) {

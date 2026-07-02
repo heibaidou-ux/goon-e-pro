@@ -16,7 +16,17 @@
       </view>
       <view class="form-item">
         <text class="form-label">密码</text>
-        <input class="form-input" password="{{true}}" placeholder="请输入密码" value="{{password}}" bindinput="onPassword" />
+        <view class="pwd-row">
+          <input class="form-input pwd-input" password="{{!showPwd}}" placeholder="请输入密码" value="{{password}}" bindinput="onPassword" />
+          <text class="pwd-toggle" bindtap="togglePwd">{{showPwd ? '🙈' : '👁'}}</text>
+        </view>
+      </view>
+
+      <view class="form-options">
+        <view class="remember-row" bindtap="toggleRemember">
+          <text class="check-box {{rememberPwd ? 'checked' : ''}}">{{rememberPwd ? '✓' : ''}}</text>
+          <text class="remember-label">记住密码</text>
+        </view>
       </view>
 
       <view class="form-btn" bindtap="doLogin" loading="{{loading}}">登 录</view>

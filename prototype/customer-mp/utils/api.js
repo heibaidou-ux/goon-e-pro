@@ -71,7 +71,21 @@ async function request(options) {
         if (res.statusCode === 401) {
           setToken(null)
           lsSet('logged_in', false)
-          // 不跳转，只报错——让用户自己决定下一步
+          // 店员端：弹对话框让用户选择是否重新登录
+          var role = lsGet('user_role', '')
+          if (role === 'staff') {
+            wx.showModal({
+              title: '登录已过期',
+              content: '您的登录已过期，是否重新登录？',
+              confirmText: '重新登录',
+              cancelText: '留在当前页',
+              success: function(m) {
+                if (m.confirm) {
+                  wx.reLaunch({ url: '/pages/staff/staff-login/staff-login' })
+                }
+              }
+            })
+          }
           reject(new Error('登录已过期，请重新登录'))
           return
         }

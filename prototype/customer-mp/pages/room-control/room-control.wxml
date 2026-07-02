@@ -29,8 +29,16 @@
       </view>
     </view>
 
+    <!-- 无权限提示 -->
+    <view class="device-section" wx:if="{{!canControl && !_isStaff}}">
+      <view class="no-control-tip">
+        <text class="tip-icon">🔒</text>
+        <text class="tip-text">请在预订时段内控制房间设备</text>
+      </view>
+    </view>
+
     <!-- 空调 -->
-    <view class="device-section" wx:if="{{acDevice}}">
+    <view class="device-section" wx:if="{{acDevice && (canControl || _isStaff)}}">
       <text class="section-label">❄️ 空调</text>
       <view class="ac-card">
         <view class="ac-main">
