@@ -116,7 +116,7 @@ Page({
         } else if (d.type === 'Curtain') {
           var pos = a.current_position !== undefined ? a.current_position : (a.position === 'open' ? 100 : 0)
           curtains.push({ deviceId: d.deviceId, name: d.name || '\u7a97\u5e18', positionNum: pos })
-        } else if (d.type === 'Light') {
+        } else if (d.type === 'Light' && (!d.name || d.name.indexOf('壁灯') < 0)) {
           devKeys.push({ key: d.deviceId, label: d.name || '\u706f\u5149', icon: '💡', type: 'Light', active: !!(a.power || a.brightness > 0), deviceId: d.deviceId })
         } else if (d.type === 'Fan' || d.type === 'ExhaustFan') {
           devKeys.push({ key: d.deviceId, label: d.name || '\u98ce\u6247', icon: '\u23e3', type: d.type, active: !!(a.speed > 0 || a.power), deviceId: d.deviceId })
@@ -161,7 +161,7 @@ Page({
       if (d.type === 'AC') { ac = { deviceId: roomId+'_ac', name: d.name, mode: 'off', temperature: 24 }; continue }
       if (d.type === 'Curtain') { curtains.push({ deviceId: d.id, name: d.name, positionNum: 0 }); continue }
       if (d.type === 'Speaker') { bgm = { deviceId: d.id, playing: false, volume: 30 }; continue }
-      if (d.type === 'Light') { devKeys.push({ key: d.id, label: d.name, icon: '💡', type: 'Light', active: false }) }
+      if (d.type === 'Light' && d.name.indexOf('壁灯') < 0) { devKeys.push({ key: d.id, label: d.name, icon: '💡', type: 'Light', active: false }) }
       if (d.type === 'Fan' || d.type === 'ExhaustFan') { devKeys.push({ key: d.id, label: d.name, icon: '\u23e3', type: d.type, active: false }) }
     }
     self.setData({ devKeys: devKeys, acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '\u5df2\u5173\u673a', curtainDevices: curtains, bgmDevice: bgm })
