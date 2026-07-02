@@ -79,7 +79,7 @@ Page({
       { id:'ac', type:'AC', name:'空调' },
       { id:'L1', type:'Light', name:'吊灯' }, { id:'L2', type:'Light', name:'筒灯' }, { id:'L3', type:'Light', name:'背景灯' },
       { id:'F1', type:'Fan', name:'风扇' },
-      { id:'bgm', type:'Speaker', name:'音响' },
+      { id:'bgm', type:'Speaker', name:'背景音乐' },
     ]
     if (roomType === 'MeetingRoom') {
       // 会议室：3个风扇，无窗帘
@@ -87,7 +87,7 @@ Page({
         { id:'ac', type:'AC', name:'空调' },
         { id:'L1', type:'Light', name:'筒灯1' }, { id:'L2', type:'Light', name:'筒灯2' }, { id:'L3', type:'Light', name:'吊灯' },
         { id:'F1', type:'Fan', name:'风扇1' }, { id:'F2', type:'Fan', name:'风扇2' }, { id:'F3', type:'Fan', name:'风扇3' },
-        { id:'bgm', type:'Speaker', name:'音响' },
+        { id:'bgm', type:'Speaker', name:'背景音乐' },
       ]
     }
     // 茶室默认：3窗帘
@@ -130,6 +130,11 @@ Page({
         }
       }
       self.setData({ devKeys: devKeys, acDevice: ac, acModeLabel: ac ? self._acModeLabel(ac.mode) : '\u5df2\u5173\u673a', curtainDevices: curtains, bgmDevice: bgm })
+      // API未返回BGM时自动补充
+      if (!bgm) {
+        bgm = { deviceId: "bgm_" + roomId, playing: false, volume: 30 }
+        devKeys.push({ key: "bgm_" + roomId, label: "背景音乐", icon: "🔊", type: "Speaker", active: false, deviceId: "bgm_" + roomId })
+      }
       try { wx.setStorageSync('room_devices_' + roomId, { devKeys: devKeys, acDevice: ac, curtains: curtains, bgm: bgm }) } catch(e) {}
     }).catch(function() {
       self._renderLocalDevices(roomId)
