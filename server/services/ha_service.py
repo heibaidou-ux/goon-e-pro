@@ -384,7 +384,24 @@ async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] 
                 if state.get('state') in ('unavailable', None, ''):
                     continue
                 devices.append(_ha_state_to_device(state))
-            return devices
+        # 补充缺失的背景音乐控件
+        bgm_rooms = set()
+        for d in devices:
+            if d['type'] in ('Speaker', 'BGM'):
+                bgm_rooms.add(d['room_id'])
+        for room in ROOMS:
+            if room['room_id'] not in bgm_rooms:
+                ha_room = HA_ROOM_MAP.get(room['room_id'], '')
+                devices.append({
+                    'device_id': f'bgm_{room["room_id"]}',
+                    'room_id': room['room_id'],
+                    'type': 'Speaker',
+                    'name': f'{room["name"]}背景音乐',
+                    'ha_entity_id': f'switch.{ha_room}_bgm',
+                    'protocol': 'IP', 'status': 'Online',
+                    'attributes': {'playing': False, 'volume': 30},
+                })
+        return devices
     except Exception:
         return []
 
