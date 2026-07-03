@@ -118,7 +118,8 @@
       <view class="extend-grid">
         <view class="extend-option {{selectedExtendIdx===index ? 'selected' : ''}}" wx:for="{{extendOptions}}" wx:key="index" bindtap="selectExtend" data-index="{{index}}">
           <text class="ext-time">{{item.label}}</text>
-          <text class="ext-price">+{{item.minutes}}分 ¥{{item.price}}</text>
+          <text class="ext-price" wx:if="{{!item.isGift}}">+{{item.minutes}}分 ¥{{item.price}}</text>
+          <text class="ext-price gift" wx:else>🎁 免费赠送</text>
         </view>
       </view>
       <view class="modal-buttons">

@@ -355,6 +355,9 @@ Page({
     var endDate = self._endDate ? new Date(self._endDate) : new Date()
     self.setData({ extendInfo: '当前将于 ' + String(endDate.getHours()).padStart(2,'0') + ':' + String(endDate.getMinutes()).padStart(2,'0') + ' 结束。请选择续订时长：', selectedExtendIdx: -1 })
     var options = []
+    options.push({ label: '🎁 店员赠送(30分)', minutes: 30, price: 0, isGift: true })
+    options.push({ label: '🎁 店员赠送(1小时)', minutes: 60, price: 0, isGift: true })
+    options.push({ label: '🎁 店员赠送(2小时)', minutes: 120, price: 0, isGift: true })
     for (var i = 1; i <= 24; i++) {
       var nd = new Date(endDate.getTime() + i * 30 * 60000)
       options.push({ label: '至 ' + String(nd.getHours()).padStart(2,'0') + ':' + String(nd.getMinutes()).padStart(2,'0'), minutes: i * 30, price: Math.round(120 * i * 30 / 60) })
@@ -366,6 +369,10 @@ Page({
     var idx = this.data.selectedExtendIdx
     if (idx < 0 || idx >= this.data.extendOptions.length) return
     var opt = this.data.extendOptions[idx], self = this
+    if (opt.price === 0) {
+      wx.showModal({ title: '赠送确认', content: '确认为客人赠送' + opt.minutes + '分钟？', success: function(r) { if (r.confirm) self._applyExtend(opt, 'gift') } })
+      return
+    }
     API.getBalance().then(function(b) { self.setData({ balance: b || 0, extendPayInfo: '续订' + opt.minutes + '分钟至 ' + opt.label.replace('至 ',''), extendPayAmount: opt.price, extendPayMethod: 'balance', showExtendModal: false, showExtendPayModal: true }) })
   },
   selectExtendPay: function(e) { this.setData({ extendPayMethod: e.currentTarget.dataset.pay }) },
@@ -373,16 +380,50 @@ Page({
     var self = this, idx = this.data.selectedExtendIdx
     if (idx < 0 || idx >= this.data.extendOptions.length) return
     var opt = this.data.extendOptions[idx], method = this.data.extendPayMethod
-    var p = function() {
-      self._countdownTotal = (self._countdownTotal || 0) + opt.minutes * 60
-      self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
-      if (self._endDate) { self._endDate = new Date(self._endDate.getTime() + opt.minutes * 60000); self.setData({ endTime: String(self._endDate.getHours()).padStart(2,'0') + ':' + String(self._endDate.getMinutes()).padStart(2,'0') }) }
-      try { var bk = wx.getStorageSync('mp_bookings') || []; for (var i = 0; i < bk.length; i++) { if (bk[i].roomId === self.data.roomId && bk[i].status === 'InUse') { bk[i].endTime = String(self._endDate.getHours()).padStart(2,'0') + ':' + String(self._endDate.getMinutes()).padStart(2,'0'); break } }; wx.setStorageSync('mp_bookings', bk) } catch(e) {}
-      self._updateSlot(); self.setData({ showExtendPayModal: false }); wx.showToast({ title: '续订成功！已支付 ¥' + opt.price, icon: 'success' })
+    self._applyExtend(opt, method)
+  },
+
+  _applyExtend: function(opt, method) {
+    var self = this
+    var isGift = (opt.price === 0)
+    if (!isGift && method === 'balance') {
+      API.getBalance().then(function(bal) {
+        if (bal < opt.price) { wx.showToast({ title: '余额不足', icon: 'none' }); return }
+        var u = wx.getStorageSync('mp_user') || {}; u.balance = bal - opt.price; wx.setStorageSync('mp_user', u); self.setData({ balance: u.balance })
+        self._extendCountdown(opt, method)
+      })
+      return
     }
-    if (method === 'balance') {
-      API.getBalance().then(function(bal) { if (bal < opt.price) { wx.showToast({ title: '余额不足，请选择其他方式', icon: 'none' }); return }; var u = wx.getStorageSync('mp_user') || {}; u.balance = bal - opt.price; wx.setStorageSync('mp_user', u); self.setData({ balance: u.balance }); p() })
-    } else { wx.showLoading({ title: '支付中...' }); setTimeout(function() { wx.hideLoading(); p() }, 800) }
+    if (!isGift && method !== 'gift') {
+      wx.showLoading({ title: '支付中...' })
+      setTimeout(function() { wx.hideLoading(); self._extendCountdown(opt, method) }, 800)
+      return
+    }
+    self._extendCountdown(opt, 'gift')
+  },
+
+  _extendCountdown: function(opt, method) {
+    var self = this
+    self._countdownTotal = (self._countdownTotal || 0) + opt.minutes * 60
+    self.setData({ countdown: self._fmtCountdown(self._countdownTotal) })
+    if (self._endDate) {
+      self._endDate = new Date(self._endDate.getTime() + opt.minutes * 60000)
+      self.setData({ endTime: String(self._endDate.getHours()).padStart(2,'0') + ':' + String(self._endDate.getMinutes()).padStart(2,'0') })
+    }
+    try {
+      var bk = wx.getStorageSync('mp_bookings') || []
+      for (var i = 0; i < bk.length; i++) {
+        if (bk[i].roomId === self.data.roomId && bk[i].status === 'InUse') {
+          bk[i].endTime = String(self._endDate.getHours()).padStart(2,'0') + ':' + String(self._endDate.getMinutes()).padStart(2,'0')
+          break
+        }
+      }
+      wx.setStorageSync('mp_bookings', bk)
+    } catch(e) {}
+    self._updateSlot()
+    self.setData({ showExtendPayModal: false })
+    var title = method === 'gift' ? '🎁 赠送成功！已延长' + opt.minutes + '分钟' : '续订成功！¥' + opt.price
+    wx.showToast({ title: title, icon: 'success' })
   },
   hideExtend: function() { this.setData({ showExtendModal: false }) },
   cancelExtendPay: function() { this.setData({ showExtendPayModal: false }); wx.showToast({ title: '已取消续订', icon: 'none' }) }

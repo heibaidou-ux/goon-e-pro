@@ -99,6 +99,8 @@ page { background:#FAF8F5; font-family:-apple-system,BlinkMacSystemFont,"PingFan
 .ext-time { font-size:12px;font-weight:600;display:block; }
 .ext-price { font-size:10px;display:block;margin-top:2px;opacity:.8; }
 .extend-option.selected .ext-price { color:#fff; }
+.ext-price.gift { color:#5D8A6B; font-weight:600; }
+.extend-option.selected .ext-price { color:#fff; }
 .extend-pay-amount { font-size:28px;font-weight:800;color:#B8860B;display:block;margin:8px 0; }
 .pay-modal { width:340px; max-width:90vw; }
 .pay-methods-section { margin:12px 0; }
