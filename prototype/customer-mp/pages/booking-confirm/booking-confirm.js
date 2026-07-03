@@ -221,7 +221,7 @@ Page({
     // 微信支付：先支付，成功后再创建订单（防止支付失败产生脏订单）
     if (self.data.selectedPay == 'wechat' && !self.data.isCombinedPay) {
       wx.showLoading({ title: '正在支付...' })
-      var totalFee = Math.round(self.data.finalPrice || self.data.price) * 100
+      var totalFee = Math.round((self.data.finalPrice || self.data.price) * 100)
       var body = '高岸茶室-' + (self.data.roomName || '包间预订')
       API.wechatPay(totalFee, body).then(function(payResult) {
         // 支付成功后再创建订单
