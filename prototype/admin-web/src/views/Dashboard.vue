@@ -12,6 +12,30 @@
     <t-alert v-else-if="loadError" theme="error" :message="loadError" close style="margin-bottom:16px" />
 
     <template v-else>
+      <!-- 使用中/已预订订单列表 -->
+      <t-card title="当前订单" :bordered="true" style="margin-bottom:20px">
+        <t-table
+          :data="activeOrders"
+          :columns="orderColumns"
+          row-key="appointmentId"
+          size="small"
+          hover
+        >
+          <template #roomName="{ row }">
+            <span style="font-weight:500">{{ row.roomName }}</span>
+          </template>
+          <template #status="{ row }">
+            <t-tag :theme="row.status === 'InUse' ? 'primary' : 'warning'" size="small" variant="light">
+              {{ row.status === 'InUse' ? '使用中' : '已预订' }}
+            </t-tag>
+          </template>
+          <template #timeSlot="{ row }">
+            <span>{{ formatDateTime(row.startTime) }} - {{ formatDateTime(row.endTime) }}</span>
+          </template>
+        </t-table>
+        <t-empty v-if="activeOrders.length === 0" description="当前无使用中或已预订的订单" style="padding:20px" />
+      </t-card>
+
       <!-- 营收卡片 -->
       <t-row :gutter="16" style="margin-bottom:20px">
         <t-col :span="3" v-for="card in revenueCards" :key="card.title">
@@ -371,6 +395,18 @@ const alertColumns = [
 
 // ── Load ──
 
+async function loadActiveOrders() {
+  try {
+    const res = await fetch(localStorage.getItem('erp_api_base') || 'http://localhost:8000' + '/api/operations/active-orders', {
+      headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('erp_api_token') || '') }
+    })
+    if (res.ok) {
+      const data = await res.json()
+      activeOrders.value = data || []
+    }
+  } catch(e) { /* silent */ }
+}
+
 async function loadDashboard() {
   loading.value = true
   loadError.value = ''
@@ -394,7 +430,7 @@ async function loadDashboard() {
   }
 }
 
-onMounted(loadDashboard)
+onMounted(() => { loadDashboard(); loadActiveOrders() })
 </script>
 
 <style scoped>

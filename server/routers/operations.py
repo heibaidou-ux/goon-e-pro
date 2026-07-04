@@ -1706,6 +1706,51 @@ async def update_rectification_task(
 # Dashboard 运营总览
 # ═══════════════════════════════════════════════════════════════
 
+@router.get("/active-orders", dependencies=[Depends(get_optional_user)])
+async def list_active_orders(
+    store_id: Optional[str] = Query(None, alias="storeId"),
+    db: AsyncSession = Depends(get_db),
+):
+    """返回今日使用中和已预订的房间订单，含客户和房间信息。"""
+    today_str = datetime.utcnow().strftime("%Y-%m-%d")
+    q = select(RoomAppointment).where(
+        RoomAppointment.startTime >= today_str,
+        RoomAppointment.status.in_(["Confirmed", "InUse", "Booked"]),
+    ).order_by(RoomAppointment.startTime.asc())
+
+    r = await db.execute(q)
+    items = r.scalars().all()
+
+    result = []
+    for item in items:
+        room_name = ""
+        room_r = await db.execute(select(Room.name).where(Room.roomId == item.roomId))
+        room_rn = room_r.scalar_one_or_none()
+        if room_rn: room_name = room_rn
+
+        # 查询客户信息
+        customer_name = ""
+        customer_phone = ""
+        if item.customerId:
+            cr = await db.execute(select(Customer.name, Customer.phone).where(Customer.customerId == item.customerId))
+            crow = cr.one_or_none()
+            if crow:
+                customer_name = crow[0] or ""
+                customer_phone = crow[1] or ""
+        result.append({
+            "appointmentId": item.appointmentId,
+            "roomId": item.roomId,
+            "roomName": room_name,
+            "customerName": customer_name,
+            "customerPhone": customer_phone,
+            "startTime": item.startTime.isoformat() if item.startTime else "",
+            "endTime": item.endTime.isoformat() if item.endTime else "",
+            "status": item.status,
+            "doorPassword": item.doorPassword or "",
+        })
+    return result
+
+
 @router.get("/dashboard", dependencies=[Depends(get_optional_user)])
 async def operations_dashboard(
     store_id: Optional[str] = Query(None, alias="storeId"),
