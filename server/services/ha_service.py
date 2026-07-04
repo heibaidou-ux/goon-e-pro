@@ -31,7 +31,7 @@ from config import settings
 
 # 485空调网关（VPS内部HTTP API）
 AC_GATEWAY_URL = "http://127.0.0.1:8801"
-AC_ADDR_MAP = {"RM001": 0x09, "RM002": 0x0B, "RM003": 0x0A, "RM004": 0x0C}
+AC_ADDR_MAP = {"RM001": 0x09, "RM002": 0x0A, "RM003": 0x0B, "RM004": 0x0C}
 
 # ERP自动生成的relay_ch{N} → HA实际实体名映射
 _HA_ENTITY_OVERRIDE = {
@@ -67,8 +67,8 @@ _HA_ENTITY_OVERRIDE = {
 
 HA_ROOM_MAP = {
     "RM001": "fengshali",       # 大会议室（丰沙里）
-    "RM002": "bulage",          # 中茶室（布拉格）
-    "RM003": "feilengcui",      # 小茶室（翡冷翠）
+    "RM002": "feilengcui",      # 中茶室（翡冷翠）⚠️已对调
+    "RM003": "bulage",          # 小茶室（布拉格）⚠️已对调
     "RM004": "baishawa",        # 大茶室（白沙瓦）
 }
 HA_ROOM_REVERSE = {v: k for k, v in HA_ROOM_MAP.items()}
@@ -78,8 +78,8 @@ HA_ROOM_REVERSE = {v: k for k, v in HA_ROOM_MAP.items()}
 # ERP内部用无下划线的短名（如 baishawa），需要做映射
 HA_ENTITY_ROOM_MAP = {
     "bai_sha_wa": "baishawa",       # 白沙瓦
-    "bu_la_ge": "bulage",           # 布拉格
-    "fei_leng_cui": "feilengcui",   # 翡冷翠
+    "bu_la_ge": "bulage",           # 布拉格(中茶室)
+    "fei_leng_cui": "feilengcui",   # 翡冷翠(小茶室)
     "feng_sha_li": "fengshali",     # 丰沙里
     # 空调温控器climate实体
     "dacha": "baishawa",
@@ -91,8 +91,8 @@ HA_ENTITY_ROOM_MAP = {
 
 ROOMS = [
     {"room_id": "RM001", "name": "大会议室·丰沙里", "type": "MeetingRoom"},
-    {"room_id": "RM002", "name": "中茶室·布拉格", "type": "TeaRoom"},
-    {"room_id": "RM003", "name": "小茶室·翡冷翠", "type": "TeaRoom"},
+    {"room_id": "RM002", "name": "中茶室·翡冷翠", "type": "TeaRoom"},
+    {"room_id": "RM003", "name": "小茶室·布拉格", "type": "TeaRoom"},
     {"room_id": "RM004", "name": "大茶室·白沙瓦", "type": "TeaRoom"},
 ]
 
@@ -119,8 +119,8 @@ RELAY_CHANNELS = {
 # 窗帘数量配置：房间ID → 窗帘电机数量
 CURTAIN_COUNT = {
     "RM001": 0,  # 丰沙里-无窗帘
-    "RM002": 3,  # 布拉格-3台
-    "RM003": 1,  # 翡冷翠-1台
+    "RM002": 1,  # 翡冷翠-1台（已对调）
+    "RM003": 3,  # 布拉格-3台（已对调）
     "RM004": 3,  # 白沙瓦-3台
 }
 
@@ -452,7 +452,7 @@ async def get_devices(room_id: Optional[str] = None, device_type: Optional[str] 
                     'attributes': {'speed': 0},
                 })
             # 翡冷翠换气扇
-            if 'ExhaustFan' not in types and rid == 'RM003':
+            if 'ExhaustFan' not in types and rid == 'RM002':  # 翡冷翠需要换气扇
                 devices.append({
                     'device_id': 'ef_' + rid, 'room_id': rid,
                     'type': 'ExhaustFan', 'name': room['name'] + '换气扇',
