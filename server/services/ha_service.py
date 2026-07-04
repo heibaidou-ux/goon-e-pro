@@ -33,6 +33,35 @@ from config import settings
 AC_GATEWAY_URL = "http://127.0.0.1:8801"
 AC_ADDR_MAP = {"RM001": 0x09, "RM002": 0x0B, "RM003": 0x0A, "RM004": 0x0C}
 
+# ERP自动生成的relay_ch{N} → HA实际实体名映射
+_HA_ENTITY_OVERRIDE = {
+    # 白沙瓦 (0x11)
+    "baishawa_relay_ch1": "switch.bi_deng",
+    "baishawa_relay_ch2": "switch.tong_deng",
+    "baishawa_relay_ch3": "switch.bei_jing_deng",
+    "baishawa_relay_ch4": "switch.feng_shan",
+    "baishawa_relay_ch5": "switch.gong_fang",
+    # 布拉格 (0x12)
+    "bulage_relay_ch1": "switch.diao_deng",
+    "bulage_relay_ch2": "switch.tong_deng_2",
+    "bulage_relay_ch3": "switch.bei_jing_deng_2",
+    "bulage_relay_ch5": "switch.gong_fang_2",
+    # 翡冷翠 (0x13)
+    "feilengcui_relay_ch1": "switch.diao_deng_2",
+    "feilengcui_relay_ch2": "switch.tong_deng_3",
+    "feilengcui_relay_ch3": "switch.huan_qi_shan",
+    "feilengcui_relay_ch4": "switch.feng_shan_3",
+    "feilengcui_relay_ch6": "switch.gong_fang_zhan",
+    # 丰沙里 (0x10)
+    "fengshali_relay_ch1": "switch.bi_deng_2",
+    "fengshali_relay_ch2": "switch.tong_deng_1",
+    "fengshali_relay_ch4": "switch.diao_deng_3",
+    "fengshali_relay_ch5": "switch.feng_shan_1",
+    "fengshali_relay_ch6": "switch.feng_shan_2_2",
+    "fengshali_relay_ch7": "switch.feng_shan_3_2",
+    "fengshali_relay_ch8": "switch.gong_fang_3",
+}
+
 # ── HA房间名映射（ERP room_id ↔ HA系统名）──
 # 根据 ERP_IoT_API规范.md v1.1
 
@@ -140,6 +169,9 @@ def _build_devices_for_room(room: dict, ha_room: str) -> list[dict]:
     })
     # Relay channels — 根据描述词自动判断设备类型
     for ch_name, ch_desc in relay_config:
+        # 用_HA_ENTITY_OVERRIDE覆盖ha_entity_id（HA实际实体名）
+        override_key = f"{ha_room}_relay_{ch_name}"
+        ha_entity_id = _HA_ENTITY_OVERRIDE.get(override_key, f"switch.{ha_room}_relay_{ch_name}")
         ch_num = ch_name.replace("ch", "")
         # 根据通道描述判断实际设备类型
         ch_desc_lower = ch_desc.lower()
@@ -156,7 +188,7 @@ def _build_devices_for_room(room: dict, ha_room: str) -> list[dict]:
             "room_id": room["room_id"],
             "type": ch_type,
             "name": f"{room['name']}{ch_desc}",
-            "ha_entity_id": f"switch.{ha_room}_relay_{ch_name}",
+            "ha_entity_id": ha_entity_id,
             "protocol": "Modbus",
             "slave_id": None,
             "sub_address": None,
